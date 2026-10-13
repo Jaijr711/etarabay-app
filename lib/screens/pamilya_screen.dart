@@ -13,6 +13,7 @@ import '../widgets/answer_feedback.dart';
 import '../widgets/answer_tile.dart';
 import '../widgets/object_picture.dart';
 import '../widgets/custom_back_button.dart';
+import '../widgets/home_house.dart';
 import '../widgets/success_modal.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../main.dart';
@@ -2770,6 +2771,18 @@ class _PamilyaScreenState extends State<PamilyaScreen>
         },
       ];
 
+  /// The items placed so far, by the room they went into.
+  Map<int, List<String>> _placedSoFar(List challenges) {
+    final placed = <int, List<String>>{};
+    for (int c = 0; c < challenges.length; c++) {
+      if (!_matchedHomeItems.contains(c)) continue;
+      placed
+          .putIfAbsent(challenges[c]['roomIndex'] as int, () => [])
+          .add(challenges[c]['itemEmoji'] as String);
+    }
+    return placed;
+  }
+
   Widget _buildMyHomeGame() {
     final challenges = _homeItemChallenges;
     final isFinished = _matchedHomeItems.length >= challenges.length;
@@ -2894,128 +2907,17 @@ class _PamilyaScreenState extends State<PamilyaScreen>
               ),
               const SizedBox(height: 8),
 
-              Expanded(child: _houseCanvas(challenges)),
+              Expanded(
+                child: HomeHouse(
+                  rooms: _homeRooms,
+                  placed: _placedSoFar(challenges),
+                  onRoomTap: _handleRoomTap,
+                ),
+              ),
             ]),
           ),
         ),
       ]),
-    );
-  }
-
-  /// Roof, walls, rooms, yard.
-  Widget _houseCanvas(List challenges) {
-    final rooms = _homeRooms;
-    // The last room in the data is the yard — it belongs outside the walls,
-    // on the grass, which is the one place a child will look for it.
-    final hasYard = rooms.length > 4;
-    final inside = hasYard ? rooms.sublist(0, rooms.length - 1) : rooms;
-    final yardIndex = hasYard ? rooms.length - 1 : -1;
-
-    return LayoutBuilder(builder: (_, box) {
-      final roofH = box.maxHeight * 0.15;
-      final yardH = hasYard ? box.maxHeight * 0.19 : 0.0;
-      final wallsH = box.maxHeight - roofH - yardH - (hasYard ? 6 : 0);
-
-      return Column(children: [
-        SizedBox(
-          height: roofH,
-          width: double.infinity,
-          child: CustomPaint(painter: _RoofPainter()),
-        ),
-        SizedBox(
-          height: wallsH < 0 ? 0 : wallsH,
-          child: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFF8EF),
-              border: Border.all(color: const Color(0xFFB4835A), width: 3),
-              borderRadius:
-                  const BorderRadius.vertical(bottom: Radius.circular(10)),
-            ),
-            padding: const EdgeInsets.all(6),
-            child: LayoutBuilder(builder: (_, w) {
-              const cols = 2;
-              const gap = 6.0;
-              final rows = (inside.length / cols).ceil();
-              final cellW = (w.maxWidth - gap * (cols - 1)) / cols;
-              final cellH = (w.maxHeight - gap * (rows - 1)) / rows;
-              return GridView.count(
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: cols,
-                childAspectRatio: cellW / (cellH <= 0 ? 1 : cellH),
-                crossAxisSpacing: gap,
-                mainAxisSpacing: gap,
-                children: List.generate(inside.length,
-                    (i) => _roomCell(i, challenges, isYard: false)),
-              );
-            }),
-          ),
-        ),
-        if (hasYard) ...[
-          const SizedBox(height: 6),
-          SizedBox(
-            height: yardH,
-            child: _roomCell(yardIndex, challenges, isYard: true),
-          ),
-        ],
-      ]);
-    });
-  }
-
-  /// One room. Tapping it is the answer.
-  Widget _roomCell(int i, List challenges, {required bool isYard}) {
-    final room = _homeRooms[i];
-    final roomColor = room['color'] as Color;
-
-    final placed = <String>[];
-    for (int c = 0; c < challenges.length; c++) {
-      if (_matchedHomeItems.contains(c) && challenges[c]['roomIndex'] == i) {
-        placed.add(challenges[c]['itemEmoji']);
-      }
-    }
-    final filled = placed.isNotEmpty;
-
-    return GestureDetector(
-      onTap: () => _handleRoomTap(i),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-        decoration: BoxDecoration(
-          color: isYard
-              ? (filled ? const Color(0xFFBFE8C6) : const Color(0xFFD7F0DC))
-              : (filled ? roomColor.withOpacity(0.16) : Colors.white),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: filled ? roomColor : Colors.grey.shade300,
-            width: filled ? 2.5 : 1.5,
-          ),
-        ),
-        // The room's caption used to be a line of 9.5px grey explaining what
-        // the family does there — unreadable, and already said in the pop-up
-        // the moment the room is chosen. Name and contents only.
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ObjectPicture(emoji: room['emoji'] as String, size: 28),
-              const SizedBox(height: 2),
-              Text(
-                room['name'],
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                  color: filled ? roomColor : Colors.grey.shade800,
-                ),
-              ),
-              if (filled) ...[
-                const SizedBox(height: 2),
-                Text(placed.join(' '), style: const TextStyle(fontSize: 15)),
-              ],
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
@@ -3119,42 +3021,4 @@ class _FamilyTreePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_FamilyTreePainter oldDelegate) => false;
-}
-
-/// The roof of "Aming Tahanan", with a chimney.
-class _RoofPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-
-    // Chimney first, so the roof slope covers where it meets the tiles.
-    canvas.drawRect(
-      Rect.fromLTWH(w * 0.72, h * 0.18, w * 0.075, h * 0.7),
-      Paint()..color = const Color(0xFF9E6B4A),
-    );
-
-    final roof = Path()
-      ..moveTo(w * 0.5, 0)
-      ..lineTo(w, h)
-      ..lineTo(0, h)
-      ..close();
-    canvas.drawPath(roof, Paint()..color = const Color(0xFFE07A5F));
-
-    // A couple of tile lines, so the roof is not a flat triangle.
-    final tile = Paint()
-      ..color = const Color(0xFFC96248)
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
-    for (final t in [0.45, 0.72]) {
-      canvas.drawLine(
-        Offset(w * 0.5 - (w * 0.5) * t, h * t),
-        Offset(w * 0.5 + (w * 0.5) * t, h * t),
-        tile,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(_RoofPainter oldDelegate) => false;
 }

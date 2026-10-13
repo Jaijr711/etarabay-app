@@ -1505,7 +1505,7 @@ class PamilyaContent {
       },
       {
         'name': 'The Kitchen',
-        'emoji': '🍳',
+        'emoji': '🍲',
         'activity': 'family cooks and eats together',
         'color': Color(0xFFE67E22)
       },
@@ -1537,7 +1537,7 @@ class PamilyaContent {
       },
       {
         'name': 'Kusina',
-        'emoji': '🍳',
+        'emoji': '🍲',
         'activity': 'pamilya ay nagluluto at kumakain',
         'color': Color(0xFFE67E22)
       },
@@ -1569,7 +1569,7 @@ class PamilyaContent {
       },
       {
         'name': 'Kusina',
-        'emoji': '🍳',
+        'emoji': '🍲',
         'activity': 'nagluto ken kumanen ti pamilya',
         'color': Color(0xFFE67E22)
       },
