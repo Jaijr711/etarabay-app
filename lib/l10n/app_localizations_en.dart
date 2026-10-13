@@ -226,7 +226,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tapLeftTapRight => 'Tap the group (left) → tap the number (right)';
 
   @override
-  String get angAkingSariliTitle => 'Ang Aking Sarili';
+  String get angAkingSariliTitle => 'About Me';
 
   @override
   String get allAboutMe => 'All About Me';
@@ -712,16 +712,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hello => 'Hello!';
 
   @override
-  String get kulaySayaProgress => 'Kulay-Saya Progress';
+  String get kulaySayaProgress => 'Color Fun Progress';
 
   @override
   String get totalSaved => 'Total Saved';
 
   @override
-  String get magbasaProgress => 'Magbasa Progress';
+  String get magbasaProgress => 'Stories and Songs Progress';
 
   @override
-  String get matematikaProgress => 'Matematika Progress';
+  String get matematikaProgress => 'Numbers Progress';
 
   @override
   String get noResults => 'No results';
@@ -848,10 +848,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get overviewTab => 'Overview';
 
   @override
-  String get magbasaTab => 'Magbasa';
+  String get magbasaTab => 'Stories & Songs';
 
   @override
-  String get matematikaTab => 'Matematika';
+  String get matematikaTab => 'Numbers';
 
   @override
   String get artworksLabel => 'Artworks';
@@ -1083,7 +1083,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get parentTipsHeader => 'Tips for Parents';
 
   @override
-  String get tipKulayTitle => 'Kulay-Saya';
+  String get tipKulayTitle => 'Color Fun';
 
   @override
   String get tipKulayBody =>
@@ -1097,14 +1097,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Guide your child in following the correct direction and strokes when tracing each other.';
 
   @override
-  String get tipMagbasaTitle => 'Magbasa';
+  String get tipMagbasaTitle => 'Stories and Songs';
 
   @override
   String get tipMagbasaBody =>
       'Read the poem stories and songs aloud together with your child. Encourage your child to read along.';
 
   @override
-  String get tipMatematikaTitle => 'Matematika';
+  String get tipMatematikaTitle => 'Numbers';
 
   @override
   String get tipMatematikaBody =>
@@ -1226,7 +1226,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get badgeColorsTitle => 'Color Artist';
 
   @override
-  String get badgeColorsHint => 'Collect all 9 stars in Kulay-Saya';
+  String get badgeColorsHint => 'Collect all 9 stars in Color Fun';
 
   @override
   String get badgeShapesTitle => 'Big Letters';
@@ -1869,4 +1869,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get roleAnyAnswer => 'Yes! Every family member can help.';
+
+  @override
+  String get yesAnswer => 'Yes';
+
+  @override
+  String get noAnswer => 'No';
+
+  @override
+  String get resetActivitiesDone => 'The selected activities were reset.';
+
+  @override
+  String get resetActivitiesFailed =>
+      'The activities could not be reset. Please try again.';
 }

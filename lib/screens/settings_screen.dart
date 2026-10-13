@@ -410,7 +410,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _setLanguage(String code) async {
     final provider = Provider.of<LanguageProvider>(context, listen: false);
     await provider.setLanguage(code);
+    if (!mounted) return;
     setState(() {});
+    // The reminders already booked carry the old language's words until
+    // they are booked again, which otherwise waited for the next app start.
+    if (_notificationsEnabled) {
+      final childName =
+          Provider.of<UserProvider>(context, listen: false).userProfile?.name ??
+              '';
+      unawaited(ReminderService.instance
+          .schedule(languageCode: code, childName: childName));
+    }
   }
 
   /// A heading you can find without looking for it.

@@ -30,40 +30,43 @@ class TeacherTools extends StatelessWidget {
             '')
         .toString();
 
+    // Named the way the rest of the app names each module, in the
+    // teacher's own language — these were Tagalog whatever was chosen.
+    final l10n = AppLocalizations.of(context)!;
     final activities = [
       {
         'key': 'matematika',
-        'label': 'Matematika (Numbers & Counting)',
+        'label': l10n.matematika,
         'icon': LucideIcons.calculator,
         'color': Colors.blue
       },
       {
         'key': 'pamilya',
-        'label': 'Aking Sarili at Pamilya',
+        'label': l10n.sariliProgress,
         'icon': LucideIcons.users,
         'color': Colors.purple
       },
       {
         'key': 'traceit',
-        'label': 'Pagsulat / Trace It (Alphabet & Numbers)',
+        'label': l10n.traceItTitle,
         'icon': LucideIcons.pencil,
         'color': Colors.teal
       },
       {
         'key': 'magbasa',
-        'label': 'Magbasa (Kwento, Tula, Kanta)',
+        'label': l10n.magbasaTitle,
         'icon': LucideIcons.book_open,
         'color': Colors.indigo
       },
       {
         'key': 'tandaan',
-        'label': 'Tandaan (Memory Matching Game)',
+        'label': l10n.tandaanTitle,
         'icon': LucideIcons.brain,
         'color': Colors.amber.shade800
       },
       {
         'key': 'kulay',
-        'label': 'Kulayan Mo (Coloring & Art)',
+        'label': l10n.kulaySaya,
         'icon': LucideIcons.palette,
         'color': Colors.pink
       },
@@ -167,8 +170,8 @@ class TeacherTools extends StatelessWidget {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(success
-                                    ? 'Matagumpay na na-reset ang napiling activities.'
-                                    : 'Hindi na-reset ang activities. Subukan muli.'),
+                                    ? l10n.resetActivitiesDone
+                                    : l10n.resetActivitiesFailed),
                                 backgroundColor:
                                     success ? Colors.green : Colors.red,
                               ),
@@ -323,6 +326,27 @@ class TeacherTools extends StatelessWidget {
     );
   }
 
+  /// An artwork's title in the teacher's language, from the page it was
+  /// colored on. The name saved with it is in whatever language the child
+  /// had on at the time.
+  String _artworkName(BuildContext context, Map creation) {
+    final l10n = AppLocalizations.of(context)!;
+    final page = '${creation['sourcePagePath'] ?? ''}';
+    final byPage = <String, String>{
+      'assets/images/paint1.png': l10n.pagePuppy,
+      'assets/images/paint2.png': l10n.pageKuting,
+      'assets/images/paint3.png': l10n.pageElepante,
+      'assets/images/paint4.png': l10n.pageFlowerBasket,
+      'assets/images/paint_daisy.png': l10n.pageFlowerBasket,
+      'assets/images/paint5.png': l10n.pageRose,
+      'assets/images/paint6.png': l10n.pageMansanas,
+      'assets/images/paint7.png': l10n.pageSaging,
+      'assets/images/paint8.png': l10n.pageTeddyBear,
+      'assets/images/paint9.png': l10n.pageSodaPop,
+    };
+    return byPage[page] ?? '${creation['name'] ?? 'Artwork'}';
+  }
+
   Widget _buildArtworksGallery(BuildContext context, List creations) {
     if (creations.isEmpty) {
       return Container(
@@ -354,7 +378,7 @@ class TeacherTools extends StatelessWidget {
         itemBuilder: (context, index) {
           final creation =
               creations[index] is Map ? creations[index] as Map : {};
-          final name = creation['name'] ?? 'Artwork';
+          final name = _artworkName(context, creation);
           final base64Img = creation['base64Image'] as String? ?? '';
           final stars = creation['stars'] as int?;
 

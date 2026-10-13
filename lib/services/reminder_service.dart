@@ -223,15 +223,15 @@ class ReminderService {
           title,
           body,
           when,
-          const NotificationDetails(
+          NotificationDetails(
             android: AndroidNotificationDetails(
               'daily_reminder',
-              'Paalala',
-              channelDescription: 'Araw-araw na paalala mula sa E-Tarabay',
+              _channelText(languageCode, 'daily').$1,
+              channelDescription: _channelText(languageCode, 'daily').$2,
               importance: Importance.defaultImportance,
               priority: Priority.defaultPriority,
             ),
-            iOS: DarwinNotificationDetails(),
+            iOS: const DarwinNotificationDetails(),
           ),
           // Battery-friendly: Android is free to fire this a few minutes
           // late, rather than waking the device precisely on the second —
@@ -312,15 +312,15 @@ class ReminderService {
         title,
         body,
         when,
-        const NotificationDetails(
+        NotificationDetails(
           android: AndroidNotificationDetails(
             'birthday',
-            'Kaarawan',
-            channelDescription: 'Bati sa kaarawan mula sa E-Tarabay',
+            _channelText(languageCode, 'birthday').$1,
+            channelDescription: _channelText(languageCode, 'birthday').$2,
             importance: Importance.high,
             priority: Priority.high,
           ),
-          iOS: DarwinNotificationDetails(),
+          iOS: const DarwinNotificationDetails(),
         ),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         // One specific date, not a rule — see the note above.
@@ -330,6 +330,24 @@ class ReminderService {
     } catch (e) {
       debugPrint('ReminderService.scheduleBirthday: $e');
     }
+  }
+
+  /// The name and description Android shows for each kind of notification
+  /// in the phone's settings. They were Tagalog whatever language was
+  /// chosen; Android renames an existing channel when it is posted to again.
+  (String, String) _channelText(String languageCode, String channel) {
+    final daily = channel == 'daily';
+    return switch (languageCode) {
+      'fil' => daily
+          ? ('Paalala', 'Araw-araw na paalala mula sa E-Tarabay')
+          : ('Kaarawan', 'Bati sa kaarawan mula sa E-Tarabay'),
+      'ilo' => daily
+          ? ('Pakaammo', 'Inaldaw a pakaammo manipud iti E-Tarabay')
+          : ('Kasangay', 'Pakablaaw iti kasangay manipud iti E-Tarabay'),
+      _ => daily
+          ? ('Reminders', 'Daily reminders from E-Tarabay')
+          : ('Birthday', 'Birthday greetings from E-Tarabay'),
+    };
   }
 
   (String, String) _birthdayText(String languageCode, String name) {

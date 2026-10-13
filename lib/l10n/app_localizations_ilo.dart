@@ -1878,4 +1878,18 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String get roleAnyAnswer => 'Wen! Makatulong ti tunggal kameng ti pamilya.';
+
+  @override
+  String get yesAnswer => 'Wen';
+
+  @override
+  String get noAnswer => 'Saan';
+
+  @override
+  String get resetActivitiesDone =>
+      'Nasayaat ti panag-reset kadagiti napili nga aktibidad.';
+
+  @override
+  String get resetActivitiesFailed =>
+      'Saan a na-reset dagiti aktibidad. Padasem manen.';
 }

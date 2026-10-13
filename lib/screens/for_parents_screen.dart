@@ -621,7 +621,7 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
                             size: 20),
                         const SizedBox(width: 10),
                         Expanded(
-                            child: Text(pages[i]['name'] ?? '',
+                            child: Text(_pageLabel(pages[i]['name'] ?? ''),
                                 style: TextStyle(
                                     fontSize: 14,
                                     color:
@@ -2406,6 +2406,35 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
   }
 
   // ── Localized label helpers (keep map keys English for progress lookup) ────
+  /// A coloring page's name in the chosen language. The list above names
+  /// them as written once — Kuting, Elepante, Mansanas — whatever language
+  /// the parent had picked.
+  String _pageLabel(String name) {
+    final loc = AppLocalizations.of(context)!;
+    switch (name) {
+      case 'Puppy':
+        return loc.pagePuppy;
+      case 'Kuting':
+        return loc.pageKuting;
+      case 'Elepante':
+        return loc.pageElepante;
+      case 'Flower':
+        return loc.pageFlowerBasket;
+      case 'Rose':
+        return loc.pageRose;
+      case 'Mansanas':
+        return loc.pageMansanas;
+      case 'Saging':
+        return loc.pageSaging;
+      case 'Teddy Bear':
+        return loc.pageTeddyBear;
+      case 'Soda':
+        return loc.pageSodaPop;
+      default:
+        return name;
+    }
+  }
+
   String _catLabel(String cat) {
     final loc = AppLocalizations.of(context)!;
     switch (cat) {

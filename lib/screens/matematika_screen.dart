@@ -3062,9 +3062,9 @@ class _MatematikaScreenState extends State<MatematikaScreen>
                     onPressed: () => _handleEqualChoice(true),
                     icon: const Icon(LucideIcons.circle_check,
                         color: Colors.white, size: 28),
-                    label: const Text(
-                      'Oo',
-                      style: TextStyle(
+                    label: Text(
+                      AppLocalizations.of(context)!.yesAnswer,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 26,
                         fontWeight: FontWeight.w900,
@@ -3088,9 +3088,9 @@ class _MatematikaScreenState extends State<MatematikaScreen>
                     onPressed: () => _handleEqualChoice(false),
                     icon: const Icon(LucideIcons.circle_x,
                         color: Colors.white, size: 28),
-                    label: const Text(
-                      'Hindi',
-                      style: TextStyle(
+                    label: Text(
+                      AppLocalizations.of(context)!.noAnswer,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 26,
                         fontWeight: FontWeight.w900,

@@ -505,7 +505,7 @@ abstract class AppLocalizations {
   /// No description provided for @angAkingSariliTitle.
   ///
   /// In en, this message translates to:
-  /// **'Ang Aking Sarili'**
+  /// **'About Me'**
   String get angAkingSariliTitle;
 
   /// No description provided for @allAboutMe.
@@ -1412,7 +1412,7 @@ abstract class AppLocalizations {
   /// No description provided for @kulaySayaProgress.
   ///
   /// In en, this message translates to:
-  /// **'Kulay-Saya Progress'**
+  /// **'Color Fun Progress'**
   String get kulaySayaProgress;
 
   /// No description provided for @totalSaved.
@@ -1424,13 +1424,13 @@ abstract class AppLocalizations {
   /// No description provided for @magbasaProgress.
   ///
   /// In en, this message translates to:
-  /// **'Magbasa Progress'**
+  /// **'Stories and Songs Progress'**
   String get magbasaProgress;
 
   /// No description provided for @matematikaProgress.
   ///
   /// In en, this message translates to:
-  /// **'Matematika Progress'**
+  /// **'Numbers Progress'**
   String get matematikaProgress;
 
   /// No description provided for @noResults.
@@ -1670,13 +1670,13 @@ abstract class AppLocalizations {
   /// No description provided for @magbasaTab.
   ///
   /// In en, this message translates to:
-  /// **'Magbasa'**
+  /// **'Stories & Songs'**
   String get magbasaTab;
 
   /// No description provided for @matematikaTab.
   ///
   /// In en, this message translates to:
-  /// **'Matematika'**
+  /// **'Numbers'**
   String get matematikaTab;
 
   /// No description provided for @artworksLabel.
@@ -2108,7 +2108,7 @@ abstract class AppLocalizations {
   /// No description provided for @tipKulayTitle.
   ///
   /// In en, this message translates to:
-  /// **'Kulay-Saya'**
+  /// **'Color Fun'**
   String get tipKulayTitle;
 
   /// No description provided for @tipKulayBody.
@@ -2132,7 +2132,7 @@ abstract class AppLocalizations {
   /// No description provided for @tipMagbasaTitle.
   ///
   /// In en, this message translates to:
-  /// **'Magbasa'**
+  /// **'Stories and Songs'**
   String get tipMagbasaTitle;
 
   /// No description provided for @tipMagbasaBody.
@@ -2144,7 +2144,7 @@ abstract class AppLocalizations {
   /// No description provided for @tipMatematikaTitle.
   ///
   /// In en, this message translates to:
-  /// **'Matematika'**
+  /// **'Numbers'**
   String get tipMatematikaTitle;
 
   /// No description provided for @tipMatematikaBody.
@@ -2354,7 +2354,7 @@ abstract class AppLocalizations {
   /// No description provided for @badgeColorsHint.
   ///
   /// In en, this message translates to:
-  /// **'Collect all 9 stars in Kulay-Saya'**
+  /// **'Collect all 9 stars in Color Fun'**
   String get badgeColorsHint;
 
   /// No description provided for @badgeShapesTitle.
@@ -3508,6 +3508,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Yes! Every family member can help.'**
   String get roleAnyAnswer;
+
+  /// No description provided for @yesAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yesAnswer;
+
+  /// No description provided for @noAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get noAnswer;
+
+  /// No description provided for @resetActivitiesDone.
+  ///
+  /// In en, this message translates to:
+  /// **'The selected activities were reset.'**
+  String get resetActivitiesDone;
+
+  /// No description provided for @resetActivitiesFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The activities could not be reset. Please try again.'**
+  String get resetActivitiesFailed;
 }
 
 class _AppLocalizationsDelegate

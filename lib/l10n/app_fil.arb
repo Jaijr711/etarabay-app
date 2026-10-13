@@ -778,5 +778,9 @@
   "updateLater": "Mamaya na Lang",
   "bgPermissionTitle": "Sabihin Mo kay Mama o Papa!",
   "bgPermissionBody": "Para gumana ang mga paalala, dapat payagan nila ang E-Tarabay sa Battery at Autostart settings ng telepono.",
-  "roleAnyAnswer": "Oo! Makatutulong ang bawat miyembro ng pamilya."
+  "roleAnyAnswer": "Oo! Makatutulong ang bawat miyembro ng pamilya.",
+  "yesAnswer": "Oo",
+  "noAnswer": "Hindi",
+  "resetActivitiesDone": "Matagumpay na na-reset ang napiling activities.",
+  "resetActivitiesFailed": "Hindi na-reset ang activities. Subukan muli."
 }

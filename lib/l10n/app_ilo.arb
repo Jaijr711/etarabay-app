@@ -774,5 +774,9 @@
   "updateLater": "Damdama Laengen",
   "bgPermissionTitle": "Ibagam kenni Nanang wenno Tatang!",
   "bgPermissionBody": "Tapno agtrabaho dagiti paalala, masapul nga palubosanda ti E-Tarabay iti Battery ken Autostart a setting ti telepono.",
-  "roleAnyAnswer": "Wen! Makatulong ti tunggal kameng ti pamilya."
+  "roleAnyAnswer": "Wen! Makatulong ti tunggal kameng ti pamilya.",
+  "yesAnswer": "Wen",
+  "noAnswer": "Saan",
+  "resetActivitiesDone": "Nasayaat ti panag-reset kadagiti napili nga aktibidad.",
+  "resetActivitiesFailed": "Saan a na-reset dagiti aktibidad. Padasem manen."
 }

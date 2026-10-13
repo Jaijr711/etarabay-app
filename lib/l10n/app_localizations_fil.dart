@@ -1886,4 +1886,18 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get roleAnyAnswer => 'Oo! Makatutulong ang bawat miyembro ng pamilya.';
+
+  @override
+  String get yesAnswer => 'Oo';
+
+  @override
+  String get noAnswer => 'Hindi';
+
+  @override
+  String get resetActivitiesDone =>
+      'Matagumpay na na-reset ang napiling activities.';
+
+  @override
+  String get resetActivitiesFailed =>
+      'Hindi na-reset ang activities. Subukan muli.';
 }
