@@ -292,12 +292,13 @@ void _showErrorsOnScreen() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    final info = await PackageInfo.fromPlatform();
+  // Not awaited: only the on-screen error report reads this label, and it
+  // was costing every launch a platform round-trip before the first frame.
+  PackageInfo.fromPlatform().then((info) {
     _diagnosticBuildLabel = '${info.version}+${info.buildNumber}';
-  } catch (e) {
+  }).catchError((Object e) {
     debugPrint('PackageInfo unavailable: $e');
-  }
+  });
   _showErrorsOnScreen();
 
   // Portrait only.
@@ -315,6 +316,18 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+
+  // Local storage opens alongside Firebase rather than after it: the two do
+  // not depend on each other, and on a slow phone each is a noticeable wait.
+  final localStorageReady = () async {
+    await Hive.initFlutter();
+    await Future.wait([
+      Hive.openBox('userProfile'),
+      Hive.openBox('userProgress'),
+      Hive.openBox('settings'),
+    ]);
+  }();
+  final prefsReady = SharedPreferences.getInstance();
 
   // Initialize Firebase
   try {
@@ -335,31 +348,25 @@ void main() async {
     // This is additive — students are still identified by their Firestore
     // record — but it lets us secure Firestore behind authentication later.
     // Fails gracefully (e.g. offline first-run, or provider disabled).
-    try {
-      if (FirebaseAuth.instance.currentUser == null) {
-        // This sits in front of runApp(), so anything it waits on is time the
-        // child spends looking at a blank screen. Offline the call can hang
-        // for as long as the platform's own retry policy allows. Signing in
-        // is not needed to play, so give it a short leash and move on.
-        await FirebaseAuth.instance
-            .signInAnonymously()
-            .timeout(const Duration(seconds: 5));
-      }
-    } catch (e) {
-      debugPrint('Anonymous auth skipped: $e');
+    //
+    // Not awaited. It used to sit in front of runApp() with a five-second
+    // timeout, so a first launch on a weak signal showed a blank screen for
+    // up to five seconds before anything else happened. Signing in is not
+    // needed to play; it finishes in the background.
+    if (FirebaseAuth.instance.currentUser == null) {
+      unawaited(FirebaseAuth.instance
+          .signInAnonymously()
+          .timeout(const Duration(seconds: 15))
+          .then((_) {}, onError: (Object e) {
+        debugPrint('Anonymous auth skipped: $e');
+      }));
     }
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
   }
 
-  // Initialize Hive for local storage
-  await Hive.initFlutter();
-  await Hive.openBox('userProfile');
-  await Hive.openBox('userProgress');
-  await Hive.openBox('settings');
-
-  // Initialize SharedPreferences early
-  final prefs = await SharedPreferences.getInstance();
+  await localStorageReady;
+  final prefs = await prefsReady;
   final savedLanguage = prefs.getString('language') ?? 'en';
 
   // Initialize UserProvider and wait for its internal async setup

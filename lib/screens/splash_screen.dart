@@ -31,23 +31,28 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkUserLoggedIn() async {
-    await Future.delayed(const Duration(seconds: 3));
-
-    if (!mounted) return;
-
+    // Leave as soon as the app is ready, with a short floor so the logo is
+    // seen rather than flashed. This was a flat three seconds on every open
+    // — on a fast phone that was three seconds of nothing, and on a slow one
+    // it came on top of the provider's own load (waited for below).
+    final shown = Stopwatch()..start();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     final prefs = await SharedPreferences.getInstance();
     final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
 
-    if (!mounted) return;
-
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-
-    // Smart Login: Ensure UserProvider is fully initialized before checking session
+    // Smart Login: Ensure UserProvider is fully initialized before checking
+    // session — polled briefly, never more than about three seconds.
     int retryCount = 0;
-    while (!userProvider.isInitialized && retryCount < 10) {
-      await Future.delayed(const Duration(milliseconds: 200));
+    while (!userProvider.isInitialized && retryCount < 30) {
+      await Future.delayed(const Duration(milliseconds: 100));
       retryCount++;
     }
+    const minShown = Duration(milliseconds: 900);
+    if (shown.elapsed < minShown) {
+      await Future.delayed(minShown - shown.elapsed);
+    }
+
+    if (!mounted) return;
 
     if (!mounted) return;
 
