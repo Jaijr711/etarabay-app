@@ -933,7 +933,7 @@ class AppLocalizationsFil extends AppLocalizations {
   String get pageElepante => 'Elepante';
 
   @override
-  String get pageFlowerBasket => 'Basket ng mga Bulaklak';
+  String get pageFlowerBasket => 'Bulaklak';
 
   @override
   String get pageRose => 'Rosas';

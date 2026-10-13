@@ -709,7 +709,10 @@ class _KulayScreenState extends State<KulayScreen>
   static const Map<String, int> _pictureRevisions = {
     // The flower in a pot (paint4.png) became a daisy (2026-10-13). The daisy
     // has its own file name: browsers had cached paint4.png and kept showing
-    // the pot. paint4.png stays for creations already saved from it.
+    // the pot. The pot itself was then removed; it is still named in the
+    // page's formerImagePaths so creations saved from it stay its own.
+    // The page is shown as "Flower" but keeps this name, which its saves
+    // are filed under.
     'Flower Basket': 2,
   };
 
@@ -1333,7 +1336,17 @@ class _KulayScreenState extends State<KulayScreen>
       }
     }
 
-    Widget asset(String path) => Image.asset(path,
+    // A former picture is no longer in the app; its page's current one is.
+    String current(String path) {
+      for (final cat in _categories) {
+        for (final page in cat.pages) {
+          if (page.formerImagePaths.contains(path)) return page.imagePath;
+        }
+      }
+      return path;
+    }
+
+    Widget asset(String path) => Image.asset(current(path),
         fit: BoxFit.contain,
         filterQuality: FilterQuality.high,
         errorBuilder: (_, __, ___) => fallback());

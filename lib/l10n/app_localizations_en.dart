@@ -925,7 +925,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pageElepante => 'Elephant';
 
   @override
-  String get pageFlowerBasket => 'Flower Basket';
+  String get pageFlowerBasket => 'Flower';
 
   @override
   String get pageRose => 'Rose';

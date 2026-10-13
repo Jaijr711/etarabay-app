@@ -928,7 +928,7 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get pageElepante => 'Elepante';
 
   @override
-  String get pageFlowerBasket => 'Basket ti Sabong';
+  String get pageFlowerBasket => 'Sabong';
 
   @override
   String get pageRose => 'Rosas';

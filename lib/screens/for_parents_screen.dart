@@ -167,7 +167,7 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
       {'name': 'Elepante', 'difficulty': 'Medium'},
     ],
     'Flowers': [
-      {'name': 'Flower Basket', 'difficulty': 'Medium'},
+      {'name': 'Flower', 'difficulty': 'Medium'},
       {'name': 'Rose', 'difficulty': 'Hard'},
     ],
     'Fruits': [

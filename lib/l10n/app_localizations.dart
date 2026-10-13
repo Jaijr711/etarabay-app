@@ -1820,7 +1820,7 @@ abstract class AppLocalizations {
   /// No description provided for @pageFlowerBasket.
   ///
   /// In en, this message translates to:
-  /// **'Flower Basket'**
+  /// **'Flower'**
   String get pageFlowerBasket;
 
   /// No description provided for @pageRose.
