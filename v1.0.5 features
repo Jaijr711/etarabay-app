@@ -1,0 +1,32 @@
+# E-Tarabay v1.0.5 Feature Request Checklist & Progress Status
+
+## 1. Authentication & Profile Updates
+- [x] **Item 1. Add middle name in login or account creation**: Included middle name field during registration/account setup and reflected in student/user profile schema (`UserProfile`, `UserProvider`, `AuthService`, `TeacherDashboard`).
+- [x] **Item 10. Password format**: Standardized password format to `DC-2026-0001` (`DC-YYYY-XXXX`) format rules with validation against repeated digit patterns (`0000`, `1111`).
+- [x] **Item 17. Student profile birthday format**: Updated birthday selection and profile display format to explicitly include month name (`MMMM dd, yyyy`).
+
+## 2. Progress Tracking & Teacher Dashboard Integration
+- [x] **Item 8. Yellow star completion indicator**: Filled activity completion star with yellow color (`#FFD700`) upon completing activities.
+- [x] **Item 15. Coloring activity progress connection**: Connected student coloring activity completion and state to `UserProvider` progress tracking.
+- [x] **Item 16. Comprehensive progress tracking**: Ensured all student progress metrics sync to Firestore and are viewable in real-time on the teacher dashboard.
+
+## 3. Audio & Soundtrack Enhancements
+- [x] **Item 5. Remove legacy background song**: Remove existing background music track.
+- [ ] **Item 6. Voice over integration**: Insert provided voice recordings into lesson and activity modules.
+- [x] **Item 7. Change overall music**: Replace existing audio with a motivated and upbeat soundtrack.
+
+## 4. UI/UX & Visual Design Polish
+- [x] **Item 2. App color palette**: Selected vibrant, harmonious app colors (`AppColors` indigo `#5C52E5`, warm rose `#FF5B79`, gold `#FFD700`) matching game and educational context.
+- [x] **Item 4. Logo presentation**: Ensured transparent logo (`splash_logo.png`) displays cleanly without JPG borders on white backgrounds.
+- [x] **Item 9. Proper alignment**: Audited screen layouts (`SingleChildScrollView`, card paddings, button heights) preventing text/icon overlaps and cut-offs.
+- [x] **Item 11. Professional & Clean UI Design**: Upgraded theme card, input decoration, and button styles for clean, error-free, motivated UI layout.
+- [x] **Item 12. Super high quality**: Elevated visual standard across assets, card themes, and typography hierarchy.
+- [x] **Item 13. Presentable font style**: Configured clear text theme hierarchy with continuous lines for optimal legibility across languages.
+- [x] **Item 14. Smoother UX & Animations**: Refined smooth scale/fade animations (`flutter_animate`) and transition feedback for optimal responsiveness.
+- [x] **Item 18. Professional overall design**: Maintained consistent theme styling, rounded corners, and shadow elevation across screens.
+
+## 5. Localization & Content Accuracy
+- [x] **Item 3. Ilocano validator & multi-language review**: Validated all Ilocano phrasing, spelling, and translations alongside English and Tagalog/Filipino strings, eliminating Tagalog leaks (`mali` -> `saan nga umiso`, `kaliwa` -> `kanigid`, `kanan` -> `kanawan`).
+
+## 6. Development Commitment
+- [ ] **Item 19. Delivery**: Execute with best effort for high-quality delivery in v1.0.5 release.

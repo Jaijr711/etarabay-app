@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12 and newer read this instead of android:fullBackupContent.
+
+  Nothing is backed up and nothing is transferred to a new device. A pupil's
+  account is issued by their teacher and their progress is kept in Firestore,
+  so the local copy is a cache — restoring it onto a fresh install would put
+  the previous pupil's record into the next pupil's app.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+    </device-transfer>
+</data-extraction-rules>

@@ -1,0 +1,821 @@
+{
+  "@@locale": "en",
+  "back": "Back",
+  "done": "Done",
+  "save": "Save",
+  "cancel": "Cancel",
+  "next": "Next",
+  "levelCompleted": "Level {level} Completed!",
+  "@levelCompleted": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "proudOfYou": "I am proud of you!",
+  "alreadyDone": "You already finished this!",
+  "categoryCompleted": "You completed all levels in {cat}!",
+  "@categoryCompleted": {
+    "placeholders": {
+      "cat": {
+        "type": "String"
+      }
+    }
+  },
+  "finished": "Finished! 🏆",
+  "previous": "Previous",
+  "completed": "Completed",
+  "inProgress": "In Progress",
+  "earned": "earned",
+  "levels": "Levels",
+  "activities": "activities",
+  "appTitle": "E-Tarabay",
+  "parents": "PARENTS",
+  "lessons": "Lessons",
+  "stars": "Stars",
+  "awards": "Awards",
+  "homeAge": "Age {age}",
+  "@homeAge": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "matematika": "Mathematics",
+  "sundanMoKayaMo": "Follow Me, You Can Do It!",
+  "angAkingSarili": "About\nMyself",
+  "atAkingPamilya": "And My Family",
+  "kulaySaya": "Color Fun",
+  "magkulayTayo": "Let's Color!",
+  "sundanMo": "Follow Me,",
+  "magbasaTitle": "Let's Read",
+  "alpabetoAtMgaSalita": "Poems, Stories and Songs",
+  "home": "Home",
+  "profile": "Profile",
+  "videoDance": "Video Dance",
+  "settingsTitle": "Settings",
+  "totalProgress": "Total Progress",
+  "poems": "Poems",
+  "stories": "Stories",
+  "songs": "Songs",
+  "readStory": "Read Story",
+  "listenToSong": "Listen to Song",
+  "readPoem": "Read Poem",
+  "swipeToRead": "Swipe to read",
+  "tune": "Tune",
+  "action": "Action",
+  "counting": "Count the Objects",
+  "dragNumber": "Drag the Number",
+  "lineMatch": "Match with Line",
+  "popBalloon": "Pop the Balloon",
+  "moreOrLess": "More or Less?",
+  "numberPuzzle": "Number Puzzle",
+  "numberSequence": "Number Sequence",
+  "chooseAnswer": "Choose the correct answer:",
+  "check": "Check",
+  "correct": "Correct!",
+  "wrong": "Wrong! Try again!",
+  "timeOut": "Time's up! Try again.",
+  "level": "Level {level}",
+  "levelShort": "L",
+  "@level": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "perfect": "Perfect!",
+  "great": "Great!",
+  "good": "Good!",
+  "mathPoints": "+{points} points",
+  "@mathPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "streak": "{streak} day streak!",
+  "@streak": {
+    "placeholders": {
+      "streak": {
+        "type": "int"
+      }
+    }
+  },
+  "mathTotalScore": "Total Score",
+  "mathTotalStars": "Total Stars",
+  "repeat": "Repeat",
+  "nextLevel": "Next Level",
+  "congratulations": "Congratulations!",
+  "completedAllLevels": "You completed all levels!",
+  "chooseFirst": "Choose an answer first!",
+  "chooseLeftFirst": "Choose a number on the left first!",
+  "dropHere": "Drop here!",
+  "dragHere": "Drag here",
+  "tapLeftThenRight": "Tap left then right",
+  "matched": "matched",
+  "popAllBalloonsWith": "Pop all balloons with",
+  "left": "Left",
+  "right": "Right",
+  "theyAreEqual": "They are equal!",
+  "tapTwoToSwap": "Tap two numbers to swap",
+  "correctOrder": "Correct order",
+  "selected": "Selected",
+  "tapAnotherToSwap": "tap another to swap",
+  "whatsMissing": "What\\'s missing?",
+  "noGames": "No games available",
+  "howMany": "How many {item}?",
+  "@howMany": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "matchWithNumber": "Match the {category} with the correct number",
+  "@matchWithNumber": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "whichIsMore": "Which is more?",
+  "whichIsLess": "Which is less?",
+  "isSameNumber": "Same number?",
+  "arrange": "Arrange: {sequence}",
+  "@arrange": {
+    "placeholders": {
+      "sequence": {
+        "type": "String"
+      }
+    }
+  },
+  "incorrectAnswer": "❌ INCORRECT ANSWER",
+  "selectCorrectAnswer": "Select the correct answer:",
+  "tryAgain": "Try Again",
+  "tapLeftTapRight": "Tap the group (left) → tap the number (right)",
+  "angAkingSariliTitle": "Ang Aking Sarili",
+  "angAkingPamilyaTitle": "Ang Aking Pamilya",
+  "allAboutMe": "All About Me",
+  "myEmotions": "My Emotions",
+  "dailyRoutines": "Daily Routines",
+  "myPreferences": "My Preferences",
+  "familyMembers": "Family Members",
+  "familyRoles": "Family Roles",
+  "familyActivities": "Family Activities",
+  "familyTree": "Family Tree",
+  "myHome": "My Home",
+  "whatIsYourName": "What is your name?",
+  "howOldAreYou": "How old are you?",
+  "areYouBoyOrGirl": "Are you a boy or a girl?",
+  "girl": "Girl",
+  "boy": "Boy",
+  "whatIsYourNameDescription": "Your name is what your family and friends call you. It is important!",
+  "howOldAreYouDescription": "Your age is the number of years since you were born. Celebrate every year!",
+  "genderDescription": "Knowing if you are a boy or a girl helps us know more about you!",
+  "typeNameHint": "Type your name here",
+  "ageHint": "Example: 5, 7, 10",
+  "girlLabel": "👧 Girl",
+  "boyLabel": "👦 Boy",
+  "aboutMeSubtitle": "All About Me",
+  "myEmotionsSubtitle": "Explain your feelings",
+  "dailyRoutinesSubtitle": "Learn daily activities",
+  "myPreferencesSubtitle": "What do you like?",
+  "familyMembersSubtitle": "Who are your family members?",
+  "familyRolesSubtitle": "What is everyone\\'s job?",
+  "familyActivitiesSubtitle": "What do you do together?",
+  "familyTreeSubtitle": "Who are your relatives?",
+  "myHomeSubtitle": "Where do you live?",
+  "emotionHappyQuestion": "When are you HAPPY?",
+  "emotionSadQuestion": "When are you SAD?",
+  "emotionAngryQuestion": "When are you ANGRY?",
+  "emotionSurprisedQuestion": "When are you SURPRISED?",
+  "routineWakeUp": "Wake up in the morning",
+  "routineBrushTeeth": "Brush your teeth",
+  "routineTakeBath": "Take a bath",
+  "routineEatBreakfast": "Eat breakfast",
+  "preferenceFood": "What is your favorite food?",
+  "preferenceColor": "What is your favorite color?",
+  "whenIsYourBirthday": "When is your birthday?",
+  "whereDoYouLive": "Where do you live?",
+  "happy": "Happy",
+  "sad": "Sad",
+  "angry": "Angry",
+  "surprised": "Surprised",
+  "sleepy": "Sleepy",
+  "scared": "Scared",
+  "mother": "Mother",
+  "father": "Father",
+  "olderBrother": "Older Brother",
+  "olderSister": "Older Sister",
+  "youngerSibling": "Younger Sibling",
+  "grandfather": "Grandfather",
+  "grandmother": "Grandmother",
+  "searchColoringPages": "Search coloring pages...",
+  "beautifulArtwork": "Beautiful Artwork!",
+  "finishedColoring": "You finished coloring {name}!",
+  "@finishedColoring": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "saveYourArtwork": "Save Your Artwork",
+  "giveArtworkName": "Give your artwork a name...",
+  "colorSomethingFirst": "Color something first!",
+  "justNow": "just now",
+  "timeAgo": "${amount}m ago",
+  "@timeAgo": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "saved": "Saved!",
+  "others": "Others",
+  "coloringBook": "Coloring Book",
+  "myCreations": "My Creations",
+  "color": "Color",
+  "animals": "Animals",
+  "flowers": "Flowers",
+  "fruits": "Fruits",
+  "toys": "Toys",
+  "red": "Red",
+  "blue": "Blue",
+  "green": "Green",
+  "yellow": "Yellow",
+  "orange": "Orange",
+  "purple": "Purple",
+  "pink": "Pink",
+  "brown": "Brown",
+  "black": "Black",
+  "white": "White",
+  "easy": "Easy",
+  "medium": "Medium",
+  "hard": "Hard",
+  "brush": "Brush",
+  "eraser": "Eraser",
+  "undo": "Undo",
+  "redo": "Redo",
+  "clear": "Clear",
+  "surotemKabaelam": "Trace It, You Can Do It!",
+  "upper": "Upper",
+  "lower": "Lower",
+  "letterLabel": "Letter {letter}",
+  "@letterLabel": {
+    "placeholders": {
+      "letter": {
+        "type": "String"
+      }
+    }
+  },
+  "pointsLabel": "Points",
+  "goodJob": "Good Job! 🌟",
+  "ulitin": "Repeat",
+  "traceTitle": "Follow Me, You Can Do It!",
+  "uppercase": "Uppercase",
+  "lowercase": "Lowercase",
+  "numbers": "Numbers",
+  "letter": "Letter {letter}",
+  "@letter": {
+    "placeholders": {
+      "letter": {
+        "type": "String"
+      }
+    }
+  },
+  "sundanPoints": "Points",
+  "reset": "Reset",
+  "finishedThisLetter": "You finished this letter!",
+  "goodJobPoints": "🌟 Good Job! +{points} points",
+  "@goodJobPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "tooHardSwitch": "Too hard? Let\\'s try the next one!",
+  "reTrace": "Re-trace",
+  "forParentsTitle": "For Parents",
+  "overallProgress": "Overall Progress",
+  "tula": "Poems",
+  "kwento": "Stories",
+  "kanta": "Songs",
+  "uppercaseProgress": "Uppercase",
+  "lowercaseProgress": "Lowercase",
+  "numbersProgress": "Numbers",
+  "basicColors": "Basic Colors",
+  "colorMixing": "Color Mixing",
+  "colorObjects": "Color Objects",
+  "completedLevels": "Completed Levels",
+  "gamesCompleted": "Games Completed",
+  "parentsTotalScore": "Total Score",
+  "currentStreak": "Current Streak",
+  "days": "{days} days",
+  "@days": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "parentsTotalStars": "Total Stars",
+  "badges": "badges",
+  "myProfile": "My Profile",
+  "yearsOld": "{age} years old",
+  "@yearsOld": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "male": "Male",
+  "female": "Female",
+  "birthday": "Birthday",
+  "profileAge": "Age",
+  "gender": "Gender",
+  "memberSince": "Member Since",
+  "editProfile": "Edit Profile",
+  "noProfileData": "No profile data",
+  "comingSoon": "Coming soon!",
+  "settings": "Settings",
+  "language": "Language",
+  "sound": "Sound",
+  "music": "Music",
+  "notifications": "Notifications",
+  "achievements": "Achievements",
+  "firstSteps": "First Steps",
+  "alphabetMaster": "Alphabet Master",
+  "numberWizard": "Number Wizard",
+  "colorArtist": "Color Artist",
+  "shapeCreator": "Shape Creator",
+  "animalFriend": "Animal Friend",
+  "bookworm": "Bookworm",
+  "starStudent": "Star Student",
+  "mathWhiz": "Math Whiz",
+  "familyHero": "Family Hero",
+  "writingStar": "Writing Star",
+  "songbird": "Songbird",
+  "perfectScore": "Perfect Score",
+  "firstStepsDesc": "Complete your first activity",
+  "alphabetMasterDesc": "Complete all Magbasa Tayo activities",
+  "numberWizardDesc": "Complete 20 Matematika games",
+  "colorArtistDesc": "Complete all Kulay-Saya activities",
+  "shapeCreatorDesc": "Complete all uppercase letters",
+  "animalFriendDesc": "Complete all lowercase letters",
+  "bookwormDesc": "Complete all stories",
+  "starStudentDesc": "Complete 20 Ang Aking Sarili games",
+  "familyHeroDesc": "Complete all family levels",
+  "writingStarDesc": "Trace all letters and numbers",
+  "songbirdDesc": "Learn all 13 songs",
+  "perfectScoreDesc": "Get perfect score in 3 games",
+  "noAwardsYet": "No Awards Yet",
+  "completeActivitiesToEarn": "Complete activities to earn awards!",
+  "teacherDashboard": "Teacher Dashboard",
+  "enrollStudent": "Enroll Student",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "lRN": "LRN (Password)",
+  "usernameLabel": "Username (Auto-generated)",
+  "genderLabel": "Gender",
+  "studentInfo": "Student Info",
+  "removeStudent": "Remove Student?",
+  "progressLabel": "Progress",
+  "logout": "Logout",
+  "confirmLogout": "Are you sure you want to log out?",
+  "verifyLRN": "Verify LRN",
+  "enterLRN": "Please enter your LRN to proceed",
+  "invalidLRN": "Invalid LRN. Please try again.",
+  "password": "Password",
+  "enrollmentInfo": "Give the username and LRN to the parent/student for login.",
+  "fillAllFields": "Please fill in all fields.",
+  "parentsInfo": "Parents Info",
+  "parentNameLabel": "Parent's Name",
+  "parentContactLabel": "Parent's Contact (11 digits)",
+  "contactLengthError": "Contact number must be exactly 11 digits.",
+  "birthdayGreeting": "Happy Birthday, {name}!",
+  "@birthdayGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "swipeToDeleteGuide": "Swipe left on a student to delete",
+  "enrollmentFailed": "Enrollment failed.",
+  "enroll": "Enroll",
+  "studentEnrolled": "Student Enrolled!",
+  "studentEnrolledSuccessfully": "{name} has been enrolled successfully.",
+  "@studentEnrolledSuccessfully": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "loginCredentials": "Login Credentials:",
+  "userLabel": "User:",
+  "usernameCopied": "Username copied!",
+  "passwordLabel": "Pass:",
+  "passwordCopied": "Password copied!",
+  "fullName": "Full Name",
+  "lRNPassword": "LRN (Password)",
+  "confirmRemoveStudent": "Are you sure you want to remove this student? This cannot be undone.",
+  "remove": "Remove",
+  "update": "Update",
+  "refresh": "Refresh",
+  "copied": "Copied!",
+  "noStudentsEnrolled": "No students enrolled yet.",
+  "tapToEnroll": "Tap \"Enroll Student\" to add one.",
+  "usernameHeader": "Username:",
+  "studentProgressTitle": "{name}'s Progress",
+  "@studentProgressTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "moduleBreakdown": "Module Breakdown",
+  "scoreLabel": "Score: {score}",
+  "@scoreLabel": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "welcome": "Welcome Back!",
+  "loginPrompt": "Log in to continue your learning journey",
+  "loginButton": "Log In",
+  "teacherLoginButton": "Continue as Teacher",
+  "enterUsernamePassword": "Please enter both username and password.",
+  "loginError": "Login failed. Please try again.",
+  "username": "Username",
+  "teacherLoginTitle": "Teacher Login",
+  "teacherLoginPrompt": "Enter your teacher credentials to continue",
+  "teacherLoginButtonLabel": "Log In as Teacher",
+  "invalidTeacherCredentials": "Invalid teacher credentials. Please try again.",
+  "monthName": "Not set",
+  "@monthName": {
+    "placeholders": {
+      "month": {
+        "type": "int"
+      }
+    }
+  },
+  "notSet": "Not Set",
+  "saveChanges": "Save Changes",
+  "enterName": "Enter your name",
+  "chooseLanguage": "Choose Language",
+  "getStarted": "Get Started",
+  "nextLevelLearningTitle": "Next Level Learning",
+  "nextLevelLearningDesc": "Fun and interactive games for kids to learn and grow.",
+  "learnAnywhereTitle": "Learn Anywhere",
+  "learnAnywhereDesc": "Access lessons offline and keep learning on the go.",
+  "trackProgressTitle": "Track Progress",
+  "trackProgressDesc": "See how well your child is doing with smart progress tracking.",
+  "welcomeOnboardingTitle": "Welcome to E-Tarabay",
+  "welcomeOnboardingDesc": "Your intelligent companion in learning and discovering the world.",
+  "continueText": "Continue",
+  "forParents": "For Parents",
+  "hello": "Hello!",
+  "kulaySayaProgress": "Kulay-Saya Progress",
+  "totalSaved": "Total Saved",
+  "sundanMoProgress": "Sundan Mo Progress",
+  "magbasaProgress": "Magbasa Progress",
+  "matematikaProgress": "Matematika Progress",
+  "noResults": "No results",
+  "greatWorkKulay": "Finished! Great Work! 🌟",
+  "imageNotFound": "Image not found",
+  "clearCanvasQuestion": "Clear Canvas?",
+  "eraseColoringWarning": "This will erase all your coloring.",
+  "noArtworksYet": "No artworks yet.",
+  "colorPagePrompt": "Color a page\nand save your artwork!",
+  "startColoring": "Start Coloring",
+  "edit": "Edit",
+  "lessonFinishedPrompt": "You finished this lesson! Great job! Choose another game.",
+  "okButton": "OK",
+  "storyFinishedGreatJob": "Great job! You finished the story!",
+  "finishedExclamation": "Finished!",
+  "readingFinishedGood": "✓ Finished! Good reading!",
+  "readingFinishedHappy": "✓ Finished! Happy reading!",
+  "poemFinishedGreatJob": "Great job! You finished the poem!",
+  "doneAlready": "Done already!",
+  "checkAnswer": "Check",
+  "noGamesAvailable2": "No games available",
+  "countAndDragCorrectNumber": "Count and drag the correct number!",
+  "theyAreSame": "They are the same! ✓",
+  "whatIsMissingNumber": "What is the missing number?",
+  "badgesWithIcon": "🏅 Badges",
+  "straightOrCorrect": "Correct!",
+  "iKnowIt": "I learned it!",
+  "familyTreeTitle": "Family Tree",
+  "familyTreeDesc": "The family tree shows your family members from oldest to youngest.",
+  "familyTreeTapHint": "💡 Tap the members to know their relationship!",
+  "iLearnedFamilyTree": "I learned the Family Tree!",
+  "ourHomeTitle": "Our Home",
+  "tapEachRoomPrompt": "Tap each room to know what you do here!",
+  "thatIsOurHome": "That is our home!",
+  "startOnLine": "Start on the line!",
+  "stayInsideLine": "Stay inside the line!",
+  "invalidInput": "Invalid input",
+  "tooShort": "Answer too short",
+  "selectAnswer": "Please select an answer",
+  "badgeKnowMyself": "Know Myself",
+  "badgeEmotionExpert": "Emotion Expert",
+  "badgeRoutineExpert": "Routine Expert",
+  "badgePreferenceExpert": "Preference Expert",
+  "badgeMemberExpert": "Member Expert",
+  "badgeWorkExpert": "Work Expert",
+  "badgeActivityExpert": "Activity Expert",
+  "badgeTreeExpert": "Tree Expert",
+  "badgeHouseExpert": "House Expert",
+  "forParentsSubtitle": "Here is your child's progress on E-Tarabay.",
+  "artworks": "artworks",
+  "error": "Error",
+  "recentActivity": "Recent Activity",
+  "recentColor": "Recent Color",
+  "unknownStudent": "Unknown Student",
+  "achievementFirstSteps": "First Steps",
+  "achievementAlphabetMaster": "Alphabet Master",
+  "achievementNumberWizard": "Number Wizard",
+  "achievementColorArtist": "Color Artist",
+  "achievementShapeCreator": "Shape Creator",
+  "achievementAnimalFriend": "Animal Friend",
+  "achievementBookworm": "Bookworm",
+  "achievementMathWhiz": "Math Whiz",
+  "achievementFamilyHero": "Family Hero",
+  "achievementWritingStar": "Writing Star",
+  "achievementSongbird": "Songbird",
+  "achievementStarStudent": "Star Student",
+  "version": "Version",
+  "backgroundMusicPlaying": "Background music playing",
+  "myArtworkDefault": "My Art",
+  "errorSaveLocal": "Could not save artwork locally.",
+  "finishedAlready": "Finished already!",
+  "zoomMode": "Zoom mode: Multi-touch allowed",
+  "brushMode": "Brush mode: Click to color",
+  "accessExpired": "Your access to this app has ended. Please consult your Teacher for the next steps.",
+  "colorsLabel": "colors",
+  "overviewTab": "Overview",
+  "sundanMoTab": "Sundan Mo",
+  "magbasaTab": "Magbasa",
+  "matematikaTab": "Matematika",
+  "artworksLabel": "Mga Obra",
+  "attemptsLabel": "Mga Subukan",
+  "pagesLabel": "pages",
+  "lettersLabel": "letters",
+  "diffEasy": "Easy",
+  "diffMedium": "Medium",
+  "diffHard": "Hard",
+  "catAnimals": "Animals",
+  "catFlowers": "Flowers",
+  "catFruits": "Fruits",
+  "catToys": "Toys",
+  "poemLabel": "Poem",
+  "storyLabel": "Story",
+  "songLabel": "Song",
+  "activitiesLabel": "activities",
+  "gamesLabel": "games",
+  "savedCountLabel": "saved",
+  "attemptsCountLabel": "attempts",
+  "uppercaseLettersTitle": "Uppercase Letters (A–Z)",
+  "lowercaseLettersTitle": "Lowercase Letters (a–z)",
+  "numbersTitle": "Numbers (1–10)",
+  "levelComplete": "Level {level} Complete!",
+  "@levelComplete": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementFirstStepsDesc": "Complete your first activity",
+  "achievementAlphabetMasterDesc": "Complete all Magbasa Tayo activities",
+  "achievementNumberWizardDesc": "Complete 20 Matematika games",
+  "achievementColorArtistDesc": "Complete all Kulay-Saya activities",
+  "achievementShapeCreatorDesc": "Complete all uppercase letters",
+  "achievementAnimalFriendDesc": "Complete all lowercase letters",
+  "achievementBookwormDesc": "Complete all stories",
+  "achievementMathWhizDesc": "Complete all Matematika levels",
+  "achievementFamilyHeroDesc": "Complete all Ang Aking Sarili levels",
+  "achievementWritingStarDesc": "Complete all numbers",
+  "achievementSongbirdDesc": "Complete 10 songs",
+  "pagePuppy": "Puppy",
+  "pageKuting": "Cat",
+  "pageElepante": "Elephant",
+  "pageFlowerBasket": "Flower Basket",
+  "pageRose": "Rose",
+  "pageMansanas": "Apple",
+  "pageSaging": "Banana",
+  "pageTeddyBear": "Teddy Bear",
+  "pageSodaPop": "Soda Pop",
+  "achievementStarStudentDesc": "Complete 20 Ang Aking Sarili games",
+  "badgeKnowMyselfDesc": "Completed 'Myself'",
+  "badgeEmotionExpertDesc": "Completed 'My Emotions'",
+  "badgeRoutineExpertDesc": "Completed 'Daily Routines'",
+  "badgePreferenceExpertDesc": "Completed 'My Preferences'",
+  "badgeMemberExpertDesc": "Completed 'Family Members'",
+  "badgeWorkExpertDesc": "Completed 'Family Work'",
+  "badgeActivityExpertDesc": "Completed 'Family Activities'",
+  "badgeTreeExpertDesc": "Completed 'Family Tree'",
+  "badgeHouseExpertDesc": "Completed 'Our Home'",
+  "familyRoleSentence": "{member} is {roles}.",
+  "@familyRoleSentence": {
+    "placeholders": {
+      "member": {
+        "type": "String"
+      },
+      "roles": {
+        "type": "String"
+      }
+    }
+  },
+  "resetAllStudents": "Reset All Students",
+  "confirmResetAllStudents": "Are you sure you want to delete all enrolled students? This cannot be undone.",
+  "confirm": "Confirm",
+  "rateYourArtwork": "Rate Artwork",
+  "howManyStars": "How many stars does it deserve?",
+  "tapToView": "Tap to view",
+  "delete": "Delete",
+  "deleteArtwork": "Delete Artwork",
+  "confirmDeleteArtwork": "Are you sure you want to delete this artwork? This cannot be undone.",
+  "artworkDeleted": "Artwork deleted.",
+  "zoomOn": "Zoom",
+  "zoomOff": "Done",
+  "karaokeTitle": "Karaoke",
+  "karaokeSubtitle": "Sing Along!",
+  "greatSinging": "Great singing!",
+  "readFullPoemBeforeBack": "Read the entire poem before going back.",
+  "iReadThePoem": "I Read the Poem! ✓",
+  "readFullStoryBeforeBack": "Read the entire story before going back.",
+  "iReadTheStory": "I Have Read It! ✓",
+  "tandaanTitle": "Remember It!",
+  "tandaanSubtitle": "Match the Pairs",
+  "round": "Round",
+  "matchThePairs": "Find and match the pairs!",
+  "flipCardsToMatch": "Tap a card to flip it. Find two that match!",
+  "traceItTitle": "Trace It - You Can Do It!",
+  "traceItSubtitle": "Draw from memory",
+  "checkTracing": "Check",
+  "showHint": "Hint",
+  "startAtDot": "Start at the dot!",
+  "almostThere": "Almost there! Try again!",
+  "progressPages": "{done} / {total} pages",
+  "@progressPages": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "percentComplete": "{percent}% complete",
+  "@percentComplete": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "obraLabel": "Artworks",
+  "strokesLabel": "Strokes",
+  "categoryProgressHeader": "Progress Per Category",
+  "savedArtworksHeader": "Saved Artworks",
+  "parentTipsHeader": "Tips for Parents",
+  "tipKulayTitle": "Kulay-Saya",
+  "tipKulayBody": "Encourage your child to color all the pages in every category.",
+  "tipTraceItTitle": "Trace It",
+  "tipTraceItBody": "Guide your child to follow the correct direction of every letter.",
+  "tipMagbasaTitle": "Magbasa",
+  "tipMagbasaBody": "Read the poems, stories, and songs aloud together with your child.",
+  "tipMatematikaTitle": "Matematika",
+  "tipMatematikaBody": "Encourage your child to complete every game to build stronger number skills.",
+  "tipStudyTimeTitle": "Study Time",
+  "tipStudyTimeBody": "Practice 15-20 minutes every day for the best results.",
+  "progressCompleted": "{done} / {total} completed",
+  "@progressCompleted": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "progressActivities": "{done} / {total} activities",
+  "@progressActivities": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "progressGames": "{done} / {total} games",
+  "@progressGames": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "pointsStatLabel": "Points",
+  "starsStatLabel": "Stars",
+  "gameProgressHeader": "Progress Per Game",
+  "tipPencilGripTitle": "Proper Pencil Grip",
+  "tipPencilGripBody": "Make sure your child holds the stylus or finger correctly while tracing.",
+  "tipRepeatTitle": "Repeat Often",
+  "tipRepeatBody": "Encourage your child to redo the letters that are not yet completed.",
+  "tipPraiseTitle": "Praise Your Child",
+  "tipPraiseBody": "Praise every achievement, big or small, to build their confidence.",
+  "tipTulaTitle": "Poems",
+  "tipTulaBody": "Read the poems aloud with your child to improve pronunciation.",
+  "tipKwentoTitle": "Stories",
+  "tipKwentoBody": "Ask your child about the story after reading to strengthen comprehension.",
+  "tipKantaTitle": "Songs",
+  "tipKantaBody": "Sing the songs together so that learning becomes fun.",
+  "tipCountingTitle": "Counting",
+  "tipCountingBody": "Use real objects like fruits or toys to help your child count.",
+  "tipPraiseMatTitle": "Praise",
+  "tipPraiseMatBody": "Praise your child for every correct answer to build their confidence in math.",
+  "tipGameFunTitle": "Games",
+  "tipGameFunBody": "The games are designed to be fun — let your child enjoy learning.",
+  "badgeFirstStepsTitle": "First Steps",
+  "badgeFirstStepsHint": "Complete 1 activity",
+  "badgeAlphabetTitle": "Alphabet Master",
+  "badgeAlphabetHint": "Complete 12 reading activities",
+  "badgeNumbersTitle": "Number Wizard",
+  "badgeNumbersHint": "Play 20 math games",
+  "badgeColorsTitle": "Color Artist",
+  "badgeColorsHint": "Complete 4 coloring activities",
+  "badgeShapesTitle": "Shape Creator",
+  "badgeShapesHint": "Trace 26 uppercase letters",
+  "badgeAnimalsTitle": "Animal Friend",
+  "badgeAnimalsHint": "Trace 26 lowercase letters",
+  "badgeBookwormTitle": "Bookworm",
+  "badgeBookwormHint": "Read 4 stories",
+  "badgeStarStudentTitle": "Star Student",
+  "badgeStarStudentHint": "Play 20 family games",
+  "badgeMathWhizTitle": "Math Whiz",
+  "badgeMathWhizHint": "Complete 7 math levels",
+  "badgeFamilyHeroTitle": "Family Hero",
+  "badgeFamilyHeroHint": "Complete 5 family levels",
+  "badgeWritingStarTitle": "Writing Star",
+  "badgeWritingStarHint": "Trace 10 numbers",
+  "badgeSongbirdTitle": "Songbird",
+  "badgeSongbirdHint": "Sing 10 songs",
+  "tapToClaim": "Tap to Claim",
+  "claimBadgeButton": "Claim Badge",
+  "badgeClaimed": "BADGE CLAIMED",
+  "awesome": "Awesome!",
+  "claimBadgeBody": "You earned this badge! Claim it to add it to your collection.",
+  "claimBadge": "Claim {title}",
+  "@claimBadge": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "plusStarsLabel": "+{stars} Stars",
+  "@plusStarsLabel": {
+    "placeholders": {
+      "stars": {
+        "type": "int"
+      }
+    }
+  },
+  "awardsWaiting": "{earned} earned, {remaining} waiting to claim!",
+  "@awardsWaiting": {
+    "placeholders": {
+      "earned": {
+        "type": "int"
+      },
+      "remaining": {
+        "type": "int"
+      }
+    }
+  }
+}

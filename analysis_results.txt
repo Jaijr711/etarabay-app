@@ -1,0 +1,16 @@
+Analyzing lib...                                                
+
+   info - Use 'const' with the constructor to improve performance - lib\login_screen.dart:270:44 - prefer_const_constructors
+   info - Don't use 'BuildContext's across async gaps - lib\screens\kulay_screen.dart:491:29 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\magbasa_tula_screen.dart:73:33 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\magbasa_tula_screen.dart:74:33 - use_build_context_synchronously
+   info - The import of 'package:flutter/services.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' - lib\screens\profile_screen.dart:3:8 - unnecessary_import
+   info - Parameter 'key' could be a super parameter - lib\screens\profile_screen.dart:493:9 - use_super_parameters
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\teacher_dashboard_screen.dart:538:45 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\teacher_dashboard_screen.dart:599:41 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\teacher_dashboard_screen.dart:777:29 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\teacher_dashboard_screen.dart:778:52 - use_build_context_synchronously
+   info - Use 'const' with the constructor to improve performance - lib\screens\teacher_login_screen.dart:131:30 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\teacher_login_screen.dart:142:30 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\teacher_login_screen.dart:238:34 - prefer_const_constructors
+

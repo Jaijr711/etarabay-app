@@ -1,0 +1,781 @@
+{
+  "@@locale": "fil",
+  "back": "Ibalik",
+  "done": "Tapos na",
+  "save": "I-save",
+  "cancel": "Kanselahin",
+  "next": "Susunod",
+  "levelCompleted": "Tapos na ang Antas {level}!",
+  "@levelCompleted": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "proudOfYou": "Ipinagmamalaki kita!",
+  "categoryCompleted": "Natapos mo ang lahat ng antas sa {cat}!",
+  "@categoryCompleted": {
+    "placeholders": {
+      "cat": {
+        "type": "String"
+      }
+    }
+  },
+  "finished": "Tapos na",
+  "completed": "Tapos na",
+  "earned": "natamo",
+  "levels": "Mga Antas",
+  "activities": "Mga Gawain",
+  "parents": "MGA MAGULANG",
+  "lessons": "Mga Aralin",
+  "stars": "Puntos",
+  "awards": "Gantimpala",
+  "homeAge": "{age} Taon",
+  "@homeAge": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "matematika": "Matematika",
+  "angAkingSarili": "Tungkol sa Aking Sarili",
+  "atAkingPamilya": "At ang Aking Pamilya",
+  "kulaySaya": "Masayang Pagkukulay",
+  "magkulayTayo": "Magkulay Tayo",
+  "magbasaTitle": "Basahin natin!",
+  "alpabetoAtMgaSalita": "Mga Tula, Kwento at Awit",
+  "home": "Pangunahing Pahina",
+  "settingsTitle": "Pag-aayos",
+  "totalProgress": "Kabuuang Pag-unlad",
+  "poems": "Mga Tula",
+  "stories": "Mga Kwento",
+  "songs": "Mga Awit",
+  "tune": "Tono",
+  "action": "Aksyon",
+  "counting": "Bilangin ang mga Bagay",
+  "dragNumber": "Itapat ang tamang bilang",
+  "lineMatch": "Itugma gamit ang Linya",
+  "popBalloon": "Putukin ang lobo",
+  "moreOrLess": "Higit o Kulang?",
+  "numberPuzzle": "Palaisipan sa Bilang",
+  "numberSequence": "Pagkakasunod-sunod ng mga bilang",
+  "check": "Suriin",
+  "correct": "Tama!",
+  "wrong": "Mali! Subukan muli!",
+  "wrongShort": "Mali",
+  "replayReplacesStar": "Ang muling paglalaro ang pumapalit sa bituing ito.",
+  "putNumbersInOrder": "Itapat ang mga bilang sa mga kahon.",
+  "timesUp": "Tapos na ang oras!",
+  "level": "Antas {level}",
+  "@level": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "streak": "{streak} araw na streak!",
+  "@streak": {
+    "placeholders": {
+      "streak": {
+        "type": "int"
+      }
+    }
+  },
+  "repeat": "Ulitin",
+  "congratulations": "Binabati kita!",
+  "chooseFirst": "Pumili muna ng sagot!",
+  "chooseLeftFirst": "Pumili muna ng bilang sa kaliwa!",
+  "dropHere": "Ilagay dito!",
+  "dragHere": "Itapat dito",
+  "popAllBalloonsWith": "Putukin ang lahat ng lobo na may bilang na",
+  "left": "Kaliwa",
+  "right": "Kanan",
+  "selected": "Napili",
+  "howMany": "Ilan ang {item}?",
+  "@howMany": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "matchWithNumber": "Itugma ang {category} sa tamang bilang.",
+  "@matchWithNumber": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "whichIsMore": "Alin ang mas marami?",
+  "whichIsLess": "Alina ng mas kaunti?",
+  "isSameNumber": "Parehong bilang?",
+  "arrange": "Ayusin: {sequence}",
+  "@arrange": {
+    "placeholders": {
+      "sequence": {
+        "type": "String"
+      }
+    }
+  },
+  "selectCorrectAnswer": "Piliin ang tamang sagot:",
+  "tapLeftTapRight": "Pindutin ang mga grupo (kaliwa) → Pindutin ang bilang (kanan)",
+  "angAkingSariliTitle": "Ang Aking Sarili",
+  "allAboutMe": "Tungkol sa Akin",
+  "myEmotions": "Ang Aking Damdamin",
+  "dailyRoutines": "Mga Pang-araw-araw na Gawain",
+  "myPreferences": "Aking Kagustuhan",
+  "familyMembers": "Miyembro ng Pamilya",
+  "familyRoles": "Tungkulin ng bawat miyembro ng pamilya",
+  "familyActivities": "Mga gawain ng pamilya",
+  "familyTree": "Talaan ng Pamilya",
+  "myHome": "Ang Aking Tahanan",
+  "whatIsYourName": "Ano ang pangalan  mo?",
+  "howOldAreYou": "Ilang taon ka na?",
+  "areYouBoyOrGirl": "Ikaw ba ay lalaki o babae?",
+  "whatIsYourNameDescription": "Ang iyong pangalan ay ang tawag sa iyo ng iyong pamilya at kaibigan. Mahalaga ito!",
+  "howOldAreYouDescription": "Ang iyong edad ay bilang ng mga taon mula nang ikaw ay ipinanganak. Ipagdiwang ang bawat taon!",
+  "genderDescription": "Ang pag-alam kung ikaw ay lalaki o babae ay nakatutulong upang mas makilala ka namin!",
+  "typeNameHint": "Ilagay ang iyong pangalan dito",
+  "ageHint": "Halimbawa: 5,7,10",
+  "aboutMeSubtitle": "Tungkol sa Akin",
+  "myEmotionsSubtitle": "Ipaliwanag ang iyong nararamdaman",
+  "dailyRoutinesSubtitle": "Matuto ng pang-araw-araw na gawain",
+  "myPreferencesSubtitle": "Ano ang iyong gusto?",
+  "familyMembersSubtitle": "Sino ang mga miyembro ng iyong pamilya?",
+  "familyRolesSubtitle": "Ano ang trabaho ng bawat isa?",
+  "familyActivitiesSubtitle": "Ano ang ginagawa ninyo nang magkasama?",
+  "familyTreeSubtitle": "Sino ang iyong mga kamag-anak?",
+  "myHomeSubtitle": "Saan ka nakatira?",
+  "colorSomethingFirst": "Kulayan muna ang isang bagay!",
+  "justNow": "Ngayon lang",
+  "timeAgo": "{amount}m ang nakalipas",
+  "@timeAgo": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
+  },
+  "saved": "Nai-save!",
+  "coloringBook": "Aklat Pangkulay",
+  "myCreations": "Ang Aking mga Likha",
+  "color": "Kulay",
+  "animals": "Mga Hayop",
+  "red": "Pula",
+  "blue": "Asul",
+  "green": "Berde",
+  "yellow": "Dilaw",
+  "orange": "Kahel",
+  "purple": "Lila",
+  "pink": "Rosas",
+  "brown": "Kayumanggi",
+  "black": "Itim",
+  "white": "Puti",
+  "brush": "Pinsel",
+  "eraser": "Burahin",
+  "undo": "Ibalik",
+  "redo": "Ulitin",
+  "clear": "Burahin",
+  "upper": "Pataas",
+  "lower": "Pababa",
+  "letterLabel": "Titik {letter}",
+  "numberLabel": "Numero {number}",
+  "@letterLabel": {
+    "placeholders": {
+      "letter": {
+        "type": "String"
+      }
+    }
+  },
+  "pointsLabel": "Puntos",
+  "goodJob": "Magaling!",
+  "ulitin": "Ulitin",
+  "traceTitle": "Sundan Mo, Kaya Mo!",
+  "uppercase": "Malaking titik",
+  "lowercase": "Maliit na titik",
+  "numbers": "Bilang",
+  "letter": "Titik {letter}",
+  "@letter": {
+    "placeholders": {
+      "letter": {
+        "type": "String"
+      }
+    }
+  },
+  "reset": "Ulitin",
+  "overallProgress": "Kabuuang Pag-unlad",
+  "tula": "Mga Tula",
+  "kwento": "Mga Kwento",
+  "kanta": "Mga Awit",
+  "badges": "Mga Badge",
+  "myProfile": "Aking Profile",
+  "yearsOld": "{age} taong gulang",
+  "@yearsOld": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "male": "Lalaki",
+  "female": "Babae",
+  "birthday": "Kaarawan",
+  "profileAge": "Edad",
+  "gender": "Kasarian",
+  "memberSince": "Kasapi Mula Noong",
+  "editProfile": "Baguhin ang Iyong Profile",
+  "noProfileData": "Walang datos ng profile",
+  "settings": "Pag-aayos",
+  "language": "Wika",
+  "audio": "Tunog at Musika",
+  "about": "Tungkol Dito",
+  "sound": "Tunog",
+  "music": "Musika",
+  "notifications": "Mga Notipikasyon",
+  "achievements": "Mga Natamo",
+  "teacherDashboard": "Dashboard ng Guro",
+  "newCertificateBadge": "Bagong Certificate!",
+  "enrollStudent": "I-enroll ang Estudyante",
+  "firstName": "Unang Pangalan",
+  "lastName": "Apelyido",
+  "studentID": "Student Number (Password)",
+  "removeStudent": "Tanggalin ang Estudyante?",
+  "logoutConfirm": "Mag-a-log out ka ba sa account na ito? Kakailanganin ang Student Number para makabalik.",
+  "logout": "Lumabas",
+  "confirmLogout": "Sigurado ka bang gusto mong mag-logout?",
+  "verifyStudentID": "I-verify ang Student Number",
+  "enterStudentID": "Mangyaring ilagay ang iyong Student Number para magpatuloy",
+  "invalidStudentID": "Maling Student Number. Pakisubukan muli.",
+  "password": "Password",
+  "fillAllFields": "Pakisuyong punan ang lahat ng fields.",
+  "parentNameLabel": "Pangalan ng Magulang",
+  "parentContactLabel": "Numero ng Magulang",
+  "contactLengthError": "Ang numero ng contact ay dapat eksaktong 11 digits.",
+  "birthdayGreeting": "Maligayang Kaarawan, {name}!",
+  "@birthdayGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "swipeToDeleteGuide": "I-swipe pakaliwa para matanggal",
+  "enroll": "I-enroll",
+  "studentEnrolled": "Nai-enroll na ang Estudyante!",
+  "studentEnrolledSuccessfully": "Matagumpay na nai-enroll si {name}.",
+  "@studentEnrolledSuccessfully": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "loginCredentials": "Mga Kredensyal sa Pag-login:",
+  "userLabel": "User:",
+  "usernameCopied": "Username ay nakopya!",
+  "passwordLabel": "Pass:",
+  "passwordCopied": "Password ay nakopya!",
+  "fullName": "Buong Pangalan",
+  "lRNPassword": "Student Number (Password)",
+  "confirmRemoveStudent": "Sigurado ka bang gusto mong tanggalin ang estudyanteng ito? Hindi na ito mababawi.",
+  "remove": "Tanggalin",
+  "update": "I-update",
+  "copied": "Nakopya!",
+  "noStudentsEnrolled": "Wala pang nai-enroll na estudyante.",
+  "tapToEnroll": "I-tap ang \"I-enroll ang Estudyante\" para magdagdag.",
+  "studentProgressTitle": "Progress ni {name}",
+  "@studentProgressTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "moduleBreakdown": "Breakdown ng Module",
+  "scoreLabel": "Puntos: {score}",
+  "@scoreLabel": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "loginPrompt": "Mag-log in upang ipagpatuloy ang iyong pag-aaral.",
+  "loginButton": "Mag-log in",
+  "teacherLoginButton": "Magpatuloy bilang Guro",
+  "enterUsernamePassword": "Pakilagay ang parehong pangalan ng gumagamit at password",
+  "loginError": "Hindi matagumpay ang pag-log in. Subukan muli.",
+  "studentNumberField": "Student Number",
+  "certificateProgress": "Gantimpala {badges}/{badgeTotal} · Aralin {modules}/{moduleTotal}",
+  "username": "Pangalan ng gumagamit",
+  "teacherLoginTitle": "Login ng Guro",
+  "teacherLoginButtonLabel": "Mag-login bilang Guro",
+  "invalidTeacherCredentials": "Maling teacher credentials. Pakisubukang muli.",
+  "monthName": "Buwan {month}",
+  "@monthName": {
+    "placeholders": {
+      "month": {
+        "type": "int"
+      }
+    }
+  },
+  "notSet": "Wala pang itinakda",
+  "saveChanges": "I-save ang mga pagbabago",
+  "enterName": "Ilagay ang iyong pangalan",
+  "chooseLanguage": "Pumili ng Wika",
+  "getStarted": "Magsimula",
+  "nextLevelLearningTitle": "Mas Mataas na Antas ng Pagkatuto",
+  "nextLevelLearningDesc": "Masaya at interaktibong mga laro para sa pagkatuto at pag-unlad ng mga bata.",
+  "learnAnywhereTitle": "Matuto kahit saan",
+  "learnAnywhereDesc": "Gamitin ang mga aralin kahit walang internet at magpatuloy sa pag-aaral kahit saan.",
+  "trackProgressTitle": "Subaybayan ang Pag-unlad",
+  "trackProgressDesc": "Tingnan ang pag-unlad ng iyong anak sa pamamagitan ng pagsubaybay sa kaniyang pagkatuto.",
+  "continueText": "Magpatuloy",
+  "forParents": "Para sa mga Magulang",
+  "hello": "Kumusta!",
+  "kulaySayaProgress": "Kulay-Saya Progress",
+  "totalSaved": "Kabuuang Nai-save",
+  "magbasaProgress": "Magbasa Progress",
+  "matematikaProgress": "Matematika Progress",
+  "noResults": "Walang resulta",
+  "imageNotFound": "Hindi makita ang larawan",
+  "clearCanvasQuestion": "Burahin ang kinulayan?",
+  "eraseColoringWarning": "Buburahin nito ang lahat ng iyong kinulayan.",
+  "noArtworksYet": "Wala pang likhang sining",
+  "colorPagePrompt": "Kulayan ang isang pahina at i-save ang iyong likhang-sining!",
+  "startColoring": "Simulan ang Pagkukulay",
+  "edit": "Baguhin",
+  "lessonFinishedPrompt": "Natapos mo na ang araling ito! Mahusay! Pumili ng isa pang laro.",
+  "okButton": "Sige",
+  "readingFinishedGood": "Tapos na! Magaling kang magbasa!",
+  "readingFinishedHappy": "Tapos na! Maligayang pagbabasa!",
+  "doneAlready": "Tapos na!",
+  "checkAnswer": "Suriin",
+  "noGamesAvailable2": "Walang larong magagamit.",
+  "countAndDragCorrectNumber": "Bilangin at i-drag ang tamang numero!",
+  "whatIsMissingNumber": "Ano ang nawawalang bilang?",
+  "straightOrCorrect": "Tama",
+  "iKnowIt": "Natutuhan ko ns",
+  "familyTreeTitle": "Talaan ng Pamilya",
+  "familyTreeTapHint": "Pindutin ang mga miyembro upang malaman ang kanilang relasyon!",
+  "iLearnedFamilyTree": "Natutunan ko ang Talaan ng Pamilya!",
+  "ourHomeTitle": "Ang Aming Tahanan",
+  "thatIsOurHome": "Iyan ang ating tahanan!",
+  "forParentsSubtitle": "Narito ang progreso ng inyong anak sa E-Tarabay.",
+  "artworks": "mga likha",
+  "error": "Error",
+  "recentActivity": "Kamakailang Gawain",
+  "recentColor": "Kamakailang Kulay",
+  "unknownStudent": "Hindi Kilalang Mag-aaral",
+  "version": "Bersyon",
+  "backgroundMusicPlaying": "May musikang tumutugtog",
+  "errorSaveLocal": "Hindi na-save ang artwork nang lokal.",
+  "finishedAlready": "Tapos na!",
+  "accessExpired": "Tapos na ang iyong pag-access sa app na ito. Kumonsulta sa iyong guro para sa susunod na hakbang.",
+  "accountPaused": "Pansamantalang naka-pause ang access sa app na ito para sa account na ito. Makipag-ugnayan sa suporta para sa karagdagang detalye.",
+  "forceLoggedOut": "Na-sign out ka ng developer. Maaari ka nang mag-login muli.",
+  "moduleLocked": "Pansamantalang hindi available ang aktibidad na ito. Bumalik ka na lang mamaya.",
+  "overviewTab": "Buod",
+  "magbasaTab": "Magbasa",
+  "matematikaTab": "Matematika",
+  "artworksLabel": "Mga Obra",
+  "pagesLabel": "pahina",
+  "lettersLabel": "letra",
+  "diffEasy": "Madali",
+  "diffMedium": "Katamtaman",
+  "diffHard": "Mahirap",
+  "catAnimals": "Mga Hayop",
+  "catFlowers": "Mga Bulaklak",
+  "catFruits": "Mga Prutas",
+  "catToys": "Mga Laruan",
+  "poemLabel": "Tula",
+  "storyLabel": "Kwento",
+  "songLabel": "Kanta",
+  "activitiesLabel": "aktibidad",
+  "gamesLabel": "laro",
+  "savedCountLabel": "na-save",
+  "uppercaseLettersTitle": "Malalaking Titik (A–Z)",
+  "lowercaseLettersTitle": "Maliliit na Titik (a–z)",
+  "numbersTitle": "Mga Numero (1–10)",
+  "levelComplete": "Tapos na ang Antas {level}!",
+  "@levelComplete": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "pagePuppy": "Tuta",
+  "pageKuting": "Pusa",
+  "pageElepante": "Elepante",
+  "pageFlowerBasket": "Basket ng mga Bulaklak",
+  "pageRose": "Rosas",
+  "pageMansanas": "Mansanas",
+  "pageSaging": "Saging",
+  "pageTeddyBear": "Teaddy Bear",
+  "pageSodaPop": "Soda Pop/Soft Drinks",
+  "favoriteChosen": "Ang paborito mo ay {choice}!",
+  "@favoriteChosen": {
+    "placeholders": {
+      "choice": {
+        "type": "String"
+      }
+    }
+  },
+  "helloName": "Kumusta, {name}!",
+  "@helloName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "letsLearnAndPlay": "Matuto at maglaro tayo!",
+  "myProgressToday": "Ang Aking Pag-unlad Ngayon",
+  "whatDoYouWantToLearn": "Ano ang gusto mong matutunan?",
+  "rewardsCount": "Gantimpala",
+  "activitiesCount": "Gawain",
+  "lessonsCount": "Mga Aralin",
+  "familyRoleSentence": "Si {member} ay {roles}.",
+  "@familyRoleSentence": {
+    "placeholders": {
+      "member": {
+        "type": "String"
+      },
+      "roles": {
+        "type": "String"
+      }
+    }
+  },
+  "resetAllStudents": "I-reset Lahat ng Mag-aaral",
+  "confirmResetAllStudents": "Sigurado ka bang gusto mong burahin ang lahat ng naka-enroll na mag-aaral? Hindi ito maa-undo.",
+  "confirm": "Kumpirmahin",
+  "rateYourArtwork": "Bigyan ng marka ang likhang-sining",
+  "howManyStars": "Ilang butuin ang nararapat ditto?",
+  "tapToView": "Pindutin upang makita",
+  "delete": "Burahin",
+  "deleteArtwork": "Burahin ang likhang-sining",
+  "confirmDeleteArtwork": "Sigurado ka bang gusto mong burahin ang guhit na ito? Hindi na ito maibabalik.",
+  "artworkDeleted": "Nabura na ang guhit.",
+  "fitPicture": "Iangkop",
+  "greatSinging": "Magaling kang kumanta!",
+  "readFullPoemBeforeBack": "Basahin ang buong tula bago bumalik.",
+  "iReadThePoem": "Nabasa Ko ang Tula!",
+  "readFullStoryBeforeBack": "Basahin ang buong kwento bago bumalik.",
+  "iReadTheStory": "Nabasa Ko Na Ito!",
+  "tandaanTitle": "Tandaan Mo!",
+  "tandaanSubtitle": "Pag-ugnayin ang mga Pares",
+  "round": "Bilog",
+  "matchThePairs": "Hanapin at itugma ang magkapareha",
+  "flipCardsToMatch": "Pindutin ang isang kard upang baligtarin ito. Maghanap ng dalawang magkapareho!",
+  "traceItTitle": "Kaya mo iyan! Sundan ang linya!",
+  "traceItSubtitle": "Gumuhit ayon sa iyong naalala",
+  "checkTracing": "Suriin",
+  "startAtDot": "Magsimula sa tuldok!",
+  "almostThere": "Malapit na! Subukan muli!",
+  "progressPages": "{done} / {total} pahina",
+  "@progressPages": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "percentComplete": "{percent}% kumpleto",
+  "@percentComplete": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "obraLabel": "Obra",
+  "strokesLabel": "Mga Pahid",
+  "categoryProgressHeader": "Progreso sa Bawat Kategorya",
+  "savedArtworksHeader": "Mga Nai-save na Obra",
+  "parentTipsHeader": "Tips para sa Magulang",
+  "tipKulayTitle": "Kulay-Saya",
+  "tipKulayBody": "Hikayatin ang inyong anak na kulayin ang lahat ng pahina sa bawat kategorya.",
+  "tipTraceItTitle": "Sundan Mo",
+  "tipTraceItBody": "Gabayan ang inyong anak na sundan ang tamang direksyon ng bawat letra.",
+  "tipMagbasaTitle": "Magbasa",
+  "tipMagbasaBody": "Basahin nang malakas kasama ang inyong anak ang mga tula, kwento at kanta.",
+  "tipMatematikaTitle": "Matematika",
+  "tipMatematikaBody": "Hikayatin ang inyong anak na matapos ang bawat laro para mas lumago ang kakayahan sa bilang.",
+  "tipStudyTimeTitle": "Oras ng Pag-aaral",
+  "tipStudyTimeBody": "Mag-practice nang 15-20 minuto araw-araw para sa pinakamabuting resulta.",
+  "progressCompleted": "{done} / {total} natatapos",
+  "@progressCompleted": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "progressActivities": "{done} / {total} aktibidad",
+  "@progressActivities": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "progressGames": "{done} / {total} laro",
+  "@progressGames": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "pointsStatLabel": "Puntos",
+  "starsStatLabel": "Bituin",
+  "gameProgressHeader": "Progreso sa Bawat Laro",
+  "tipPencilGripTitle": "Tamang Hawak ng Lapis",
+  "tipPencilGripBody": "Siguraduhin na tamang hawak ng inyong anak ang stylus o daliri habang nag-tracing.",
+  "tipRepeatTitle": "Ulit-ulitin",
+  "tipRepeatBody": "Hikayatin ang inyong anak na ulit-ulitin ang mga letra na hindi pa kumpleto.",
+  "tipPraiseTitle": "Purihin ang Inyong Anak",
+  "tipPraiseBody": "Purihin ang bawat tagumpay, malaki man o maliit, para mapalakas ang kanilang kumpiyansa.",
+  "tipTulaTitle": "Tula",
+  "tipTulaBody": "Basahin nang malakas ang mga tula kasama ang inyong anak para mapabuti ang pagbigkas.",
+  "tipKwentoTitle": "Kwento",
+  "tipKwentoBody": "Itanong sa inyong anak ang tungkol sa kwento pagkatapos basahin para mapalakas ang pag-unawa.",
+  "tipKantaTitle": "Kanta",
+  "tipKantaBody": "Awitin nang magkasama ang mga kanta para maging masaya ang pag-aaral.",
+  "tipCountingTitle": "Bilangan",
+  "tipCountingBody": "Gumamit ng tunay na bagay tulad ng prutas o laruan para matulungan ang inyong anak na mabilang.",
+  "tipPraiseMatTitle": "Papuri",
+  "tipPraiseMatBody": "Purihin ang inyong anak sa bawat tamang sagot para mapalakas ang kanilang kumpiyansa sa matematika.",
+  "tipGameFunTitle": "Laro",
+  "tipGameFunBody": "Ang mga laro ay dinisenyo para maging masaya — hayaan ang inyong anak na mag-enjoy sa pag-aaral.",
+  "badgeFirstStepsTitle": "Unang Hakbang",
+  "badgeFirstStepsHint": "Kunin ang iyong unang 3 bituin",
+  "badgeAlphabetTitle": "Asahin ang Alphabeto",
+  "badgeAlphabetHint": "Kolektahin ang lahat ng 19 na bituin sa Magbasa Tayo",
+  "badgeNumbersTitle": "Kagalingan sa Numero",
+  "badgeNumbersHint": "Sundan ang lahat ng 10 bilang.",
+  "badgeColorsTitle": "Husayan sa Pagkulay",
+  "badgeColorsHint": "Kolektahin ang lahat ng 9 na bituin sa Kulay-Saya.",
+  "badgeShapesTitle": "Malalaking titik",
+  "badgeShapesHint": "Sundan ang lahat ng 26 na malalaking titik.",
+  "badgeAnimalsTitle": "Maliliit na titik",
+  "badgeAnimalsHint": "Sundan ang lahat ng 26 na maliliit na titik.",
+  "badgeBookwormTitle": "Munting Mambabasa",
+  "badgeBookwormHint": "Kolektahin ang lahat ng 5 bituin sa mga Kuwento.",
+  "badgeStarStudentTitle": "Tungkol sa Akin",
+  "badgeStarStudentHint": "Makakuha ng 3 bituin sa lahat ng 4 na antas ng “Tungkol sa Akin.”",
+  "badgeMathWhizTitle": "Dalubhasa sa Matematika",
+  "badgeMathWhizHint": "Makakuha ng 3 bituin sa lahat ng 7 antas ng Matematika.",
+  "badgeFamilyHeroTitle": "Bayani ng Pamilya",
+  "badgeFamilyHeroHint": "Makakuha ng 3 bituin sa lahat ng 5 antas ng Pamilya.",
+  "badgeWritingStarTitle": "Huwarang Manunulat",
+  "badgeWritingStarHint": "Sundan ang bawat titik at bilang.",
+  "badgeSongbirdTitle": "Biritera/Biritero",
+  "badgeSongbirdHint": "Kolektahin ang lahat ng 9 bituin sa mga Awit.",
+  "badgeStreakFiveTitle": "Araw-araw na bituin",
+  "badgeStreakFiveHint": "Maglaro nang 5 araw na magkakasunod",
+  "claimBadgeButton": "Kunin ang Badge",
+  "badgeClaimed": "NAKUHA NA ANG BADGE",
+  "awesome": "Ang galing!",
+  "claimBadgeBody": "Nakuha mo ang badge na ito! Kunin ito para idagdag sa iyong koleksyon.",
+  "claimBadge": "Kunin ang {title}",
+  "awardsWaiting": "{earned} nakuha, {remaining} naghihintay na makuha!",
+  "@awardsWaiting": {
+    "placeholders": {
+      "earned": {
+        "type": "int"
+      },
+      "remaining": {
+        "type": "int"
+      }
+    }
+  },
+  "viewArtwork": "Tingnan",
+  "brushSmall": "Maliit",
+  "brushMedium": "Katamtaman",
+  "brushLarge": "Malaki",
+  "startOverYes": "Oo, ulitin",
+  "keepColoring": "Hindi, ituloy",
+  "loadingArtwork": "Binubuksan ang iyong likha...",
+  "memoriseTheCards": "Tandaan mo ang mga card!",
+  "letsCount": "Magbilang Tayo!",
+  "studentsLabel": "Mga Bata",
+  "needsHelp": "Nahuhuli",
+  "notSeenRecently": "Di Naglalaro",
+  "theClass": "Ang Klase",
+  "weakestFirst": "Pinakakulang sa itaas",
+  "recentAchievements": "Kamakailang Nakamit",
+  "achievementEarnedBy": "Nakuha ni {name} ang {achievement}",
+  "searchStudents": "Maghanap ng bata",
+  "noStudentsMatch": "Walang batang tumugma",
+  "everyoneActive": "Lahat ay naglaro ngayong linggo",
+  "daysAgo": "{days}a nakalipas",
+  "hoursAgo": "{hours}h nakalipas",
+  "sariliProgress": "Ang Aking Sarili at Aming Pamilya",
+  "tandaanProgress": "Tandaan Mo!",
+  "starsOfPossible": "{earned} sa {total} bituin",
+  "notStartedYet": "Hindi pa nasisimulan",
+  "memoryPairs": "Pagtutugma ng pares",
+  "fruits": "Mga Prutas",
+  "shapes": "Mga Hugis",
+  "letters": "Mga Titik",
+  "setParentPin": "Gumawa ng 4-numerong code",
+  "setParentPinNote": "Ikaw lang ang dapat nakakaalam nito. Hindi ito dapat mahulaan ng bata.",
+  "confirmParentPin": "I-type itong muli",
+  "enterParentPin": "Ilagay ang iyong code",
+  "pinMismatch": "Magkaiba ang dalawang code",
+  "wrongPin": "Maling code",
+  "forgotPin": "Nakalimutan? Gamitin ang Student Number",
+  "pinSaved": "Naitala ang code",
+  "or": "o",
+  "lRN": "Student Number (Password)",
+  "verifyLRN": "I-verify ang Student Number",
+  "enterLRN": "Ilagay ang Student Number para makapasok",
+  "invalidLRN": "Maling Student Number. Subukan muli.",
+  "openReport": "Buksan",
+  "accountSecurity": "Account at Seguridad",
+  "securityHeader": "Seguridad",
+  "changeLogin": "Palitan ang Login",
+  "changeLoginNote": "Palitan ang username o password",
+  "continueLabel": "Magpatuloy",
+  "biometricLogin": "Login gamit ang daliri o mukha",
+  "enableBiometric": "Buksan ang login gamit ang daliri",
+  "confirmYourPassword": "Kumpirmahin ang iyong password",
+  "blankToKeepPassword": "Iwanang blangko ang password kung ang username lang ang papalitan.",
+  "newPasswordStudentNumber": "Bagong password (Student Number)",
+  "noBiometricOnDevice": "Walang daliri o mukhang nakatakda sa teleponong ito,",
+  "noSessionLogInFirst": "Walang bukas na account ng bata. Mag-log in muna.",
+  "resetActivity": "I-reset ang Gawain",
+  "resetSpecificActivity": "I-reset ang Piling Gawain",
+  "resetAllActivities": "I-reset ang Lahat ng Gawain",
+  "resetAll": "I-reset Lahat",
+  "resetCount": "I-reset ({count})",
+  "pickActivitiesToReset": "Piliin ang mga gawaing nais i-reset para kay {name}:",
+  "confirmResetAll": "I-reset ang LAHAT ng progreso ni {name}? Hindi na ito maibabalik.",
+  "studentArtworks": "Mga Likha ({count})",
+  "noArtworksSaved": "Wala pang nai-save na likha.",
+  "middleName": "Gitnang Pangalan",
+  "studentIdFormat": "Student Number (Anyo: DC-2026-0001)",
+  "autoGenerateId": "Gumawa ng ID para sa akin",
+  "accountPreview": "Silip sa Account",
+  "studentInformation": "Tungkol sa Bata",
+  "parentInformation": "Tungkol sa Magulang",
+  "celebrate": "Ipagdiwang",
+  "stepOf": "Hakbang {current} sa {total} · {label}",
+  "autoGenerated": "Gagawin para sa iyo",
+  "enterIdAbove": "Ilagay ang ID sa itaas",
+  "couldNotLoad": "Hindi ma-load. Subukan muli.",
+  "teacherSignInPrompt": "Pumasok sa iyong teacher account",
+  "daycareTeacher": "Guro sa Daycare",
+  "useBiometric": "Gamitin ang daliri o mukha",
+  "biometricUnavailable": "Walang daliri o mukhang nakatakda sa teleponong ito, kaya hindi magagamit ang paraang ito.",
+  "strongest": "Pinakamalakas",
+  "modulesHeader": "Ang anim na modyul",
+  "credentialsUpdated": "Na-update ang login.",
+  "biometricEnabled": "Bukas na ang login gamit ang daliri.",
+  "biometricDisabled": "Sarado na ang login gamit ang daliri.",
+  "biometricNotConfirmed": "Hindi nakumpirma. Subukan muli.",
+  "passwordsDoNotMatch": "Magkaiba ang dalawang password.",
+  "usernameEmpty": "Maglagay ng username.",
+  "passwordIncorrect": "Mali ang password na iyon.",
+  "studentNumberIncorrect": "Mali ang Student Number na iyon.",
+  "confirmChildStudentNumber": "Kumpirmahin ang Student Number ng bata",
+  "scanToEnableBiometric": "Mag-scan para buksan ang login gamit ang daliri",
+  "certificateSaved": "Nai-save ang sertipiko sa iyong mga larawan",
+  "certificateSaveFailed": "Hindi na-save ang sertipiko.",
+  "howStarsEarned": "Paano nakukuha ang bituin dito:",
+  "starOneTitle": "Natapos mo",
+  "starOneBody": "May isa sa bawat gawaing natapos mo.",
+  "starTwoTitle": "Halos tama lahat",
+  "starTwoBody": "Isang maling sagot lang sa buong laro.",
+  "starThreeTitle": "Tama lahat, unang subok",
+  "starThreeBody": "Walang maling sagot kahit isa.",
+  "starTip": "Ulitin at subukang tamaan lahat ng sagot.",
+  "gotIt": "Naintindihan ko",
+  "yourCode": "Ang code mo",
+  "yourCodeNote": "Ang apat na numerong nagbubukas ng ulat na ito.",
+  "changeCode": "Palitan ang code",
+  "currentCode": "Kasalukuyang code",
+  "newCode": "Bagong code",
+  "codeChanged": "Napalitan ang code.",
+  "childLogin": "Ang login ng anak mo",
+  "childLoginNote": "Ang tinitipa ng anak mo para buksan ang app. Kayang palitan ito ng guro.",
+  "usernameTaken": "May gumagamit na ng username na iyon. Pumili ng iba.",
+  "playedToday": "Naglaro ngayon",
+  "playedYesterday": "Naglaro kahapon",
+  "playedDaysAgo": "Huling naglaro {days} araw na ang nakalipas",
+  "notPlayedYet": "Hindi pa nagsisimula",
+  "dayRun": "{days} araw na sunod-sunod",
+  "removeFromDevice": "Alisin sa teleponong ito",
+  "removeFromDeviceNote": "Hindi na lalabas si {name} dito o sa sign-in. Hindi nabubura ang account at ang mga nagawa niya — kayang ipasok siyang muli ng guro.",
+  "childRemoved": "Naalis sa teleponong ito.",
+  "chooseAvatar": "Larawan",
+  "manageStudent": "Pamahalaan ang mag-aaral",
+  "noStudentNumbersLeft": "Wala nang natitirang student number para sa taong ito.",
+  "moreModules": "+{count} pa",
+  "filterBehindNote": "Nagsimula na, pero malayo ang agwat sa klase.",
+  "filterQuietNote": "Isang linggo o higit nang hindi nagbubukas.",
+  "authNothingToUpdate": "Walang binago.",
+  "authSaveFailed": "Hindi na-save ang pagbabago. Tingnan ang koneksyon.",
+  "authUsernameTaken": "Gamit na ang username na iyan. Pumili ng iba.",
+  "authUseTeacherButton": "Ito ang login ng bata. Gamitin ang \"Continue as Teacher\" sa ibaba ng screen.",
+  "authUsernameNotFound": "Walang ganyang username. Tingnan ang baybay, o tanungin ang guro kung nakatala na ang bata.",
+  "authWrongStudentNumber": "Mali ang Student Number na iyan. Subukan ulit.",
+  "authConnectionError": "Hindi maabot ang server. Tingnan ang koneksyon.",
+  "authNumberEmpty": "Hindi pwedeng walang laman ang Student Number.",
+  "authNumberFormat": "Dapat ganito ang Student Number: DC-2026-0001.",
+  "authNumberRepeated": "Hindi pwedeng apat na magkaparehong numero ang dulo.",
+  "authNumberTaken": "May ibang bata nang may ganitong Student Number.",
+  "authEnrollFailed": "Hindi naitala ang bata. Tingnan ang koneksyon.",
+  "authNoStudentsToDelete": "Walang batang maaalis.",
+  "authAllStudentsDeleted": "Naalis na ang lahat ng bata.",
+  "authDeleteFailed": "Hindi naalis ang mga bata. Subukan ulit.",
+  "authNoStudentsToReset": "Walang batang mare-reset.",
+  "authResetDone": "Na-reset ang login ng {count} bata.",
+  "authResetFailed": "Hindi na-reset ang login. Subukan ulit.",
+  "passwordNotSetYet": "Wala pa.",
+  "passwordChangedByParent": "Pinalitan ito ng magulang. Hindi na ito ang Student Number.",
+  "authPasswordTooShort": "Kailangan ng hindi bababa sa 4 na karakter ang password.",
+  "newPasswordLabel": "Bagong password",
+  "whatToPractise": "Ano ang Sanayin",
+  "nothingToPractise": "Wala. Nasasagot nang tama ng batang ito ang mga tanong.",
+  "pupilReport": "Ang progreso ng mag-aaral na ito sa E-Tarabay.",
+  "editStudent": "I-edit ang detalye",
+  "copyByHand": "Hindi pinapayagan ng browser na kopyahin ito ng app. Piliin at kopyahin nang manu-mano.",
+  "confirmNewPassword": "Ulitin ang bagong password",
+  "newParentPin": "Bagong code",
+  "welcome": "Maligayang pagbabalik!",
+  "switchToChild": "Buksan ang account ni {name}",
+  "switchToChildNote": "Magiging kay {name} ang app. Walang kailangang mag-login ulit, at nananatili ang mga nagawa nila.",
+  "switchAccount": "Lumipat",
+  "switchNeedsConnection": "Kumonekta muna sa internet — may nagawa ang batang ito na nasa teleponong ito lang.",
+  "scoreWord": "Puntos",
+  "streakWord": "Streak",
+  "notifPermissionDenied": "Payagan muna ang abiso sa settings ng iyong telepono.",
+  "greetMorning": "Magandang Umaga!",
+  "greetAfternoon": "Magandang Hapon!",
+  "greetEvening": "Magandang Gabi!",
+  "updateAvailableTitle": "May bagong bersyon!",
+  "updateAvailableBody": "Handa nang i-download ang bersyon {version}.",
+  "updateDownloadNow": "I-download Ngayon",
+  "updateLater": "Mamaya na Lang",
+  "bgPermissionTitle": "Sabihin Mo kay Mama o Papa!",
+  "bgPermissionBody": "Para gumana ang mga paalala, dapat payagan nila ang E-Tarabay sa Battery at Autostart settings ng telepono."
+}

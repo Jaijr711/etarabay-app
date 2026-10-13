@@ -1,0 +1,36 @@
+# E-Tarabay v1.0.6 Feature Release & Change Documentation
+
+## 1. Coloring Activity Improvements (Kulay sa Saya)
+- [x] **Item 1. Persistent Work Across Sessions & Logouts**: All finished and in-progress coloring work is automatically saved and bound to student accounts (`kulay_autosave_${studentId}_${pageName}`), ensuring work stays preserved even after logging out.
+- [x] **Item 2. Color-by-Number Tap-to-Fill Mode**: Converted freehand brush coloring to a numbered palette (`1`, `2`, `3`, `4`...) with matching region fill, preventing color from bleeding or going outside line boundaries.
+
+## 2. Letter & Number Tracing (Sundan / Trace It)
+- [x] **Item 3. Stroke Order & Direction Process**: Added numbered origin badges (`1`, `2`, `3`...) and directional arrow indicators for tracing numbers (0-10), uppercase letters (A-Z), and lowercase letters (a-z) based on stroke reference diagrams.
+- [x] **Item 13. Trace It Mode Selector Redesign**: Upgraded mode tabs (`ABC`, `abc`, `123`) in `TraceItScreen` with vibrant gradient cards (Ocean Blue `#4FACFE`→`#00F2FE`, Emerald Green `#11998E`→`#38EF7D`, Sunburst Coral `#FF6B6B`→`#FF8E53`), glowing active shadows, rounded corners, and responsive typography wrappers.
+
+## 3. UI/UX & Navigation Smoothness
+- [x] **Item 4. Enlarged Instruction Text**: Standardized global typography with `AppStyles.instructionText` (22px bold) and `AppStyles.instructionHeader` (26px extra bold), significantly enlarging instruction banners across all activities.
+- [x] **Item 7. Prominent Timer UI**: Enhanced countdown timer badges with high-contrast containers and icon indicators across all timed games.
+- [x] **Item 14. Smooth Tab Transitions**: Integrated `pushReplacementFadeThrough` transitions across `HomeScreen`, `LessonsScreen`, `AwardsScreen`, and `SettingsScreen` for seamless Material cross-fades when switching main navigation tabs and returning Home.
+- [x] **Item 15. Home Screen Dynamic Badges & Stats Overflow**: Added live top-right progress pill badges (`🏅 1/5`, `⭐ X/31`, `🎨 X/9`) to all Home grid cards. Wrapped stat numbers and subtitles in `FittedBox` and `Expanded` to prevent text clipping for 3+ digit star counts.
+
+## 4. Teacher Management & Real-Time Student Reset
+- [x] **Item 5. Complete Real-Time Student Activity Reset**: 
+  - Updated `AuthService.resetStudentActivityProgress()` to perform an exhaustive Firestore wipe (`progress`, `rawProgress: {}`, `profile.stars: 0`, `profile.lessonsCompleted: 0`, `profile.achievements: {}`, `creations: []`, `coloring_creations: []`, `activities: {}`, `lastResetAt`).
+  - Added real-time listener in `UserProvider._startProfileListener()` to catch reset events live on student devices.
+  - Purged Hive binary database progress boxes (`_gb.clear()`) and all sub-module `SharedPreferences` keys (`sundan_`, `traceit_`, `mat_`, `matematika_`, `pamilya_`, `kulay_`, `magbasa_`, `tula_`, `kwento_`, `kanta_`, `karaoke_`, `tandaan_`, `quiz_`, `progress_`, `level_`, `game_`).
+  - Fixed student document ID injection from `TeacherDashboardScreen` to `StudentDetailScreen`.
+
+## 5. Quiz & Game Mechanics
+- [x] **Item 6. Delayed Score & Completion Overlays**: Adjusted score modal triggers so "Perfect!" and level completion popups appear ONLY after completing the full set (e.g. 5/5 or 7/7 rounds), not on item 1.
+- [x] **Item 8. Standardized Red/Green Answer Colors**: Standardized answer feedback colors across all game modules: Red for incorrect answers and Green for correct answers.
+- [x] **Item 10. Lock Placed Green Numbers (Isimpa ti Numero)**: Locked correctly placed numbers in mathematics ordering games once they turn green so they cannot be dragged or moved out of position.
+- [x] **Item 12. Non-Repeating Family Game Questions**: Created 7 unique questions for "Puno ng Pamilya" and 7 unique questions for "Ang Aming Tahanan" in `PamilyaContent`, eliminating question repetition across the 7 rounds.
+- [x] **Item 16. Interactive Object-to-Room Matching Game ("Ti Balaymi / Our Home")**: Replaced static room tap cards in Level 5 of `PamilyaScreen` with an interactive object matching game. Children match household objects (`📺 Television`, `🍳 Frying Pan`, `🛏️ Bed & Pillow`, `🧼 Soap`, `🌷 Garden & Plants`) to target rooms with multilingual prompts (Ilokano, Filipino, English), step progress indicators, haptic feedback, and placed emoji badges.
+
+## 6. Audio, Story & Song Media Controls
+- [x] **Item 9. Play, Pause, Replay & Manual Navigation**: Integrated explicit Play, Pause, Replay/Repeat, and manual Continue ("Susunod") buttons into `MagbasaKwentoScreen`, `MagbasaTulaScreen`, and `KaraokeGameScreen`. Auto-advance screen transitions were disabled to allow children ample time to re-listen and comprehend lessons.
+
+## 7. Terminology, Certificate Auto-Fill & Framework Stability
+- [x] **Item 11. Rename LRN to Student Number & Certificate Auto-Fill**: Updated all UI labels, auth fields, change password dialogs, teacher dashboard items, and localization files (`app_en.arb`, `app_fil.arb`, `app_ilo.arb`) from "LRN" to **"Student Number"**. Automatically rendered the student's Student Number onto the earned Certificate of Completion.
+- [x] **Item 17. Material Ancestor Assertion Fix**: Wrapped ListTile and SwitchListTile elements inside `parent_account_screen.dart` with `Material(color: Colors.transparent)` to prevent Flutter framework ink splash assertions when placed inside `DecoratedBox`.

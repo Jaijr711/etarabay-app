@@ -1,0 +1,111 @@
+name: e_tarabay
+description: "Ang Kabataan ay Pagasa ng Bayan"
+publish_to: 'none'
+version: 1.2.48+60
+
+environment:
+  sdk: ^3.5.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2  
+
+  # UI and Icons
+  google_fonts: ^6.3.2
+  animated_text_kit: ^4.3.0
+  flutter_animate: ^4.5.2
+  
+  # State Management
+  provider: ^6.1.5+1
+  shared_preferences: ^2.5.3
+  
+  # Local Storage
+  hive_flutter: ^1.1.0
+  path_provider: ^2.1.1
+  audioplayers: ^6.1.1
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.3.1
+  cloud_firestore: ^5.4.4
+  flutter_secure_storage: ^10.0.0
+  local_auth: ^2.3.0
+  confetti: ^0.8.0
+  cached_network_image: ^3.4.1
+  image: ^4.5.2
+  share_plus: ^13.1.0
+  gal: ^2.3.2
+  flutter_lucide: ^1.11.0
+  crypto: ^3.0.7
+  # Imported directly by the browser half of the certificate save. It
+  # arrived transitively before; an import needs it declared.
+  web: ^1.1.0
+  # A daily reminder that fires with the app closed. Android/iOS/desktop
+  # only — there is no web implementation, so every call to it is guarded
+  # with kIsWeb in reminder_service.dart.
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.9.4
+  # Sideloaded-update check (outside the Play Store): reads a small version
+  # manifest and offers the newer APK's own download page — see
+  # lib/services/update_checker.dart. Android/iOS only; guarded with kIsWeb.
+  package_info_plus: ^10.2.1
+  http: ^1.2.2
+  url_launcher: ^6.3.1
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.4
+  # flutter_native_splash was removed on 2026-09-10. It is a one-shot
+  # generator — the splash it drew (launch_background.xml, styles.xml and
+  # the splash/android12splash PNGs under android/app/src/main/res) is
+  # already in the tree and nothing in lib/ ever imported the package.
+  # Kept as a dev_dependency it broke every release build that
+  # regenerated GeneratedPluginRegistrant.java: Flutter's registrant
+  # generator emits a runtime registration for it, while the Gradle
+  # plugin loader correctly leaves a dev_dependency off the compile
+  # classpath — so the build failed with "package
+  # net.jonhanson.flutter_native_splash does not exist". Hand-deleting
+  # that line only lasted until the next pub get. To change the splash,
+  # add the package and its config block back, run it once, then take it
+  # out again.
+
+flutter:
+  generate: true
+  uses-material-design: true
+  assets:
+    # The whole folder, so a new picture just has to be dropped in —
+    # listing each file by hand meant a forgotten line showed up as a
+    # missing image at runtime and nowhere else.
+    - assets/images/
+    # The whole folder too, for the same reason. Naming one file by hand is
+    # why the seven family recordings could be dropped in and still not ship:
+    # nothing would have said they were missing.
+    #
+    # One folder per kind of recording. They used to be named after where they
+    # came from — poems_sfx, mabasa_sfx — with a song, a pop, three chimes and
+    # the module music all loose together in audio/. A folder entry covers
+    # only the files directly inside it, so every one of these has to be
+    # listed: a folder left out here ships nothing and says nothing.
+    - assets/audio/
+    - assets/audio/music/
+    - assets/audio/poems/
+    - assets/audio/stories/
+    - assets/audio/songs/
+    - assets/audio/family/
+    - assets/audio/sfx/
+    - assets/audio/birthday/
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app_logo.jpg"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/app_logo-transparent.png"
+  remove_alpha_ios: true
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/images/app_logo.jpg"
+    background_color: "#5C52E5"
+    theme_color: "#5C52E5"

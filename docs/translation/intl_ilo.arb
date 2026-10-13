@@ -1,0 +1,811 @@
+{
+  "@@locale": "ilo",
+  "back": "Agsubli",
+  "done": "Nalpas",
+  "save": "Idulin",
+  "cancel": "Ubusan",
+  "next": "Sumaruno",
+  "levelCompleted": "Level {level} Nalpasen!",
+  "@levelCompleted": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "proudOfYou": "Ipagpannakkel ka!",
+  "alreadyDone": "Nalpasem daytoyen!",
+  "categoryCompleted": "Nalpasem amin dagiti levels iti {cat}!",
+  "@categoryCompleted": {
+    "placeholders": {
+      "cat": {
+        "type": "String"
+      }
+    }
+  },
+  "finished": "Nalpasen! 🏆",
+  "previous": "Ngauna",
+  "completed": "Nalpas",
+  "inProgress": "Agsasakay",
+  "earned": "nagun-od",
+  "levels": "Levels",
+  "activities": "aktibidad",
+  "appTitle": "E-Tarabay",
+  "parents": "NAKATATAKENG",
+  "lessons": "Adal",
+  "stars": "Bituen",
+  "awards": "Premio",
+  "homeAge": "{age} Tawen",
+  "@homeAge": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "matematika": "MATEMATIKA",
+  "sundanMoKayaMo": "SUROTEM, KAYAM!",
+  "angAkingSarili": "BAGIK",
+  "atAkingPamilya": "KEN PAMILIAK",
+  "kulaySaya": "KOLOR-SAYA",
+  "magkulayTayo": "MAGKULAY TAYO!",
+  "sundanMo": "SUROTEM,",
+  "magbasaTitle": "Magbasa Tayo",
+  "alpabetoAtMgaSalita": "DAGITI TULA, KWENTO KEN KANTA",
+  "home": "Tahanan",
+  "profile": "Profil",
+  "videoDance": "Sayaw Video",
+  "settingsTitle": "Mga Setting",
+  "totalProgress": "Kabuuang Progress",
+  "poems": "Dagiti Tula",
+  "stories": "Dagiti Kwento",
+  "songs": "Dagiti Kanta",
+  "readStory": "Basaen ti Kwento",
+  "listenToSong": "Denggen ti Kanta",
+  "readPoem": "Basaen ti Tula",
+  "swipeToRead": "I-swipe tapno agbasa",
+  "tune": "Tono",
+  "action": "Galaw",
+  "counting": "Bibilangen dagiti Bagay",
+  "dragNumber": "I-drag ti Numero",
+  "lineMatch": "Itugma iti Linya",
+  "popBalloon": "I-pop ti Balloon",
+  "moreOrLess": "Adu wenno Bassit?",
+  "numberPuzzle": "Palaisipan ti Numero",
+  "numberSequence": "Panagsusurot ti Numero",
+  "chooseAnswer": "Piliem ti umiso a sungbat:",
+  "check": "Suriin",
+  "correct": "Umiso!",
+  "wrong": "Saan nga umiso! Padasen manen!",
+  "timeOut": "Nalpasen ti oras! Padasen manen.",
+  "level": "Antas {level}",
+  "@level": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "levelShort": "A",
+  "perfect": "Perpekto!",
+  "great": "Nagsayaat!",
+  "good": "Naimbag!",
+  "mathPoints": "+{points} puntos",
+  "@mathPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "streak": "{streak} nga aldaw a streak!",
+  "@streak": {
+    "placeholders": {
+      "streak": {
+        "type": "int"
+      }
+    }
+  },
+  "mathTotalScore": "Kabuuang Puntos",
+  "mathTotalStars": "Kabuuang Bituin",
+  "repeat": "Ulitin",
+  "nextLevel": "Sumaruno a Level",
+  "congratulations": "Ipagpannakkel Ka!",
+  "completedAllLevels": "Nalpasem amin dagiti levels!",
+  "chooseFirst": "Piliem muna ti sungbat!",
+  "chooseLeftFirst": "Piliem nga una ti numero iti kanigid!",
+  "dropHere": "I-drop ditoy!",
+  "dragHere": "I-drag ditoy",
+  "tapLeftThenRight": "Pindutem ti kanigid ken kanawan",
+  "matched": "natugma",
+  "popAllBalloonsWith": "I-pop amin a balloon a addaan",
+  "left": "Kanigid",
+  "right": "Kanawan",
+  "theyAreEqual": "Pareho da!",
+  "tapTwoToSwap": "Pindutem ti dua a numero tapno magukat",
+  "correctOrder": "Umiso nga urnos",
+  "selected": "Napili",
+  "tapAnotherToSwap": "pindutem ti maysa pay tapno magukat",
+  "whatsMissing": "Ania ti agkurang?",
+  "noGames": "Awan ti ay-ayam",
+  "howMany": "Mano ti {item}?",
+  "@howMany": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "matchWithNumber": "Itugma dagiti {category} iti umiso a numero",
+  "@matchWithNumber": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "whichIsMore": "Ania ti ad-adu?",
+  "whichIsLess": "Ania ti basbassit?",
+  "isSameNumber": "Pareho ti bilang?",
+  "arrange": "Urnosen: {sequence}",
+  "@arrange": {
+    "placeholders": {
+      "sequence": {
+        "type": "String"
+      }
+    }
+  },
+  "incorrectAnswer": "❌ SAAN NGA UMISO TI SUNGBAT",
+  "selectCorrectAnswer": "Piliem ti umiso a sungbat:",
+  "tryAgain": "Padasen Manen",
+  "tapLeftTapRight": "I-tap ti grupo (kanigid) → i-tap ti numero (kanawan)",
+  "angAkingSariliTitle": "Ti Bagik",
+  "angAkingPamilyaTitle": "Ti Pamilyak",
+  "allAboutMe": "Maipanggep Kaniak",
+  "myEmotions": "Dagiti Riknak",
+  "dailyRoutines": "Inaldaw nga Aramid",
+  "myPreferences": "Dagiti Kaykayatko",
+  "familyMembers": "Kameng ti Pamilya",
+  "familyRoles": "Trabaho ti Pamilya",
+  "familyActivities": "Aramid ti Pamilya",
+  "familyTree": "Punuan ti Pamilya",
+  "myHome": "Balayko",
+  "whatIsYourName": "Ania ti naganmo?",
+  "howOldAreYou": "Mano ti tawenmo?",
+  "areYouBoyOrGirl": "Lalaki ka wenno babai?",
+  "girl": "Babai",
+  "boy": "Lalaki",
+  "whatIsYourNameDescription": "Ti naganmo ket isu ti awag kenka ti pamilyam ken dagiti gayyemmo. Napateg daytoy!",
+  "howOldAreYouDescription": "Ti tawenmo ket ti bilang dagiti tawen manipud idin nayanakka. Salimetmetan ti tunggal tawen!",
+  "genderDescription": "Ti pannakaammo no lalaki wenno babai ka ket makatulong tapno mas maammalaanmi ka!",
+  "typeNameHint": "I-type ti naganmo ditoy",
+  "ageHint": "Halimbawa: 5, 7, 10",
+  "girlLabel": "👧 Babai",
+  "boyLabel": "👦 Lalaki",
+  "aboutMeSubtitle": "Maipanggep Kaniak",
+  "myEmotionsSubtitle": "Ilawlawag dagiti riknam",
+  "dailyRoutinesSubtitle": "Adalen dagiti inaldaw nga aramid",
+  "myPreferencesSubtitle": "Ania ti kaykayatmo?",
+  "familyMembersSubtitle": "Siasino dagiti kameng ti pamilyam?",
+  "familyRolesSubtitle": "Ania ti trabaho ti tunggal maysa?",
+  "familyActivitiesSubtitle": "Ania ti ar-aramidenyo a sangsangkamaysa?",
+  "familyTreeSubtitle": "Siasino dagiti karruba ken kadiam?",
+  "myHomeSubtitle": "Sadino ti pagtaengam?",
+  "emotionHappyQuestion": "Kaano ka NARAGSAK?",
+  "emotionSadQuestion": "Kaano ka NALIDAY?",
+  "emotionAngryQuestion": "Kaano ka PUNGTOT?",
+  "emotionSurprisedQuestion": "Kaano ka NAKIGTOT?",
+  "routineWakeUp": "Agriing ti bigat",
+  "routineBrushTeeth": "Agpuris/Agsepilio",
+  "routineTakeBath": "Agdigos",
+  "routineEatBreakfast": "Agpamigat",
+  "preferenceFood": "Ania ti paboritom a makan?",
+  "preferenceColor": "Ania ti paboritom a kulor?",
+  "whenIsYourBirthday": "Kaano ti kasangaymo?",
+  "whereDoYouLive": "Sadino ti pagtaengam?",
+  "happy": "Naragsak",
+  "sad": "Liday",
+  "angry": "Pungtot",
+  "surprised": "Nakigtot",
+  "sleepy": "Nakadurukay",
+  "scared": "Mabuteng",
+  "mother": "Nanang",
+  "father": "Tatang",
+  "olderBrother": "Manong",
+  "olderSister": "Manang",
+  "youngerSibling": "Ading",
+  "grandfather": "Lolo",
+  "grandmother": "Lola",
+  "searchColoringPages": "Biroken dagiti pangkulayan a pahina...",
+  "beautifulArtwork": "Napintas ti Artwork mo!",
+  "finishedColoring": "Nalpasmo ti nagkolor iti {name}!",
+  "@finishedColoring": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "saveYourArtwork": "Idulin ti Artwork Mo",
+  "giveArtworkName": "Ikan ti nagan ti artwork mo...",
+  "colorSomethingFirst": "Magkulay muna ng kahit ano!",
+  "justNow": "itan",
+  "timeAgo": "{amount}m ti naglabas",
+  "@timeAgo": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
+  },
+  "saved": "Naidulin!",
+  "others": "Iba pa",
+  "coloringBook": "Libro ti Panagkulay",
+  "myCreations": "Dagiti Likhak",
+  "color": "Kulor",
+  "animals": "Dagiti Ayup",
+  "flowers": "Dagiti Sabong",
+  "fruits": "Dagiti Bunga",
+  "toys": "Dagiti Ay-ayam",
+  "red": "Nalabbaga",
+  "blue": "Asul",
+  "green": "Berde",
+  "yellow": "Duyaw",
+  "orange": "Kahel",
+  "purple": "Lila",
+  "pink": "Rosas",
+  "brown": "Kayumanggi",
+  "black": "Nangisit",
+  "white": "Puraw",
+  "easy": "Nalaka",
+  "medium": "Katamtaman",
+  "hard": "Narigat",
+  "brush": "Pinsel",
+  "eraser": "Pambura",
+  "undo": "Urong",
+  "redo": "Ulitin",
+  "clear": "Linisin",
+  "surotemKabaelam": "Surotem, Kayam!",
+  "upper": "Dackel",
+  "lower": "Bassit",
+  "letterLabel": "Titik {letter}",
+  "@letterLabel": {
+    "placeholders": {
+      "letter": {
+        "type": "String"
+      }
+    }
+  },
+  "pointsLabel": "Puntos",
+  "goodJob": "Nagsayaat! 🌟",
+  "ulitin": "Ulitin",
+  "traceTitle": "Surotem, Kayam!",
+  "uppercase": "Dackel a Titik",
+  "lowercase": "Bassit a Titik",
+  "numbers": "Dagiti Numero",
+  "letter": "Titik {letter}",
+  "@letter": {
+    "placeholders": {
+      "letter": {
+        "type": "String"
+      }
+    }
+  },
+  "sundanPoints": "Puntos",
+  "reset": "Ulitin",
+  "finishedThisLetter": "Nalpasem daytoy a titik!",
+  "goodJobPoints": "🌟 Nagsayaat! +{points} puntos",
+  "@goodJobPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "tooHardSwitch": "Masyadong mahirap? Lipat tayo sa susunod!",
+  "reTrace": "Bakas muli",
+  "forParentsTitle": "Para kadagiti NAKATATAKENG",
+  "overallProgress": "Kabuuang Progress",
+  "tula": "Tula",
+  "kwento": "Kwento",
+  "kanta": "Kanta",
+  "uppercaseProgress": "Dackel a Titik",
+  "lowercaseProgress": "Bassit a Titik",
+  "numbersProgress": "Dagiti Numero",
+  "basicColors": "Dagiti Kangrunaan a Kulor",
+  "colorMixing": "Panagkaiwanen ti Kulor",
+  "colorObjects": "Kulor dagiti Bagay",
+  "completedLevels": "Nalpas a Levels",
+  "gamesCompleted": "Nalpas nga Ay-ayam",
+  "parentsTotalScore": "Kabuuang Puntos",
+  "currentStreak": "Kasalukuyang Streak",
+  "days": "{days} aldaw",
+  "@days": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "parentsTotalStars": "Kabuuang Bituin",
+  "badges": "dagiti badge",
+  "myProfile": "Ti Profilko",
+  "yearsOld": "{age} tawen",
+  "@yearsOld": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "male": "Lalaki",
+  "female": "Babai",
+  "birthday": "Kasangay",
+  "profileAge": "Tawen",
+  "gender": "Kasarian",
+  "memberSince": "Kameng Manipud",
+  "editProfile": "I-edit ti Profil",
+  "noProfileData": "Awan ti data ti profil",
+  "comingSoon": "Urayem manen!",
+  "settings": "Mga Setting",
+  "language": "Wika",
+  "sound": "Tunog",
+  "music": "Musika",
+  "notifications": "Mga Abiso",
+  "achievements": "Mga Natamo",
+  "firstSteps": "Unang Hakbang",
+  "alphabetMaster": "Alphabet Master",
+  "numberWizard": "Number Wizard",
+  "colorArtist": "Color Artist",
+  "shapeCreator": "Shape Creator",
+  "animalFriend": "Animal Friend",
+  "bookworm": "Bookworm",
+  "starStudent": "Star Student",
+  "mathWhiz": "Math Whiz",
+  "familyHero": "Family Hero",
+  "writingStar": "Writing Star",
+  "songbird": "Songbird",
+  "perfectScore": "Perpektong Puntos",
+  "firstStepsDesc": "Kumpletuhin ang unang aktibidad",
+  "alphabetMasterDesc": "Kumpletuhin lahat ng Magbasa Tayo activities",
+  "numberWizardDesc": "Kumpletuhin ang 20 Matematika games",
+  "colorArtistDesc": "Kumpletuhin lahat ng Kulay-Saya activities",
+  "shapeCreatorDesc": "Kumpletuhin lahat ng dackel a titik",
+  "animalFriendDesc": "Kumpletuhin lahat ng bassit a titik",
+  "bookwormDesc": "Kumpletuhin lahat ng kwento",
+  "starStudentDesc": "Kumpletuhin ang 20 Ang Aking Sarili games",
+  "familyHeroDesc": "Kumpletuhin lahat ng family levels",
+  "writingStarDesc": "Suroten lahat ng titik ken numero",
+  "songbirdDesc": "Matutunan lahat ng 13 kanta",
+  "perfectScoreDesc": "Mag-perpekto sa 3 laro",
+  "noAwardsYet": "Awan ti Premio Pay",
+  "completeActivitiesToEarn": "Lippasen dagiti aktibidad tapno makagun-od iti premio!",
+  "teacherDashboard": "Dashboard ti Guro",
+  "enrollStudent": "Ilista ti Estudiante",
+  "firstName": "Unang Nagan",
+  "lastName": "Apelyido",
+  "lRN": "LRN (Password)",
+  "usernameLabel": "Username (Auto-generated)",
+  "genderLabel": "Kasarian",
+  "studentInfo": "Impormasyon ti Estudiante",
+  "removeStudent": "Ikkaton ti Estudiante?",
+  "progressLabel": "Progress",
+  "logout": "Mag-logout",
+  "confirmLogout": "Sigurado ka a kayatmo ti mag-logout?",
+  "verifyLRN": "I-verify ti LRN",
+  "enterLRN": "Mangyaring ilagay ang iyong LRN para magpatuloy",
+  "invalidLRN": "Saan nga umiso a LRN. Padasen manen.",
+  "password": "Password",
+  "enrollmentInfo": "Ikan ti username ken LRN iti nakatatakeng/estudiante para iti login.",
+  "fillAllFields": "Pakisuyong punan ang lahat ng fields.",
+  "parentsInfo": "Impormasyon dagiti Nakatatakeng",
+  "parentNameLabel": "Nagan ti Nakatatakeng",
+  "parentContactLabel": "Contact ti Nakatatakeng (11 digits)",
+  "contactLengthError": "Ang numero ng contact ay dapat eksaktong 11 digits.",
+  "birthdayGreeting": "Naragsak a Kasangay, {name}!",
+  "@birthdayGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "swipeToDeleteGuide": "I-swipe pakigid tapno maikkat",
+  "enrollmentFailed": "Bigo ang pag-enroll.",
+  "enroll": "Ilista",
+  "studentEnrolled": "Nailista ti Estudiante!",
+  "studentEnrolledSuccessfully": "Nailistan ni {name}.",
+  "@studentEnrolledSuccessfully": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "loginCredentials": "Mga Kredensyal sa Pag-login:",
+  "userLabel": "User:",
+  "usernameCopied": "Nakopya ti Username!",
+  "passwordLabel": "Pass:",
+  "passwordCopied": "Nakopya ti Password!",
+  "fullName": "Daplis a Nagan",
+  "lRNPassword": "LRN (Password)",
+  "confirmRemoveStudent": "Sigurado ka a kayatmo nga ikkaton daytoy nga estudiante? Saanen a maibabawi.",
+  "remove": "Ikkaton",
+  "update": "I-update",
+  "refresh": "I-refresh",
+  "copied": "Nakopya!",
+  "noStudentsEnrolled": "Awan ti nailista nga estudiante pay.",
+  "tapToEnroll": "I-tap ti \"Ilista ti Estudiante\" tapno manginayon.",
+  "usernameHeader": "Username:",
+  "studentProgressTitle": "Progress ni {name}",
+  "@studentProgressTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "moduleBreakdown": "Breakdown ti Module",
+  "scoreLabel": "Puntos: {score}",
+  "@scoreLabel": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "welcome": "Naragsak a Panagsubli!",
+  "loginPrompt": "Mag-login tapno ituloy ti panag-adalo",
+  "loginButton": "Mag-login",
+  "teacherLoginButton": "Magpatuloy bilang Guro",
+  "enterUsernamePassword": "Pakisuyong ilagay ang username at password.",
+  "loginError": "Bigo ti pag-login. Padasen manen.",
+  "username": "Username",
+  "teacherLoginTitle": "Login ti Guro",
+  "teacherLoginPrompt": "Ipasok ang iyong teacher credentials para magpatuloy",
+  "teacherLoginButtonLabel": "Mag-login bilang Guro",
+  "invalidTeacherCredentials": "Saan nga umiso a teacher credentials. Padasen manen.",
+  "monthName": "Bulan {month}",
+  "@monthName": {
+    "placeholders": {
+      "month": {
+        "type": "int"
+      }
+    }
+  },
+  "notSet": "Saan a Nakatakda",
+  "saveChanges": "Idulin dagiti Pagbabago",
+  "enterName": "I-type ti naganmo",
+  "chooseLanguage": "Pumili ti Wika",
+  "getStarted": "Magsimula",
+  "nextLevelLearningTitle": "Sumaruno nga Antas ti Panag-adal",
+  "nextLevelLearningDesc": "Kapakapa ken interactive nga ay-ayam para kadagiti ubbing tapno matuto ken dumakkel.",
+  "learnAnywhereTitle": "Matuto Kahit Saan",
+  "learnAnywhereDesc": "I-access ang mga aralin kahit offline at ituloy ang pag-aaral kahit nasaan mang dako.",
+  "trackProgressTitle": "Subaybayan ti Panag-unlad",
+  "trackProgressDesc": "Tignan kung gaano kagaling ang iyong anak sa pamamanan ng smart progress tracking.",
+  "welcomeOnboardingTitle": "Naragsak a Panagumay iti E-Tarabay",
+  "welcomeOnboardingDesc": "Ti matalino nga kabsatmo iti panag-adal ken panagduktal iti lubong.",
+  "continueText": "Magpatuloy",
+  "forParents": "Para kadagiti Nakatatakeng",
+  "hello": "Kablaaw!",
+  "kulaySayaProgress": "Kulay-Saya Progress",
+  "totalSaved": "Kabuuang Naidulin",
+  "sundanMoProgress": "Sundan Mo Progress",
+  "magbasaProgress": "Magbasa Progress",
+  "matematikaProgress": "Matematika Progress",
+  "noResults": "Awan ti resulta",
+  "greatWorkKulay": "Nalpasen! Nagsayaat! 🌟",
+  "imageNotFound": "Saan a nahanap ti rupa",
+  "clearCanvasQuestion": "Linisin ti Canvas?",
+  "eraseColoringWarning": "Buburahin nito ang lahat ng iyong kinulayan.",
+  "noArtworksYet": "Awan ti ginawa pay.",
+  "colorPagePrompt": "Magkulay ng pahina\nat i-save ang iyong gawa!",
+  "startColoring": "Simulan ti Panagkulay",
+  "edit": "I-edit",
+  "lessonFinishedPrompt": "Nalpasem daytoy nga adal! Nagsayaat! Pumili ng ibang laro.",
+  "okButton": "OK",
+  "storyFinishedGreatJob": "Nagsayaat! Nalpasem ti kwento!",
+  "finishedExclamation": "Nalpasen!",
+  "readingFinishedGood": "✓ Nalpasen! Nagsayaat a panagbasa!",
+  "readingFinishedHappy": "✓ Nalpasen! Naragsak a panagbasa!",
+  "poemFinishedGreatJob": "Nagsayaat! Nalpasem ti tula!",
+  "doneAlready": "Nalpasen daytoy!",
+  "checkAnswer": "Suriin",
+  "noGamesAvailable2": "Awan ti ay-ayam",
+  "countAndDragCorrectNumber": "Bilangen ken i-drag ti umiso a numero!",
+  "theyAreSame": "Pareho da! ✓",
+  "whatIsMissingNumber": "Ania ti nawawalang numero?",
+  "badgesWithIcon": "🏅 Dagiti Badge",
+  "straightOrCorrect": "Umiso!",
+  "iKnowIt": "Naammangak!",
+  "familyTreeTitle": "Family Tree",
+  "familyTreeDesc": "Ti punuan ti pamilya ket agpakpakita kadagiti kameng ti pamilyam manipud kailakayan aginggana kailubingan.",
+  "familyTreeTapHint": "💡 Pindutem dagiti kameng tapno maammalaan ti relasyon!",
+  "iLearnedFamilyTree": "Naammalaak ti Family Tree!",
+  "ourHomeTitle": "Balaymi",
+  "tapEachRoomPrompt": "Pindutem ti tunggal kwarto tapno maammalaan ti ar-aramidenyoditoy!",
+  "thatIsOurHome": "Dayta ti balaymi!",
+  "startOnLine": "Magsimula sa linya!",
+  "stayInsideLine": "Manatili sa loob ng linya!",
+  "invalidInput": "Di-wastong input",
+  "tooShort": "Masyadong maikli ang sagot",
+  "selectAnswer": "Pumili ti sungbat",
+  "badgeKnowMyself": "Amangak ti Bagik",
+  "badgeEmotionExpert": "Eksperto iti Rikna",
+  "badgeRoutineExpert": "Eksperto iti Aramid",
+  "badgePreferenceExpert": "Eksperto iti Kaykayat",
+  "badgeMemberExpert": "Eksperto iti Kameng",
+  "badgeWorkExpert": "Eksperto iti Trabaho",
+  "badgeActivityExpert": "Eksperto iti Aramid",
+  "badgeTreeExpert": "Eksperto iti Punuan",
+  "badgeHouseExpert": "Eksperto iti Balay",
+  "forParentsSubtitle": "Adtoy ti progreso ti anakyo iti E-Tarabay.",
+  "artworks": "dagiti likha",
+  "error": "Error",
+  "recentActivity": "Kamakailang Aramid",
+  "recentColor": "Kamakailang Kulor",
+  "unknownStudent": "Saan a Amang nga Estudiante",
+  "achievementFirstSteps": "Unang Hakbang",
+  "achievementAlphabetMaster": "Alphabet Master",
+  "achievementNumberWizard": "Number Wizard",
+  "achievementColorArtist": "Color Artist",
+  "achievementShapeCreator": "Shape Creator",
+  "achievementAnimalFriend": "Animal Friend",
+  "achievementBookworm": "Bookworm",
+  "achievementMathWhiz": "Math Whiz",
+  "achievementFamilyHero": "Family Hero",
+  "achievementWritingStar": "Writing Star",
+  "achievementSongbird": "Songbird",
+  "achievementStarStudent": "Star Student",
+  "version": "Bersyon",
+  "backgroundMusicPlaying": "Tumutugtog ti musika",
+  "myArtworkDefault": "Artwork-ko",
+  "errorSaveLocal": "Saan nga ma-save ti likha iti device.",
+  "finishedAlready": "Nalpasen!",
+  "zoomMode": "Zoom mode: Pinapayagan ang multi-touch",
+  "brushMode": "Brush mode: I-click tapno magkulay",
+  "accessExpired": "Tapos na ang iyong access sa app na ito. Mangyaring kumonsulta sa iyong Teacher para sa susunod na hakbang.",
+  "colorsLabel": "dagiti kulor",
+  "overviewTab": "Buod",
+  "sundanMoTab": "Surotem",
+  "magbasaTab": "Magbasa",
+  "matematikaTab": "Matematika",
+  "artworksLabel": "Dagiti Obra",
+  "attemptsLabel": "Dagiti Subukan",
+  "pagesLabel": "pahina",
+  "lettersLabel": "titik",
+  "diffEasy": "Nalaka",
+  "diffMedium": "Katamtaman",
+  "diffHard": "Narigat",
+  "catAnimals": "Dagiti Ayup",
+  "catFlowers": "Dagiti Sabong",
+  "catFruits": "Dagiti Bunga",
+  "catToys": "Dagiti Ay-ayam",
+  "poemLabel": "Tula",
+  "storyLabel": "Kwento",
+  "songLabel": "Kanta",
+  "activitiesLabel": "aktibidad",
+  "gamesLabel": "ay-ayam",
+  "savedCountLabel": "naidulin",
+  "attemptsCountLabel": "subok",
+  "uppercaseLettersTitle": "Dackel a Titik (A–Z)",
+  "lowercaseLettersTitle": "Bassit a Titik (a–z)",
+  "numbersTitle": "Dagiti Numero (1–10)",
+  "levelComplete": "Nakumpleto ti Level {level}!",
+  "@levelComplete": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementFirstStepsDesc": "Lippasen ti unang aktibidad",
+  "achievementAlphabetMasterDesc": "Lippasen amin a aktibidad iti Magbasa",
+  "achievementNumberWizardDesc": "Lippasen ti 20 laro iti Matematika",
+  "achievementColorArtistDesc": "Lippasen amin a aktibidad iti Kulay-Saya",
+  "achievementShapeCreatorDesc": "Lippasen amin a dackel a titik",
+  "achievementAnimalFriendDesc": "Lippasen amin a bassit a titik",
+  "achievementBookwormDesc": "Lippasen amin a kwento",
+  "achievementMathWhizDesc": "Lippasen amin a level iti Matematika",
+  "achievementFamilyHeroDesc": "Lippasen amin a level iti Bagik",
+  "achievementWritingStarDesc": "Lippasen amin a numero",
+  "achievementSongbirdDesc": "Lippasen ti 10 kanta",
+  "pagePuppy": "Ubbing nga Aso",
+  "pageKuting": "Ubbing a Kuting",
+  "pageElepante": "Elepante",
+  "pageFlowerBasket": "Basket ti Sabong",
+  "pageRose": "Rosas",
+  "pageMansanas": "Mansanas",
+  "pageSaging": "Saging",
+  "pageTeddyBear": "Teddy Bear",
+  "pageSodaPop": "Soda Pop",
+  "achievementStarStudentDesc": "Lippasen ti 20 laro iti Bagik",
+  "badgeKnowMyselfDesc": "Nalpas ti 'Bagik'",
+  "badgeEmotionExpertDesc": "Nalpas ti 'Dagiti Riknak'",
+  "badgeRoutineExpertDesc": "Nalpas ti 'Inaldaw nga Aramid'",
+  "badgePreferenceExpertDesc": "Nalpas ti 'Dagiti Kaykayatko'",
+  "badgeMemberExpertDesc": "Nalpas ti 'Kameng ti Pamilya'",
+  "badgeWorkExpertDesc": "Nalpas ti 'Trabaho ti Pamilya'",
+  "badgeActivityExpertDesc": "Nalpas ti 'Aramid ti Pamilya'",
+  "badgeTreeExpertDesc": "Nalpas ti 'Punuan ti Pamilya'",
+  "badgeHouseExpertDesc": "Nalpas ti 'Balayko'",
+  "familyRoleSentence": "Ni {member} ket {roles}.",
+  "@familyRoleSentence": {
+    "placeholders": {
+      "member": {
+        "type": "String"
+      },
+      "roles": {
+        "type": "String"
+      }
+    }
+  },
+  "resetAllStudents": "I-reset Amin nga Estudiante",
+  "confirmResetAllStudents": "Sigurado ka a kayatmo nga ikkaton amin a nailista nga estudiante? Saanen a maibabawi.",
+  "confirm": "Kumpirmahin",
+  "rateYourArtwork": "I-rate ti Likha",
+  "howManyStars": "Mano a bituen ti maikari?",
+  "tapToView": "Pindutem tapno buyaen",
+  "delete": "Ikkaton",
+  "deleteArtwork": "Ikkaton ti Artwork",
+  "confirmDeleteArtwork": "Sigurado ka a kayatmo nga ikkaton daytoy nga artwork? Saanen a maibabawi.",
+  "artworkDeleted": "Naikkat ti artwork.",
+  "zoomOn": "Zoom",
+  "zoomOff": "Nalpas",
+  "karaokeTitle": "Karaoke",
+  "karaokeSubtitle": "Agkanta Tayo!",
+  "greatSinging": "Nagsayaat nga agkanta!",
+  "readFullPoemBeforeBack": "Basaen ti buong tula bago agsubli.",
+  "iReadThePoem": "Nabasa Ko ti Tula! ✓",
+  "readFullStoryBeforeBack": "Basaen ti buong kwento bago agsubli.",
+  "iReadTheStory": "Nabasakon! ✓",
+  "tandaanTitle": "Lagipem!",
+  "tandaanSubtitle": "ITUGMA TI PARES",
+  "round": "Round",
+  "matchThePairs": "Biroken ken itugma dagiti pares!",
+  "flipCardsToMatch": "Pindutem ti card tapno i-flip. Biroken ti dua a magkatulad!",
+  "traceItTitle": "Surotem - Kayam!",
+  "traceItSubtitle": "Idrowing manipud memorya",
+  "checkTracing": "Tingnan",
+  "showHint": "Tulong",
+  "startAtDot": "Magsimula sa tuldok!",
+  "almostThere": "Dandamagen! Padasen manen!",
+  "progressPages": "{done} / {total} pahina",
+  "@progressPages": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "percentComplete": "{percent}% kumpleto",
+  "@percentComplete": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "obraLabel": "Obra",
+  "strokesLabel": "Dagiti Pahid",
+  "categoryProgressHeader": "Progreso iti Tunggal Kategorya",
+  "savedArtworksHeader": "Dagiti Naidulin nga Obra",
+  "parentTipsHeader": "Tips para kadagiti Nakatatakeng",
+  "tipKulayTitle": "Kulay-Saya",
+  "tipKulayBody": "Panggepen ti anakyo a magkulay amin a pahina iti tunggal kategorya.",
+  "tipTraceItTitle": "Surotem",
+  "tipTraceItBody": "I-guide ti anakyo a suroten ti umiso a direksyon ti tunggal letra.",
+  "tipMagbasaTitle": "Magbasa",
+  "tipMagbasaBody": "Basaen ti napukaw kasama ti anakyo dagiti tula, kwento ken kanta.",
+  "tipMatematikaTitle": "Matematika",
+  "tipMatematikaBody": "Panggepen ti anakyo a malpas ti tunggal laro tapno dumakkel ti kakayahan iti bilang.",
+  "tipStudyTimeTitle": "Oras ti Panag-adal",
+  "tipStudyTimeBody": "Mag-practice iti 15-20 minuto inaldaw-aldaw para iti kasayaatan a resulta.",
+  "progressCompleted": "{done} / {total} nalpas",
+  "@progressCompleted": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "progressActivities": "{done} / {total} aktibidad",
+  "@progressActivities": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "progressGames": "{done} / {total} ay-ayam",
+  "@progressGames": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "pointsStatLabel": "Puntos",
+  "starsStatLabel": "Bituen",
+  "gameProgressHeader": "Progreso iti Tunggal Laro",
+  "tipPencilGripTitle": "Umiso a Panagiggem ti Lapis",
+  "tipPencilGripBody": "Siguraduhin a umiso ti panagiggem ti anakyo iti stylus wenno ima habang nag-tracing.",
+  "tipRepeatTitle": "Ulit-ulitin",
+  "tipRepeatBody": "Panggepen ti anakyo a ulit-ulitin dagiti letra a saan pay a nalpas.",
+  "tipPraiseTitle": "Ipagpannakkel ti Anakyo",
+  "tipPraiseBody": "Ipagpannakkel ti tunggal tagumpay, dackel man wenno bassit, tapno napagbalin ti kumpiyansa.",
+  "tipTulaTitle": "Tula",
+  "tipTulaBody": "Basaen ti napukaw dagiti tula kasama ti anakyo tapno maas-asik ti pagbigkas.",
+  "tipKwentoTitle": "Kwento",
+  "tipKwentoBody": "Saludsoden iti anakyo ti maipanggep iti kwento pagkatapos basaen tapno maas-asik ti pag-unawa.",
+  "tipKantaTitle": "Kanta",
+  "tipKantaBody": "Agkanta a sangsangkamaysa dagiti kanta tapno naragsak ti panag-adal.",
+  "tipCountingTitle": "Panagbilang",
+  "tipCountingBody": "Gumamit ti tunay a bagay kasla bunga wenno ay-ayam tapno makatulong iti anakyo a magbilang.",
+  "tipPraiseMatTitle": "Papuri",
+  "tipPraiseMatBody": "Ipagpannakkel ti anakyo iti tunggal umiso a sungbat tapno napagbalin ti kumpiyansa iti matematika.",
+  "tipGameFunTitle": "Ay-ayam",
+  "tipGameFunBody": "Dagiti ay-ayam ket dinisenyo tapno naragsak — palubosan ti anakyo a mag-enjoy iti panag-adal.",
+  "badgeFirstStepsTitle": "Unang Hakbang",
+  "badgeFirstStepsHint": "Lippasen ti 1 nga aramid",
+  "badgeAlphabetTitle": "Master ti Alpabeto",
+  "badgeAlphabetHint": "Lippasen ti 12 nga aramid iti panagbasa",
+  "badgeNumbersTitle": "Salamangkero ti Numero",
+  "badgeNumbersHint": "Agay-ayam ti 20 nga ay-ayam iti matematika",
+  "badgeColorsTitle": "Artista ti Kulor",
+  "badgeColorsHint": "Lippasen ti 4 nga aramid iti panagkulay",
+  "badgeShapesTitle": "Tagalikha ti Hugis",
+  "badgeShapesHint": "Suroten ti 26 a dackel a titik",
+  "badgeAnimalsTitle": "Gayyem ti Ayup",
+  "badgeAnimalsHint": "Suroten ti 26 a bassit a titik",
+  "badgeBookwormTitle": "Mahilig Magbasa",
+  "badgeBookwormHint": "Basaen ti 4 a kwento",
+  "badgeStarStudentTitle": "Bituen nga Estudiante",
+  "badgeStarStudentHint": "Agay-ayam ti 20 nga ay-ayam maipanggep iti pamilya",
+  "badgeMathWhizTitle": "Henyo iti Matematika",
+  "badgeMathWhizHint": "Lippasen ti 7 a level iti matematika",
+  "badgeFamilyHeroTitle": "Bannuar ti Pamilia",
+  "badgeFamilyHeroHint": "Lippasen ti 5 a level ti pamilia",
+  "badgeWritingStarTitle": "Bituen iti Panagsurat",
+  "badgeWritingStarHint": "Suroten ti 10 a numero",
+  "badgeSongbirdTitle": "Mannakakanta",
+  "badgeSongbirdHint": "Agkanta ti 10 a kanta",
+  "tapToClaim": "I-tap tapno Alaen",
+  "claimBadgeButton": "Alaen ti Badge",
+  "badgeClaimed": "NAALAN",
+  "awesome": "Nagsayaat!",
+  "claimBadgeBody": "Nagun-odmo daytoy a badge! Alaem tapno mainayon iti koleksionmo.",
+  "claimBadge": "Alaen ti {title}",
+  "plusStarsLabel": "+{stars} a Bituin",
+  "@plusStarsLabel": {
+    "placeholders": {
+      "stars": {
+        "type": "int"
+      }
+    }
+  },
+  "awardsWaiting": "{earned} ti nagun-od, {remaining} ti aguray a maala!",
+  "@awardsWaiting": {
+    "placeholders": {
+      "earned": {
+        "type": "int"
+      },
+      "remaining": {
+        "type": "int"
+      }
+    }
+  }
+}

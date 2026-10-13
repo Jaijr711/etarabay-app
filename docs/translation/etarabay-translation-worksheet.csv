@@ -1,0 +1,609 @@
+﻿KEY (do not change),ENGLISH (reference),TAGALOG (type here),ILOKANO (type here),MUST KEEP EXACTLY,Where it appears
+pamilya/_pamilyaLevel1Games[0].question,"Who takes care of you, cooks food, and gives you love?",,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[0].choices[0],👩 Mother,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[0].choices[1],👨 Father,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[0].choices[2],👧 Sister,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[0].choices[3],👦 Brother,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[0].member,Mother,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[0].roles,"cooking, caring, loving",,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[0].description,Mother takes care of us and cooks delicious food.,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[0].note,"In Filipino, we call mother ""Nanay"" or ""Ina"".",,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[1].question,Who works for the family and loves to play with you?,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[1].choices[0],👩 Mother,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[1].choices[1],👨 Father,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[1].choices[2],👧 Sister,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[1].choices[3],👦 Brother,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[1].member,Father,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[1].roles,"working, playing, protecting",,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[1].description,Father works for the family and is fun to play with.,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[1].note,"In Filipino, we call father ""Tatay"" or ""Ama"".",,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[2].question,Who is your older brother?,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[2].choices[0],👩 Mother,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[2].choices[1],👨 Father,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[2].choices[2],👧 Older Sister,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[2].choices[3],👦 Older Brother,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[2].member,Older Brother,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[2].roles,"older sibling, companion, playmate",,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[2].description,Your older brother is your older male sibling.,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[2].note,"In Filipino, we call older brother ""Kuya"".",,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[3].question,Who is your older sister?,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[3].choices[0],👩 Mother,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[3].choices[1],👨 Father,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[3].choices[2],👧 Older Sister,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[3].choices[3],👦 Older Brother,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[3].member,Older Sister,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[3].roles,"older sibling, helps at home, playmate",,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[3].description,Your older sister is your older female sibling.,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[3].note,"In Filipino, we call older sister ""Ate"".",,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[4].question,Who is the youngest member of the family?,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[4].choices[0],👶 Youngest Sibling,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[4].choices[1],👦 Older Brother,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[4].choices[2],👧 Older Sister,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[4].choices[3],👴 Grandfather,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[4].member,Youngest Sibling,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[4].roles,"youngest sibling, cared for",,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[4].description,The youngest is the youngest member of the family.,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[4].note,"In Filipino, we call the youngest sibling ""Bunso"".",,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[5].question,Who is the father of your mother or father?,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[5].choices[0],👴 Grandfather,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[5].choices[1],👵 Grandmother,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[5].choices[2],👨 Father,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[5].choices[3],👩 Mother,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[5].member,Grandfather,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[5].roles,"tells stories, gives advice",,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[5].description,Grandfather is the father of your mother or father.,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[5].note,"In Filipino, we call grandfather ""Lolo"".",,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[6].question,Who is the mother of your mother or father?,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[6].choices[0],👴 Grandfather,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[6].choices[1],👵 Grandmother,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[6].choices[2],👨 Father,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[6].choices[3],👩 Mother,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[6].member,Grandmother,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[6].roles,"cooks delicious food, tells stories",,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[6].description,Grandmother is the mother of your mother or father.,,,,My Family — Family Members
+pamilya/_pamilyaLevel1Games[6].note,"In Filipino, we call grandmother ""Lola"".",,,,My Family — Family Members
+pamilya/_homeRooms[0].name,Living Room,,,,My Family — Our Home
+pamilya/_homeRooms[0].activity,family relaxes and watches TV together,,,,My Family — Our Home
+pamilya/_homeRooms[1].name,Kitchen,,,,My Family — Our Home
+pamilya/_homeRooms[1].activity,family cooks and eats together,,,,My Family — Our Home
+pamilya/_homeRooms[2].name,Bedroom,,,,My Family — Our Home
+pamilya/_homeRooms[2].activity,family rests and talks together,,,,My Family — Our Home
+pamilya/_homeRooms[3].name,Bathroom,,,,My Family — Our Home
+pamilya/_homeRooms[3].activity,family bathes and washes up,,,,My Family — Our Home
+pamilya/_homeRooms[4].name,Yard,,,,My Family — Our Home
+pamilya/_homeRooms[4].activity,family plays and spends time together,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[0].question,In which part of the house do we cook and prepare food?,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[0].choices[0],Kitchen,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[0].choices[1],Bedroom,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[0].choices[2],Bathroom,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[0].choices[3],Garage,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[0].explanation,Correct! The kitchen is where delicious meals are prepared.,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[1].question,In which part of the house do we sleep and rest?,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[1].choices[0],Bedroom,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[1].choices[1],Kitchen,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[1].choices[2],Yard,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[1].choices[3],Dining room,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[1].explanation,Correct! Bedrooms provide rest and peaceful sleep.,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[2].question,Where does the family gather to talk and watch TV?,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[2].choices[0],Living Room (Sala),,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[2].choices[1],Bathroom,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[2].choices[2],Storage room,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[2].choices[3],Kitchen,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[2].explanation,Correct! The living room is for family relaxation and gathering.,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[3].question,Where do we take a bath and wash up?,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[3].choices[0],Bathroom,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[3].choices[1],Living Room,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[3].choices[2],Garden,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[3].choices[3],Bedroom,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[3].explanation,Correct! We maintain hygiene in the bathroom.,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[4].question,Where can children safely play outdoors near home?,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[4].choices[0],Yard / Garden,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[4].choices[1],Busy road,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[4].choices[2],Kitchen stove,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[4].choices[3],Roof,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[4].explanation,Correct! The yard or garden is safe for outdoor fun.,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[5].question,Why is our home very important to us?,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[5].choices[0],It protects and shelters our family with love,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[5].choices[1],It is just a store,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[5].choices[2],It is noisy,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[5].choices[3],No reason,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[5].explanation,Correct! Home is our safe haven filled with family love.,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[6].question,How can we help keep our home clean and neat?,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[6].choices[0],Help sweep and organize toys,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[6].choices[1],Throw trash anywhere,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[6].choices[2],Break things,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[6].choices[3],Make a mess,,,,My Family — Our Home
+pamilya/_pamilyaLevel5Games[6].explanation,Correct! Helping clean keeps our home comfortable for everyone.,,,,My Family — Our Home
+pamilya_screen/_homeItemChallenges[0].itemName,Television,,,,My Family — Our Home
+pamilya_screen/_homeItemChallenges[0].question,Where do we watch TV together as a family?,,,,My Family — Our Home
+pamilya_screen/_homeItemChallenges[1].itemName,Frying Pan & Stove,,,,My Family — Our Home
+pamilya_screen/_homeItemChallenges[1].question,Where does Nanang cook delicious meals?,,,,My Family — Our Home
+pamilya_screen/_homeItemChallenges[2].itemName,Bed & Pillow,,,,My Family — Our Home
+pamilya_screen/_homeItemChallenges[2].question,Where do we rest and sleep at night?,,,,My Family — Our Home
+pamilya_screen/_homeItemChallenges[3].itemName,Soap & Shampoo,,,,My Family — Our Home
+pamilya_screen/_homeItemChallenges[3].question,Where do we take a bath and wash clean?,,,,My Family — Our Home
+pamilya_screen/_homeItemChallenges[4].itemName,Garden & Plants,,,,My Family — Our Home
+pamilya_screen/_homeItemChallenges[4].question,Where do we play outdoors and water the plants?,,,,My Family — Our Home
+pamilya/_pamilyaLevel4Games[0].question,Who are the parents of your Father or Mother?,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[0].choices[0],Grandfather and Grandmother,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[0].choices[1],Uncles and Aunts,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[0].choices[2],Siblings,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[0].choices[3],Cousins,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[0].explanation,Correct! Grandparents are the parents of our parents.,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[1].question,Who is the youngest sibling in the family?,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[1].choices[0],Older Brother,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[1].choices[1],Older Sister,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[1].choices[2],Baby / Youngest,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[1].choices[3],Grandmother,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[1].explanation,Correct! The baby or youngest is the youngest member among siblings.,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[2].question,What do you call an older brother in Tagalog/Filipino?,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[2].choices[0],Ate,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[2].choices[1],Kuya,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[2].choices[2],Bunso,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[2].choices[3],Lolo,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[2].explanation,Correct! Kuya is the term for an older brother.,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[3].question,What do you call an older sister in Tagalog/Filipino?,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[3].choices[0],Kuya,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[3].choices[1],Ate,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[3].choices[2],Bunso,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[3].choices[3],Lola,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[3].explanation,Correct! Ate is the term for an older sister.,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[4].question,Who guides and takes care of the children at home?,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[4].choices[0],Father and Mother,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[4].choices[1],Neighbors,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[4].choices[2],Strangers,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[4].choices[3],Only pets,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[4].explanation,Correct! Father and Mother guide and love their children.,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[5].question,What chart shows family relationships across generations?,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[5].choices[0],Family Tree,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[5].choices[1],Shopping List,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[5].choices[2],Calendar,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[5].choices[3],Weather Chart,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[5].explanation,Correct! A Family Tree illustrates generations of a family.,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[6].question,How should family members treat each other?,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[6].choices[0],With love and respect,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[6].choices[1],With fighting,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[6].choices[2],By ignoring each other,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[6].choices[3],Shouting,,,,My Family — Family Tree
+pamilya/_pamilyaLevel4Games[6].explanation,Correct! Loving and respecting each other makes a happy family.,,,,My Family — Family Tree
+pamilya/_familyTreeData.generations[0].title,Grandparents (Lolo and Lola),,,,My Family — Family Tree
+pamilya/_familyTreeData.generations[0].members[0].relation,Grandfather (father of father),,,,My Family — Family Tree
+pamilya/_familyTreeData.generations[0].members[1].relation,Grandmother (mother of father),,,,My Family — Family Tree
+pamilya/_familyTreeData.generations[0].members[2].relation,Grandfather (father of mother),,,,My Family — Family Tree
+pamilya/_familyTreeData.generations[0].members[3].relation,Grandmother (mother of mother),,,,My Family — Family Tree
+pamilya/_familyTreeData.generations[1].title,Parents,,,,My Family — Family Tree
+pamilya/_familyTreeData.generations[1].members[0].relation,Father,,,,My Family — Family Tree
+pamilya/_familyTreeData.generations[1].members[1].relation,Mother,,,,My Family — Family Tree
+pamilya/_familyTreeData.generations[2].title,Siblings,,,,My Family — Family Tree
+pamilya/_familyTreeData.generations[2].members[0].relation,Older Brother,,,,My Family — Family Tree
+pamilya/_familyTreeData.generations[2].members[1].relation,Older Sister,,,,My Family — Family Tree
+pamilya/_familyTreeData.generations[2].members[2].relation,Youngest Sibling,,,,My Family — Family Tree
+pamilya/_mainCategories[0].title,About Myself,,,,About & My Family
+pamilya/_mainCategories[1].title,My Family,,,,About & My Family
+pamilya/_categoryLevelTitles[0][0],All About Me,,,,About & My Family
+pamilya/_categoryLevelTitles[0][1],My Emotions,,,,About & My Family
+pamilya/_categoryLevelTitles[0][2],Daily Routines,,,,About & My Family
+pamilya/_categoryLevelTitles[0][3],My Preferences,,,,About & My Family
+pamilya/_categoryLevelTitles[1][0],Family Members,,,,About & My Family
+pamilya/_categoryLevelTitles[1][1],Family Roles,,,,About & My Family
+pamilya/_categoryLevelTitles[1][2],Family Activities,,,,About & My Family
+pamilya/_categoryLevelTitles[1][3],Family Tree,,,,About & My Family
+pamilya/_categoryLevelTitles[1][4],Our Home,,,,About & My Family
+pamilya/_sariliLevel2Games[0].question,When are you HAPPY?,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[0].choices[0],🎁 When there is a gift or surprise,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[0].choices[1],😢 When someone is mean,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[0].choices[2],😴 When sleepy,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[0].explanation,Correct! We are happy when good things happen like receiving gifts or celebrating.,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[0].tip,Smile and share your happiness with your family!,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[1].question,When are you SAD?,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[1].choices[0],🎂 When there is a birthday party,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[1].choices[1],🧸 When your favorite toy is lost,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[1].choices[2],🍦 When eating ice cream,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[1].explanation,Correct! It is normal to feel sad when we lose something or when something bad happens.,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[1].tip,"When you are sad, hug your mom or dad.",,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[2].question,When are you ANGRY?,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[2].choices[0],🎮 When you win a game,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[2].choices[1],🧸 When you get a new toy,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[2].choices[2],👊 When someone takes your toy without asking,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[2].explanation,Correct! We get angry when something unfair or wrong happens.,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[2].tip,"When you are angry, take a deep breath and count to five.",,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[3].question,When are you SURPRISED?,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[3].choices[0],🎁 When there is an unexpected surprise,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[3].choices[1],🍚 When eating,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[3].choices[2],😴 When sleeping,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[3].explanation,Correct! We are surprised when something unexpected happens.,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[3].tip,It is okay to be surprised — learning is an adventure!,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[4].question,When are you SLEEPY?,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[4].choices[0],🌅 In the morning after waking up,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[4].choices[1],🌙 When it is night time,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[4].choices[2],☀️ When playing outside,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[4].explanation,Correct! We feel sleepy at night because it is time to sleep.,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[4].tip,Go to bed early so you can grow big and strong!,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[5].question,When are you SCARED?,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[5].choices[0],🌈 When there is a rainbow,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[5].choices[1],⚡ When there is thunder and lightning,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[5].choices[2],☀️ On a sunny day,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[5].explanation,Correct! We are scared of loud sounds like thunder.,,,,About Myself — My Emotions
+pamilya/_sariliLevel2Games[5].tip,"When you are scared, hug your mom or dad.",,,,About Myself — My Emotions
+pamilya/_pamilyaLevel2Games[0].question,Who usually cooks at home?,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[0].choices[0],Mother only,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[0].choices[1],Father only,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[0].choices[2],Grandmother only,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[0].choices[3],Anyone can,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[0].explanation,Correct! Anyone in the family can cook.,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[1].question,Who works for the family?,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[1].choices[0],Father only,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[1].choices[1],Mother only,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[1].choices[2],Grandfather only,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[1].choices[3],Many can,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[1].explanation,Correct! Many family members can work.,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[2].question,Who usually tells stories?,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[2].choices[0],Older Brother,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[2].choices[1],Older Sister,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[2].choices[2],Grandparents,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[2].choices[3],Father,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[2].explanation,Correct! Grandparents are the best storytellers.,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[3].question,Who takes care of you when you are sick?,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[3].choices[0],Mother,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[3].choices[1],Father,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[3].choices[2],Grandmother,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[3].choices[3],All of them,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[3].explanation,Correct! All family members take care of each other.,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[4].question,Who do you play with at home?,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[4].choices[0],Older Brother,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[4].choices[1],Older Sister,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[4].choices[2],Youngest Sibling,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[4].choices[3],Any sibling,,,,My Family — Family Roles
+pamilya/_pamilyaLevel2Games[4].explanation,Correct! You can play with anyone.,,,,My Family — Family Roles
+pamilya/_sariliLevel3Games[0].question,What is the first thing you do in the MORNING after waking up?,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[0].choices[0],🛏️ Wake up and get out of bed,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[0].choices[1],🍳 Eat breakfast,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[0].choices[2],📺 Watch TV,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[0].explanation,Correct! First we wake up and get out of bed before doing other things.,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[0].tip,Wake up early to be ready for the whole day!,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[1].question,What do we usually do in the AFTERNOON?,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[1].choices[0],📚 Study or play,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[1].choices[1],🍚 Eat lunch,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[1].choices[2],😴 Sleep the whole afternoon,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[1].explanation,"Correct! In the afternoon, we study or play.",,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[1].tip,Balance your time for studying and playing!,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[2].question,What can you do before going to BED?,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[2].choices[0],🪥 Brush your teeth,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[2].choices[1],🍪 Eat a snack,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[2].choices[2],📱 Play with a cellphone,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[2].explanation,Correct! It is important to brush your teeth before sleeping to protect them.,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[2].tip,Clean teeth mean no toothaches!,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[3].question,How can you protect yourself from getting sick?,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[3].choices[0],🧼 Wash your hands,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[3].choices[1],🪥 Just brush teeth,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[3].choices[2],💧 Drink water,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[3].explanation,Correct! Washing your hands prevents sickness.,,,,About Myself — Daily Routines
+pamilya/_sariliLevel3Games[3].tip,Wash your hands before eating and after using the bathroom!,,,,About Myself — Daily Routines
+pamilya/_sariliLevel4Games[0].question,What is your favorite FOOD?,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[0].options[0],🍚 Rice,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[0].options[1],🐟 Fish,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[0].options[2],🍛 Stew,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[0].options[3],🍖 Meat,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[0].description,Choose your favorite food!,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[1].question,What is your favorite COLOR?,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[1].options[0],🔴 Red,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[1].options[1],🔵 Blue,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[1].options[2],🟢 Green,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[1].options[3],🟡 Yellow,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[1].description,Pick your favorite color!,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[2].question,What is your favorite GAME?,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[2].options[0],🪀 Hopscotch,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[2].options[1],🏃 Tag,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[2].options[2],🧩 Puzzle,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[2].options[3],🎯 Ring Toss,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[2].description,Fun games to play with friends!,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[3].question,What is your favorite ANIMAL?,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[3].options[0],🐶 Dog,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[3].options[1],🐱 Cat,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[3].options[2],🐓 Chicken,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[3].options[3],🐃 Carabao,,,,About Myself — My Preferences
+pamilya/_sariliLevel4Games[3].description,Pick your favorite animal!,,,,About Myself — My Preferences
+pamilya/_pamilyaLevel3Games[0].question,What is a good thing to do together during meals?,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[0].choices[0],Eat and talk together,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[0].choices[1],Watch TV,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[0].choices[2],Sleep,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[0].choices[3],Use cellphone,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[0].explanation,Correct! Eating together and talking is wonderful.,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[1].question,What can the family do on weekends?,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[1].choices[0],Relax at the park,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[1].choices[1],Shop at the grocery,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[1].choices[2],Clean together,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[1].choices[3],All of the above,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[1].explanation,Correct! All activities done together are wonderful.,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[2].question,What does the family do during birthdays?,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[2].choices[0],Eat cake,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[2].choices[1],Give gifts,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[2].choices[2],Celebrate together,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[2].choices[3],All of the above,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[2].explanation,Correct! Birthdays are celebrations for the whole family!,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[3].question,How can you help your family?,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[3].choices[0],Organize toys,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[3].choices[1],Sweep the floor,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[3].choices[2],Wash dishes,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[3].choices[3],All of the above,,,,My Family — Family Activities
+pamilya/_pamilyaLevel3Games[3].explanation,Correct! Helping at home shows love for your family.,,,,My Family — Family Activities
+pamilya/_sariliLevel1Games[0].question,What is your name?,,,,About Myself — All About Me
+pamilya/_sariliLevel1Games[0].hint,Type your name here,,,,About Myself — All About Me
+pamilya/_sariliLevel1Games[0].description,Your name is what your family and friends call you. It is important!,,,,About Myself — All About Me
+pamilya/_sariliLevel1Games[1].question,How old are you?,,,,About Myself — All About Me
+pamilya/_sariliLevel1Games[1].hint,"Example: 5, 7, 10",,,,About Myself — All About Me
+pamilya/_sariliLevel1Games[1].description,Your age is the number of years since you were born. Celebrate every year!,,,,About Myself — All About Me
+pamilya/_sariliLevel1Games[2].question,Are you a boy or a girl?,,,,About Myself — All About Me
+pamilya/_sariliLevel1Games[2].options[0],👧 Girl,,,,About Myself — All About Me
+pamilya/_sariliLevel1Games[2].options[1],👦 Boy,,,,About Myself — All About Me
+pamilya/_sariliLevel1Games[2].description,Knowing if you are a boy or a girl helps us know more about you!,,,,About Myself — All About Me
+pamilya/_sariliLevel1Games[3].question,When is your birthday?,,,,About Myself — All About Me
+pamilya/_sariliLevel1Games[3].description,Celebrate your birthday with your family!,,,,About Myself — All About Me
+pamilya/_sariliLevel1Games[4].question,Where do you live?,,,,About Myself — All About Me
+pamilya/_sariliLevel1Games[4].hint,Name of city or town,,,,About Myself — All About Me
+pamilya/_sariliLevel1Games[4].description,Your home is the place where you live with your family. Home sweet home!,,,,About Myself — All About Me
+matematika/_game1Levels[0].item_name_en,apples,,,,Mathematics — Count the Objects
+matematika/_game1Levels[1].item_name_en,bananas,,,,Mathematics — Count the Objects
+matematika/_game1Levels[2].item_name_en,dogs,,,,Mathematics — Count the Objects
+matematika/_game1Levels[3].item_name_en,🐟,,,,Mathematics — Count the Objects
+matematika/_game1Levels[4].item_name_en,birds,,,,Mathematics — Count the Objects
+matematika/_game3Levels[0].target_cat_en,fruit,,,,Mathematics — Match with Line
+matematika/_game3Levels[1].target_cat_en,animal,,,,Mathematics — Match with Line
+matematika/_game3Levels[2].target_cat_en,fruit,,,,Mathematics — Match with Line
+next,Next,,,,About & My Family
+levelCompleted,Level {level} Completed!,,,{level},About & My Family
+proudOfYou,I am proud of you!,,,,About & My Family
+alreadyDone,You already finished this!,,,,About & My Family
+finished,Finished! 🏆,,,,About & My Family
+level,Level {level},,,{level},About & My Family
+allAboutMe,All About Me,,,,About & My Family
+myEmotions,My Emotions,,,,About & My Family
+dailyRoutines,Daily Routines,,,,About & My Family
+myPreferences,My Preferences,,,,About & My Family
+familyMembers,Family Members,,,,About & My Family
+familyRoles,Family Roles,,,,About & My Family
+familyActivities,Family Activities,,,,About & My Family
+familyTree,Family Tree,,,,About & My Family
+myHome,My Home,,,,About & My Family
+whatIsYourName,What is your name?,,,,About & My Family
+howOldAreYou,How old are you?,,,,About & My Family
+areYouBoyOrGirl,Are you a boy or a girl?,,,,About & My Family
+whatIsYourNameDescription,Your name is what your family and friends call you. It is important!,,,,About & My Family
+howOldAreYouDescription,Your age is the number of years since you were born. Celebrate every year!,,,,About & My Family
+genderDescription,Knowing if you are a boy or a girl helps us know more about you!,,,,About & My Family
+typeNameHint,Type your name here,,,,About & My Family
+ageHint,"Example: 5, 7, 10",,,,About & My Family
+aboutMeSubtitle,All About Me,,,,About & My Family
+myEmotionsSubtitle,Explain your feelings,,,,About & My Family
+dailyRoutinesSubtitle,Learn daily activities,,,,About & My Family
+myPreferencesSubtitle,What do you like?,,,,About & My Family
+familyMembersSubtitle,Who are your family members?,,,,About & My Family
+familyRolesSubtitle,What is everyone's job?,,,,About & My Family
+familyActivitiesSubtitle,What do you do together?,,,,About & My Family
+familyTreeSubtitle,Who are your relatives?,,,,About & My Family
+myHomeSubtitle,Where do you live?,,,,About & My Family
+badgesWithIcon,🏅 Badges,,,,About & My Family
+straightOrCorrect,Correct!,,,,About & My Family
+familyTreeTitle,Family Tree,,,,About & My Family
+familyTreeTapHint,💡 Tap the members to know their relationship!,,,,About & My Family
+iLearnedFamilyTree,I learned the Family Tree!,,,,About & My Family
+ourHomeTitle,Our Home,,,,About & My Family
+thatIsOurHome,That is our home!,,,,About & My Family
+done,Done,,,,Kulay-Saya
+save,Save,,,,Kulay-Saya
+cancel,Cancel,,,,Kulay-Saya
+colorSomethingFirst,Color something first!,,,,Kulay-Saya
+justNow,just now,,,,Kulay-Saya
+timeAgo,{amount}m ago,,,{amount},Kulay-Saya
+saved,Saved!,,,,Kulay-Saya
+coloringBook,Coloring Book,,,,Kulay-Saya
+myCreations,My Creations,,,,Kulay-Saya
+color,Color,,,,Kulay-Saya
+eraser,Eraser,,,,Kulay-Saya
+undo,Undo,,,,Kulay-Saya
+redo,Redo,,,,Kulay-Saya
+clear,Clear,,,,Kulay-Saya
+update,Update,,,,Kulay-Saya
+noResults,No results,,,,Kulay-Saya
+imageNotFound,Image not found,,,,Kulay-Saya
+clearCanvasQuestion,Clear Canvas?,,,,Kulay-Saya
+eraseColoringWarning,This will erase all your coloring.,,,,Kulay-Saya
+noArtworksYet,No artworks yet.,,,,Kulay-Saya
+colorPagePrompt,"Color a page
+and save your artwork!",,,,Kulay-Saya
+startColoring,Start Coloring,,,,Kulay-Saya
+edit,Edit,,,,Kulay-Saya
+errorSaveLocal,Could not save artwork locally.,,,,Kulay-Saya
+pagePuppy,Puppy,,,,Kulay-Saya
+pageKuting,Cat,,,,Kulay-Saya
+pageElepante,Elephant,,,,Kulay-Saya
+pageFlowerBasket,Flower Basket,,,,Kulay-Saya
+pageRose,Rose,,,,Kulay-Saya
+pageMansanas,Apple,,,,Kulay-Saya
+pageSaging,Banana,,,,Kulay-Saya
+pageTeddyBear,Teddy Bear,,,,Kulay-Saya
+pageSodaPop,Soda Pop,,,,Kulay-Saya
+rateYourArtwork,Rate Artwork,,,,Kulay-Saya
+howManyStars,How many stars does it deserve?,,,,Kulay-Saya
+tapToView,Tap to view,,,,Kulay-Saya
+delete,Delete,,,,Kulay-Saya
+deleteArtwork,Delete Artwork,,,,Kulay-Saya
+confirmDeleteArtwork,Are you sure you want to delete this artwork? This cannot be undone.,,,,Kulay-Saya
+artworkDeleted,Artwork deleted.,,,,Kulay-Saya
+fitPicture,Fit,,,,Kulay-Saya
+lessons,Lessons,,,,Awards
+awards,Awards,,,,Awards
+home,Home,,,,Awards
+settings,Settings,,,,Awards
+forParents,For Parents,,,,Awards
+badgeFirstStepsTitle,First Steps,,,,Awards
+badgeFirstStepsHint,Earn your first 3 stars,,,,Awards
+badgeAlphabetTitle,Alphabet Master,,,,Awards
+badgeAlphabetHint,Collect all 69 stars in Let's Read,,,,Awards
+badgeNumbersTitle,Number Wizard,,,,Awards
+badgeNumbersHint,Trace all 10 numbers,,,,Awards
+badgeColorsTitle,Color Artist,,,,Awards
+badgeColorsHint,Collect all 39 stars in Kulay-Saya,,,,Awards
+badgeShapesTitle,Big Letters,,,,Awards
+badgeShapesHint,Trace all 26 capital letters,,,,Awards
+badgeAnimalsTitle,Small Letters,,,,Awards
+badgeAnimalsHint,Trace all 26 small letters,,,,Awards
+badgeBookwormTitle,Bookworm,,,,Awards
+badgeBookwormHint,Collect all 15 stars in Stories,,,,Awards
+badgeStarStudentTitle,All About Me,,,,Awards
+badgeStarStudentHint,Get 3 stars on all 4 About Myself levels,,,,Awards
+badgeMathWhizTitle,Math Expert,,,,Awards
+badgeMathWhizHint,Get 3 stars on all 7 math levels,,,,Awards
+badgeFamilyHeroTitle,Family Hero,,,,Awards
+badgeFamilyHeroHint,Get 3 stars on all 5 family levels,,,,Awards
+badgeWritingStarTitle,Writing Star,,,,Awards
+badgeWritingStarHint,Trace every letter and number,,,,Awards
+badgeSongbirdTitle,Songbird,,,,Awards
+badgeSongbirdHint,Collect all 39 stars in Songs,,,,Awards
+badgeStreakFiveTitle,Every Day Star,,,,Awards
+badgeStreakFiveHint,Play on 5 days in a row,,,,Awards
+tapToClaim,Tap to Claim,,,,Awards
+claimBadgeButton,Claim Badge,,,,Awards
+badgeClaimed,BADGE CLAIMED,,,,Awards
+awesome,Awesome!,,,,Awards
+claimBadgeBody,You earned this badge! Claim it to add it to your collection.,,,,Awards
+claimBadge,Claim {title},,,{title},Awards
+awardsWaiting,"{earned} earned, {remaining} waiting to be claimed!",,,{earned} {remaining},Awards
+back,Back,,,,Mathematics
+counting,Count the Objects,,,,Mathematics
+dragNumber,Drag the Number,,,,Mathematics
+lineMatch,Match with Line,,,,Mathematics
+popBalloon,Pop the Balloon,,,,Mathematics
+moreOrLess,More or Less?,,,,Mathematics
+numberPuzzle,Number Puzzle,,,,Mathematics
+numberSequence,Number Sequence,,,,Mathematics
+wrongShort,Wrong,,,,Mathematics
+replayReplacesStar,Playing again replaces this star.,,,,Mathematics
+putNumbersInOrder,Put the numbers in order,,,,Mathematics
+timesUp,Time's Up!,,,,Mathematics
+chooseFirst,Choose an answer first!,,,,Mathematics
+chooseLeftFirst,Choose a number on the left first!,,,,Mathematics
+dropHere,Drop here!,,,,Mathematics
+dragHere,Drag here,,,,Mathematics
+popAllBalloonsWith,Pop all balloons with,,,,Mathematics
+left,Left,,,,Mathematics
+right,Right,,,,Mathematics
+howMany,How many {item}?,,,{item},Mathematics
+matchWithNumber,Match the {category} with the correct number,,,{category},Mathematics
+whichIsMore,Which is more?,,,,Mathematics
+whichIsLess,Which is less?,,,,Mathematics
+isSameNumber,Same number?,,,,Mathematics
+selectCorrectAnswer,Select the correct answer:,,,,Mathematics
+tapLeftTapRight,Tap the group (left) → tap the number (right),,,,Mathematics
+pointsLabel,Points,,,,Mathematics
+goodJob,Good Job! 🌟,,,,Mathematics
+continueText,Continue,,,,Mathematics
+doneAlready,Done already!,,,,Mathematics
+checkAnswer,Check,,,,Mathematics
+noGamesAvailable2,No games available,,,,Mathematics
+countAndDragCorrectNumber,Count and drag the correct number!,,,,Mathematics
+whatIsMissingNumber,What is the missing number?,,,,Mathematics
+finishedAlready,Finished already!,,,,Mathematics
+levelComplete,Level {level} Complete!,,,{level},Mathematics
+stars,Stars,,,,Dashboard
+matematika,Mathematics,,,,Dashboard
+sundanMoKayaMo,"Follow Me, You Can Do It!",,,,Dashboard
+angAkingSarili,"About
+Myself",,,,Dashboard
+atAkingPamilya,And My Family,,,,Dashboard
+kulaySaya,Color Fun,,,,Dashboard
+magkulayTayo,Let's Color!,,,,Dashboard
+magbasaTitle,Let's Read,,,,Dashboard
+alpabetoAtMgaSalita,"Poems, Stories and Songs",,,,Dashboard
+hello,Hello!,,,,Dashboard
+accessExpired,Your access to this app has ended. Please consult your Teacher for the next steps.,,,,Dashboard
+helloName,"Hello, {name}!",,,{name},Dashboard
+letsLearnAndPlay,Let's learn and play!,,,,Dashboard
+myProgressToday,My Progress Today,,,,Dashboard
+whatDoYouWantToLearn,What do you want to learn?,,,,Dashboard
+rewardsCount,Reward,,,,Dashboard
+activitiesCount,Activities,,,,Dashboard
+lessonsCount,Lessons,,,,Dashboard
+tandaanTitle,Remember It!,,,,Dashboard
+tandaanSubtitle,Match the Pairs,,,,Dashboard
+traceItTitle,Trace It - You Can Do It!,,,,Dashboard
+traceItSubtitle,Draw from memory,,,,Dashboard
+badges,badges,,,,Profile
+myProfile,My Profile,,,,Profile
+yearsOld,{age} years old,,,{age},Profile
+male,Male,,,,Profile
+female,Female,,,,Profile
+birthday,Birthday,,,,Profile
+profileAge,Age,,,,Profile
+gender,Gender,,,,Profile
+memberSince,Member Since,,,,Profile
+editProfile,Edit Profile,,,,Profile
+noProfileData,No profile data,,,,Profile
+logout,Logout,,,,Profile
+parentNameLabel,Parent's Name,,,,Profile
+parentContactLabel,Parent's Contact (11 digits),,,,Profile
+fullName,Full Name,,,,Profile
+monthName,Month {month},,,{month},Profile
+notSet,Not Set,,,,Profile
+saveChanges,Save Changes,,,,Profile
+enterName,Enter your name,,,,Profile
+totalProgress,Total Progress,,,,Let's Read
+poems,Poems,,,,Let's Read
+stories,Stories,,,,Let's Read
+songs,Songs,,,,Let's Read
+tune,Tune,,,,Let's Read
+action,Action,,,,Let's Read
+repeat,Repeat,,,,Let's Read
+congratulations,Congratulations!,,,,Let's Read
+tula,Poems,,,,Let's Read
+kwento,Stories,,,,Let's Read
+kanta,Songs,,,,Let's Read
+readingFinishedGood,✓ Finished! Good reading!,,,,Let's Read
+readingFinishedHappy,✓ Finished! Happy reading!,,,,Let's Read
+greatSinging,Great singing!,,,,Let's Read
+iReadThePoem,I Read the Poem! ✓,,,,Let's Read
+iReadTheStory,I Have Read It! ✓,,,,Let's Read
+categoryCompleted,You completed all levels in {cat}!,,,{cat},Trace It
+upper,Upper,,,,Trace It
+lower,Lower,,,,Trace It
+letterLabel,Letter {letter},,,{letter},Trace It
+uppercase,Uppercase,,,,Trace It
+lowercase,Lowercase,,,,Trace It
+numbers,Numbers,,,,Trace It
+iKnowIt,I learned it!,,,,Trace It
+checkTracing,Check,,,,Trace It
+startAtDot,Start at the dot!,,,,Trace It
+almostThere,Almost there! Try again!,,,,Trace It
+chooseLanguage,Choose Language,,,,Onboarding
+getStarted,Get Started,,,,Onboarding
+nextLevelLearningTitle,Next Level Learning,,,,Onboarding
+nextLevelLearningDesc,Fun and interactive games for kids to learn and grow.,,,,Onboarding
+learnAnywhereTitle,Learn Anywhere,,,,Onboarding
+learnAnywhereDesc,Access lessons offline and keep learning on the go.,,,,Onboarding
+trackProgressTitle,Track Progress,,,,Onboarding
+trackProgressDesc,See how well your child is doing with smart progress tracking.,,,,Onboarding
+completed,Completed,,,,Lessons
+levels,Levels,,,,Lessons
+activities,activities,,,,Lessons
+angAkingSariliTitle,Ang Aking Sarili,,,,Lessons
+ulitin,Repeat,,,,Lessons
+overallProgress,Overall Progress,,,,Lessons
+lessonFinishedPrompt,You finished this lesson! Great job! Choose another game.,,,,Lessons
+settingsTitle,Settings,,,,Settings
+language,Language,,,,Settings
+sound,Sound,,,,Settings
+music,Music,,,,Settings
+notifications,Notifications,,,,Settings
+version,Version,,,,Settings
+backgroundMusicPlaying,Background music playing,,,,Settings
+welcome,Welcome Back!,,,,Student Login
+loginPrompt,Log in to continue your learning journey,,,,Student Login
+loginButton,Log In,,,,Student Login
+enterUsernamePassword,Please enter both username and password.,,,,Student Login
+loginError,Login failed. Please try again.,,,,Student Login
+username,Username,,,,Student Login
+round,Round,,,,Tandaan
+matchThePairs,Find and match the pairs!,,,,Tandaan
+flipCardsToMatch,Tap a card to flip it. Find two that match!,,,,Tandaan
+birthdayGreeting,"Happy Birthday, {name}!",,,{name},Birthday Greeting
+okButton,OK,,,,Birthday Greeting

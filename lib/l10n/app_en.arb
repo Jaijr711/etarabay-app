@@ -1,0 +1,1394 @@
+{
+  "@@locale": "en",
+  "back": "Back",
+  "done": "Done",
+  "save": "Save",
+  "cancel": "Cancel",
+  "next": "Next",
+  "levelCompleted": "Level {level} Completed!",
+  "@levelCompleted": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "proudOfYou": "I am proud of you!",
+  "categoryCompleted": "You completed all levels in {cat}!",
+  "@categoryCompleted": {
+    "placeholders": {
+      "cat": {
+        "type": "String"
+      }
+    }
+  },
+  "finished": "Finished! 🏆",
+  "completed": "Completed",
+  "earned": "earned",
+  "levels": "Levels",
+  "activities": "activities",
+  "parents": "PARENTS",
+  "lessons": "Lessons",
+  "stars": "Stars",
+  "awards": "Awards",
+  "homeAge": "Age {age}",
+  "@homeAge": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "matematika": "Numbers",
+  "angAkingSarili": "About Me",
+  "atAkingPamilya": "My Family",
+  "kulaySaya": "Color Fun",
+  "magkulayTayo": "Let's Color!",
+  "magbasaTitle": "Stories & Songs",
+  "alpabetoAtMgaSalita": "Read & Sing!",
+  "home": "Home",
+  "settingsTitle": "Settings",
+  "totalProgress": "Total Progress",
+  "poems": "Poems",
+  "stories": "Stories",
+  "songs": "Songs",
+  "tune": "Tune",
+  "action": "Action",
+  "counting": "Count the Objects",
+  "dragNumber": "Drag the Number",
+  "lineMatch": "Match with Line",
+  "popBalloon": "Pop the Balloon",
+  "moreOrLess": "More or Less?",
+  "numberPuzzle": "Number Puzzle",
+  "numberSequence": "Number Sequence",
+  "check": "Check",
+  "correct": "Correct!",
+  "wrong": "Wrong! Try again!",
+  "wrongShort": "Wrong",
+  "replayReplacesStar": "Playing again replaces this star.",
+  "putNumbersInOrder": "Drag the numbers into the boxes",
+  "timesUp": "Time's Up!",
+  "level": "Level {level}",
+  "@level": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "streak": "{streak} day streak!",
+  "@streak": {
+    "placeholders": {
+      "streak": {
+        "type": "int"
+      }
+    }
+  },
+  "repeat": "Repeat",
+  "congratulations": "Congratulations!",
+  "chooseFirst": "Choose an answer first!",
+  "chooseLeftFirst": "Choose a number on the left first!",
+  "dropHere": "Drop here!",
+  "dragHere": "Drag here",
+  "popAllBalloonsWith": "Pop all balloons with",
+  "left": "Left",
+  "right": "Right",
+  "selected": "Selected",
+  "howMany": "How many {item}?",
+  "@howMany": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "matchWithNumber": "Match the {category} with the correct number",
+  "@matchWithNumber": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "whichIsMore": "Which is more?",
+  "whichIsLess": "Which is less?",
+  "isSameNumber": "Same number?",
+  "arrange": "Arrange: {sequence}",
+  "@arrange": {
+    "placeholders": {
+      "sequence": {
+        "type": "String"
+      }
+    }
+  },
+  "selectCorrectAnswer": "Select the correct answer:",
+  "tapLeftTapRight": "Tap the group (left) → tap the number (right)",
+  "angAkingSariliTitle": "Ang Aking Sarili",
+  "allAboutMe": "All About Me",
+  "myEmotions": "My Emotions",
+  "dailyRoutines": "Daily Routines",
+  "myPreferences": "My Preferences",
+  "familyMembers": "Family Members",
+  "familyRoles": "Family Roles",
+  "familyActivities": "Family Activities",
+  "familyTree": "Family Tree",
+  "myHome": "My Home",
+  "whatIsYourName": "What is your name?",
+  "howOldAreYou": "How old are you?",
+  "areYouBoyOrGirl": "Are you a boy or a girl?",
+  "whatIsYourNameDescription": "Your name is what your family and friends call you. It is important!",
+  "howOldAreYouDescription": "Your age is the number of years since you were born. Celebrate every year!",
+  "genderDescription": "Knowing if you are a boy or a girl helps us know more about you!",
+  "typeNameHint": "Type your name here",
+  "ageHint": "Example: 5, 7, 10",
+  "aboutMeSubtitle": "All About Me",
+  "myEmotionsSubtitle": "Explain your feelings",
+  "dailyRoutinesSubtitle": "Learn daily activities",
+  "myPreferencesSubtitle": "What do you like?",
+  "familyMembersSubtitle": "Who are your family members?",
+  "familyRolesSubtitle": "What is everyone's job?",
+  "familyActivitiesSubtitle": "What do you do together?",
+  "familyTreeSubtitle": "Who are your relatives?",
+  "myHomeSubtitle": "Where do you live?",
+  "colorSomethingFirst": "Color something first!",
+  "justNow": "just now",
+  "timeAgo": "{amount}m ago",
+  "@timeAgo": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
+  },
+  "saved": "Saved!",
+  "coloringBook": "Coloring Book",
+  "myCreations": "My Creations",
+  "color": "Color",
+  "animals": "Animals",
+  "red": "Red",
+  "blue": "Blue",
+  "green": "Green",
+  "yellow": "Yellow",
+  "orange": "Orange",
+  "purple": "Purple",
+  "pink": "Pink",
+  "brown": "Brown",
+  "black": "Black",
+  "white": "White",
+  "brush": "Brush",
+  "eraser": "Eraser",
+  "undo": "Undo",
+  "redo": "Redo",
+  "clear": "Clear",
+  "upper": "Upper",
+  "lower": "Lower",
+  "letterLabel": "Letter {letter}",
+  "@letterLabel": {
+    "placeholders": {
+      "letter": {
+        "type": "String"
+      }
+    }
+  },
+  "numberLabel": "Number {number}",
+  "@numberLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "pointsLabel": "Points",
+  "goodJob": "Good Job! 🌟",
+  "ulitin": "Repeat",
+  "traceTitle": "Follow Me, You Can Do It!",
+  "uppercase": "Uppercase",
+  "lowercase": "Lowercase",
+  "numbers": "Numbers",
+  "letter": "Letter {letter}",
+  "@letter": {
+    "placeholders": {
+      "letter": {
+        "type": "String"
+      }
+    }
+  },
+  "reset": "Reset",
+  "overallProgress": "Overall Progress",
+  "tula": "Poems",
+  "kwento": "Stories",
+  "kanta": "Songs",
+  "badges": "badges",
+  "myProfile": "My Profile",
+  "yearsOld": "{age} years old",
+  "@yearsOld": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "male": "Male",
+  "female": "Female",
+  "birthday": "Birthday",
+  "profileAge": "Age",
+  "gender": "Gender",
+  "memberSince": "Member Since",
+  "editProfile": "Edit Profile",
+  "noProfileData": "No profile data",
+  "settings": "Settings",
+  "language": "Language",
+  "audio": "Sound and Music",
+  "about": "About",
+  "sound": "Sound",
+  "music": "Music",
+  "notifications": "Notifications",
+  "achievements": "Achievements",
+  "teacherDashboard": "Teacher Dashboard",
+  "newCertificateBadge": "New Certificate!",
+  "enrollStudent": "Enroll Student",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "lRN": "Student Number (Password)",
+  "removeStudent": "Remove Student?",
+  "logoutConfirm": "Sign out of this account? You will need the Student Number to sign back in.",
+  "logout": "Logout",
+  "confirmLogout": "Are you sure you want to log out?",
+  "verifyLRN": "Verify Student Number",
+  "enterLRN": "Please enter your Student Number to proceed",
+  "invalidLRN": "Invalid Student Number. Please try again.",
+  "password": "Password",
+  "fillAllFields": "Please fill in all fields.",
+  "parentNameLabel": "Parent's Name",
+  "parentContactLabel": "Parent's Contact (11 digits)",
+  "contactLengthError": "Contact number must be exactly 11 digits.",
+  "birthdayGreeting": "Happy Birthday, {name}!",
+  "@birthdayGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "swipeToDeleteGuide": "Swipe left on a student to delete",
+  "enroll": "Enroll",
+  "studentEnrolled": "Student Enrolled!",
+  "studentEnrolledSuccessfully": "{name} has been enrolled successfully.",
+  "@studentEnrolledSuccessfully": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "loginCredentials": "Login Credentials:",
+  "userLabel": "User:",
+  "usernameCopied": "Username copied!",
+  "passwordLabel": "Pass:",
+  "passwordCopied": "Password copied!",
+  "fullName": "Full Name",
+  "lRNPassword": "Student Number (Password)",
+  "confirmRemoveStudent": "Are you sure you want to remove this student? This cannot be undone.",
+  "remove": "Remove",
+  "update": "Update",
+  "copied": "Copied!",
+  "noStudentsEnrolled": "No students enrolled yet.",
+  "tapToEnroll": "Tap \"Enroll Student\" to add one.",
+  "studentProgressTitle": "{name}'s Progress",
+  "@studentProgressTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "moduleBreakdown": "Module Breakdown",
+  "scoreLabel": "Score: {score}",
+  "@scoreLabel": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "loginPrompt": "Log in to continue your learning journey",
+  "loginButton": "Log In",
+  "teacherLoginButton": "Continue as Teacher",
+  "enterUsernamePassword": "Please enter both username and password.",
+  "loginError": "Login failed. Please try again.",
+  "studentNumberField": "Student Number",
+  "certificateProgress": "Awards {badges}/{badgeTotal} · Lessons {modules}/{moduleTotal}",
+  "@certificateProgress": {
+    "description": "Shown on a locked certificate: how many of the twelve badges are claimed and how many of the six lessons are finished.",
+    "placeholders": {
+      "badges": {
+        "type": "int"
+      },
+      "badgeTotal": {
+        "type": "int"
+      },
+      "modules": {
+        "type": "int"
+      },
+      "moduleTotal": {
+        "type": "int"
+      }
+    }
+  },
+  "username": "Username",
+  "teacherLoginTitle": "Teacher Login",
+  "teacherLoginButtonLabel": "Log In as Teacher",
+  "invalidTeacherCredentials": "Invalid teacher credentials. Please try again.",
+  "monthName": "Month {month}",
+  "@monthName": {
+    "placeholders": {
+      "month": {
+        "type": "int"
+      }
+    }
+  },
+  "notSet": "Not Set",
+  "saveChanges": "Save Changes",
+  "enterName": "Enter your name",
+  "chooseLanguage": "Choose Language",
+  "getStarted": "Get Started",
+  "nextLevelLearningTitle": "Next Level Learning",
+  "nextLevelLearningDesc": "Fun and interactive games for kids to learn and grow.",
+  "learnAnywhereTitle": "Learn Anywhere",
+  "learnAnywhereDesc": "Access lessons offline and keep learning on the go.",
+  "trackProgressTitle": "Track Progress",
+  "trackProgressDesc": "See how well your child is doing with smart progress tracking.",
+  "continueText": "Continue",
+  "forParents": "For Parents",
+  "hello": "Hello!",
+  "kulaySayaProgress": "Kulay-Saya Progress",
+  "totalSaved": "Total Saved",
+  "magbasaProgress": "Magbasa Progress",
+  "matematikaProgress": "Matematika Progress",
+  "noResults": "No results",
+  "imageNotFound": "Image not found",
+  "clearCanvasQuestion": "Clear Canvas?",
+  "eraseColoringWarning": "This will erase all your coloring.",
+  "noArtworksYet": "No artworks yet.",
+  "colorPagePrompt": "Color a page\nand save your artwork!",
+  "startColoring": "Start Coloring",
+  "edit": "Edit",
+  "lessonFinishedPrompt": "You finished this lesson! Great job! Choose another game.",
+  "okButton": "OK",
+  "readingFinishedGood": "✓ Finished! Good reading!",
+  "readingFinishedHappy": "✓ Finished! Happy reading!",
+  "doneAlready": "Done already!",
+  "checkAnswer": "Check",
+  "noGamesAvailable2": "No games available",
+  "countAndDragCorrectNumber": "Count and drag the correct number!",
+  "whatIsMissingNumber": "What is the missing number?",
+  "straightOrCorrect": "Correct!",
+  "iKnowIt": "I learned it!",
+  "familyTreeTitle": "Family Tree",
+  "familyTreeTapHint": "💡 Tap the members to know their relationship!",
+  "iLearnedFamilyTree": "I learned the Family Tree!",
+  "ourHomeTitle": "Our Home",
+  "thatIsOurHome": "That is our home!",
+  "forParentsSubtitle": "Here is your child's progress on E-Tarabay.",
+  "artworks": "artworks",
+  "error": "Error",
+  "recentActivity": "Recent Activity",
+  "recentColor": "Recent Color",
+  "unknownStudent": "Unknown Student",
+  "version": "Version",
+  "backgroundMusicPlaying": "Background music playing",
+  "errorSaveLocal": "Could not save artwork locally.",
+  "finishedAlready": "Finished already!",
+  "accessExpired": "Your access to this app has ended. Please consult your Teacher for the next steps.",
+  "accountPaused": "Access to this app has been paused for this account. Please contact support for more details.",
+  "forceLoggedOut": "You were signed out by the developer. You can log in again right away.",
+  "moduleLocked": "This activity is temporarily unavailable. Please check back later.",
+  "overviewTab": "Overview",
+  "magbasaTab": "Magbasa",
+  "matematikaTab": "Matematika",
+  "artworksLabel": "Artworks",
+  "pagesLabel": "pages",
+  "lettersLabel": "letters",
+  "diffEasy": "Easy",
+  "diffMedium": "Medium",
+  "diffHard": "Hard",
+  "catAnimals": "Animals",
+  "catFlowers": "Flowers",
+  "catFruits": "Fruits",
+  "catToys": "Toys",
+  "poemLabel": "Poem",
+  "storyLabel": "Story",
+  "songLabel": "Song",
+  "activitiesLabel": "activities",
+  "gamesLabel": "games",
+  "savedCountLabel": "saved",
+  "uppercaseLettersTitle": "Uppercase Letters (A–Z)",
+  "lowercaseLettersTitle": "Lowercase Letters (a–z)",
+  "numbersTitle": "Numbers (1–10)",
+  "levelComplete": "Level {level} Complete!",
+  "@levelComplete": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "pagePuppy": "Puppy",
+  "pageKuting": "Cat",
+  "pageElepante": "Elephant",
+  "pageFlowerBasket": "Flower Basket",
+  "pageRose": "Rose",
+  "pageMansanas": "Apple",
+  "pageSaging": "Banana",
+  "pageTeddyBear": "Teddy Bear",
+  "pageSodaPop": "Soda Pop",
+  "favoriteChosen": "Your favourite is {choice}!",
+  "@favoriteChosen": {
+    "placeholders": {
+      "choice": {
+        "type": "String"
+      }
+    }
+  },
+  "helloName": "Hello, {name}!",
+  "@helloName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "letsLearnAndPlay": "Let's learn and play!",
+  "myProgressToday": "My Progress Today",
+  "whatDoYouWantToLearn": "What do you want to learn?",
+  "rewardsCount": "Reward",
+  "activitiesCount": "Activities",
+  "lessonsCount": "Lessons",
+  "familyRoleSentence": "{member} is {roles}.",
+  "@familyRoleSentence": {
+    "placeholders": {
+      "member": {
+        "type": "String"
+      },
+      "roles": {
+        "type": "String"
+      }
+    }
+  },
+  "resetAllStudents": "Reset All Students",
+  "confirmResetAllStudents": "Are you sure you want to delete all enrolled students? This cannot be undone.",
+  "confirm": "Confirm",
+  "rateYourArtwork": "Rate Artwork",
+  "howManyStars": "How many stars does it deserve?",
+  "tapToView": "Tap to view",
+  "delete": "Delete",
+  "deleteArtwork": "Delete Artwork",
+  "confirmDeleteArtwork": "Are you sure you want to delete this artwork? This cannot be undone.",
+  "artworkDeleted": "Artwork deleted.",
+  "fitPicture": "Fit",
+  "greatSinging": "Great singing!",
+  "readFullPoemBeforeBack": "Read the entire poem before going back.",
+  "iReadThePoem": "I Read the Poem! ✓",
+  "readFullStoryBeforeBack": "Read the entire story before going back.",
+  "iReadTheStory": "I Have Read It! ✓",
+  "tandaanTitle": "Remember It!",
+  "tandaanSubtitle": "Match the Pairs",
+  "round": "Round",
+  "matchThePairs": "Find and match the pairs!",
+  "flipCardsToMatch": "Tap a card to flip it. Find two that match!",
+  "traceItTitle": "Trace It",
+  "traceItSubtitle": "Learn Your ABC!",
+  "checkTracing": "Check",
+  "startAtDot": "Start at the dot!",
+  "almostThere": "Almost there! Try again!",
+  "progressPages": "{done} / {total} pages",
+  "@progressPages": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "percentComplete": "{percent}% complete",
+  "@percentComplete": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "obraLabel": "Artworks",
+  "strokesLabel": "Strokes",
+  "categoryProgressHeader": "Progress Per Category",
+  "savedArtworksHeader": "Saved Artworks",
+  "parentTipsHeader": "Tips for Parents",
+  "tipKulayTitle": "Kulay-Saya",
+  "tipKulayBody": "Encourage your child to color all the pages in every category.",
+  "tipTraceItTitle": "Trace It",
+  "tipTraceItBody": "Guide your child to follow the correct direction of every letter.",
+  "tipMagbasaTitle": "Magbasa",
+  "tipMagbasaBody": "Read the poems, stories, and songs aloud together with your child.",
+  "tipMatematikaTitle": "Matematika",
+  "tipMatematikaBody": "Encourage your child to complete every game to build stronger number skills.",
+  "tipStudyTimeTitle": "Study Time",
+  "tipStudyTimeBody": "Practice 15-20 minutes every day for the best results.",
+  "progressCompleted": "{done} / {total} completed",
+  "@progressCompleted": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "progressActivities": "{done} / {total} activities",
+  "@progressActivities": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "progressGames": "{done} / {total} games",
+  "@progressGames": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "pointsStatLabel": "Points",
+  "starsStatLabel": "Stars",
+  "gameProgressHeader": "Progress Per Game",
+  "tipPencilGripTitle": "Proper Pencil Grip",
+  "tipPencilGripBody": "Make sure your child holds the stylus or finger correctly while tracing.",
+  "tipRepeatTitle": "Repeat Often",
+  "tipRepeatBody": "Encourage your child to redo the letters that are not yet completed.",
+  "tipPraiseTitle": "Praise Your Child",
+  "tipPraiseBody": "Praise every achievement, big or small, to build their confidence.",
+  "tipTulaTitle": "Poems",
+  "tipTulaBody": "Read the poems aloud with your child to improve pronunciation.",
+  "tipKwentoTitle": "Stories",
+  "tipKwentoBody": "Ask your child about the story after reading to strengthen comprehension.",
+  "tipKantaTitle": "Songs",
+  "tipKantaBody": "Sing the songs together so that learning becomes fun.",
+  "tipCountingTitle": "Counting",
+  "tipCountingBody": "Use real objects like fruits or toys to help your child count.",
+  "tipPraiseMatTitle": "Praise",
+  "tipPraiseMatBody": "Praise your child for every correct answer to build their confidence in math.",
+  "tipGameFunTitle": "Games",
+  "tipGameFunBody": "The games are designed to be fun — let your child enjoy learning.",
+  "badgeFirstStepsTitle": "First Steps",
+  "badgeFirstStepsHint": "Earn your first 3 stars",
+  "badgeAlphabetTitle": "Alphabet Master",
+  "badgeAlphabetHint": "Collect all 19 stars in Let's Read",
+  "badgeNumbersTitle": "Number Wizard",
+  "badgeNumbersHint": "Trace all 10 numbers",
+  "badgeColorsTitle": "Color Artist",
+  "badgeColorsHint": "Collect all 9 stars in Kulay-Saya",
+  "badgeShapesTitle": "Big Letters",
+  "badgeShapesHint": "Trace all 26 capital letters",
+  "badgeAnimalsTitle": "Small Letters",
+  "badgeAnimalsHint": "Trace all 26 small letters",
+  "badgeBookwormTitle": "Bookworm",
+  "badgeBookwormHint": "Collect all 5 stars in Stories",
+  "badgeStarStudentTitle": "All About Me",
+  "badgeStarStudentHint": "Get 3 stars on all 4 About Myself levels",
+  "badgeMathWhizTitle": "Math Expert",
+  "badgeMathWhizHint": "Get 3 stars on all 7 math levels",
+  "badgeFamilyHeroTitle": "Family Hero",
+  "badgeFamilyHeroHint": "Get 3 stars on all 5 family levels",
+  "badgeWritingStarTitle": "Writing Star",
+  "badgeWritingStarHint": "Trace every letter and number",
+  "badgeSongbirdTitle": "Songbird",
+  "badgeSongbirdHint": "Collect all 9 stars in Songs",
+  "badgeStreakFiveTitle": "Every Day Star",
+  "badgeStreakFiveHint": "Play on 5 days in a row",
+  "claimBadgeButton": "Claim Badge",
+  "badgeClaimed": "BADGE CLAIMED",
+  "awesome": "Awesome!",
+  "claimBadgeBody": "You earned this badge! Claim it to add it to your collection.",
+  "claimBadge": "Claim {title}",
+  "@claimBadge": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "awardsWaiting": "{earned} earned, {remaining} waiting to be claimed!",
+  "@awardsWaiting": {
+    "placeholders": {
+      "earned": {
+        "type": "int"
+      },
+      "remaining": {
+        "type": "int"
+      }
+    }
+  },
+  "viewArtwork": "View",
+  "@viewArtwork": {
+    "description": "Button that opens an already-saved drawing"
+  },
+  "brushSmall": "Small",
+  "@brushSmall": {
+    "description": "Smallest of the three brush sizes"
+  },
+  "brushMedium": "Medium",
+  "@brushMedium": {
+    "description": "Middle of the three brush sizes"
+  },
+  "brushLarge": "Big",
+  "@brushLarge": {
+    "description": "Largest of the three brush sizes"
+  },
+  "startOverYes": "Yes, start over",
+  "@startOverYes": {
+    "description": "Confirms wiping the drawing and starting again"
+  },
+  "keepColoring": "No, keep it",
+  "@keepColoring": {
+    "description": "Declines wiping the drawing"
+  },
+  "loadingArtwork": "Loading your artwork...",
+  "@loadingArtwork": {
+    "description": "Shown while a saved drawing is reopened"
+  },
+  "memoriseTheCards": "Remember the cards!",
+  "@memoriseTheCards": {
+    "description": "Shown while the memory cards are face up before a round"
+  },
+  "@matematika": {
+    "description": "Home card wording for a module"
+  },
+  "letsCount": "Let's Count!",
+  "@letsCount": {
+    "description": "Home card wording for a module"
+  },
+  "@traceItTitle": {
+    "description": "Home card wording for a module"
+  },
+  "@traceItSubtitle": {
+    "description": "Home card wording for a module"
+  },
+  "@angAkingSarili": {
+    "description": "Home card wording for a module"
+  },
+  "@atAkingPamilya": {
+    "description": "Home card wording for a module"
+  },
+  "@magbasaTitle": {
+    "description": "Home card wording for a module"
+  },
+  "@alpabetoAtMgaSalita": {
+    "description": "Home card wording for a module"
+  },
+  "studentsLabel": "Students",
+  "@studentsLabel": {
+    "description": "Count of enrolled children on the teacher dashboard"
+  },
+  "needsHelp": "Falling behind",
+  "@needsHelp": {
+    "description": "Children who have finished under a quarter of the app"
+  },
+  "notSeenRecently": "Not playing",
+  "@notSeenRecently": {
+    "description": "Children with no activity in the last seven days"
+  },
+  "theClass": "The class",
+  "@theClass": {
+    "description": "Heading for the class-wide module breakdown"
+  },
+  "weakestFirst": "Weakest module first",
+  "@weakestFirst": {
+    "description": "Note under the class breakdown explaining the order"
+  },
+  "recentAchievements": "Recent Achievements",
+  "@recentAchievements": {
+    "description": "Heading for the class-wide feed of recently earned badges and certificates"
+  },
+  "achievementEarnedBy": "{name} earned {achievement}",
+  "@achievementEarnedBy": {
+    "description": "One row of the recent-achievements feed, e.g. \"Jay earned Alphabet Star\"",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "achievement": {
+        "type": "String"
+      }
+    }
+  },
+  "searchStudents": "Search students",
+  "@searchStudents": {
+    "description": "Placeholder in the teacher search field"
+  },
+  "noStudentsMatch": "No student found",
+  "@noStudentsMatch": {
+    "description": "Shown when a search matches nobody"
+  },
+  "everyoneActive": "Everyone has played this week",
+  "@everyoneActive": {
+    "description": "Shown when no child is inactive"
+  },
+  "daysAgo": "{days}d ago",
+  "@daysAgo": {
+    "description": "How long since a child last played, e.g. 12d ago",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "{hours}h ago",
+  "@hoursAgo": {
+    "description": "How long since something happened, in hours, e.g. 3h ago",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "sariliProgress": "About Me and My Family",
+  "@sariliProgress": {
+    "description": "Heading of the About Me parent report"
+  },
+  "tandaanProgress": "Remember It!",
+  "@tandaanProgress": {
+    "description": "Heading of the Remember It parent report"
+  },
+  "starsOfPossible": "{earned} of {total} stars",
+  "@starsOfPossible": {
+    "description": "Stars earned out of the stars available",
+    "placeholders": {
+      "earned": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "notStartedYet": "Not started yet",
+  "@notStartedYet": {
+    "description": "Shown against a level the child has not opened"
+  },
+  "memoryPairs": "Matching pairs",
+  "@memoryPairs": {
+    "description": "Subtitle of the Remember It parent report"
+  },
+  "fruits": "Fruits",
+  "@fruits": {
+    "description": "Remember It category"
+  },
+  "shapes": "Shapes",
+  "@shapes": {
+    "description": "Remember It category"
+  },
+  "letters": "Letters",
+  "@letters": {
+    "description": "Remember It category"
+  },
+  "setParentPin": "Set a 4-digit code",
+  "@setParentPin": {
+    "description": "Title when a parent first sets their access code"
+  },
+  "setParentPinNote": "Only you should know this. The child must not be able to guess it.",
+  "@setParentPinNote": {
+    "description": "Explains that the code must be secret from the child"
+  },
+  "confirmParentPin": "Type it again",
+  "@confirmParentPin": {
+    "description": "Second field when setting the code"
+  },
+  "enterParentPin": "Enter your code",
+  "@enterParentPin": {
+    "description": "Title when a parent is asked for their existing code"
+  },
+  "pinMismatch": "The two codes are different",
+  "@pinMismatch": {
+    "description": "The two entries did not match"
+  },
+  "wrongPin": "Wrong code",
+  "@wrongPin": {
+    "description": "The code entered was not correct"
+  },
+  "forgotPin": "Forgot it? Use the Student Number",
+  "@forgotPin": {
+    "description": "Link back to the LRN as a recovery route"
+  },
+  "pinSaved": "Code saved",
+  "@pinSaved": {
+    "description": "Confirmation that a new code was stored"
+  },
+  "or": "or",
+  "@or": {
+    "description": "Divider between two ways of signing in"
+  },
+  "openReport": "Open",
+  "@openReport": {
+    "description": "Button that opens the parents report"
+  },
+  "accountSecurity": "Account & Security",
+  "@accountSecurity": {
+    "description": "Adult screen wording"
+  },
+  "securityHeader": "Security",
+  "@securityHeader": {
+    "description": "Adult screen wording"
+  },
+  "changeLogin": "Change Login",
+  "@changeLogin": {
+    "description": "Adult screen wording"
+  },
+  "changeLoginNote": "Update username or password",
+  "@changeLoginNote": {
+    "description": "Adult screen wording"
+  },
+  "continueLabel": "Continue",
+  "@continueLabel": {
+    "description": "Adult screen wording"
+  },
+  "biometricLogin": "Fingerprint / Face login",
+  "@biometricLogin": {
+    "description": "Adult screen wording"
+  },
+  "enableBiometric": "Enable fingerprint login",
+  "@enableBiometric": {
+    "description": "Adult screen wording"
+  },
+  "confirmYourPassword": "Confirm your password",
+  "@confirmYourPassword": {
+    "description": "Adult screen wording"
+  },
+  "blankToKeepPassword": "Leave the password blank to change only the username.",
+  "@blankToKeepPassword": {
+    "description": "Adult screen wording"
+  },
+  "newPasswordStudentNumber": "New password (Student Number)",
+  "@newPasswordStudentNumber": {
+    "description": "Adult screen wording"
+  },
+  "noBiometricOnDevice": "No fingerprint or face is set up on this phone,",
+  "@noBiometricOnDevice": {
+    "description": "Adult screen wording"
+  },
+  "noSessionLogInFirst": "No student session found. Please log in first.",
+  "@noSessionLogInFirst": {
+    "description": "Adult screen wording"
+  },
+  "resetActivity": "Reset Activity",
+  "@resetActivity": {
+    "description": "Adult screen wording"
+  },
+  "resetSpecificActivity": "Reset Specific Activity",
+  "@resetSpecificActivity": {
+    "description": "Adult screen wording"
+  },
+  "resetAllActivities": "Reset All Activities",
+  "@resetAllActivities": {
+    "description": "Adult screen wording"
+  },
+  "resetAll": "Reset All",
+  "@resetAll": {
+    "description": "Adult screen wording"
+  },
+  "resetCount": "Reset ({count})",
+  "@resetCount": {
+    "description": "Reset button with how many activities are selected",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pickActivitiesToReset": "Choose which activities to reset for {name}:",
+  "@pickActivitiesToReset": {
+    "description": "Title of the reset picker, with the child name",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmResetAll": "Reset all of {name}’s progress? This cannot be undone.",
+  "@confirmResetAll": {
+    "description": "Confirmation before wiping a child’s progress",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "studentArtworks": "Artworks ({count})",
+  "@studentArtworks": {
+    "description": "Header over a child’s saved drawings",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noArtworksSaved": "No artwork saved yet.",
+  "@noArtworksSaved": {
+    "description": "Adult screen wording"
+  },
+  "middleName": "Middle Name",
+  "@middleName": {
+    "description": "Adult screen wording"
+  },
+  "studentIdFormat": "Student Number (Format: DC-2026-0001)",
+  "@studentIdFormat": {
+    "description": "Adult screen wording"
+  },
+  "autoGenerateId": "Make an ID for me",
+  "@autoGenerateId": {
+    "description": "Adult screen wording"
+  },
+  "accountPreview": "Account Preview",
+  "@accountPreview": {
+    "description": "Adult screen wording"
+  },
+  "studentInformation": "Student Information",
+  "@studentInformation": {
+    "description": "Adult screen wording"
+  },
+  "parentInformation": "Parent Information",
+  "@parentInformation": {
+    "description": "Adult screen wording"
+  },
+  "celebrate": "Celebrate",
+  "@celebrate": {
+    "description": "Adult screen wording"
+  },
+  "stepOf": "Step {current} of {total} · {label}",
+  "@stepOf": {
+    "description": "Progress through the enrolment wizard",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "autoGenerated": "Made for you",
+  "@autoGenerated": {
+    "description": "Adult screen wording"
+  },
+  "enterIdAbove": "Enter the ID above",
+  "@enterIdAbove": {
+    "description": "Adult screen wording"
+  },
+  "couldNotLoad": "Could not load. Please try again.",
+  "@couldNotLoad": {
+    "description": "Adult screen wording"
+  },
+  "teacherSignInPrompt": "Sign in to your teacher account",
+  "@teacherSignInPrompt": {
+    "description": "Adult screen wording"
+  },
+  "daycareTeacher": "Daycare Teacher",
+  "@daycareTeacher": {
+    "description": "Adult screen wording"
+  },
+  "useBiometric": "Use fingerprint / face",
+  "@useBiometric": {
+    "description": "Adult screen wording"
+  },
+  "biometricUnavailable": "No fingerprint or face is set up on this phone, so this login is unavailable.",
+  "@biometricUnavailable": {
+    "description": "Shown when the device has no biometrics"
+  },
+  "strongest": "Going best",
+  "@strongest": {
+    "description": "Parents summary wording"
+  },
+  "modulesHeader": "All six modules",
+  "@modulesHeader": {
+    "description": "Parents summary wording"
+  },
+  "credentialsUpdated": "Login updated.",
+  "@credentialsUpdated": {
+    "description": "Message shown to a teacher or parent"
+  },
+  "biometricEnabled": "Fingerprint login is on.",
+  "@biometricEnabled": {
+    "description": "Message shown to a teacher or parent"
+  },
+  "biometricDisabled": "Fingerprint login is off.",
+  "@biometricDisabled": {
+    "description": "Message shown to a teacher or parent"
+  },
+  "biometricNotConfirmed": "Not confirmed. Please try again.",
+  "@biometricNotConfirmed": {
+    "description": "Message shown to a teacher or parent"
+  },
+  "passwordsDoNotMatch": "The two passwords are different.",
+  "@passwordsDoNotMatch": {
+    "description": "Message shown to a teacher or parent"
+  },
+  "usernameEmpty": "Please enter a username.",
+  "@usernameEmpty": {
+    "description": "Message shown to a teacher or parent"
+  },
+  "passwordIncorrect": "That password is not correct.",
+  "@passwordIncorrect": {
+    "description": "Message shown to a teacher or parent"
+  },
+  "studentNumberIncorrect": "That Student Number is not correct.",
+  "@studentNumberIncorrect": {
+    "description": "Message shown to a teacher or parent"
+  },
+  "confirmChildStudentNumber": "Confirm the child's Student Number",
+  "@confirmChildStudentNumber": {
+    "description": "Message shown to a teacher or parent"
+  },
+  "scanToEnableBiometric": "Scan to turn on fingerprint login",
+  "@scanToEnableBiometric": {
+    "description": "Prompt shown by the fingerprint scanner"
+  },
+  "certificateSaved": "Certificate saved to your photos",
+  "@certificateSaved": {
+    "description": "Result of saving a certificate"
+  },
+  "certificateSaveFailed": "Could not save the certificate.",
+  "@certificateSaveFailed": {
+    "description": "Result of saving a certificate"
+  },
+  "howStarsEarned": "How you earn stars here:",
+  "@howStarsEarned": {
+    "description": "Explains the 1-to-3 star rating"
+  },
+  "starOneTitle": "You finished it",
+  "@starOneTitle": {
+    "description": "Explains the 1-to-3 star rating"
+  },
+  "starOneBody": "Every activity you finish earns one.",
+  "@starOneBody": {
+    "description": "Explains the 1-to-3 star rating"
+  },
+  "starTwoTitle": "Almost all right",
+  "@starTwoTitle": {
+    "description": "Explains the 1-to-3 star rating"
+  },
+  "starTwoBody": "One wrong answer along the way.",
+  "@starTwoBody": {
+    "description": "Explains the 1-to-3 star rating"
+  },
+  "starThreeTitle": "All right, first try",
+  "@starThreeTitle": {
+    "description": "Explains the 1-to-3 star rating"
+  },
+  "starThreeBody": "No wrong answers at all.",
+  "@starThreeBody": {
+    "description": "Explains the 1-to-3 star rating"
+  },
+  "starTip": "Play it again and try to get every answer right.",
+  "@starTip": {
+    "description": "Explains the 1-to-3 star rating"
+  },
+  "gotIt": "Got it",
+  "@gotIt": {
+    "description": "Explains the 1-to-3 star rating"
+  },
+  "yourCode": "Your code",
+  "@yourCode": {
+    "description": "Parent account wording"
+  },
+  "yourCodeNote": "The four digits that open this report.",
+  "@yourCodeNote": {
+    "description": "Parent account wording"
+  },
+  "changeCode": "Change code",
+  "@changeCode": {
+    "description": "Parent account wording"
+  },
+  "currentCode": "Current code",
+  "@currentCode": {
+    "description": "Parent account wording"
+  },
+  "newCode": "New code",
+  "@newCode": {
+    "description": "Parent account wording"
+  },
+  "codeChanged": "Code changed.",
+  "@codeChanged": {
+    "description": "Parent account wording"
+  },
+  "childLogin": "Your child's login",
+  "@childLogin": {
+    "description": "Parent account wording"
+  },
+  "childLoginNote": "What your child types to open the app. The teacher can change it too.",
+  "@childLoginNote": {
+    "description": "Parent account wording"
+  },
+  "usernameTaken": "That username is taken. Please pick another.",
+  "@usernameTaken": {
+    "description": "Parent account wording"
+  },
+  "playedToday": "Played today",
+  "@playedToday": {
+    "description": "When the child last played"
+  },
+  "playedYesterday": "Played yesterday",
+  "@playedYesterday": {
+    "description": "When the child last played"
+  },
+  "playedDaysAgo": "Last played {days} days ago",
+  "@playedDaysAgo": {
+    "description": "When the child last played",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "notPlayedYet": "Has not started yet",
+  "@notPlayedYet": {
+    "description": "When the child last played"
+  },
+  "dayRun": "{days} days in a row",
+  "@dayRun": {
+    "description": "When the child last played",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "removeFromDevice": "Remove from this phone",
+  "@removeFromDevice": {
+    "description": "Removing a child from this device"
+  },
+  "removeFromDeviceNote": "{name} will no longer appear here or on the sign-in screen. Their account and their work are not deleted — a teacher can sign them in again.",
+  "@removeFromDeviceNote": {
+    "description": "Removing a child from this device",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "childRemoved": "Removed from this phone.",
+  "@childRemoved": {
+    "description": "Removing a child from this device"
+  },
+  "chooseAvatar": "Picture",
+  "@chooseAvatar": {
+    "description": "Teacher sheet section heading"
+  },
+  "manageStudent": "Manage this student",
+  "@manageStudent": {
+    "description": "Teacher sheet section heading"
+  },
+  "noStudentNumbersLeft": "No student numbers are left for this year.",
+  "@noStudentNumbersLeft": {
+    "description": "Shown when enrolment cannot mint a free number"
+  },
+  "moreModules": "+{count} more",
+  "@moreModules": {
+    "description": "Collapsed class card: how many modules are hidden",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "filterBehindNote": "Started, but well behind the rest of the class.",
+  "@filterBehindNote": {
+    "description": "Explains an active class filter"
+  },
+  "filterQuietNote": "Has not opened the app in a week or more.",
+  "@filterQuietNote": {
+    "description": "Explains an active class filter"
+  },
+  "authNothingToUpdate": "Nothing to update.",
+  "@authNothingToUpdate": {
+    "description": "Result of a sign-in, enrolment or class action"
+  },
+  "authSaveFailed": "Could not save the changes. Check your connection.",
+  "@authSaveFailed": {
+    "description": "Result of a sign-in, enrolment or class action"
+  },
+  "authUsernameTaken": "That username is already taken. Please pick another.",
+  "@authUsernameTaken": {
+    "description": "Result of a sign-in, enrolment or class action"
+  },
+  "authUseTeacherButton": "This is the pupil sign-in. Use \"Continue as Teacher\" at the bottom of the screen.",
+  "@authUseTeacherButton": {
+    "description": "Result of a sign-in, enrolment or class action"
+  },
+  "authUsernameNotFound": "No such username. Check the spelling, or ask the teacher whether the child is enrolled.",
+  "@authUsernameNotFound": {
+    "description": "Result of a sign-in, enrolment or class action"
+  },
+  "authWrongStudentNumber": "That Student Number is not right. Please try again.",
+  "@authWrongStudentNumber": {
+    "description": "Result of a sign-in, enrolment or class action"
+  },
+  "authConnectionError": "Could not reach the server. Check your connection.",
+  "@authConnectionError": {
+    "description": "Result of a sign-in, enrolment or class action"
+  },
+  "authNumberEmpty": "The Student Number cannot be empty.",
+  "@authNumberEmpty": {
+    "description": "Result of a sign-in, enrolment or class action"
+  },
+  "authNumberFormat": "The Student Number must look like DC-2026-0001.",
+  "@authNumberFormat": {
+    "description": "Result of a sign-in, enrolment or class action"
+  },
+  "authNumberRepeated": "The Student Number cannot end in four identical digits.",
+  "@authNumberRepeated": {
+    "description": "Result of a sign-in, enrolment or class action"
+  },
+  "authNumberTaken": "Another child already has this Student Number.",
+  "@authNumberTaken": {
+    "description": "Result of a sign-in, enrolment or class action"
+  },
+  "authEnrollFailed": "Could not enrol the child. Check your connection.",
+  "@authEnrollFailed": {
+    "description": "Result of a sign-in, enrolment or class action"
+  },
+  "authNoStudentsToDelete": "There are no children to remove.",
+  "@authNoStudentsToDelete": {
+    "description": "Result of a sign-in, enrolment or class action"
+  },
+  "authAllStudentsDeleted": "All children removed.",
+  "@authAllStudentsDeleted": {
+    "description": "Result of a sign-in, enrolment or class action"
+  },
+  "authDeleteFailed": "Could not remove the children. Please try again.",
+  "@authDeleteFailed": {
+    "description": "Result of a sign-in, enrolment or class action"
+  },
+  "authNoStudentsToReset": "There are no children to reset.",
+  "@authNoStudentsToReset": {
+    "description": "Result of a sign-in, enrolment or class action"
+  },
+  "authResetDone": "Reset the sign-in of {count} children.",
+  "@authResetDone": {
+    "description": "Result of a sign-in, enrolment or class action",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "authResetFailed": "Could not reset the sign-in. Please try again.",
+  "@authResetFailed": {
+    "description": "Result of a sign-in, enrolment or class action"
+  },
+  "passwordNotSetYet": "Not set yet.",
+  "@passwordNotSetYet": {
+    "description": "Student password, shown to the teacher"
+  },
+  "passwordChangedByParent": "The parent has changed this. It is no longer the Student Number.",
+  "@passwordChangedByParent": {
+    "description": "Student password, shown to the teacher"
+  },
+  "authPasswordTooShort": "The password needs at least 4 characters.",
+  "@authPasswordTooShort": {
+    "description": "Student password, shown to the teacher"
+  },
+  "newPasswordLabel": "New password",
+  "@newPasswordLabel": {
+    "description": "Parent's field for the child's new password"
+  },
+  "whatToPractise": "What to practise",
+  "@whatToPractise": {
+    "description": "Teacher's per-child practice list"
+  },
+  "nothingToPractise": "Nothing outstanding. This child is getting the questions right.",
+  "@nothingToPractise": {
+    "description": "Teacher's per-child practice list"
+  },
+  "pupilReport": "This pupil's progress on E-Tarabay.",
+  "@pupilReport": {
+    "description": "Subtitle when a teacher opens the report"
+  },
+  "editStudent": "Edit details",
+  "@editStudent": {
+    "description": "Opens the child's details form from their card"
+  },
+  "copyByHand": "This browser will not let the app copy. Select it and copy by hand.",
+  "@copyByHand": {
+    "description": "Shown when the browser refuses the clipboard"
+  },
+  "confirmNewPassword": "Confirm new password",
+  "@confirmNewPassword": {
+    "description": "Second box when a parent changes the password"
+  },
+  "newParentPin": "New code",
+  "@newParentPin": {
+    "description": "First box when a parent is creating their code"
+  },
+  "welcome": "Welcome Back!",
+  "@welcome": {
+    "description": "Sign-in screen greeting"
+  },
+  "switchToChild": "Open {name}'s account",
+  "@switchToChild": {
+    "description": "Parent switches to their other child",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "switchToChildNote": "The app becomes {name}'s. Nobody has to sign in again, and their work is kept.",
+  "@switchToChildNote": {
+    "description": "Parent switches to their other child",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "switchAccount": "Switch",
+  "@switchAccount": {
+    "description": "Parent switches to their other child"
+  },
+  "switchNeedsConnection": "Connect to the internet first — this child has work that is only on this phone.",
+  "@switchNeedsConnection": {
+    "description": "Parent switches to their other child"
+  },
+  "scoreWord": "Score",
+  "streakWord": "Streak",
+  "notifPermissionDenied": "Allow notifications in your phone settings first.",
+  "greetMorning": "Good Morning!",
+  "greetAfternoon": "Good Afternoon!",
+  "greetEvening": "Good Evening!",
+  "updateAvailableTitle": "A new version is available!",
+  "updateAvailableBody": "Version {version} is ready to download.",
+  "@updateAvailableBody": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "updateDownloadNow": "Download Now",
+  "updateLater": "Later",
+  "bgPermissionTitle": "Tell Mom or Dad!",
+  "bgPermissionBody": "For the reminders to work, ask them to allow E-Tarabay in the phone's Battery and Autostart settings.",
+  "@bgPermissionBody": {
+    "description": "Shown once after turning Notifications on, so a child can relay it to a parent on OEMs (Oppo/Vivo/Realme/Xiaomi) that kill background alarms unless the app is whitelisted"
+  }
+}
