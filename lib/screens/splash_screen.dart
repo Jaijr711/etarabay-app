@@ -27,6 +27,59 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
+/// A white fade over each edge of the video, so it melts into the white
+/// page instead of ending on a visible line.
+class _EdgeFade extends StatelessWidget {
+  const _EdgeFade();
+
+  static const _white = Colors.white;
+  static const _clear = Color(0x00FFFFFF);
+
+  Widget _strip(Alignment from, Alignment to) => DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: from,
+            end: to,
+            colors: const [_white, _clear],
+          ),
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (_, box) {
+      final v = (box.maxHeight * 0.035).clamp(10.0, 28.0);
+      final h = (box.maxWidth * 0.035).clamp(8.0, 20.0);
+      return Stack(children: [
+        Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: v,
+            child: _strip(Alignment.topCenter, Alignment.bottomCenter)),
+        Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: v,
+            child: _strip(Alignment.bottomCenter, Alignment.topCenter)),
+        Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: h,
+            child: _strip(Alignment.centerLeft, Alignment.centerRight)),
+        Positioned(
+            right: 0,
+            top: 0,
+            bottom: 0,
+            width: h,
+            child: _strip(Alignment.centerRight, Alignment.centerLeft)),
+      ]);
+    });
+  }
+}
+
 class _SplashScreenState extends State<SplashScreen> {
   static const _videoAsset = 'assets/images/app_animation.mp4';
 
@@ -164,7 +217,19 @@ class _SplashScreenState extends State<SplashScreen> {
                 ? Center(
                     child: AspectRatio(
                       aspectRatio: v.value.aspectRatio,
-                      child: VideoPlayer(v),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          VideoPlayer(v),
+                          // On a screen taller or wider than the video, its
+                          // edge falls inside the screen: a block dropping in
+                          // from the top appeared out of nothing along a
+                          // straight line, and some Android decoders draw a
+                          // thin stripe at the frame's edge. A short fade to
+                          // the page's white on all four sides hides both.
+                          const IgnorePointer(child: _EdgeFade()),
+                        ],
+                      ),
                     ),
                   )
                 : Center(
