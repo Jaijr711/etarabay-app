@@ -466,7 +466,7 @@ class _KulayScreenState extends State<KulayScreen>
     ColoringCategory(name: 'Flowers', icon: '🌸', color: Colors.pink, pages: [
       ColoringPage(
           name: 'Flower Basket',
-          imagePath: 'assets/images/paint4.png',
+          imagePath: 'assets/images/paint_daisy.png',
           difficulty: 'Medium',
           timeEstimate: '10 min',
           colors: 5),
@@ -691,7 +691,9 @@ class _KulayScreenState extends State<KulayScreen>
   /// picture would be painted over the new one, so a new revision gives the
   /// page a fresh save of its own.
   static const Map<String, int> _pictureRevisions = {
-    // paint4.png: the flower in a pot became a daisy (2026-10-13).
+    // The flower in a pot (paint4.png) became a daisy (2026-10-13). The daisy
+    // has its own file name: browsers had cached paint4.png and kept showing
+    // the pot. paint4.png stays for creations already saved from it.
     'Flower Basket': 2,
   };
 
