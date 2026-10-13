@@ -190,7 +190,7 @@ class _CertificatesScreenState extends State<CertificatesScreen>
             const SizedBox(width: 16),
             const Expanded(
               child: Text(
-                'My Certificates',
+                'My Certificate',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,

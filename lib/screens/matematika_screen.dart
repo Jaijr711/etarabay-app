@@ -199,7 +199,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
 
   final List<Map<String, dynamic>> _game1Levels = const [
     {
-      'question_en': 'How many apples?',
+      'question_en': 'How many apples can you count?',
       'item_name_en': 'apples',
       'item_name_il': 'mansanas',
       'item_name_tl': 'mansanas',
@@ -208,7 +208,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       'correct': 3,
     },
     {
-      'question_en': 'How many bananas?',
+      'question_en': 'How many bananas can you count?',
       'item_name_en': 'bananas',
       'item_name_il': 'saging',
       'item_name_tl': 'saging',
@@ -217,7 +217,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       'correct': 2,
     },
     {
-      'question_en': 'How many dogs?',
+      'question_en': 'How many dogs can you count?',
       'item_name_en': 'dogs',
       'item_name_il': 'aso',
       'item_name_tl': 'aso',
@@ -235,7 +235,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       'correct': 4,
     },
     {
-      'question_en': 'How many birds?',
+      'question_en': 'How many birds you count?',
       'item_name_en': 'birds',
       'item_name_il': 'billit',
       'item_name_tl': 'ibon',

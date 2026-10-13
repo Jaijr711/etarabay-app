@@ -136,7 +136,7 @@ class PamilyaContent {
         'hint': 'Name of city or town',
         'icon': '🏠',
         'description':
-            'Your home is the place where you live with your family. Home sweet home!',
+            'Home is the place where you live with your family. Home sweet home!',
       },
     ],
     'fil': [
@@ -246,7 +246,7 @@ class PamilyaContent {
     'en': [
       {
         'id': 'emotion_happy',
-        'question': 'When are you HAPPY?',
+        'question': 'When do you feel Happy?',
         'choices': [
           '🎁 When there is a gift or surprise',
           '😢 When someone is mean',
@@ -259,7 +259,7 @@ class PamilyaContent {
       },
       {
         'id': 'emotion_sad',
-        'question': 'When are you SAD?',
+        'question': 'When do you feel Sad?',
         'choices': [
           '🎂 When there is a birthday party',
           '🧸 When your favorite toy is lost',
@@ -272,7 +272,7 @@ class PamilyaContent {
       },
       {
         'id': 'emotion_angry',
-        'question': 'When are you ANGRY?',
+        'question': 'When do you feel Angry?',
         'choices': [
           '🎮 When you win a game',
           '🧸 When you get a new toy',
@@ -285,7 +285,7 @@ class PamilyaContent {
       },
       {
         'id': 'emotion_surprised',
-        'question': 'When are you SURPRISED?',
+        'question': 'When do you feel Surprised?',
         'choices': [
           '🎁 When there is an unexpected surprise',
           '🍚 When eating',
@@ -311,7 +311,7 @@ class PamilyaContent {
       },
       {
         'id': 'emotion_scared',
-        'question': 'When are you SCARED?',
+        'question': 'When do you feel Scared?',
         'choices': [
           '🌈 When there is a rainbow',
           '⚡ When there is thunder and lightning',
@@ -503,11 +503,11 @@ class PamilyaContent {
         'correct': 0,
         'explanation':
             'Correct! First we wake up and get out of bed before doing other things.',
-        'tip': 'Wake up early to be ready for the whole day!',
+        'tip': 'A good morning routine helps you have a great day!',
       },
       {
         'id': 'routine_afternoon',
-        'question': 'What do we usually do in the AFTERNOON?',
+        'question': 'What do you do in the afternoon',
         'choices': [
           '📚 Study or play',
           '🍚 Eat lunch',
@@ -515,11 +515,11 @@ class PamilyaContent {
         ],
         'correct': 0,
         'explanation': 'Correct! In the afternoon, we study or play.',
-        'tip': 'Balance your time for studying and playing!',
+        'tip': 'A good day has time for learning and fun',
       },
       {
         'id': 'routine_evening',
-        'question': 'What can you do before going to BED?',
+        'question': 'what do you do before Bedtime',
         'choices': [
           '🪥 Brush your teeth',
           '🍪 Eat a snack',
@@ -532,7 +532,7 @@ class PamilyaContent {
       },
       {
         'id': 'routine_hygiene',
-        'question': 'How can you protect yourself from getting sick?',
+        'question': 'How can you stay healthy and avoid getting sick?',
         'choices': [
           '🧼 Wash your hands',
           '🪥 Just brush teeth',
@@ -540,7 +540,7 @@ class PamilyaContent {
         ],
         'correct': 0,
         'explanation': 'Correct! Washing your hands prevents sickness.',
-        'tip': 'Wash your hands before eating and after using the bathroom!',
+        'tip': 'Remember to wash your hands before eating and after using the bathroom!',
       },
     ],
     'fil': [
@@ -659,7 +659,7 @@ class PamilyaContent {
     'en': [
       {
         'id': 'preference_food',
-        'question': 'What is your favorite FOOD?',
+        'question': 'Which food do you like best?',
         'options': ['🍚 Rice', '🐟 Fish', '🍛 Stew', '🍖 Meat'],
         'emojis': ['🍚', '🐟', '🍛', '🍖'],
         'description': 'Choose your favorite food!',
@@ -673,14 +673,14 @@ class PamilyaContent {
       },
       {
         'id': 'preference_game',
-        'question': 'What is your favorite GAME?',
+        'question': 'Which game do you like best?',
         'options': ['🪀 Hopscotch', '🏃 Tag', '🧩 Puzzle', '🎯 Ring Toss'],
         'emojis': ['🪀', '🏃', '🧩', '🎯'],
         'description': 'Fun games to play with friends!',
       },
       {
         'id': 'preference_animal',
-        'question': 'What is your favorite ANIMAL?',
+        'question': 'Which animal is your favorite?',
         'options': ['🐶 Dog', '🐱 Cat', '🐓 Chicken', '🐃 Carabao'],
         'emojis': ['🐶', '🐱', '🐓', '🐃'],
         'description': 'Pick your favorite animal!',
@@ -767,7 +767,7 @@ class PamilyaContent {
     'en': [
       {
         'id': 'family_mother',
-        'question': 'Who takes care of you, cooks food, and gives you love?',
+        'question': 'Who takes care of you and makes you feel loved?',
         'choices': ['👩 Mother', '👨 Father', '👧 Sister', '👦 Brother'],
         'correct': 0,
         'member': 'Mother',
@@ -775,11 +775,12 @@ class PamilyaContent {
         'roles': 'cooking, caring, loving',
         'description': 'Mother takes care of us and cooks delicious food.',
         'note': 'In Filipino, we call mother "Nanay" or "Ina".',
+        'popup': 'A mother takes care of you, helps you and loves you everyday. in Filipino we call her "Nanay" or "Ina"',
         'audioPath': 'audio/family/ni_nanang.mp3'
       },
       {
         'id': 'family_father',
-        'question': 'Who works for the family and loves to play with you?',
+        'question': 'Who works to help your family and loves to play with you',
         'choices': ['👩 Mother', '👨 Father', '👧 Sister', '👦 Brother'],
         'correct': 1,
         'member': 'Father',
@@ -787,6 +788,7 @@ class PamilyaContent {
         'roles': 'working, playing, protecting',
         'description': 'Father works for the family and is fun to play with.',
         'note': 'In Filipino, we call father "Tatay" or "Ama".',
+        'popup': 'A father works, cares for his family, keeps you safe and loves to spend tie with you. In Filipino, we call him"Tatay" or "Ama".',
         'audioPath': 'audio/family/si_amang.mp3'
       },
       {
@@ -804,6 +806,7 @@ class PamilyaContent {
         'roles': 'older sibling, companion, playmate',
         'description': 'Your older brother is your older male sibling.',
         'note': 'In Filipino, we call older brother "Kuya".',
+        'popup': 'An older Brother plays with you, helps you, and looks out for you. In Filipino, we call him "kuya"',
         'audioPath': 'audio/family/ni_manong.mp3'
       },
       {
@@ -821,11 +824,12 @@ class PamilyaContent {
         'roles': 'older sibling, helps at home, playmate',
         'description': 'Your older sister is your older female sibling.',
         'note': 'In Filipino, we call older sister "Ate".',
+        'popup': 'An older sister helps at home, plays with you and care for you. In Filipino, we call her "Ate".',
         'audioPath': 'audio/family/ni_manang.mp3'
       },
       {
         'id': 'family_youngest',
-        'question': 'Who is the youngest member of the family?',
+        'question': 'Who is the youngest in the family?',
         'choices': [
           '👶 Youngest Sibling',
           '👦 Older Brother',
@@ -838,11 +842,12 @@ class PamilyaContent {
         'roles': 'youngest sibling, cared for',
         'description': 'The youngest is the youngest member of the family.',
         'note': 'In Filipino, we call the youngest sibling "Bunso".',
+        'popup': 'The youngest sibling are loved and cared for by the family. In Filipino, we call them "Bunso".',
         'audioPath': 'audio/family/ni_bunsoy.mp3'
       },
       {
         'id': 'family_grandfather',
-        'question': 'Who is the father of your mother or father?',
+        'question': 'Who is the father of your mom or dad',
         'choices': [
           '👴 Grandfather',
           '👵 Grandmother',
@@ -855,6 +860,7 @@ class PamilyaContent {
         'roles': 'tells stories, gives advice',
         'description': 'Grandfather is the father of your mother or father.',
         'note': 'In Filipino, we call grandfather "Lolo".',
+        'popup': 'A Grandfather is a storyteller gives advice, and loves spending time with his Family. In Filipino, we call him "Lolo".',
         'audioPath': 'audio/family/ni_lelong.mp3'
       },
       {
@@ -872,6 +878,7 @@ class PamilyaContent {
         'roles': 'cooks delicious food, tells stories',
         'description': 'Grandmother is the mother of your mother or father.',
         'note': 'In Filipino, we call grandmother "Lola".',
+        'popup': 'A grandmother cooks delicious food, tells stories and loves spending time with her family. In Filipino, we call her "Lola".',
         'audioPath': 'audio/family/ni_leling.mp3'
       },
     ],
@@ -1072,14 +1079,14 @@ class PamilyaContent {
           'Mother only',
           'Father only',
           'Grandmother only',
-          'Anyone can'
+          'Sister/Brother'
         ],
         'correct': 3,
         'explanation': 'Correct! Anyone in the family can cook.'
       },
       {
         'id': 'role_work',
-        'question': 'Who works for the family?',
+        'question': 'Who works to help support the family?',
         'choices': [
           'Father only',
           'Mother only',
@@ -1224,7 +1231,7 @@ class PamilyaContent {
     'en': [
       {
         'id': 'activity_dinner',
-        'question': 'What is a good thing to do together during meals?',
+        'question': 'What can you do together during meals?',
         'choices': [
           'Eat and talk together',
           'Watch TV',
@@ -1497,13 +1504,13 @@ class PamilyaContent {
         'color': Color(0xFFE74C3C)
       },
       {
-        'name': 'Kitchen',
+        'name': 'The Kitchen',
         'emoji': '🍳',
         'activity': 'family cooks and eats together',
         'color': Color(0xFFE67E22)
       },
       {
-        'name': 'Bedroom',
+        'name': 'The Bedroom',
         'emoji': '🛏️',
         'activity': 'family rests and talks together',
         'color': Color(0xFF3498DB)
@@ -1624,14 +1631,14 @@ class PamilyaContent {
       },
       {
         'id': 'tree_5',
-        'question': 'Who guides and takes care of the children at home?',
+        'question': 'Who guides and takes care of children at home?',
         'choices': ['Father and Mother', 'Neighbors', 'Strangers', 'Only pets'],
         'correct': 0,
-        'explanation': 'Correct! Father and Mother guide and love their children.'
+        'explanation': 'Parents guide and care for you everyday. Show your love by listening , helping and saying "Thank you!"'
       },
       {
         'id': 'tree_6',
-        'question': 'What chart shows family relationships across generations?',
+        'question': 'What chart shows the relationships between family members across generations?',
         'choices': ['Family Tree', 'Shopping List', 'Calendar', 'Weather Chart'],
         'correct': 0,
         'explanation': 'Correct! A Family Tree illustrates generations of a family.'

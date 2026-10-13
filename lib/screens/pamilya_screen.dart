@@ -1094,9 +1094,19 @@ class _PamilyaScreenState extends State<PamilyaScreen>
       // instead — the sentence about what this family member does, and the
       // note about what they are called at home. It is the part worth
       // reading, so it goes where the child is already looking.
-      final sentence = AppLocalizations.of(context)!
-          .familyRoleSentence(game['member'], game['roles']);
-      _correctThenTip('$sentence  📖 ${game['note']}');
+      //
+      // Where the game carries its own validated pop-up text (the English
+      // games do, from the language validation), that whole text is shown
+      // as written; "{member} is {roles}." joined to the note did not make a
+      // sentence.
+      final popup = game['popup'];
+      if (popup is String && popup.isNotEmpty) {
+        _correctThenTip(popup);
+      } else {
+        final sentence = AppLocalizations.of(context)!
+            .familyRoleSentence(game['member'], game['roles']);
+        _correctThenTip('$sentence  📖 ${game['note']}');
+      }
     } else {
       _onWrong();
     }
@@ -2706,7 +2716,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
         {
           'itemEmoji': '🛏️',
           'itemName': _currentLang == 'en'
-              ? 'Bed & Pillow'
+              ? 'Bed and Pillow'
               : (_currentLang == 'fil' ? 'Kama at Unan' : 'Kama ken Pango'),
           'roomIndex': 2, // Bedroom / Kwarto
           'question': _currentLang == 'en'
@@ -2718,13 +2728,13 @@ class _PamilyaScreenState extends State<PamilyaScreen>
         {
           'itemEmoji': '🧼',
           'itemName': _currentLang == 'en'
-              ? 'Soap & Shampoo'
+              ? 'Soap and Shampoo'
               : (_currentLang == 'fil'
                   ? 'Sabon at Shampoo'
                   : 'Sabon ken Digos'),
           'roomIndex': 3, // Bathroom / Banyo
           'question': _currentLang == 'en'
-              ? 'Where do we take a bath and wash clean?'
+              ? 'Where do we take a bath and wash ourselves?'
               : (_currentLang == 'fil'
                   ? 'Saan tayo naliligo at naghuhugas ng katawan?'
                   : 'Adino ti pagdigosantayo ken pagbugguantayo?'),

@@ -72,10 +72,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matematika => 'Numbers';
 
   @override
-  String get angAkingSarili => 'About Me';
+  String get angAkingSarili => 'About me';
 
   @override
-  String get atAkingPamilya => 'My Family';
+  String get atAkingPamilya => 'my family';
 
   @override
   String get kulaySaya => 'Color Fun';
@@ -84,7 +84,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get magkulayTayo => 'Let\'s Color!';
 
   @override
-  String get magbasaTitle => 'Stories & Songs';
+  String get magbasaTitle => 'Stories and Songs';
 
   @override
   String get alpabetoAtMgaSalita => 'Read & Sing!';
@@ -99,7 +99,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get totalProgress => 'Total Progress';
 
   @override
-  String get poems => 'Poems';
+  String get poems => 'Poetry';
 
   @override
   String get stories => 'Stories';
@@ -117,16 +117,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get counting => 'Count the Objects';
 
   @override
-  String get dragNumber => 'Drag the Number';
+  String get dragNumber => 'Drag the Numbers';
 
   @override
   String get lineMatch => 'Match with Line';
 
   @override
-  String get popBalloon => 'Pop the Balloon';
+  String get popBalloon => 'Pop the Balloons';
 
   @override
-  String get moreOrLess => 'More or Less?';
+  String get moreOrLess => 'More or Less';
 
   @override
   String get numberPuzzle => 'Number Puzzle';
@@ -184,7 +184,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dragHere => 'Drag here';
 
   @override
-  String get popAllBalloonsWith => 'Pop all balloons with';
+  String get popAllBalloonsWith => 'Pop all the balloons with';
 
   @override
   String get left => 'Left';
@@ -206,17 +206,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get whichIsMore => 'Which is more?';
+  String get whichIsMore => 'Which side have more, left or right?';
 
   @override
-  String get whichIsLess => 'Which is less?';
+  String get whichIsLess => 'Which side have lesser, left or right?';
 
   @override
   String get isSameNumber => 'Same number?';
 
   @override
   String arrange(String sequence) {
-    return 'Arrange: $sequence';
+    return 'Arrange the numbers in the correct order/Sequence: $sequence';
   }
 
   @override
@@ -270,7 +270,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get howOldAreYouDescription =>
-      'Your age is the number of years since you were born. Celebrate every year!';
+      'Your age tells you how many years have passed since you were born.';
 
   @override
   String get genderDescription =>
@@ -429,7 +429,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get overallProgress => 'Overall Progress';
 
   @override
-  String get tula => 'Poems';
+  String get tula => 'Poetry';
 
   @override
   String get kwento => 'Stories';
@@ -497,7 +497,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get achievements => 'Achievements';
 
   @override
-  String get teacherDashboard => 'Teacher Dashboard';
+  String get teacherDashboard => 'Teacher\'s Dashboard';
 
   @override
   String get newCertificateBadge => 'New Certificate!';
@@ -519,7 +519,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logoutConfirm =>
-      'Sign out of this account? You will need the Student Number to sign back in.';
+      'Sign out this account? You will need the Student Number to sign back in.';
 
   @override
   String get logout => 'Logout';
@@ -546,7 +546,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get parentNameLabel => 'Parent\'s Name';
 
   @override
-  String get parentContactLabel => 'Parent\'s Contact (11 digits)';
+  String get parentContactLabel => 'Parent\'s Contact Number';
 
   @override
   String get contactLengthError => 'Contact number must be exactly 11 digits.';
@@ -773,7 +773,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get countAndDragCorrectNumber => 'Count and drag the correct number!';
 
   @override
-  String get whatIsMissingNumber => 'What is the missing number?';
+  String get whatIsMissingNumber => 'What number is missing?';
 
   @override
   String get straightOrCorrect => 'Correct!';
@@ -940,11 +940,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pageTeddyBear => 'Teddy Bear';
 
   @override
-  String get pageSodaPop => 'Soda Pop';
+  String get pageSodaPop => 'Soda';
 
   @override
   String favoriteChosen(String choice) {
-    return 'Your favourite is $choice!';
+    return 'Your Favorite is $choice!';
   }
 
   @override
@@ -1037,7 +1037,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get round => 'Round';
 
   @override
-  String get matchThePairs => 'Find and match the pairs!';
+  String get matchThePairs => 'Find the Matching Pairs!';
 
   @override
   String get flipCardsToMatch => 'Tap a card to flip it. Find two that match!';
@@ -1087,21 +1087,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tipKulayBody =>
-      'Encourage your child to color all the pages in every category.';
+      'Encourage your child to color all the pages in every category. This helps develop creativity and fine motor skills.';
 
   @override
   String get tipTraceItTitle => 'Trace It';
 
   @override
   String get tipTraceItBody =>
-      'Guide your child to follow the correct direction of every letter.';
+      'Guide your child in following the correct direction and strokes when tracing each other.';
 
   @override
   String get tipMagbasaTitle => 'Magbasa';
 
   @override
   String get tipMagbasaBody =>
-      'Read the poems, stories, and songs aloud together with your child.';
+      'Read the poem stories and songs aloud together with your child. Encourage your child to read along.';
 
   @override
   String get tipMatematikaTitle => 'Matematika';
@@ -1115,7 +1115,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tipStudyTimeBody =>
-      'Practice 15-20 minutes every day for the best results.';
+      'Set aside 15-20 minutes each day for learning and practice. Regular practice can help your child build confidence and improve their skills.';
 
   @override
   String progressCompleted(int done, int total) {
@@ -1146,14 +1146,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tipPencilGripBody =>
-      'Make sure your child holds the stylus or finger correctly while tracing.';
+      'Make sure your child holds the stylus or uses their fingers correctly when tracing each letter.';
 
   @override
-  String get tipRepeatTitle => 'Repeat Often';
+  String get tipRepeatTitle => 'Repeat as needed';
 
   @override
   String get tipRepeatBody =>
-      'Encourage your child to redo the letters that are not yet completed.';
+      'Encourage your child to trace unfinished letters again and keep practicing.';
 
   @override
   String get tipPraiseTitle => 'Praise Your Child';
@@ -1167,42 +1167,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tipTulaBody =>
-      'Read the poems aloud with your child to improve pronunciation.';
+      'Read the poems aloud with your child to practice pronunciation and reading fluency.';
 
   @override
   String get tipKwentoTitle => 'Stories';
 
   @override
   String get tipKwentoBody =>
-      'Ask your child about the story after reading to strengthen comprehension.';
+      'Ask your child questions about the story after reading to strengthen comprehension.';
 
   @override
   String get tipKantaTitle => 'Songs';
 
   @override
   String get tipKantaBody =>
-      'Sing the songs together so that learning becomes fun.';
+      'Sing the songs together with your child to make learning fun and enjoyable.';
 
   @override
   String get tipCountingTitle => 'Counting';
 
   @override
   String get tipCountingBody =>
-      'Use real objects like fruits or toys to help your child count.';
+      'Use everyday objects like fruits or toys to help your child practice counting.';
 
   @override
   String get tipPraiseMatTitle => 'Praise';
 
   @override
   String get tipPraiseMatBody =>
-      'Praise your child for every correct answer to build their confidence in math.';
+      'Praise your child for every correct answer to build their confidence and interest in Math.';
 
   @override
   String get tipGameFunTitle => 'Games';
 
   @override
   String get tipGameFunBody =>
-      'The games are designed to be fun — let your child enjoy learning.';
+      'The games are designed to make learning enjoyable. Let your child explore, play, and enjoy learning at their own pace.';
 
   @override
   String get badgeFirstStepsTitle => 'First Steps';
@@ -1375,7 +1375,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get sariliProgress => 'About Me and My Family';
+  String get sariliProgress => 'About me and my family';
 
   @override
   String get tandaanProgress => 'Remember It!';
@@ -1386,7 +1386,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get notStartedYet => 'Not started yet';
+  String get notStartedYet => 'Not yet started';
 
   @override
   String get memoryPairs => 'Matching pairs';
@@ -1420,7 +1420,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wrongPin => 'Wrong code';
 
   @override
-  String get forgotPin => 'Forgot it? Use the Student Number';
+  String get forgotPin => 'Forgot code? Use the Student Number';
 
   @override
   String get pinSaved => 'Code saved';
@@ -1611,7 +1611,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get starTwoBody => 'One wrong answer along the way.';
 
   @override
-  String get starThreeTitle => 'All right, first try';
+  String get starThreeTitle => 'You got them all right on your first try!';
 
   @override
   String get starThreeBody => 'No wrong answers at all.';
@@ -1626,7 +1626,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get yourCode => 'Your code';
 
   @override
-  String get yourCodeNote => 'The four digits that open this report.';
+  String get yourCodeNote => 'Enter the four digits to open this report.';
 
   @override
   String get changeCode => 'Change code';
@@ -1662,7 +1662,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get notPlayedYet => 'Has not started yet';
+  String get notPlayedYet => 'Has not yet started';
 
   @override
   String dayRun(int days) {
@@ -1697,7 +1697,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get filterBehindNote =>
-      'Started, but well behind the rest of the class.';
+      'Started, but is progressing more slowly than the class.';
 
   @override
   String get filterQuietNote => 'Has not opened the app in a week or more.';

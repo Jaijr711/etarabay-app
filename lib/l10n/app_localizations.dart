@@ -217,13 +217,13 @@ abstract class AppLocalizations {
   /// Home card wording for a module
   ///
   /// In en, this message translates to:
-  /// **'About Me'**
+  /// **'About me'**
   String get angAkingSarili;
 
   /// Home card wording for a module
   ///
   /// In en, this message translates to:
-  /// **'My Family'**
+  /// **'my family'**
   String get atAkingPamilya;
 
   /// No description provided for @kulaySaya.
@@ -241,7 +241,7 @@ abstract class AppLocalizations {
   /// Home card wording for a module
   ///
   /// In en, this message translates to:
-  /// **'Stories & Songs'**
+  /// **'Stories and Songs'**
   String get magbasaTitle;
 
   /// Home card wording for a module
@@ -271,7 +271,7 @@ abstract class AppLocalizations {
   /// No description provided for @poems.
   ///
   /// In en, this message translates to:
-  /// **'Poems'**
+  /// **'Poetry'**
   String get poems;
 
   /// No description provided for @stories.
@@ -307,7 +307,7 @@ abstract class AppLocalizations {
   /// No description provided for @dragNumber.
   ///
   /// In en, this message translates to:
-  /// **'Drag the Number'**
+  /// **'Drag the Numbers'**
   String get dragNumber;
 
   /// No description provided for @lineMatch.
@@ -319,13 +319,13 @@ abstract class AppLocalizations {
   /// No description provided for @popBalloon.
   ///
   /// In en, this message translates to:
-  /// **'Pop the Balloon'**
+  /// **'Pop the Balloons'**
   String get popBalloon;
 
   /// No description provided for @moreOrLess.
   ///
   /// In en, this message translates to:
-  /// **'More or Less?'**
+  /// **'More or Less'**
   String get moreOrLess;
 
   /// No description provided for @numberPuzzle.
@@ -433,7 +433,7 @@ abstract class AppLocalizations {
   /// No description provided for @popAllBalloonsWith.
   ///
   /// In en, this message translates to:
-  /// **'Pop all balloons with'**
+  /// **'Pop all the balloons with'**
   String get popAllBalloonsWith;
 
   /// No description provided for @left.
@@ -469,13 +469,13 @@ abstract class AppLocalizations {
   /// No description provided for @whichIsMore.
   ///
   /// In en, this message translates to:
-  /// **'Which is more?'**
+  /// **'Which side have more, left or right?'**
   String get whichIsMore;
 
   /// No description provided for @whichIsLess.
   ///
   /// In en, this message translates to:
-  /// **'Which is less?'**
+  /// **'Which side have lesser, left or right?'**
   String get whichIsLess;
 
   /// No description provided for @isSameNumber.
@@ -487,7 +487,7 @@ abstract class AppLocalizations {
   /// No description provided for @arrange.
   ///
   /// In en, this message translates to:
-  /// **'Arrange: {sequence}'**
+  /// **'Arrange the numbers in the correct order/Sequence: {sequence}'**
   String arrange(String sequence);
 
   /// No description provided for @selectCorrectAnswer.
@@ -589,7 +589,7 @@ abstract class AppLocalizations {
   /// No description provided for @howOldAreYouDescription.
   ///
   /// In en, this message translates to:
-  /// **'Your age is the number of years since you were born. Celebrate every year!'**
+  /// **'Your age tells you how many years have passed since you were born.'**
   String get howOldAreYouDescription;
 
   /// No description provided for @genderDescription.
@@ -889,7 +889,7 @@ abstract class AppLocalizations {
   /// No description provided for @tula.
   ///
   /// In en, this message translates to:
-  /// **'Poems'**
+  /// **'Poetry'**
   String get tula;
 
   /// No description provided for @kwento.
@@ -1021,7 +1021,7 @@ abstract class AppLocalizations {
   /// No description provided for @teacherDashboard.
   ///
   /// In en, this message translates to:
-  /// **'Teacher Dashboard'**
+  /// **'Teacher\'s Dashboard'**
   String get teacherDashboard;
 
   /// No description provided for @newCertificateBadge.
@@ -1063,7 +1063,7 @@ abstract class AppLocalizations {
   /// No description provided for @logoutConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Sign out of this account? You will need the Student Number to sign back in.'**
+  /// **'Sign out this account? You will need the Student Number to sign back in.'**
   String get logoutConfirm;
 
   /// No description provided for @logout.
@@ -1117,7 +1117,7 @@ abstract class AppLocalizations {
   /// No description provided for @parentContactLabel.
   ///
   /// In en, this message translates to:
-  /// **'Parent\'s Contact (11 digits)'**
+  /// **'Parent\'s Contact Number'**
   String get parentContactLabel;
 
   /// No description provided for @contactLengthError.
@@ -1532,7 +1532,7 @@ abstract class AppLocalizations {
   /// No description provided for @whatIsMissingNumber.
   ///
   /// In en, this message translates to:
-  /// **'What is the missing number?'**
+  /// **'What number is missing?'**
   String get whatIsMissingNumber;
 
   /// No description provided for @straightOrCorrect.
@@ -1850,13 +1850,13 @@ abstract class AppLocalizations {
   /// No description provided for @pageSodaPop.
   ///
   /// In en, this message translates to:
-  /// **'Soda Pop'**
+  /// **'Soda'**
   String get pageSodaPop;
 
   /// No description provided for @favoriteChosen.
   ///
   /// In en, this message translates to:
-  /// **'Your favourite is {choice}!'**
+  /// **'Your Favorite is {choice}!'**
   String favoriteChosen(String choice);
 
   /// No description provided for @helloName.
@@ -2024,7 +2024,7 @@ abstract class AppLocalizations {
   /// No description provided for @matchThePairs.
   ///
   /// In en, this message translates to:
-  /// **'Find and match the pairs!'**
+  /// **'Find the Matching Pairs!'**
   String get matchThePairs;
 
   /// No description provided for @flipCardsToMatch.
@@ -2114,7 +2114,7 @@ abstract class AppLocalizations {
   /// No description provided for @tipKulayBody.
   ///
   /// In en, this message translates to:
-  /// **'Encourage your child to color all the pages in every category.'**
+  /// **'Encourage your child to color all the pages in every category. This helps develop creativity and fine motor skills.'**
   String get tipKulayBody;
 
   /// No description provided for @tipTraceItTitle.
@@ -2126,7 +2126,7 @@ abstract class AppLocalizations {
   /// No description provided for @tipTraceItBody.
   ///
   /// In en, this message translates to:
-  /// **'Guide your child to follow the correct direction of every letter.'**
+  /// **'Guide your child in following the correct direction and strokes when tracing each other.'**
   String get tipTraceItBody;
 
   /// No description provided for @tipMagbasaTitle.
@@ -2138,7 +2138,7 @@ abstract class AppLocalizations {
   /// No description provided for @tipMagbasaBody.
   ///
   /// In en, this message translates to:
-  /// **'Read the poems, stories, and songs aloud together with your child.'**
+  /// **'Read the poem stories and songs aloud together with your child. Encourage your child to read along.'**
   String get tipMagbasaBody;
 
   /// No description provided for @tipMatematikaTitle.
@@ -2162,7 +2162,7 @@ abstract class AppLocalizations {
   /// No description provided for @tipStudyTimeBody.
   ///
   /// In en, this message translates to:
-  /// **'Practice 15-20 minutes every day for the best results.'**
+  /// **'Set aside 15-20 minutes each day for learning and practice. Regular practice can help your child build confidence and improve their skills.'**
   String get tipStudyTimeBody;
 
   /// No description provided for @progressCompleted.
@@ -2210,19 +2210,19 @@ abstract class AppLocalizations {
   /// No description provided for @tipPencilGripBody.
   ///
   /// In en, this message translates to:
-  /// **'Make sure your child holds the stylus or finger correctly while tracing.'**
+  /// **'Make sure your child holds the stylus or uses their fingers correctly when tracing each letter.'**
   String get tipPencilGripBody;
 
   /// No description provided for @tipRepeatTitle.
   ///
   /// In en, this message translates to:
-  /// **'Repeat Often'**
+  /// **'Repeat as needed'**
   String get tipRepeatTitle;
 
   /// No description provided for @tipRepeatBody.
   ///
   /// In en, this message translates to:
-  /// **'Encourage your child to redo the letters that are not yet completed.'**
+  /// **'Encourage your child to trace unfinished letters again and keep practicing.'**
   String get tipRepeatBody;
 
   /// No description provided for @tipPraiseTitle.
@@ -2246,7 +2246,7 @@ abstract class AppLocalizations {
   /// No description provided for @tipTulaBody.
   ///
   /// In en, this message translates to:
-  /// **'Read the poems aloud with your child to improve pronunciation.'**
+  /// **'Read the poems aloud with your child to practice pronunciation and reading fluency.'**
   String get tipTulaBody;
 
   /// No description provided for @tipKwentoTitle.
@@ -2258,7 +2258,7 @@ abstract class AppLocalizations {
   /// No description provided for @tipKwentoBody.
   ///
   /// In en, this message translates to:
-  /// **'Ask your child about the story after reading to strengthen comprehension.'**
+  /// **'Ask your child questions about the story after reading to strengthen comprehension.'**
   String get tipKwentoBody;
 
   /// No description provided for @tipKantaTitle.
@@ -2270,7 +2270,7 @@ abstract class AppLocalizations {
   /// No description provided for @tipKantaBody.
   ///
   /// In en, this message translates to:
-  /// **'Sing the songs together so that learning becomes fun.'**
+  /// **'Sing the songs together with your child to make learning fun and enjoyable.'**
   String get tipKantaBody;
 
   /// No description provided for @tipCountingTitle.
@@ -2282,7 +2282,7 @@ abstract class AppLocalizations {
   /// No description provided for @tipCountingBody.
   ///
   /// In en, this message translates to:
-  /// **'Use real objects like fruits or toys to help your child count.'**
+  /// **'Use everyday objects like fruits or toys to help your child practice counting.'**
   String get tipCountingBody;
 
   /// No description provided for @tipPraiseMatTitle.
@@ -2294,7 +2294,7 @@ abstract class AppLocalizations {
   /// No description provided for @tipPraiseMatBody.
   ///
   /// In en, this message translates to:
-  /// **'Praise your child for every correct answer to build their confidence in math.'**
+  /// **'Praise your child for every correct answer to build their confidence and interest in Math.'**
   String get tipPraiseMatBody;
 
   /// No description provided for @tipGameFunTitle.
@@ -2306,7 +2306,7 @@ abstract class AppLocalizations {
   /// No description provided for @tipGameFunBody.
   ///
   /// In en, this message translates to:
-  /// **'The games are designed to be fun — let your child enjoy learning.'**
+  /// **'The games are designed to make learning enjoyable. Let your child explore, play, and enjoy learning at their own pace.'**
   String get tipGameFunBody;
 
   /// No description provided for @badgeFirstStepsTitle.
@@ -2630,7 +2630,7 @@ abstract class AppLocalizations {
   /// Heading of the About Me parent report
   ///
   /// In en, this message translates to:
-  /// **'About Me and My Family'**
+  /// **'About me and my family'**
   String get sariliProgress;
 
   /// Heading of the Remember It parent report
@@ -2648,7 +2648,7 @@ abstract class AppLocalizations {
   /// Shown against a level the child has not opened
   ///
   /// In en, this message translates to:
-  /// **'Not started yet'**
+  /// **'Not yet started'**
   String get notStartedYet;
 
   /// Subtitle of the Remember It parent report
@@ -2714,7 +2714,7 @@ abstract class AppLocalizations {
   /// Link back to the LRN as a recovery route
   ///
   /// In en, this message translates to:
-  /// **'Forgot it? Use the Student Number'**
+  /// **'Forgot code? Use the Student Number'**
   String get forgotPin;
 
   /// Confirmation that a new code was stored
@@ -3068,7 +3068,7 @@ abstract class AppLocalizations {
   /// Explains the 1-to-3 star rating
   ///
   /// In en, this message translates to:
-  /// **'All right, first try'**
+  /// **'You got them all right on your first try!'**
   String get starThreeTitle;
 
   /// Explains the 1-to-3 star rating
@@ -3098,7 +3098,7 @@ abstract class AppLocalizations {
   /// Parent account wording
   ///
   /// In en, this message translates to:
-  /// **'The four digits that open this report.'**
+  /// **'Enter the four digits to open this report.'**
   String get yourCodeNote;
 
   /// Parent account wording
@@ -3164,7 +3164,7 @@ abstract class AppLocalizations {
   /// When the child last played
   ///
   /// In en, this message translates to:
-  /// **'Has not started yet'**
+  /// **'Has not yet started'**
   String get notPlayedYet;
 
   /// When the child last played
@@ -3218,7 +3218,7 @@ abstract class AppLocalizations {
   /// Explains an active class filter
   ///
   /// In en, this message translates to:
-  /// **'Started, but well behind the rest of the class.'**
+  /// **'Started, but is progressing more slowly than the class.'**
   String get filterBehindNote;
 
   /// Explains an active class filter

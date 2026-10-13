@@ -176,7 +176,7 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
     ],
     'Toys': [
       {'name': 'Teddy Bear', 'difficulty': 'Medium'},
-      {'name': 'Soda Pop', 'difficulty': 'Easy'},
+      {'name': 'Soda', 'difficulty': 'Easy'},
     ],
   };
   static const Map<String, Color> _kulayColors = {

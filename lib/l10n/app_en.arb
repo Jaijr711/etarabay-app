@@ -40,25 +40,25 @@
     }
   },
   "matematika": "Numbers",
-  "angAkingSarili": "About Me",
-  "atAkingPamilya": "My Family",
+  "angAkingSarili": "About me",
+  "atAkingPamilya": "my family",
   "kulaySaya": "Color Fun",
   "magkulayTayo": "Let's Color!",
-  "magbasaTitle": "Stories & Songs",
+  "magbasaTitle": "Stories and Songs",
   "alpabetoAtMgaSalita": "Read & Sing!",
   "home": "Home",
   "settingsTitle": "Settings",
   "totalProgress": "Total Progress",
-  "poems": "Poems",
+  "poems": "Poetry",
   "stories": "Stories",
   "songs": "Songs",
   "tune": "Tune",
   "action": "Action",
   "counting": "Count the Objects",
-  "dragNumber": "Drag the Number",
+  "dragNumber": "Drag the Numbers",
   "lineMatch": "Match with Line",
-  "popBalloon": "Pop the Balloon",
-  "moreOrLess": "More or Less?",
+  "popBalloon": "Pop the Balloons",
+  "moreOrLess": "More or Less",
   "numberPuzzle": "Number Puzzle",
   "numberSequence": "Number Sequence",
   "check": "Check",
@@ -90,7 +90,7 @@
   "chooseLeftFirst": "Choose a number on the left first!",
   "dropHere": "Drop here!",
   "dragHere": "Drag here",
-  "popAllBalloonsWith": "Pop all balloons with",
+  "popAllBalloonsWith": "Pop all the balloons with",
   "left": "Left",
   "right": "Right",
   "selected": "Selected",
@@ -110,10 +110,10 @@
       }
     }
   },
-  "whichIsMore": "Which is more?",
-  "whichIsLess": "Which is less?",
+  "whichIsMore": "Which side have more, left or right?",
+  "whichIsLess": "Which side have lesser, left or right?",
   "isSameNumber": "Same number?",
-  "arrange": "Arrange: {sequence}",
+  "arrange": "Arrange the numbers in the correct order/Sequence: {sequence}",
   "@arrange": {
     "placeholders": {
       "sequence": {
@@ -137,7 +137,7 @@
   "howOldAreYou": "How old are you?",
   "areYouBoyOrGirl": "Are you a boy or a girl?",
   "whatIsYourNameDescription": "Your name is what your family and friends call you. It is important!",
-  "howOldAreYouDescription": "Your age is the number of years since you were born. Celebrate every year!",
+  "howOldAreYouDescription": "Your age tells you how many years have passed since you were born.",
   "genderDescription": "Knowing if you are a boy or a girl helps us know more about you!",
   "typeNameHint": "Type your name here",
   "ageHint": "Example: 5, 7, 10",
@@ -215,7 +215,7 @@
   },
   "reset": "Reset",
   "overallProgress": "Overall Progress",
-  "tula": "Poems",
+  "tula": "Poetry",
   "kwento": "Stories",
   "kanta": "Songs",
   "badges": "badges",
@@ -244,14 +244,14 @@
   "music": "Music",
   "notifications": "Notifications",
   "achievements": "Achievements",
-  "teacherDashboard": "Teacher Dashboard",
+  "teacherDashboard": "Teacher's Dashboard",
   "newCertificateBadge": "New Certificate!",
   "enrollStudent": "Enroll Student",
   "firstName": "First Name",
   "lastName": "Last Name",
   "lRN": "Student Number (Password)",
   "removeStudent": "Remove Student?",
-  "logoutConfirm": "Sign out of this account? You will need the Student Number to sign back in.",
+  "logoutConfirm": "Sign out this account? You will need the Student Number to sign back in.",
   "logout": "Logout",
   "confirmLogout": "Are you sure you want to log out?",
   "verifyLRN": "Verify Student Number",
@@ -260,7 +260,7 @@
   "password": "Password",
   "fillAllFields": "Please fill in all fields.",
   "parentNameLabel": "Parent's Name",
-  "parentContactLabel": "Parent's Contact (11 digits)",
+  "parentContactLabel": "Parent's Contact Number",
   "contactLengthError": "Contact number must be exactly 11 digits.",
   "birthdayGreeting": "Happy Birthday, {name}!",
   "@birthdayGreeting": {
@@ -381,7 +381,7 @@
   "checkAnswer": "Check",
   "noGamesAvailable2": "No games available",
   "countAndDragCorrectNumber": "Count and drag the correct number!",
-  "whatIsMissingNumber": "What is the missing number?",
+  "whatIsMissingNumber": "What number is missing?",
   "straightOrCorrect": "Correct!",
   "iKnowIt": "I learned it!",
   "familyTreeTitle": "Family Tree",
@@ -441,8 +441,8 @@
   "pageMansanas": "Apple",
   "pageSaging": "Banana",
   "pageTeddyBear": "Teddy Bear",
-  "pageSodaPop": "Soda Pop",
-  "favoriteChosen": "Your favourite is {choice}!",
+  "pageSodaPop": "Soda",
+  "favoriteChosen": "Your Favorite is {choice}!",
   "@favoriteChosen": {
     "placeholders": {
       "choice": {
@@ -494,7 +494,7 @@
   "tandaanTitle": "Remember It!",
   "tandaanSubtitle": "Match the Pairs",
   "round": "Round",
-  "matchThePairs": "Find and match the pairs!",
+  "matchThePairs": "Find the Matching Pairs!",
   "flipCardsToMatch": "Tap a card to flip it. Find two that match!",
   "traceItTitle": "Trace It",
   "traceItSubtitle": "Learn Your ABC!",
@@ -526,15 +526,15 @@
   "savedArtworksHeader": "Saved Artworks",
   "parentTipsHeader": "Tips for Parents",
   "tipKulayTitle": "Kulay-Saya",
-  "tipKulayBody": "Encourage your child to color all the pages in every category.",
+  "tipKulayBody": "Encourage your child to color all the pages in every category. This helps develop creativity and fine motor skills.",
   "tipTraceItTitle": "Trace It",
-  "tipTraceItBody": "Guide your child to follow the correct direction of every letter.",
+  "tipTraceItBody": "Guide your child in following the correct direction and strokes when tracing each other.",
   "tipMagbasaTitle": "Magbasa",
-  "tipMagbasaBody": "Read the poems, stories, and songs aloud together with your child.",
+  "tipMagbasaBody": "Read the poem stories and songs aloud together with your child. Encourage your child to read along.",
   "tipMatematikaTitle": "Matematika",
   "tipMatematikaBody": "Encourage your child to complete every game to build stronger number skills.",
   "tipStudyTimeTitle": "Study Time",
-  "tipStudyTimeBody": "Practice 15-20 minutes every day for the best results.",
+  "tipStudyTimeBody": "Set aside 15-20 minutes each day for learning and practice. Regular practice can help your child build confidence and improve their skills.",
   "progressCompleted": "{done} / {total} completed",
   "@progressCompleted": {
     "placeholders": {
@@ -572,23 +572,23 @@
   "starsStatLabel": "Stars",
   "gameProgressHeader": "Progress Per Game",
   "tipPencilGripTitle": "Proper Pencil Grip",
-  "tipPencilGripBody": "Make sure your child holds the stylus or finger correctly while tracing.",
-  "tipRepeatTitle": "Repeat Often",
-  "tipRepeatBody": "Encourage your child to redo the letters that are not yet completed.",
+  "tipPencilGripBody": "Make sure your child holds the stylus or uses their fingers correctly when tracing each letter.",
+  "tipRepeatTitle": "Repeat as needed",
+  "tipRepeatBody": "Encourage your child to trace unfinished letters again and keep practicing.",
   "tipPraiseTitle": "Praise Your Child",
   "tipPraiseBody": "Praise every achievement, big or small, to build their confidence.",
   "tipTulaTitle": "Poems",
-  "tipTulaBody": "Read the poems aloud with your child to improve pronunciation.",
+  "tipTulaBody": "Read the poems aloud with your child to practice pronunciation and reading fluency.",
   "tipKwentoTitle": "Stories",
-  "tipKwentoBody": "Ask your child about the story after reading to strengthen comprehension.",
+  "tipKwentoBody": "Ask your child questions about the story after reading to strengthen comprehension.",
   "tipKantaTitle": "Songs",
-  "tipKantaBody": "Sing the songs together so that learning becomes fun.",
+  "tipKantaBody": "Sing the songs together with your child to make learning fun and enjoyable.",
   "tipCountingTitle": "Counting",
-  "tipCountingBody": "Use real objects like fruits or toys to help your child count.",
+  "tipCountingBody": "Use everyday objects like fruits or toys to help your child practice counting.",
   "tipPraiseMatTitle": "Praise",
-  "tipPraiseMatBody": "Praise your child for every correct answer to build their confidence in math.",
+  "tipPraiseMatBody": "Praise your child for every correct answer to build their confidence and interest in Math.",
   "tipGameFunTitle": "Games",
-  "tipGameFunBody": "The games are designed to be fun — let your child enjoy learning.",
+  "tipGameFunBody": "The games are designed to make learning enjoyable. Let your child explore, play, and enjoy learning at their own pace.",
   "badgeFirstStepsTitle": "First Steps",
   "badgeFirstStepsHint": "Earn your first 3 stars",
   "badgeAlphabetTitle": "Alphabet Master",
@@ -761,7 +761,7 @@
       }
     }
   },
-  "sariliProgress": "About Me and My Family",
+  "sariliProgress": "About me and my family",
   "@sariliProgress": {
     "description": "Heading of the About Me parent report"
   },
@@ -781,7 +781,7 @@
       }
     }
   },
-  "notStartedYet": "Not started yet",
+  "notStartedYet": "Not yet started",
   "@notStartedYet": {
     "description": "Shown against a level the child has not opened"
   },
@@ -825,7 +825,7 @@
   "@wrongPin": {
     "description": "The code entered was not correct"
   },
-  "forgotPin": "Forgot it? Use the Student Number",
+  "forgotPin": "Forgot code? Use the Student Number",
   "@forgotPin": {
     "description": "Link back to the LRN as a recovery route"
   },
@@ -1092,7 +1092,7 @@
   "@starTwoBody": {
     "description": "Explains the 1-to-3 star rating"
   },
-  "starThreeTitle": "All right, first try",
+  "starThreeTitle": "You got them all right on your first try!",
   "@starThreeTitle": {
     "description": "Explains the 1-to-3 star rating"
   },
@@ -1112,7 +1112,7 @@
   "@yourCode": {
     "description": "Parent account wording"
   },
-  "yourCodeNote": "The four digits that open this report.",
+  "yourCodeNote": "Enter the four digits to open this report.",
   "@yourCodeNote": {
     "description": "Parent account wording"
   },
@@ -1161,7 +1161,7 @@
       }
     }
   },
-  "notPlayedYet": "Has not started yet",
+  "notPlayedYet": "Has not yet started",
   "@notPlayedYet": {
     "description": "When the child last played"
   },
@@ -1212,7 +1212,7 @@
       }
     }
   },
-  "filterBehindNote": "Started, but well behind the rest of the class.",
+  "filterBehindNote": "Started, but is progressing more slowly than the class.",
   "@filterBehindNote": {
     "description": "Explains an active class filter"
   },
