@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/badge_catalog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_model.dart';
 
 class UserProvider extends ChangeNotifier {
@@ -605,8 +606,35 @@ class UserProvider extends ChangeNotifier {
       await _ensureInitialized();
       await _initializeBoxes();
       _startConfigListener();
+      _watchSignIn();
     } catch (e) {
       debugPrint('CRITICAL: UserProvider initialization failed: $e');
+    }
+  }
+
+  StreamSubscription<User?>? _authSubscription;
+  String? _authedUid;
+
+  /// Firestore only answers a signed-in app, and the anonymous sign-in now
+  /// finishes in the background after the first frame (see main.dart) — so
+  /// the listeners started at launch can be refused before it lands, and a
+  /// refused listener stays dead. When the sign-in arrives they are started
+  /// again, and a pull that was refused is retried.
+  void _watchSignIn() {
+    try {
+      _authSubscription ??=
+          FirebaseAuth.instance.authStateChanges().listen((user) {
+        if (user == null || user.uid == _authedUid) return;
+        _authedUid = user.uid;
+        _configSubscription?.cancel();
+        _startConfigListener();
+        if (_currentStudentId != null) {
+          _startProfileListener();
+          if (!_hasSyncedFromCloud) syncFromFirebase();
+        }
+      });
+    } catch (e) {
+      debugPrint('Sign-in watch unavailable: $e');
     }
   }
 
