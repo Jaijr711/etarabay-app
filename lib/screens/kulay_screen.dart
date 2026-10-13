@@ -19,6 +19,7 @@ import '../providers/user_provider.dart';
 import '../utils/constants.dart';
 import '../widgets/crayon_swatch.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
+import '../utils/word_fit.dart';
 
 class ColoringCategory {
   final String name;
@@ -2056,7 +2057,8 @@ class _KulayScreenState extends State<KulayScreen>
           Padding(
             padding: const EdgeInsets.all(12),
             child: Center(
-              child: Text(_localizedPageName(page.name),
+              child: WordSafeText(_localizedPageName(page.name),
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontSize: 17, fontWeight: FontWeight.bold)),
             ),

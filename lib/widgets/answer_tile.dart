@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'object_picture.dart';
 import 'pressable.dart';
+import '../utils/word_fit.dart';
 
 /// One answer a child taps, in "Ang Aking Sarili" and "Ken Ti Pamiliak".
 ///
@@ -69,6 +70,8 @@ class AnswerTile extends StatelessWidget {
     required double cellW,
     required double cellH,
     TextScaler textScaler = TextScaler.noScaling,
+    // The font the tiles are drawn in, so they are measured in it too.
+    String? fontFamily,
   }) {
     final list = labels.toList();
     var size = groupFontSize(list);
@@ -86,22 +89,28 @@ class AnswerTile extends StatelessWidget {
           w -= (cellH * 0.62).clamp(28.0, 64.0) + 10;
         }
         if (w <= 0 || h <= 0) return false;
+        // Bold is the wider of the two weights a tile uses.
+        final style = TextStyle(
+            fontFamily: fontFamily,
+            fontSize: s,
+            fontWeight: FontWeight.bold,
+            height: 1.1);
+        final words = withoutLeadingEmoji(label);
+        // Every word whole on one line. Checking the laid-out lines missed
+        // this: once a word is broken each piece fits, so "Bedroo" / "m"
+        // passed on a small phone.
+        if (widestWordWidth(words, style, textScaler: textScaler) > w) {
+          return false;
+        }
         final painter = TextPainter(
-          text: TextSpan(
-            text: withoutLeadingEmoji(label),
-            // Bold is the wider of the two weights a tile uses.
-            style: TextStyle(
-                fontSize: s, fontWeight: FontWeight.bold, height: 1.1),
-          ),
+          text: TextSpan(text: words, style: style),
           textAlign: TextAlign.center,
           textDirection: TextDirection.ltr,
           textScaler: textScaler,
         )..layout(maxWidth: w);
-        // A single word wider than the slot would be broken mid-word.
-        final tooWide = painter.computeLineMetrics().any((l) => l.width > w + 0.5);
         final tooTall = painter.height > h;
         painter.dispose();
-        if (tooWide || tooTall) return false;
+        if (tooTall) return false;
       }
       return true;
     }
@@ -226,6 +235,21 @@ class AnswerTile extends StatelessWidget {
           final width = slot.maxWidth.isFinite && slot.maxWidth > 0
               ? slot.maxWidth
               : box.maxWidth;
+          final style = TextStyle(
+            // The board's shared size when there is one, so every answer
+            // reads the same size; otherwise sized from this tile's own
+            // length, as before.
+            fontSize: AnswerTileGroup.maybeOf(context) ??
+                (text.length <= 5 ? 44 : (short ? 28 : 20)),
+            color: textColor,
+            fontWeight: selected ? FontWeight.bold : FontWeight.w600,
+            height: 1.1,
+          );
+          // And never a word broken in two, whatever the board worked out.
+          // Measured in the font the text inherits, as it will be drawn.
+          final fontSize = wordSafeFontSize(
+              text, DefaultTextStyle.of(context).style.merge(style), width,
+              textScaler: MediaQuery.textScalerOf(context));
           return FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.center,
@@ -234,16 +258,7 @@ class AnswerTile extends StatelessWidget {
               child: Text(
                 text,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  // The board's shared size when there is one, so every
-                  // answer reads the same size; otherwise sized from this
-                  // tile's own length, as before.
-                  fontSize: AnswerTileGroup.maybeOf(context) ??
-                      (text.length <= 5 ? 44 : (short ? 28 : 20)),
-                  color: textColor,
-                  fontWeight: selected ? FontWeight.bold : FontWeight.w600,
-                  height: 1.1,
-                ),
+                style: style.copyWith(fontSize: fontSize),
               ),
             ),
           );

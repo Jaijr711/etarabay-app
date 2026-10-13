@@ -23,6 +23,7 @@ import '../widgets/staggered_entrance.dart';
 import '../widgets/star_tally.dart';
 import 'dart:async';
 import 'package:flutter_lucide/flutter_lucide.dart';
+import '../utils/word_fit.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  BADGE MODEL
@@ -1620,7 +1621,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
               ],
             ),
             const Spacer(),
-            Text(
+            WordSafeText(
               _getLevelTitle(cat, i),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -2102,6 +2103,9 @@ class _PamilyaScreenState extends State<PamilyaScreen>
                                     cellH: cellH,
                                     textScaler:
                                         MediaQuery.textScalerOf(context),
+                                    fontFamily: DefaultTextStyle.of(context)
+                                        .style
+                                        .fontFamily,
                                   ),
                                   child: grid,
                                 ),

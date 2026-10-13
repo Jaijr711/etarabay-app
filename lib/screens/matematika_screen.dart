@@ -23,6 +23,7 @@ import '../widgets/pressable.dart';
 import '../widgets/staggered_entrance.dart';
 import '../widgets/star_tally.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
+import '../utils/word_fit.dart';
 
 // ─── CustomPainter: draws animated lines between matched nodes ───────────────
 class _Game3LinePainter extends CustomPainter {
@@ -1691,7 +1692,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
               ],
             ),
             const Spacer(),
-            Text(
+            WordSafeText(
               _getLevelTitleLocalized(i),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

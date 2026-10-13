@@ -20,6 +20,7 @@ import '../widgets/pressable.dart';
 import '../widgets/staggered_entrance.dart';
 import '../widgets/star_tally.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
+import '../utils/word_fit.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  TANDAAN MO! — Memory / Matching Game
@@ -1157,7 +1158,7 @@ class _TandaanScreenState extends State<TandaanScreen>
               ],
             ),
             const Spacer(),
-            Text(
+            WordSafeText(
               _getCategoryTitleLocalized(i),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

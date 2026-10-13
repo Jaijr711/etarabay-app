@@ -18,6 +18,7 @@ import '../providers/user_provider.dart';
 import '../providers/language_provider.dart';
 import '../utils/constants.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
+import '../utils/word_fit.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  MAIN SCREEN
@@ -711,7 +712,7 @@ class _MagbasaScreenState extends State<MagbasaScreen>
               child: SizedBox(
                 height: 38,
                 child: Center(
-                  child: Text(
+                  child: WordSafeText(
                     title,
                     maxLines: 2,
                     textAlign: TextAlign.center,
