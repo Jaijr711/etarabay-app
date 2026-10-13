@@ -732,14 +732,19 @@ class _KulayScreenState extends State<KulayScreen>
     final strokesJson = jsonEncode(_strokes.map((s) => s.toMap()).toList());
     await prefs.setString('${key}_strokes', strokesJson);
 
-    // Save bucket-fill image. File writes aren't available on web, so a
-    // failure here must not surface as an error while the child is coloring.
+    // Save bucket-fill image. The web has no files, so there it is kept in
+    // the preferences as text instead — before, every fill was lost on the
+    // web as soon as the child left the page.
     if (_coloredImage != null) {
       try {
-        final path = await _autoSaveImagePath(pageName);
         final bytes = img.encodePng(_coloredImage!);
-        await File(path).writeAsBytes(bytes);
-        await prefs.setString('${key}_imagePath', path);
+        if (kIsWeb) {
+          await prefs.setString('${key}_imageData', base64Encode(bytes));
+        } else {
+          final path = await _autoSaveImagePath(pageName);
+          await File(path).writeAsBytes(bytes);
+          await prefs.setString('${key}_imagePath', path);
+        }
       } catch (e) {
         debugPrint('Autosave image skipped: $e');
       }
@@ -760,6 +765,7 @@ class _KulayScreenState extends State<KulayScreen>
 
     final strokesJson = prefs.getString('${key}_strokes');
     final imagePath = prefs.getString('${key}_imagePath');
+    final imageData = prefs.getString('${key}_imageData');
     final filledPixels = prefs.getInt('${key}_filledPixels');
     final colorVal = prefs.getInt('${key}_color');
     final brushSize = prefs.getDouble('${key}_brushSize');
@@ -780,7 +786,17 @@ class _KulayScreenState extends State<KulayScreen>
       }
     }
 
-    if (imagePath != null && imagePath.isNotEmpty) {
+    if (kIsWeb && imageData != null && imageData.isNotEmpty) {
+      try {
+        final image = img.decodeImage(base64Decode(imageData));
+        if (image != null && _baseImage != null) {
+          loadedColoredImage = image;
+          loadedDisplayImage = await _imageToUi(loadedColoredImage);
+        }
+      } catch (e) {
+        debugPrint('Error loading autosave image: $e');
+      }
+    } else if (!kIsWeb && imagePath != null && imagePath.isNotEmpty) {
       try {
         final file = File(imagePath);
         if (await file.exists()) {
@@ -831,6 +847,7 @@ class _KulayScreenState extends State<KulayScreen>
 
     await prefs.remove('${key}_strokes');
     await prefs.remove('${key}_imagePath');
+    await prefs.remove('${key}_imageData');
     await prefs.remove('${key}_filledPixels');
     await prefs.remove('${key}_color');
     await prefs.remove('${key}_brushSize');
@@ -1381,11 +1398,23 @@ class _KulayScreenState extends State<KulayScreen>
       }
 
       final pngBytes = byteData.buffer.asUint8List();
-      final dir = await getApplicationDocumentsDirectory();
-      final path =
-          '${dir.path}/creation_${DateTime.now().millisecondsSinceEpoch}.png';
-      final file = File(path);
-      await file.writeAsBytes(pngBytes);
+
+      // The small copy first, and the file on its own. The web has no
+      // documents folder: getApplicationDocumentsDirectory threw there, the
+      // small copy was never made, and every creation in My Creations showed
+      // the blank page instead of what the child had colored.
+      String path = _selectedPage!.imagePath;
+      if (!kIsWeb) {
+        try {
+          final dir = await getApplicationDocumentsDirectory();
+          final filePath =
+              '${dir.path}/creation_${DateTime.now().millisecondsSinceEpoch}.png';
+          await File(filePath).writeAsBytes(pngBytes);
+          path = filePath;
+        } catch (e) {
+          debugPrint('Error saving creation file: $e');
+        }
+      }
 
       String base64Str = '';
       try {
@@ -1410,6 +1439,18 @@ class _KulayScreenState extends State<KulayScreen>
     if (_selectedPage == null) return false;
     if (_editingCreation != null) return true;
     return _myCreations.any(_selectedPage!.owns);
+  }
+
+  /// A creation's title in the language the child is using now. The name
+  /// saved with it is in whatever language was on when it was saved, so a
+  /// child who switched to English still saw "Bulaklak" in My Creations.
+  String _creationTitle(MyCreation creation) {
+    for (final cat in _categories) {
+      for (final page in cat.pages) {
+        if (page.owns(creation)) return _localizedPageName(page.name);
+      }
+    }
+    return creation.name;
   }
 
   String _localizedPageName(String name) {
@@ -2754,7 +2795,7 @@ class _KulayScreenState extends State<KulayScreen>
             padding: const EdgeInsets.fromLTRB(11, 8, 11, 11),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(creation.name,
+              Text(_creationTitle(creation),
                   style: const TextStyle(
                       fontSize: 13, fontWeight: FontWeight.bold),
                   maxLines: 1,
@@ -2812,7 +2853,7 @@ class _KulayScreenState extends State<KulayScreen>
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(creation.name,
+                    child: Text(_creationTitle(creation),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
