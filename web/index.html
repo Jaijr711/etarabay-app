@@ -131,7 +131,34 @@
   
   
   
-  <script src="flutter_bootstrap.js" async=""></script>
+  <div id="android-only"
+       style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:32px;background:#FFFFFF;text-align:center;font:18px/1.5 system-ui,-apple-system,sans-serif;color:#1F2340;">
+    <div>
+      <strong>Para sa Android lamang ang <span style="white-space:nowrap">E-Tarabay</span>.</strong><br>
+      Hindi ito magagamit sa iPhone o iPad.<br><br>
+      <span style="white-space:nowrap">E-Tarabay</span> is available on Android only.
+    </div>
+  </div>
+  <script>
+    // Android only (2026-10-13): on an iPhone or iPad — in Safari or added to
+    // the home screen — the app is not loaded, only the note above is shown.
+    // iPadOS reports itself as a Mac; a Mac has no touch screen.
+    (function () {
+      var ua = navigator.userAgent || '';
+      var isIOS = /iPhone|iPad|iPod/i.test(ua) ||
+        (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+      if (isIOS) {
+        var splash = document.getElementById('splash');
+        if (splash) splash.remove();
+        document.getElementById('android-only').style.display = 'flex';
+        return;
+      }
+      var s = document.createElement('script');
+      s.src = 'flutter_bootstrap.js';
+      s.async = true;
+      document.body.appendChild(s);
+    })();
+  </script>
 
 
 </body></html>

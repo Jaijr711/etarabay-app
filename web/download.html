@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>I-download ang E-Tarabay</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <!--
+    The link to hand out instead of the raw GitHub one. E-Tarabay is
+    released for Android only: an iPhone or iPad gets no download button,
+    just a note saying so. Everyone else gets the newest APK from the
+    etarabay-releases repository (the same one the in-app update check
+    reads). Without JavaScript the button still opens the releases page.
+  -->
+  <style>
+    :root {
+      --brand: #5C52E5;
+      --ink: #1F2340;
+      --muted: #5E6380;
+      --card: #FFFFFF;
+      --page: #F3F2FF;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      background: var(--page);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border-radius: 24px;
+      padding: 32px 24px;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(92, 82, 229, 0.15);
+    }
+    .logo { width: 96px; height: 96px; border-radius: 22px; }
+    h1 { margin: 16px 0 4px; font-size: 26px; }
+    .tagline { margin: 0 0 24px; color: var(--muted); font-size: 15px; }
+    .button {
+      display: block;
+      padding: 16px;
+      border-radius: 16px;
+      background: var(--brand);
+      color: #FFFFFF;
+      font-size: 18px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .button:active { opacity: 0.85; }
+    .version { margin: 10px 0 0; color: var(--muted); font-size: 13px; min-height: 1em; }
+    .note { margin: 20px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .ios {
+      padding: 20px;
+      border-radius: 16px;
+      background: #FFF4E5;
+      color: #7A4B00;
+      font-size: 17px;
+      line-height: 1.5;
+    }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <img class="logo" src="icons/Icon-192.png" alt="">
+    <h1>E-Tarabay</h1>
+    <p class="tagline">Ang Kabataan ay Pag-asa ng Bayan</p>
+
+    <div id="android">
+      <a id="download" class="button"
+         href="https://github.com/Jaijr711/etarabay-releases/releases/latest">
+        I-download para sa Android
+      </a>
+      <p id="version" class="version"></p>
+      <p class="note">
+        Pagkatapos mag-download, buksan ang file para i-install.<br>
+        After downloading, open the file to install it.
+      </p>
+    </div>
+
+    <div id="ios" class="ios" hidden>
+      <strong>Para sa Android lamang ang <span style="white-space:nowrap">E-Tarabay</span>.</strong><br>
+      Hindi ito magagamit sa iPhone o iPad.<br><br>
+      <span style="white-space:nowrap">E-Tarabay</span> is available on Android only.
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var ua = navigator.userAgent || '';
+      // iPadOS reports itself as a Mac; a Mac has no touch screen.
+      var isIOS = /iPhone|iPad|iPod/i.test(ua) ||
+        (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+
+      if (isIOS) {
+        document.getElementById('android').hidden = true;
+        document.getElementById('ios').hidden = false;
+        return;
+      }
+
+      // Point the button straight at the newest APK, not the releases page.
+      fetch('https://api.github.com/repos/Jaijr711/etarabay-releases/releases/latest',
+            { headers: { Accept: 'application/vnd.github+json' } })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (release) {
+          if (!release || !release.assets) return;
+          var apk = release.assets.filter(function (a) {
+            return /\.apk$/i.test(a.name);
+          })[0];
+          if (!apk) return;
+          document.getElementById('download').href = apk.browser_download_url;
+          document.getElementById('version').textContent =
+            'Bersyon ' + String(release.tag_name || '').replace(/^v/, '');
+        })
+        .catch(function () { /* the releases page link still works */ });
+    })();
+  </script>
+</body>
+</html>
