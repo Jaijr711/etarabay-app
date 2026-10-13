@@ -2080,16 +2080,29 @@ class _PamilyaScreenState extends State<PamilyaScreen>
                         final cap = short ? 132.0 : 108.0;
                         final cellH = available < cap ? available : cap;
 
+                        final grid = GridView.count(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: cols,
+                          childAspectRatio: cellW / (cellH <= 0 ? 1 : cellH),
+                          crossAxisSpacing: gap,
+                          mainAxisSpacing: gap,
+                          children: choices,
+                        );
+                        // Every answer at one size — see [AnswerTileGroup].
                         return Center(
-                          child: GridView.count(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            crossAxisCount: cols,
-                            childAspectRatio: cellW / (cellH <= 0 ? 1 : cellH),
-                            crossAxisSpacing: gap,
-                            mainAxisSpacing: gap,
-                            children: choices,
-                          ),
+                          child: labels == null || labels.isEmpty
+                              ? grid
+                              : AnswerTileGroup(
+                                  fontSize: AnswerTile.fitFontSize(
+                                    labels,
+                                    cellW: cellW,
+                                    cellH: cellH,
+                                    textScaler:
+                                        MediaQuery.textScalerOf(context),
+                                  ),
+                                  child: grid,
+                                ),
                         );
                       }),
                     ),

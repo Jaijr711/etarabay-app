@@ -20,7 +20,98 @@ import 'pressable.dart';
 ///     and sizes the drawing and the text from its own height, rather than
 ///     from constants that were tuned when a strip of level tabs was eating
 ///     the top of the screen.
+/// One text size for every answer on a board.
+///
+/// Each tile used to size its own words from its own length, so a question
+/// could show "Father" at 44 beside "Grandmother only" at 20 — the answers
+/// looked unequal, as if one mattered more. The board wraps its tiles in this
+/// with a size worked out from its longest answer ([AnswerTile.groupFontSize]),
+/// and every tile under it uses that size.
+class AnswerTileGroup extends InheritedWidget {
+  final double fontSize;
+
+  const AnswerTileGroup({
+    super.key,
+    required this.fontSize,
+    required super.child,
+  });
+
+  static double? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<AnswerTileGroup>()?.fontSize;
+
+  @override
+  bool updateShouldNotify(AnswerTileGroup oldWidget) =>
+      oldWidget.fontSize != fontSize;
+}
+
 class AnswerTile extends StatelessWidget {
+  /// The size every answer on a board shares, from the longest of them.
+  /// Pictures are left out of the count: they are drawn, not typed.
+  static double groupFontSize(Iterable<String> labels) {
+    var longest = 0;
+    for (final l in labels) {
+      final n = withoutLeadingEmoji(l).length;
+      if (n > longest) longest = n;
+    }
+    if (longest <= 5) return 40;
+    if (longest <= shortLabelLimit) return 26;
+    if (longest <= 32) return 20;
+    return 17;
+  }
+
+  /// The largest size, up to [groupFontSize], at which EVERY answer fits the
+  /// tile the board gives it — measured, so no tile has to shrink its own
+  /// words afterwards and fall out of step with the others. [cellW] and
+  /// [cellH] are one grid cell; the slot for the words inside it follows the
+  /// same padding, picture and layout rules as [build].
+  static double fitFontSize(
+    Iterable<String> labels, {
+    required double cellW,
+    required double cellH,
+    TextScaler textScaler = TextScaler.noScaling,
+  }) {
+    final list = labels.toList();
+    var size = groupFontSize(list);
+    if (cellW <= 0 || cellH <= 0 || list.isEmpty) return size;
+    const border = 4.0;
+    bool fits(double s) {
+      for (final label in list) {
+        final hasPicture = leadingEmoji(label) != null;
+        final stacked = hasPicture && cellH >= 96;
+        var w = cellW - 24 - border;
+        var h = cellH - (stacked ? 20 : 16) - border;
+        if (stacked) {
+          h -= (cellH * 0.56).clamp(40.0, 92.0) + 4;
+        } else if (hasPicture) {
+          w -= (cellH * 0.62).clamp(28.0, 64.0) + 10;
+        }
+        if (w <= 0 || h <= 0) return false;
+        final painter = TextPainter(
+          text: TextSpan(
+            text: withoutLeadingEmoji(label),
+            // Bold is the wider of the two weights a tile uses.
+            style: TextStyle(
+                fontSize: s, fontWeight: FontWeight.bold, height: 1.1),
+          ),
+          textAlign: TextAlign.center,
+          textDirection: TextDirection.ltr,
+          textScaler: textScaler,
+        )..layout(maxWidth: w);
+        // A single word wider than the slot would be broken mid-word.
+        final tooWide = painter.computeLineMetrics().any((l) => l.width > w + 0.5);
+        final tooTall = painter.height > h;
+        painter.dispose();
+        if (tooWide || tooTall) return false;
+      }
+      return true;
+    }
+
+    while (size > 11 && !fits(size)) {
+      size -= 1;
+    }
+    return size;
+  }
+
   /// The answer as the content stores it — "👧 Babae", or a whole sentence.
   final String label;
 
@@ -144,7 +235,11 @@ class AnswerTile extends StatelessWidget {
                 text,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: text.length <= 5 ? 44 : (short ? 28 : 20),
+                  // The board's shared size when there is one, so every
+                  // answer reads the same size; otherwise sized from this
+                  // tile's own length, as before.
+                  fontSize: AnswerTileGroup.maybeOf(context) ??
+                      (text.length <= 5 ? 44 : (short ? 28 : 20)),
                   color: textColor,
                   fontWeight: selected ? FontWeight.bold : FontWeight.w600,
                   height: 1.1,
