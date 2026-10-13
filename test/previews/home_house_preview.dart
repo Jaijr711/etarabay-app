@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Renders the My Home house at the size the board gives it on a phone, empty
-/// and with a few items placed. Not part of the suite — run by hand:
+/// Renders the My Home house at the size the board gives it on a phone: in
+/// English with nothing placed, and in Filipino (labels laid over the
+/// picture's English ones) with a few items placed. Not part of the suite —
+/// run by hand:
 ///
 ///   flutter test --update-goldens test/previews/home_house_preview.dart
 ///
-/// Emoji have no font here and draw as boxes; the room pictures are real.
+/// Emoji have no font here and draw as boxes; the pictures are real.
 void main() {
   setUpAll(() async {
     final file = File(r'C:\Windows\Fonts\arialbd.ttf');
@@ -21,17 +23,20 @@ void main() {
     }
   });
 
-  Future<void> shoot(WidgetTester tester, String name, Size size,
-      Map<int, List<String>> placed) async {
+  Future<void> shoot(WidgetTester tester, String name, Size size) async {
     await tester.binding
         .setSurfaceSize(Size(size.width * 2 + 36, size.height + 24));
-    final rooms = PamilyaContent.getHomeRooms('en');
-    Widget board(Map<int, List<String>> p) => Container(
+    Widget board(String lang, Map<int, List<String>> placed) => Container(
           width: size.width,
           height: size.height,
           color: Colors.white,
           padding: const EdgeInsets.all(8),
-          child: HomeHouse(rooms: rooms, placed: p, onRoomTap: (_) {}),
+          child: HomeHouse(
+            rooms: PamilyaContent.getHomeRooms(lang),
+            placed: placed,
+            onRoomTap: (_) {},
+            ownLabels: lang != 'en',
+          ),
         );
     await tester.runAsync(() async {
       await tester.pumpWidget(MaterialApp(
@@ -42,9 +47,13 @@ void main() {
           child: Container(
             padding: const EdgeInsets.all(12),
             child: Row(children: [
-              board(const {}),
+              board('en', const {}),
               const SizedBox(width: 12),
-              board(placed),
+              board('fil', const {
+                0: ['📺'],
+                2: ['🛏️'],
+                4: ['🌷'],
+              }),
             ]),
           ),
         ),
@@ -58,16 +67,10 @@ void main() {
   }
 
   testWidgets('house on a phone', (tester) async {
-    await shoot(tester, 'home_house_phone.png', const Size(330, 470), {
-      0: ['📺'],
-      2: ['🛏️'],
-      4: ['🌷'],
-    });
+    await shoot(tester, 'home_house_phone.png', const Size(330, 470));
   });
 
   testWidgets('house on a small phone', (tester) async {
-    await shoot(tester, 'home_house_small.png', const Size(300, 380), {
-      1: ['🍳'],
-    });
+    await shoot(tester, 'home_house_small.png', const Size(300, 380));
   });
 }

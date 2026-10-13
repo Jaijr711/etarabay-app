@@ -2912,6 +2912,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
                   rooms: _homeRooms,
                   placed: _placedSoFar(challenges),
                   onRoomTap: _handleRoomTap,
+                  ownLabels: _currentLang != 'en',
                 ),
               ),
             ]),
