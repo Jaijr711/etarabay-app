@@ -87,7 +87,25 @@ def shell_extra():
     return sorted(out)
 
 
-def stamp(paths):
+def asset_hashes(paths):
+    """A short content hash of every held picture and recording.
+
+    The worker keeps these between builds and drops any cached file whose
+    hash changed. Without them a picture redrawn under the same name (the
+    Kulay Saya daisy in paint4.png) stayed the old one on every phone that
+    had already opened the page.
+    """
+    out = {}
+    for rel in paths:
+        h = hashlib.sha1()
+        with open(os.path.join(OUT, rel), 'rb') as f:
+            for chunk in iter(lambda: f.read(1 << 20), b''):
+                h.update(chunk)
+        out[rel] = h.hexdigest()[:12]
+    return out
+
+
+def stamp(paths, hashes):
     """Changes when the code, the file list, or the worker itself changes.
 
     The worker was left out at first, and changing how it caches left the
@@ -101,10 +119,11 @@ def stamp(paths):
             for chunk in iter(lambda: f.read(1 << 20), b''):
                 h.update(chunk)
     h.update('\n'.join(paths).encode('utf-8'))
+    h.update(json.dumps(hashes, sort_keys=True).encode('utf-8'))
     return h.hexdigest()[:12]
 
 
-def write_sw(build_id, paths, extra):
+def write_sw(build_id, paths, extra, hashes):
     p = os.path.join(OUT, 'sw.js')
     with open(p, encoding='utf-8') as f:
         s = f.read()
@@ -113,6 +132,8 @@ def write_sw(build_id, paths, extra):
         ('const WARM = [];', 'const WARM = %s;' % json.dumps(paths)),
         ('const SHELL_EXTRA = [];',
          'const SHELL_EXTRA = %s;' % json.dumps(extra)),
+        ('const ASSET_HASHES = {};',
+         'const ASSET_HASHES = %s;' % json.dumps(hashes, sort_keys=True)),
     ):
         if s.count(old) != 1:
             sys.exit('sw.js: %d matches for %r — not stamped' % (s.count(old), old))
@@ -125,8 +146,9 @@ if __name__ == '__main__':
     run_build(sys.argv[1:])
     paths = warm_list()
     extra = shell_extra()
-    build_id = stamp(paths + extra)
-    write_sw(build_id, paths, extra)
+    hashes = asset_hashes(paths)
+    build_id = stamp(paths + extra, hashes)
+    write_sw(build_id, paths, extra, hashes)
     total = sum(os.path.getsize(os.path.join(OUT, p)) for p in paths + extra)
     print('stamped sw.js  build %s  %d shell + %d assets  %.1f MB held offline'
           % (build_id, len(extra), len(paths), total / 1048576.0))

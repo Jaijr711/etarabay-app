@@ -17,9 +17,12 @@
 //            stops "the phone is still showing the old build".
 //
 //    assets  the pictures and the recordings — 50 MB that almost never
-//            change and must never be downloaded twice. Survives a rebuild.
+//            change and must never be downloaded twice. Survives a rebuild —
+//            except a file whose content changed under the same name (a
+//            coloring page redrawn as paint4.png kept showing the old
+//            picture), which is dropped on activation by its content hash.
 //
-//  Both lines below are rewritten by tool/build_web.py after every build.
+//  The lines below are rewritten by tool/build_web.py after every build.
 //  Unstamped, the worker deliberately falls back to network-first, so an
 //  unstamped build can never serve stale code from a previous one.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -27,10 +30,16 @@
 const BUILD = 'dev';
 const WARM = [];
 const SHELL_EXTRA = [];
+const ASSET_HASHES = {};
 
 const STAMPED = BUILD !== 'dev';
 const SHELL = 'etarabay-shell-' + BUILD;
-const ASSETS = 'etarabay-assets-v1';
+// v2: v1 caches were filled before hashes were recorded, so nothing in them
+// can be told apart from a stale copy. Renaming drops them once.
+const ASSETS = 'etarabay-assets-v2';
+
+/// Where the hashes of what the assets cache holds are kept between workers.
+const HASHES_KEY = '__asset_hashes__';
 
 /// Both CanvasKit builds, because guessing which one is wrong.
 ///
@@ -92,6 +101,7 @@ self.addEventListener('activate', (event) => {
       for (const name of await caches.keys()) {
         if (!keep.has(name)) await caches.delete(name);
       }
+      if (STAMPED) await dropChangedAssets();
       await self.clients.claim();
       // Not awaited. Activation must not sit behind 50 MB of downloads.
       warmAssets();
@@ -120,14 +130,47 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(STAMPED ? cacheFirst(req, SHELL) : networkFirst(req));
 });
 
-/// Never fetched twice. For a recording or a picture the cached copy is the
-/// right answer forever — the path changes when the file does.
+/// Removes every held picture or recording whose content this build changed
+/// (or no longer ships), then records this build's hashes for the next one.
+async function dropChangedAssets() {
+  const cache = await caches.open(ASSETS);
+  let held = {};
+  try {
+    const saved = await cache.match(HASHES_KEY);
+    if (saved) held = await saved.json();
+  } catch (e) {
+    held = {};
+  }
+  for (const path of Object.keys(held)) {
+    if (held[path] !== ASSET_HASHES[path]) {
+      await cache.delete(path, { ignoreSearch: true });
+    }
+  }
+  // Anything held without a recorded hash cannot be trusted either.
+  for (const req of await cache.keys()) {
+    const path = new URL(req.url).pathname.replace(/^\//, '');
+    if (path !== HASHES_KEY && !(path in held && path in ASSET_HASHES)) {
+      await cache.delete(req);
+    }
+  }
+  await cache.put(
+    HASHES_KEY,
+    new Response(JSON.stringify(ASSET_HASHES), {
+      headers: { 'Content-Type': 'application/json' },
+    }),
+  );
+}
+
+/// Never fetched twice. A picture changed under the same name is dropped on
+/// activation by dropChangedAssets, so the cached copy is otherwise right.
 async function cacheFirst(req, cacheName) {
   const cache = await caches.open(cacheName);
   const hit = await cache.match(req, { ignoreSearch: true });
   if (hit) return hit;
   try {
-    const res = await fetch(req);
+    // Past the browser's own HTTP cache too: it would happily hand back the
+    // old picture the worker just dropped.
+    const res = await fetch(req, { cache: 'no-cache' });
     if (res && res.ok) await cache.put(req, res.clone());
     return res;
   } catch (e) {
