@@ -1,43 +1,61 @@
-# E-Tarabay Project Overview (v 1.0.4)
+# E-Tarabay Project Overview (v1.2.48)
 
-E-Tarabay is a modern, interactive Flutter-based educational mobile application designed for early childhood learning, primarily focused on Filipino learners (Tagalog/English). The app’s tagline, **"Ang Kabataan ay Pag-asa ng Bayan"** (The Youth are the Hope of the Nation), reflects its core mission of fostering foundational knowledge in young students.
+E-Tarabay is a modern, interactive Flutter-based educational mobile application designed for early childhood learning, primarily for daycare learners in Ilocos. It teaches in **Ilokano**, **Filipino** and **English**. The app’s tagline, **"Ang Kabataan ay Pag-asa ng Bayan"** (The Youth are the Hope of the Nation), reflects its core mission of fostering foundational knowledge in young students.
+
+**Current version:** 1.2.48 (build 60) — see [`pubspec.yaml`](pubspec.yaml).
 
 ## Core Modules & Features
 
-### Learning Modules (Pag-aaral)
-*   **Lessons**: Curated educational content for various subjects.
-*   **Matematika (Math)**: Interactive math exercises and games.
-*   **Magbasa (Reading)**: Dedicated screens for reading stories (**Kwento**) and poems (**Tula**).
-*   **Alphabet & Numbers**: Foundational literacy and numeracy.
+### Learning Modules
 
-### Creative & Social
-*   **Kulay (Coloring)**: An interactive coloring and art activities section.
-*   **Sundan (Tracing)**: Tracing exercises for motor skill development.
-*   **Pamilya (Family)**: Lessons focused on family values and identification.
+- **Matematika (Numbers)**: Seven levels of counting and number games — Count the Objects, Drag the Number, Match with Line, Pop the Balloon, More or Less, Number Puzzle and Sequencing — each rated with 1–3 stars.
+- **Ang Aking Sarili / Pamilya (About Me / My Family)**: Nine levels about the child and their family — All About Me, My Emotions, Daily Routines, My Preferences, Family Members, Family Roles, Family Activities, Family Tree and Our Home.
+- **Magbasa (Stories & Songs)**: Five poems (**Tula**), five illustrated stories (**Kwento**) and nine songs with karaoke-style lyrics (**Kanta**), with play, pause and replay controls.
+- **Kulay Saya (Color Fun)**: Nine colour-by-number pages that stay inside the lines and save the child's work.
+- **Trace It (Sundan)**: Tracing of A–Z, a–z and 1–10 with stroke-order numbers and arrows.
+- **Tandaan Mo! (Remember It)**: Memory card matching across four categories.
 
-### Gamification (Achievements)
-*   **Awards & Achievements**: Motivation through visual rewards and milestones for completed tasks.
+### Rewards
 
-### Audio & Visual
-*   Background music management via a dedicated **AudioManager**.
-*   Rich assets including custom illustrations and audio feedback for an engaging experience.
+- **Stars** for every activity, **13 badges** in three tiers, and a **Certificate of Completion** once all twelve graduate badges are claimed and every module is finished.
+- A birthday celebration on the child's birthday.
+
+### For Adults
+
+- **Teacher Dashboard**: Enrol students (with auto-generated Student Numbers), follow each child's progress live, see who needs help, and reset all or selected modules.
+- **For Parents**: A PIN-locked progress report, and management of the child's login.
+- **Developer Dashboard**: Messages and broadcasts to students, account pause, force logout, progress reset and module locks.
+
+### Devices
+
+- Android (APK), web, and an enlarged phone layout on iPads and tablets.
+- Works offline; progress syncs to the cloud when a connection is available.
+- Daily reminder notifications and an in-app update check (Android).
 
 ## Technology Stack
 
-*   **Framework**: Flutter (Dart) for cross-platform mobile development.
-*   **Backend**: 
-    *   **Firebase Auth**: For user authentication across student, teacher, and parent roles.
-    *   **Firestore & Realtime Database**: For cloud synchronization of progress and data.
-*   **Local Storage**:
-    *   **Hive**: For fast, persistent local caching of user profiles and progress.
-    *   **Shared Preferences**: For simple app settings (e.g., language, music toggle).
-*   **State Management**: Provider package for handling app state (Language, User session, Audio).
-*   **Security**: `flutter_secure_storage` for protecting sensitive information such as PINs and login credentials.
+- **Framework**: Flutter (Dart) for cross-platform development.
+- **Backend**:
+    - **Firebase Auth**: Anonymous app sign-in.
+    - **Cloud Firestore**: Cloud synchronization of student records and progress.
+- **Local Storage**:
+    - **Hive**: Fast, persistent local caching of user profiles and progress.
+    - **Shared Preferences**: App settings and per-activity progress.
+- **State Management**: Provider package for app state (language, user session, audio).
+- **Security**: `flutter_secure_storage` and `local_auth` for PINs, credentials and fingerprint login.
+
+## What's New in 1.2.48
+
+- Home header redesigned so the child's name is always readable, with a gold star medal.
+- Developer messages are shown once per student, across all devices.
+- Matematika per-level stars and points are now backed up and restored on new devices.
+- Badges and the certificate are no longer withdrawn when signing in on a new device.
+- Larger, proportional layout on iPads and tablets.
 
 ## Edge Cases
 
-*   **Offline Mode**: The app uses Hive and Shared Preferences for local data, but core authentication and dashboard features likely require an internet connection for Firebase synchronization.
-*   **Language Switching**: The app supports bilingual (English/Tagalog/Ilocano) toggling, affecting descriptions and content across screens.
+- **Offline Mode**: Progress is saved locally with Hive and Shared Preferences and synced to Firestore when online.
+- **Language Switching**: The app supports Ilokano, Filipino and English, affecting descriptions and content across screens.
 
 ## Credits
 
