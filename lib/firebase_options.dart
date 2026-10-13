@@ -23,7 +23,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        // Android only: the app does not run on iPhone or iPad (see
+        // _AndroidOnly in main.dart).
+        throw UnsupportedError('E-Tarabay is not available on iOS.');
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:

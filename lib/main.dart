@@ -4,6 +4,7 @@ import 'widgets/account_watcher.dart';
 import 'widgets/tablet_scale.dart';
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
@@ -290,8 +291,40 @@ void _showErrorsOnScreen() {
   };
 }
 
+/// Shown instead of the app on an iPhone or iPad. E-Tarabay is released for
+/// Android only; the iOS project was removed (2026-10-13), and this stops a
+/// regenerated one from running anyway. The web version is not affected.
+class _AndroidOnly extends StatelessWidget {
+  const _AndroidOnly();
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Padding(
+            padding: EdgeInsets.all(32),
+            child: Text(
+              'E-Tarabay is available on Android only.\n\n'
+              'Ang E-Tarabay ay para sa Android lamang.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18, color: Colors.black87),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+    runApp(const _AndroidOnly());
+    return;
+  }
   // Not awaited: only the on-screen error report reads this label, and it
   // was costing every launch a platform round-trip before the first frame.
   PackageInfo.fromPlatform().then((info) {

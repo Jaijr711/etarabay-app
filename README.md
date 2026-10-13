@@ -28,7 +28,7 @@ E-Tarabay is a modern, interactive Flutter-based educational mobile application 
 
 ### Devices
 
-- Android (APK), web, and an enlarged phone layout on iPads and tablets.
+- Android only (APK). Not available on iPhone or iPad. A web version is also built.
 - Works offline; progress syncs to the cloud when a connection is available.
 - Daily reminder notifications and an in-app update check (Android).
 
@@ -50,7 +50,7 @@ E-Tarabay is a modern, interactive Flutter-based educational mobile application 
 - Developer messages are shown once per student, across all devices.
 - Matematika per-level stars and points are now backed up and restored on new devices.
 - Badges and the certificate are no longer withdrawn when signing in on a new device.
-- Larger, proportional layout on iPads and tablets.
+- Larger, proportional layout on tablets.
 
 ## Edge Cases
 
