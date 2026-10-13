@@ -1112,13 +1112,15 @@ class _PamilyaScreenState extends State<PamilyaScreen>
     }
   }
 
+  /// Family Roles has no wrong answer: who cooks, works, tells stories or
+  /// plays differs from one family to the next, and a child naming their own
+  /// family's cook should not be told they are wrong. The listed answer keeps
+  /// its own explanation; any other choice gets a reply that fits everyone.
   void _handleRoleAnswer(int index, int correct, String explanation) {
     setState(() => _selectedRoleAnswer = index);
-    if (index == correct) {
-      _correctThenTip(explanation);
-    } else {
-      _onWrong();
-    }
+    _correctThenTip(index == correct
+        ? explanation
+        : AppLocalizations.of(context)!.roleAnyAnswer);
   }
 
   void _handleActivityAnswer(int index, int correct, String explanation) {
@@ -2420,11 +2422,11 @@ class _PamilyaScreenState extends State<PamilyaScreen>
       labels: choices.map((e) => e.toString()).toList(),
       choices: List.generate(choices.length, (i) {
         final sel = _selectedRoleAnswer == i;
-        final correct = i == game['correct'];
         return _choiceTile(
           label: choices[i],
           isSelected: sel,
-          isCorrect: sel ? correct : null,
+          // Every choice is right here — see _handleRoleAnswer.
+          isCorrect: sel ? true : null,
           onTap: () =>
               _handleRoleAnswer(i, game['correct'], game['explanation']),
         );

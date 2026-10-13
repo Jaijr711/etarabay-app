@@ -773,5 +773,6 @@
   "updateDownloadNow": "I-download Ita",
   "updateLater": "Damdama Laengen",
   "bgPermissionTitle": "Ibagam kenni Nanang wenno Tatang!",
-  "bgPermissionBody": "Tapno agtrabaho dagiti paalala, masapul nga palubosanda ti E-Tarabay iti Battery ken Autostart a setting ti telepono."
+  "bgPermissionBody": "Tapno agtrabaho dagiti paalala, masapul nga palubosanda ti E-Tarabay iti Battery ken Autostart a setting ti telepono.",
+  "roleAnyAnswer": "Wen! Makatulong ti tunggal kameng ti pamilya."
 }

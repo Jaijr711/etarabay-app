@@ -1883,4 +1883,7 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get bgPermissionBody =>
       'Para gumana ang mga paalala, dapat payagan nila ang E-Tarabay sa Battery at Autostart settings ng telepono.';
+
+  @override
+  String get roleAnyAnswer => 'Oo! Makatutulong ang bawat miyembro ng pamilya.';
 }

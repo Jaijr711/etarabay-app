@@ -1390,5 +1390,9 @@
   "bgPermissionBody": "For the reminders to work, ask them to allow E-Tarabay in the phone's Battery and Autostart settings.",
   "@bgPermissionBody": {
     "description": "Shown once after turning Notifications on, so a child can relay it to a parent on OEMs (Oppo/Vivo/Realme/Xiaomi) that kill background alarms unless the app is whitelisted"
+  },
+  "roleAnyAnswer": "Yes! Every family member can help.",
+  "@roleAnyAnswer": {
+    "description": "Family Roles: shown for any answer other than the listed one — there is no wrong answer in this game."
   }
 }

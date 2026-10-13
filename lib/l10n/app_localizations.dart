@@ -3502,6 +3502,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'For the reminders to work, ask them to allow E-Tarabay in the phone\'s Battery and Autostart settings.'**
   String get bgPermissionBody;
+
+  /// Family Roles: shown for any answer other than the listed one — there is no wrong answer in this game.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes! Every family member can help.'**
+  String get roleAnyAnswer;
 }
 
 class _AppLocalizationsDelegate

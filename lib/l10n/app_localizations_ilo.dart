@@ -1875,4 +1875,7 @@ class AppLocalizationsIlo extends AppLocalizations {
   @override
   String get bgPermissionBody =>
       'Tapno agtrabaho dagiti paalala, masapul nga palubosanda ti E-Tarabay iti Battery ken Autostart a setting ti telepono.';
+
+  @override
+  String get roleAnyAnswer => 'Wen! Makatulong ti tunggal kameng ti pamilya.';
 }

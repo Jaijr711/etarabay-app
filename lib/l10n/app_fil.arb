@@ -777,5 +777,6 @@
   "updateDownloadNow": "I-download Ngayon",
   "updateLater": "Mamaya na Lang",
   "bgPermissionTitle": "Sabihin Mo kay Mama o Papa!",
-  "bgPermissionBody": "Para gumana ang mga paalala, dapat payagan nila ang E-Tarabay sa Battery at Autostart settings ng telepono."
+  "bgPermissionBody": "Para gumana ang mga paalala, dapat payagan nila ang E-Tarabay sa Battery at Autostart settings ng telepono.",
+  "roleAnyAnswer": "Oo! Makatutulong ang bawat miyembro ng pamilya."
 }

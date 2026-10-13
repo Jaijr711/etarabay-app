@@ -1866,4 +1866,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get bgPermissionBody =>
       'For the reminders to work, ask them to allow E-Tarabay in the phone\'s Battery and Autostart settings.';
+
+  @override
+  String get roleAnyAnswer => 'Yes! Every family member can help.';
 }
