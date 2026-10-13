@@ -13,6 +13,7 @@ import '../widgets/answer_feedback.dart';
 import '../widgets/answer_tile.dart';
 import '../widgets/object_picture.dart';
 import '../widgets/custom_back_button.dart';
+import '../widgets/family_tree_picture.dart';
 import '../widgets/home_house.dart';
 import '../widgets/success_modal.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -2502,44 +2503,20 @@ class _PamilyaScreenState extends State<PamilyaScreen>
   Widget _buildFamilyTreeGame() {
     final generations = _familyTreeData['generations'] as List;
 
-    // An actual tree, drawn.
-    //
-    // This board used to be three stacked rounded boxes with a row of faces
-    // inside each, and the row was wrapped in a scale-to-fit — so with four
-    // grandparents the whole row was shrunk to about a third, leaving 56px
-    // portraits at 18px and their names at 3. Nothing on it could be read,
-    // and nothing about it said "tree" either.
-    //
-    // Now the tree is painted behind — trunk, branches, canopy — and the
-    // family stands on it at a fixed, readable size. What each label loses is
-    // its parenthesis: the board shows "Lolo", and tapping says "Lolo (ama ni
-    // Tatay)". The long version was never legible where it was.
+    // The tree is a picture — see FamilyTreePicture — with no heading over
+    // it: the tree is the heading. The board shows "Lolo"; tapping a person
+    // says their full relation, "Lolo (ama ni Tatay)".
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
       child: Column(children: [
         Expanded(
           child: _gameCard(
-              child: Column(children: [
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(LucideIcons.workflow, color: _currentMainColor, size: 22),
-              const SizedBox(width: 8),
-              Flexible(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(AppLocalizations.of(context)!.familyTreeTitle,
-                      style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                          color: _currentMainColor)),
-                ),
-              ),
-            ]),
-            const SizedBox(height: 6),
-            // The paragraph that used to sit here explained in three lines of
-            // 13px what the picture below now shows at a glance. The picture
-            // is the explanation.
-            Expanded(child: _familyTreeCanvas(generations)),
-          ])),
+            child: FamilyTreePicture(
+              generations: generations,
+              onMemberTap: (m) => _showTip('${m['emoji']} ${m['relation']}'),
+              ownLabels: _currentLang != 'en',
+            ),
+          ),
         ),
         const SizedBox(height: 6),
         Text(AppLocalizations.of(context)!.familyTreeTapHint,
@@ -2565,140 +2542,6 @@ class _PamilyaScreenState extends State<PamilyaScreen>
           ),
         ),
       ]),
-    );
-  }
-
-  /// The painted tree with the family standing on it.
-  Widget _familyTreeCanvas(List generations) {
-    return LayoutBuilder(builder: (_, box) {
-      // The bottom fifth is trunk and roots, so the family sits above it.
-      final canopyHeight = box.maxHeight * 0.80;
-
-      return Stack(
-        children: [
-          // Clipped, because the crown is drawn as overlapping circles and
-          // the top lobe's radius reaches about thirty pixels above y=0. A
-          // CustomPaint does not clip to its own bounds, so those leaves were
-          // painting straight over the "Talaan ng Pamilya" heading sitting
-          // above this canvas.
-          Positioned.fill(
-            child: ClipRect(
-              child: CustomPaint(painter: _FamilyTreePainter()),
-            ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            height: canopyHeight,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(6, 6, 6, 2),
-              child: Column(
-                children: [
-                  for (final gen in generations)
-                    Expanded(child: _treeTier(gen)),
-                ],
-              ),
-            ),
-          ),
-        ],
-      );
-    });
-  }
-
-  /// One generation, spread across a branch.
-  Widget _treeTier(Map<String, dynamic> gen) {
-    final members = gen['members'] as List;
-    final color = gen['color'] as Color;
-
-    return LayoutBuilder(builder: (_, t) {
-      const labelFont = 11.0;
-      const gapUnderFace = 3.0;
-      // Two lines, because the labels are not all one word: "Nakakatandang
-      // kapatid na lalaki" is four. Reserved whether or not this tier needs
-      // it, so every branch keeps its faces on the same line.
-      const labelLines = 2;
-
-      // Each member gets an equal slice of the branch and nothing wider, so a
-      // long name wraps inside its own slice instead of running under its
-      // neighbour's.
-      final cell = t.maxWidth / members.length;
-
-      // The face is as big as both the row and the branch allow, and never so
-      // big that two of them touch.
-      final byHeight =
-          t.maxHeight - labelFont * 1.25 * labelLines - gapUnderFace;
-      final byWidth = cell - 8;
-      var face = byHeight < byWidth ? byHeight : byWidth;
-      face = face.clamp(30.0, 58.0).toDouble();
-
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          for (final m in members)
-            SizedBox(
-              width: cell,
-              child:
-                  _treeNode(m as Map<String, dynamic>, color, face, labelFont),
-            ),
-        ],
-      );
-    });
-  }
-
-  Widget _treeNode(
-      Map<String, dynamic> m, Color color, double face, double labelFont) {
-    final full = m['relation'] as String;
-    // "Lolo (ama ni Tatay)" → "Lolo". The rest is what the tap is for.
-    final shortLabel = full.split('(').first.trim();
-
-    return GestureDetector(
-      onTap: () => _showTip('${m['emoji']} $full'),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: face,
-            height: face,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              border: Border.all(color: color, width: 2.5),
-              boxShadow: const [
-                BoxShadow(
-                    color: Colors.black26, blurRadius: 5, offset: Offset(0, 2))
-              ],
-            ),
-            child: Center(
-              child:
-                  ObjectPicture(emoji: m['emoji'] as String, size: face * 0.62),
-            ),
-          ),
-          const SizedBox(height: 3),
-          // The label used to be unbounded: maxLines and ellipsis were set,
-          // but with no width to overflow they never applied, so "Nakakatandang
-          // kapatid na lalaki" drew straight through its neighbour and off the
-          // card. Its slice bounds it now, and it is allowed the second line
-          // rather than being cut to "Nakakatandang…" — a three-year-old is
-          // being taught the word, so the word has to be whole.
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 2),
-            child: Text(
-              shortLabel,
-              maxLines: 2,
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: labelFont,
-                fontWeight: FontWeight.w800,
-                color: color,
-                height: 1.15,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -2921,105 +2764,4 @@ class _PamilyaScreenState extends State<PamilyaScreen>
       ]),
     );
   }
-}
-
-/// The tree behind the family: trunk, branches and a three-lobed canopy.
-///
-/// Drawn rather than assembled from boxes because the board is called a
-/// family tree and a three-year-old should be able to see one. The lobes line
-/// up with the three generations, so each row of faces sits in its own part
-/// of the canopy.
-class _FamilyTreePainter extends CustomPainter {
-  static const _leaf = Color(0xFFD7EFDC);
-  static const _leafEdge = Color(0xFFA8D8B4);
-  static const _bark = Color(0xFF9A6B4F);
-  static const _barkDark = Color(0xFF7B543D);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-    final cx = w / 2;
-    final trunkTop = h * 0.72;
-
-    final barkPaint = Paint()
-      ..color = _bark
-      ..isAntiAlias = true;
-
-    // Branches first, so the canopy sits over where they join.
-    final branch = Paint()
-      ..color = _bark
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..isAntiAlias = true;
-
-    void limb(double toX, double toY, double width) {
-      branch.strokeWidth = width;
-      final path = Path()
-        ..moveTo(cx, trunkTop)
-        ..quadraticBezierTo(cx, (trunkTop + toY) / 2, toX, toY);
-      canvas.drawPath(path, branch);
-    }
-
-    limb(w * 0.16, h * 0.30, w * 0.030);
-    limb(w * 0.84, h * 0.30, w * 0.030);
-    limb(w * 0.30, h * 0.12, w * 0.022);
-    limb(w * 0.70, h * 0.12, w * 0.022);
-    canvas.drawLine(Offset(cx, trunkTop), Offset(cx, h * 0.10),
-        branch..strokeWidth = w * 0.026);
-
-    // Canopy — one lobe per generation, overlapping into a single crown.
-    final crown = Path();
-    void lobe(double x, double y, double r) {
-      crown.addOval(Rect.fromCircle(center: Offset(x, y), radius: r));
-    }
-
-    lobe(cx, h * 0.15, w * 0.30);
-    lobe(w * 0.22, h * 0.24, w * 0.22);
-    lobe(w * 0.78, h * 0.24, w * 0.22);
-    lobe(cx, h * 0.42, w * 0.34);
-    lobe(w * 0.26, h * 0.55, w * 0.24);
-    lobe(w * 0.74, h * 0.55, w * 0.24);
-    lobe(cx, h * 0.63, w * 0.30);
-
-    canvas.drawPath(crown, Paint()..color = _leaf);
-    canvas.drawPath(
-        crown,
-        Paint()
-          ..color = _leafEdge
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.5);
-
-    // Trunk, drawn last so it reads in front of the leaves it grows out of.
-    final trunk = Path()
-      ..moveTo(cx - w * 0.045, trunkTop)
-      ..lineTo(cx - w * 0.085, h * 0.97)
-      ..lineTo(cx + w * 0.085, h * 0.97)
-      ..lineTo(cx + w * 0.045, trunkTop)
-      ..close();
-    canvas.drawPath(trunk, barkPaint);
-
-    // Roots spreading along the ground.
-    final root = Paint()
-      ..color = _barkDark
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = w * 0.018
-      ..strokeCap = StrokeCap.round;
-    canvas.drawLine(
-        Offset(cx - w * 0.06, h * 0.95), Offset(cx - w * 0.20, h), root);
-    canvas.drawLine(
-        Offset(cx + w * 0.06, h * 0.95), Offset(cx + w * 0.20, h), root);
-
-    // A seam down the bark, so the trunk is not a flat block of brown.
-    canvas.drawLine(
-        Offset(cx, trunkTop + h * 0.03),
-        Offset(cx - w * 0.01, h * 0.94),
-        Paint()
-          ..color = _barkDark
-          ..strokeWidth = w * 0.010
-          ..strokeCap = StrokeCap.round);
-  }
-
-  @override
-  bool shouldRepaint(_FamilyTreePainter oldDelegate) => false;
 }
