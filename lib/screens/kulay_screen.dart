@@ -682,8 +682,18 @@ class _KulayScreenState extends State<KulayScreen>
       studentId = userProvider.userProfile?.lrn ?? 'guest';
       if (studentId.isEmpty) studentId = 'guest';
     } catch (_) {}
-    return 'kulay_autosave_${studentId}_$pageName';
+    final revision = _pictureRevisions[pageName];
+    final page = revision == null ? pageName : '${pageName}_v$revision';
+    return 'kulay_autosave_${studentId}_$page';
   }
+
+  /// Pages whose picture has been replaced. A coloring saved on the old
+  /// picture would be painted over the new one, so a new revision gives the
+  /// page a fresh save of its own.
+  static const Map<String, int> _pictureRevisions = {
+    // paint4.png: the flower in a pot became a daisy (2026-10-13).
+    'Flower Basket': 2,
+  };
 
   Future<String> _autoSaveImagePath(String pageName) async {
     final dir = await getApplicationDocumentsDirectory();
