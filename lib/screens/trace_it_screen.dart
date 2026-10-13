@@ -1292,27 +1292,32 @@ class _TraceItScreenState extends State<TraceItScreen>
           // drag-fill strokes, so that guard has never once been true and the
           // button has never been drawn — leaving a lone grey outline in the
           // smallest type on the screen as the child's only way back.
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
-            child: SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: _resetTracing,
-                icon: const Icon(LucideIcons.rotate_ccw, size: 22),
-                label: Text(loc.clear,
-                    style: const TextStyle(
-                        fontSize: 17, fontWeight: FontWeight.bold)),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.primary,
-                  side: BorderSide(
-                      color: AppColors.primary.withOpacity(0.5), width: 2),
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18)),
+          //
+          // Shown only while the character is still being traced: once it is
+          // finished there is nothing to clear, and the button only invited
+          // a child to wipe out work they had just completed.
+          if (!_isCompleted)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
+              child: SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _resetTracing,
+                  icon: const Icon(LucideIcons.rotate_ccw, size: 22),
+                  label: Text(loc.clear,
+                      style: const TextStyle(
+                          fontSize: 17, fontWeight: FontWeight.bold)),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: BorderSide(
+                        color: AppColors.primary.withOpacity(0.5), width: 2),
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18)),
+                  ),
                 ),
               ),
             ),
-          ),
         ]),
       ),
     );
