@@ -1389,12 +1389,8 @@ class _TraceItScreenState extends State<TraceItScreen>
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                           fontSize: 18, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 2),
-                  Text('${_currentLetter.example} • "${_currentLetter.sound}"',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style:
-                          TextStyle(fontSize: 13, color: Colors.grey.shade600)),
+                  // The example word and its sound ("Ten • 'ten'") used to
+                  // sit under the label; removed at the team's request.
                 ]),
           ),
           const SizedBox(width: 10),
