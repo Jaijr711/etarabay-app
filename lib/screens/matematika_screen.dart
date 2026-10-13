@@ -226,8 +226,8 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       'correct': 1,
     },
     {
-      'question_en': 'How many fish?',
-      'item_name_en': '🐟',
+      'question_en': 'How many fish do you count?',
+      'item_name_en': 'fish',
       'item_name_il': 'isda',
       'item_name_tl': 'isda',
       'objects': ['🐟', '🐟', '🐟', '🐟'],
@@ -887,6 +887,10 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     final key = lang.currentLanguage == 'ilo'
         ? 'item_name_il'
         : (lang.currentLanguage == 'fil' ? 'item_name_tl' : 'item_name_en');
+    // The validated English question, written out per board. It sat in the
+    // data unused while the screen showed the generic "How many {item}?".
+    final english = game['question_en'] as String?;
+    if (key == 'item_name_en' && english != null) return english;
     return AppLocalizations.of(context)!.howMany(game[key] ?? 'items');
   }
 
