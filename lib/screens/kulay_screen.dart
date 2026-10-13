@@ -7,6 +7,7 @@ import 'package:e_tarabay/l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import '../main.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
@@ -38,13 +39,27 @@ class ColoringPage {
   final String difficulty;
   final String timeEstimate;
   final int colors;
+
+  /// Pictures this page used before its current one. Creations saved from
+  /// them still belong to this page — otherwise replacing a picture would
+  /// quietly take the page's check mark away from every child who finished it.
+  final List<String> formerImagePaths;
   const ColoringPage({
     required this.name,
     required this.imagePath,
     required this.difficulty,
     required this.timeEstimate,
     required this.colors,
+    this.formerImagePaths = const [],
   });
+
+  /// Whether [path] is this page's picture, now or before.
+  bool usesImage(String path) =>
+      path == imagePath || formerImagePaths.contains(path);
+
+  /// Whether [creation] was colored on this page.
+  bool owns(MyCreation creation) =>
+      usesImage(creation.sourcePagePath) || usesImage(creation.thumbnailPath);
 }
 
 class ColoringStroke {
@@ -467,6 +482,7 @@ class _KulayScreenState extends State<KulayScreen>
       ColoringPage(
           name: 'Flower Basket',
           imagePath: 'assets/images/paint_daisy.png',
+          formerImagePaths: ['assets/images/paint4.png'],
           difficulty: 'Medium',
           timeEstimate: '10 min',
           colors: 5),
@@ -1299,6 +1315,44 @@ class _KulayScreenState extends State<KulayScreen>
     );
   }
 
+  /// A creation's picture: the saved file on the device that made it, else
+  /// the small copy kept with it (all a creation restored from the cloud
+  /// has), else the page it was colored on.
+  Widget _creationPicture(MyCreation creation) {
+    Widget fallback() => Icon(LucideIcons.image,
+        size: 40, color: Colors.grey.shade300);
+    Widget memory() {
+      if (creation.base64Image.isEmpty) return fallback();
+      try {
+        return Image.memory(base64Decode(creation.base64Image),
+            fit: BoxFit.contain,
+            filterQuality: FilterQuality.high,
+            errorBuilder: (_, __, ___) => fallback());
+      } catch (_) {
+        return fallback();
+      }
+    }
+
+    Widget asset(String path) => Image.asset(path,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.high,
+        errorBuilder: (_, __, ___) => fallback());
+
+    final path = creation.thumbnailPath;
+    if (path.isNotEmpty && !path.startsWith('assets/') && !kIsWeb) {
+      return Image.file(File(path),
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.high,
+          errorBuilder: (_, __, ___) => memory());
+    }
+    if (creation.base64Image.isNotEmpty) return memory();
+    if (path.startsWith('assets/')) return asset(path);
+    if (creation.sourcePagePath.startsWith('assets/')) {
+      return asset(creation.sourcePagePath);
+    }
+    return fallback();
+  }
+
   Future<Map<String, String>> _captureThumbnailData() async {
     try {
       final boundary = _canvasKey.currentContext?.findRenderObject()
@@ -1342,9 +1396,7 @@ class _KulayScreenState extends State<KulayScreen>
   bool _isCurrentPageSaved() {
     if (_selectedPage == null) return false;
     if (_editingCreation != null) return true;
-    return _myCreations.any((c) =>
-        c.sourcePagePath == _selectedPage!.imagePath ||
-        c.thumbnailPath == _selectedPage!.imagePath);
+    return _myCreations.any(_selectedPage!.owns);
   }
 
   String _localizedPageName(String name) {
@@ -1507,7 +1559,9 @@ class _KulayScreenState extends State<KulayScreen>
               _myCreations.add(MyCreation(
                 name: item['name'],
                 date: DateTime.fromMillisecondsSinceEpoch(item['date']),
-                thumbnailPath: item['thumbnailPath'],
+                // The cloud copy keeps no thumbnail path — a file on the
+                // device that saved it — so one restored at login has none.
+                thumbnailPath: item['thumbnailPath'] as String? ?? '',
                 sourcePagePath: item['sourcePagePath'] ?? '',
                 base64Image: item['base64Image'] ?? '',
                 strokes: strokes,
@@ -1530,9 +1584,7 @@ class _KulayScreenState extends State<KulayScreen>
     for (final cat in _categories) {
       for (int i = 0; i < cat.pages.length; i++) {
         final page = cat.pages[i];
-        final hasCreation = _myCreations.any((c) =>
-            c.sourcePagePath == page.imagePath ||
-            c.thumbnailPath == page.imagePath);
+        final hasCreation = _myCreations.any(page.owns);
         if (!hasCreation && userProvider.isKulayPageCompleted(cat.name, i)) {
           await userProvider.updateKulayProgress('coloring', false,
               category: cat.name, index: i);
@@ -1862,9 +1914,7 @@ class _KulayScreenState extends State<KulayScreen>
     // Check if this page is already completed (local creations + provider)
     final pageIndex = cat.pages.indexOf(page);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final bool isCompleted = _myCreations.any((c) =>
-            c.sourcePagePath == page.imagePath ||
-            c.thumbnailPath == page.imagePath) ||
+    final bool isCompleted = _myCreations.any(page.owns) ||
         (pageIndex >= 0 &&
             userProvider.isKulayPageCompleted(cat.name, pageIndex));
 
@@ -2658,21 +2708,7 @@ class _KulayScreenState extends State<KulayScreen>
                   child: Center(
                       child: Padding(
                     padding: const EdgeInsets.all(12),
-                    child: creation.thumbnailPath.startsWith('assets/')
-                        ? Image.asset(creation.thumbnailPath,
-                            fit: BoxFit.contain,
-                            filterQuality: FilterQuality.high,
-                            errorBuilder: (_, __, ___) => Icon(
-                                LucideIcons.image,
-                                size: 40,
-                                color: Colors.grey.shade300))
-                        : Image.file(File(creation.thumbnailPath),
-                            fit: BoxFit.contain,
-                            filterQuality: FilterQuality.high,
-                            errorBuilder: (_, __, ___) => Icon(
-                                LucideIcons.image,
-                                size: 40,
-                                color: Colors.grey.shade300)),
+                    child: _creationPicture(creation),
                   )),
                 ),
               ),
@@ -2814,13 +2850,7 @@ class _KulayScreenState extends State<KulayScreen>
                   borderRadius: BorderRadius.circular(16),
                   child: Container(
                     color: const Color(0xFFF0F1FF),
-                    child: creation.thumbnailPath.startsWith('assets/')
-                        ? Image.asset(creation.thumbnailPath,
-                            fit: BoxFit.contain,
-                            filterQuality: FilterQuality.high)
-                        : Image.file(File(creation.thumbnailPath),
-                            fit: BoxFit.contain,
-                            filterQuality: FilterQuality.high),
+                    child: _creationPicture(creation),
                   ),
                 ),
               ),
@@ -2851,8 +2881,7 @@ class _KulayScreenState extends State<KulayScreen>
                         Navigator.pop(context);
                         for (final cat in _categories) {
                           for (final page in cat.pages) {
-                            if (page.imagePath == creation.thumbnailPath ||
-                                creation.sourcePagePath == page.imagePath) {
+                            if (page.owns(creation)) {
                               _clearZoom();
                               setState(() {
                                 _selectedPage = page;
@@ -2942,7 +2971,8 @@ class _KulayScreenState extends State<KulayScreen>
   Future<void> _deleteCreation(MyCreation creation) async {
     setState(() => _myCreations.remove(creation));
     _saveCreationsToHive();
-    if (!creation.thumbnailPath.startsWith('assets/')) {
+    if (creation.thumbnailPath.isNotEmpty &&
+        !creation.thumbnailPath.startsWith('assets/')) {
       try {
         File(creation.thumbnailPath).deleteSync();
       } catch (e) {
@@ -2954,7 +2984,7 @@ class _KulayScreenState extends State<KulayScreen>
     if (creation.sourcePagePath.isNotEmpty) {
       for (final cat in _categories) {
         final pageIndex = cat.pages.indexWhere(
-          (p) => p.imagePath == creation.sourcePagePath,
+          (p) => p.usesImage(creation.sourcePagePath),
         );
         if (pageIndex >= 0) {
           final pageName = cat.pages[pageIndex].name;
