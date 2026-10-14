@@ -10,7 +10,7 @@ import '../l10n/app_localizations.dart';
 import '../providers/user_provider.dart';
 import '../utils/constants.dart';
 import '../utils/path_smoothing.dart';
-import '../widgets/custom_back_button.dart';
+import '../widgets/question_cloud.dart' show DoodleBackground;
 import '../widgets/success_modal.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 
@@ -1084,353 +1084,357 @@ class _TraceItScreenState extends State<TraceItScreen>
     final size = MediaQuery.of(context).size;
     final loc = AppLocalizations.of(context)!;
 
+    // As the team drew it: doodles behind everything, a big blue title with
+    // sparkles between a round back button and the star counter, chunky 3D
+    // mode pills, the character in a glossy bubble between two round arrows,
+    // a glossy progress bar ending in a smiling star, and the tracing card in
+    // a thick green frame.
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FC),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leadingWidth: 60,
-        leading: Center(
-          child: CustomBackButton(
-            iconColor: AppColors.textDark,
-            onPressed: () => Navigator.pop(context),
-          ),
-        ),
-        title: FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: Alignment.centerLeft,
-          child: Text(loc.traceItTitle,
-              maxLines: 1,
-              style: const TextStyle(
-                  color: AppColors.textDark,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold)),
-        ),
-        actions: [
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.amber.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(20),
-              border:
-                  Border.all(color: Colors.amber.withOpacity(0.3), width: 1.5),
-            ),
-            child: Row(children: [
-              const Icon(Icons.star_rounded,
-                  color: Color(0xFFFFB800), size: 16),
-              const SizedBox(width: 4),
-              // The child's one star total, read straight from the profile.
-              Text('${Provider.of<UserProvider>(context).displayStars}',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.amber,
-                      fontSize: 14)),
-            ]),
-          ),
-          const SizedBox(width: 4),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(58),
-          child: _buildModeTabs(),
-        ),
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFF8F9FE), Color(0xFFEDF1F9)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Column(children: [
-          _letterHeader(loc),
+      body: Stack(children: [
+        const Positioned.fill(child: _TraceBackdrop()),
+        SafeArea(
+          child: Column(children: [
+            _traceHeader(loc),
+            _buildModeTabs(),
+            _letterHeader(loc),
 
-          // Canvas
-          Expanded(
-            child: PageView.builder(
-              controller: _pageController,
-              onPageChanged: _onPageChanged,
-              itemCount: _currentLetters.length,
-              // Navigation is arrow-only so students can't swipe to letters they
-              // haven't reached yet.
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
-                final letter = _currentLetters[index];
-                // Selected page reuses the already-magnified live strokes;
-                // other pages magnify on the fly for their preview. Every
-                // character in every mode has strokes, so the empty list is
-                // unreachable and only keeps a future character from crashing.
-                final rawStrokes =
-                    strokesForMode(_selectedMode, letter.letter) ?? const [];
-                final letterStrokes =
-                    _selectedIndex == index ? _strokes : _magnify(rawStrokes);
-                return Center(
-                  child: AnimatedBuilder(
-                    animation: _warningAnimation,
-                    builder: (_, child) {
-                      final done = _currentCompletedSet.contains(index) ||
-                          (_isCompleted && _selectedIndex == index);
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 350),
-                        curve: Curves.easeOut,
-                        width: size.width,
-                        height: size.height * 0.98,
-                        decoration: BoxDecoration(
-                          // A finished letter turns the whole canvas green. It
-                          // says "done" without a banner popping up over the
-                          // letter the child just traced.
-                          color: done ? const Color(0xFFEAF8EF) : Colors.white,
-                          borderRadius: BorderRadius.circular(28),
-                          border: _outOfBounds && _selectedIndex == index
-                              ? Border.all(
-                                  color: Colors.orange.withOpacity(
-                                      0.6 + _warningAnimation.value * 0.4),
-                                  width: 3)
-                              : Border.all(
-                                  color: done
-                                      ? const Color(0xFF34C759)
-                                      : Colors.grey.shade100,
-                                  width: done ? 3 : 1.5),
-                          boxShadow: [
-                            BoxShadow(
-                              color: done
-                                  ? const Color(0xFF34C759).withOpacity(0.35)
-                                  : letter.color.withOpacity(0.15),
-                              blurRadius: done ? 28 : 20,
-                              spreadRadius: done ? 2 : 0,
-                              offset: const Offset(0, 8),
-                            )
-                          ],
-                        ),
-                        child: LayoutBuilder(builder: (_, constraints) {
-                          final cs =
-                              Size(constraints.maxWidth, constraints.maxHeight);
-                          _computeTransform(cs);
-                          return GestureDetector(
-                            onPanStart: _onPanStart,
-                            onPanUpdate: _onPanUpdate,
-                            onPanEnd: _onPanEnd,
-                            child: Stack(fit: StackFit.expand, children: [
-                              CustomPaint(
-                                painter: _StrokeFillPainter(
-                                  strokes: letterStrokes,
-                                  strokeProgress: _selectedIndex == index
-                                      ? _strokeProgress
-                                      : List<double>.filled(
-                                          letterStrokes.length,
-                                          _currentCompletedSet.contains(index)
-                                              ? 1.0
-                                              : 0.0),
-                                  activeStroke: _selectedIndex == index
-                                      ? _activeStroke
-                                      : (_currentCompletedSet.contains(index)
-                                          ? letterStrokes.length
-                                          : 0),
-                                  color: letter.color,
-                                  isCompleted:
-                                      _currentCompletedSet.contains(index),
-                                  scale: _canvasScale,
-                                  offset: _canvasOffset,
-                                  guideProgress: _selectedIndex == index
-                                      ? _guideProgress
-                                      : null,
-                                  starPulse: _starController,
-                                  // Only the character on screen collects a
-                                  // star; the pages either side must not
-                                  // borrow this one's moment.
-                                  collect: _selectedIndex == index
-                                      ? _successController
-                                      : kAlwaysDismissedAnimation,
-                                ),
+            // Canvas
+            Expanded(
+              child: PageView.builder(
+                controller: _pageController,
+                onPageChanged: _onPageChanged,
+                itemCount: _currentLetters.length,
+                // Navigation is arrow-only so students can't swipe to letters they
+                // haven't reached yet.
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  final letter = _currentLetters[index];
+                  // Selected page reuses the already-magnified live strokes;
+                  // other pages magnify on the fly for their preview. Every
+                  // character in every mode has strokes, so the empty list is
+                  // unreachable and only keeps a future character from crashing.
+                  final rawStrokes =
+                      strokesForMode(_selectedMode, letter.letter) ?? const [];
+                  final letterStrokes =
+                      _selectedIndex == index ? _strokes : _magnify(rawStrokes);
+                  return Center(
+                    child: AnimatedBuilder(
+                      animation: _warningAnimation,
+                      builder: (_, child) {
+                        final done = _currentCompletedSet.contains(index) ||
+                            (_isCompleted && _selectedIndex == index);
+                        // A thick green frame round the canvas, as drawn.
+                        return Container(
+                          width: size.width,
+                          height: size.height * 0.98,
+                          margin: const EdgeInsets.fromLTRB(12, 6, 12, 8),
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFBFE6C4),
+                            borderRadius: BorderRadius.circular(34),
+                            border: Border.all(
+                                color: const Color(0xFF9ED3A6), width: 3),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    const Color(0xFF6DBB7A).withOpacity(0.35),
+                                blurRadius: 18,
+                                offset: const Offset(0, 8),
                               ),
-                              // Completion mark, tucked into the corner.
-                              //
-                              // This used to be a wide "Good Job!" banner across
-                              // the bottom of the canvas — it covered the letter
-                              // the child had just traced, and repeated word for
-                              // word the message already shown below the canvas.
-                              if (_isCompleted && _selectedIndex == index)
-                                Positioned(
-                                  top: 14,
-                                  right: 14,
-                                  child: ScaleTransition(
-                                    scale: _scaleAnimation,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(9),
-                                      decoration: BoxDecoration(
-                                        color: Colors.green,
-                                        shape: BoxShape.circle,
-                                        boxShadow: [
-                                          BoxShadow(
-                                              color: Colors.green
-                                                  .withOpacity(0.45),
-                                              blurRadius: 14,
-                                              offset: const Offset(0, 4))
-                                        ],
-                                      ),
-                                      child: const Icon(LucideIcons.check,
-                                          color: Colors.white, size: 26),
+                            ],
+                          ),
+                          foregroundDecoration: const _FrameSpeckles(),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 350),
+                            curve: Curves.easeOut,
+                            decoration: BoxDecoration(
+                              // A finished letter turns the whole canvas green. It
+                              // says "done" without a banner popping up over the
+                              // letter the child just traced.
+                              color: done
+                                  ? const Color(0xFFE3F6E6)
+                                  : const Color(0xFFF2FBF3),
+                              borderRadius: BorderRadius.circular(24),
+                              border: _outOfBounds && _selectedIndex == index
+                                  ? Border.all(
+                                      color: Colors.orange.withOpacity(
+                                          0.6 + _warningAnimation.value * 0.4),
+                                      width: 3)
+                                  : Border.all(
+                                      color: done
+                                          ? const Color(0xFF34C759)
+                                          : const Color(0xFFA8D9AF),
+                                      width: done ? 3 : 2),
+                              // A glow only once the character is done; the
+                              // green frame round it already lifts it off the
+                              // page, and a shadow in the letter's colour left
+                              // a muddy band along the frame's bottom.
+                              boxShadow: [
+                                if (done)
+                                  BoxShadow(
+                                    color: const Color(0xFF34C759)
+                                        .withOpacity(0.35),
+                                    blurRadius: 18,
+                                    spreadRadius: 1,
+                                  ),
+                              ],
+                            ),
+                            child: LayoutBuilder(builder: (_, constraints) {
+                              final cs = Size(
+                                  constraints.maxWidth, constraints.maxHeight);
+                              _computeTransform(cs);
+                              return GestureDetector(
+                                onPanStart: _onPanStart,
+                                onPanUpdate: _onPanUpdate,
+                                onPanEnd: _onPanEnd,
+                                child: Stack(fit: StackFit.expand, children: [
+                                  CustomPaint(
+                                    painter: _StrokeFillPainter(
+                                      strokes: letterStrokes,
+                                      strokeProgress: _selectedIndex == index
+                                          ? _strokeProgress
+                                          : List<double>.filled(
+                                              letterStrokes.length,
+                                              _currentCompletedSet
+                                                      .contains(index)
+                                                  ? 1.0
+                                                  : 0.0),
+                                      activeStroke: _selectedIndex == index
+                                          ? _activeStroke
+                                          : (_currentCompletedSet
+                                                  .contains(index)
+                                              ? letterStrokes.length
+                                              : 0),
+                                      color: letter.color,
+                                      isCompleted:
+                                          _currentCompletedSet.contains(index),
+                                      scale: _canvasScale,
+                                      offset: _canvasOffset,
+                                      guideProgress: _selectedIndex == index
+                                          ? _guideProgress
+                                          : null,
+                                      starPulse: _starController,
+                                      // Only the character on screen collects a
+                                      // star; the pages either side must not
+                                      // borrow this one's moment.
+                                      collect: _selectedIndex == index
+                                          ? _successController
+                                          : kAlwaysDismissedAnimation,
                                     ),
                                   ),
-                                ),
-                            ]),
-                          );
-                        }),
-                      );
-                    },
-                  ),
-                );
-              },
-            ),
-          ),
-
-          // Start this character again.
-          //
-          // The only other control here was a "Suriin" button guarded by
-          // `if (!_useDragFill)`. Every character in all three alphabets has
-          // drag-fill strokes, so that guard has never once been true and the
-          // button has never been drawn — leaving a lone grey outline in the
-          // smallest type on the screen as the child's only way back.
-          //
-          // Shown only while the character is still being traced: once it is
-          // finished there is nothing to clear, and the button only invited
-          // a child to wipe out work they had just completed.
-          if (!_isCompleted)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
-              child: SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: _resetTracing,
-                  icon: const Icon(LucideIcons.rotate_ccw, size: 22),
-                  label: Text(loc.clear,
-                      style: const TextStyle(
-                          fontSize: 17, fontWeight: FontWeight.bold)),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.primary,
-                    side: BorderSide(
-                        color: AppColors.primary.withOpacity(0.5), width: 2),
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18)),
-                  ),
-                ),
+                                  // Completion mark, tucked into the corner.
+                                  //
+                                  // This used to be a wide "Good Job!" banner across
+                                  // the bottom of the canvas — it covered the letter
+                                  // the child had just traced, and repeated word for
+                                  // word the message already shown below the canvas.
+                                  if (_isCompleted && _selectedIndex == index)
+                                    Positioned(
+                                      top: 14,
+                                      right: 14,
+                                      child: ScaleTransition(
+                                        scale: _scaleAnimation,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(9),
+                                          decoration: BoxDecoration(
+                                            color: Colors.green,
+                                            shape: BoxShape.circle,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  color: Colors.green
+                                                      .withOpacity(0.45),
+                                                  blurRadius: 14,
+                                                  offset: const Offset(0, 4))
+                                            ],
+                                          ),
+                                          child: const Icon(LucideIcons.check,
+                                              color: Colors.white, size: 26),
+                                        ),
+                                      ),
+                                    ),
+                                ]),
+                              );
+                            }),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
               ),
             ),
-        ]),
-      ),
+
+            // Start this character again.
+            //
+            // The only other control here was a "Suriin" button guarded by
+            // `if (!_useDragFill)`. Every character in all three alphabets has
+            // drag-fill strokes, so that guard has never once been true and the
+            // button has never been drawn — leaving a lone grey outline in the
+            // smallest type on the screen as the child's only way back.
+            //
+            // Shown only while the character is still being traced: once it is
+            // finished there is nothing to clear, and the button only invited
+            // a child to wipe out work they had just completed.
+            if (!_isCompleted)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
+                child: _ChunkyPill(
+                  label: loc.clear,
+                  icon: LucideIcons.rotate_ccw,
+                  top: const Color(0xFF45DCCB),
+                  bottom: const Color(0xFF18A8B6),
+                  edge: const Color(0xFF0F7A85),
+                  onTap: _resetTracing,
+                ),
+              ),
+          ]),
+        ),
+      ]),
+    );
+  }
+
+  /// Back button, title and star counter, drawn into the page rather than
+  /// an app bar, as in the design.
+  Widget _traceHeader(AppLocalizations loc) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+      child: Row(children: [
+        _RoundButton(
+          colors: const [Color(0xFF9AA6B8), Color(0xFF66748A)],
+          edge: const Color(0xFF4B5668),
+          icon: Icons.arrow_back_rounded,
+          size: 50,
+          onTap: () => Navigator.pop(context),
+        ),
+        Expanded(
+          child: Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
+              children: [
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    child: Text(
+                      loc.traceItTitle,
+                      maxLines: 1,
+                      style: const TextStyle(
+                        fontSize: 38,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF2266B8),
+                        shadows: [
+                          Shadow(
+                              color: Colors.white,
+                              blurRadius: 0,
+                              offset: Offset(0, 2)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                for (final s in const [
+                  (-0.92, -0.9, 13.0, Color(0xFF2266B8)),
+                  (-0.98, 0.2, 9.0, Color(0xFF6FB4F0)),
+                  (-0.75, 0.95, 10.0, Color(0xFF2266B8)),
+                  (0.72, -0.95, 10.0, Color(0xFF6FB4F0)),
+                  (0.95, -0.4, 12.0, Color(0xFF2266B8)),
+                  (0.85, 0.9, 9.0, Color(0xFF6FB4F0)),
+                ])
+                  Align(
+                    alignment: Alignment(s.$1, s.$2),
+                    child: Icon(Icons.star_rounded, size: s.$3, color: s.$4),
+                  ),
+              ]),
+        ),
+        // The child's one star total, read straight from the profile.
+        Container(
+          padding: const EdgeInsets.fromLTRB(4, 3, 14, 3),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFFFFE07A), Color(0xFFF5B92E)],
+            ),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: const Color(0xFFC98A12), width: 2.5),
+            boxShadow: const [
+              BoxShadow(color: Color(0xFFC98A12), offset: Offset(0, 3)),
+            ],
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Image.asset('assets/images/star_happy_1.webp',
+                width: 32, height: 32),
+            const SizedBox(width: 4),
+            Text('${Provider.of<UserProvider>(context).displayStars}',
+                style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFF7A4A00),
+                    fontSize: 20)),
+          ]),
+        ),
+      ]),
     );
   }
 
   /// The letter, where the child is, and the way forward — in one band.
   ///
-  /// This was two bands. The upper one held the letter, its name, an English
-  /// example word, its sound, a green "8/26" chip and a running points total;
-  /// the lower one held two arrows around "8 / 26". The child was shown the
-  /// same fraction twice, and the other number was in points while the
-  /// dashboard, the awards and every other module count stars.
-  ///
-  /// Now: the arrows sit either side of the letter they move between, and one
+  /// The arrows sit either side of the character they move between, and one
   /// line underneath says how far along this alphabet the child has come — in
-  /// stars, because a finished character is worth exactly one.
+  /// stars, because a finished character is worth exactly one. Drawn as in
+  /// the design: round 3D arrows, the character in a glossy teal bubble, a
+  /// glossy green bar ending in a smiling star.
   Widget _letterHeader(AppLocalizations loc) {
     final done = _currentCompletedSet.length;
     final total = _currentLetters.length;
 
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 6,
-              offset: const Offset(0, 2)),
-        ],
-      ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 6, 12, 2),
       child: Column(children: [
         Row(children: [
           _buildNavArrow(
-            icon: LucideIcons.chevron_left,
+            icon: Icons.chevron_left_rounded,
             enabled: _selectedIndex > 0,
             onTap: () => _goToLetter(_selectedIndex - 1),
+            colors: const [Color(0xFFC9A8F5), Color(0xFF9468E0)],
+            edge: const Color(0xFF6C45B8),
           ),
           const SizedBox(width: 10),
-          // The character being traced, at the size it deserves.
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: _currentLetter.color.withOpacity(0.1),
-              shape: BoxShape.circle,
-              border: Border.all(color: _currentLetter.color, width: 2.5),
-            ),
-            child: Center(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: Text(_currentLetter.letter,
-                      style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: _currentLetter.color)),
+          _CharBubble(_currentLetter.letter),
+          const SizedBox(width: 12),
+          Expanded(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                _selectedMode == 2
+                    ? loc.numberLabel(_currentLetter.letter)
+                    : loc.letterLabel(_currentLetter.letter),
+                maxLines: 1,
+                style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF14204A),
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                      _selectedMode == 2
-                          ? loc.numberLabel(_currentLetter.letter)
-                          : loc.letterLabel(_currentLetter.letter),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
-                  // The example word and its sound ("Ten • 'ten'") used to
-                  // sit under the label; removed at the team's request.
-                ]),
-          ),
           const SizedBox(width: 10),
           _buildNavArrow(
-            icon: LucideIcons.chevron_right,
+            icon: Icons.chevron_right_rounded,
             enabled: _selectedIndex < _maxReachableIndex,
             onTap: () => _goToLetter(_selectedIndex + 1),
+            colors: const [Color(0xFF8FB4F7), Color(0xFF4F7BE0)],
+            edge: const Color(0xFF3358B4),
           ),
         ]),
         const SizedBox(height: 10),
         // How far through this alphabet the child has come. One star per
         // character, which is exactly what finishing one is worth.
-        Row(children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: LinearProgressIndicator(
-                value: total == 0 ? 0 : done / total,
-                minHeight: 10,
-                backgroundColor: Colors.grey.shade200,
-                valueColor: AlwaysStoppedAnimation<Color>(done >= total
-                    ? const Color(0xFF34C759)
-                    : _currentLetter.color),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          const Icon(Icons.star_rounded, size: 19, color: Color(0xFFFFB800)),
-          const SizedBox(width: 3),
-          Text('$done/$total',
-              style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFFF5A300))),
-        ]),
+        _GlossyProgress(
+          value: total == 0 ? 0 : done / total,
+          label: '$done/$total',
+        ),
       ]),
     );
   }
@@ -1439,27 +1443,17 @@ class _TraceItScreenState extends State<TraceItScreen>
     required IconData icon,
     required bool enabled,
     required VoidCallback onTap,
+    required List<Color> colors,
+    required Color edge,
   }) {
-    return GestureDetector(
+    // 56 across: these move the child between characters and sit at the very
+    // edge of the screen, where a small hand is least accurate.
+    return _RoundButton(
+      colors: enabled ? colors : const [Color(0xFFE3E6EC), Color(0xFFC9CED8)],
+      edge: enabled ? edge : const Color(0xFFB3B9C4),
+      icon: icon,
+      size: 56,
       onTap: enabled ? onTap : null,
-      // 52 across rather than 40: these move the child between characters
-      // and sit at the very edge of the screen, where a small hand is least
-      // accurate.
-      child: Container(
-        width: 52,
-        height: 52,
-        decoration: BoxDecoration(
-          color: enabled
-              ? AppColors.primary.withOpacity(0.12)
-              : Colors.grey.shade100,
-          shape: BoxShape.circle,
-        ),
-        child: Icon(
-          icon,
-          size: 22,
-          color: enabled ? AppColors.primary : Colors.grey.shade300,
-        ),
-      ),
     );
   }
 
@@ -1522,151 +1516,420 @@ class _TraceItScreenState extends State<TraceItScreen>
     }
   }
 
-  /// Modern gradient card tabs matching Pamilya / Matematika tab selection style.
+  /// The three alphabets as chunky 3D pills, as in the design: pale with a
+  /// tinted rim until chosen, then bright with a solid edge under it.
   Widget _buildModeTabs() {
     final loc = AppLocalizations.of(context)!;
     final modes = [
       (
-        0,
-        'ABC',
-        loc.upper,
-        _completedUpper.length >= uppercaseLetters.length,
-        const Color(0xFF4FACFE),
-        const Color(0xFF00F2FE),
+        index: 0,
+        badge: 'ABC',
+        label: loc.upper,
+        completed: _completedUpper.length >= uppercaseLetters.length,
+        face: const Color(0xFFDCE8FF),
+        ink: const Color(0xFF3D6CC4),
+        rim: const Color(0xFF9DBBF0),
+        bright: const [Color(0xFF7FB2FF), Color(0xFF3D7BE0)],
+        edge: const Color(0xFF2A5BB0),
       ),
       (
-        1,
-        'abc',
-        loc.lower,
-        _completedLower.length >= lowercaseLetters.length,
-        const Color(0xFF11998E),
-        const Color(0xFF38EF7D),
+        index: 1,
+        badge: 'abc',
+        label: loc.lower,
+        completed: _completedLower.length >= lowercaseLetters.length,
+        face: const Color(0xFFD9F2E9),
+        ink: const Color(0xFF2E8A6A),
+        rim: const Color(0xFF98D3BD),
+        bright: const [Color(0xFF5BDDA4), Color(0xFF1FA874)],
+        edge: const Color(0xFF147A54),
       ),
       (
-        2,
-        '123',
-        loc.numbers,
-        _completedNums.length >= numberLetters.length,
-        const Color(0xFFFF6B6B),
-        const Color(0xFFFF8E53),
+        index: 2,
+        badge: '123',
+        label: loc.numbers,
+        completed: _completedNums.length >= numberLetters.length,
+        face: const Color(0xFFFFE2D8),
+        ink: const Color(0xFFD9573A),
+        rim: const Color(0xFFF5AE96),
+        bright: const [Color(0xFFFF8F70), Color(0xFFF0533A)],
+        edge: const Color(0xFFB8361F),
       ),
     ];
 
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
-        ],
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Row(
-        children: [
-          for (final m in modes)
-            Expanded(
-              child: _buildModeSegment(
-                index: m.$1,
-                badge: m.$2,
-                label: m.$3,
-                completed: m.$4,
-                startColor: m.$5,
-                endColor: m.$6,
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildModeSegment({
-    required int index,
-    required String badge,
-    required String label,
-    required bool completed,
-    required Color startColor,
-    required Color endColor,
-  }) {
-    final active = _selectedMode == index;
-
-    return GestureDetector(
-      onTap: () => _switchMode(index),
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          gradient: active
-              ? LinearGradient(
-                  colors: [startColor, endColor],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-              : null,
-          color: active ? null : startColor.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(16),
-          border: active
-              ? null
-              : Border.all(color: startColor.withOpacity(0.2), width: 1.5),
-          boxShadow: active
-              ? [
-                  BoxShadow(
-                    color: endColor.withOpacity(0.4),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : [],
-        ),
-        child: Center(
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: active
-                          ? Colors.white.withOpacity(0.25)
-                          : startColor.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      badge,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w900,
-                        color: active ? Colors.white : startColor,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: active ? FontWeight.bold : FontWeight.w600,
-                      color: active ? Colors.white : startColor,
-                    ),
-                  ),
-                  if (completed) ...[
-                    const SizedBox(width: 4),
-                    Icon(
-                      LucideIcons.circle_check,
-                      size: 14,
-                      color: active ? Colors.white : Colors.green.shade600,
-                    ),
-                  ],
-                ],
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 4, 8, 6),
+      child: Row(children: [
+        for (final m in modes)
+          Expanded(
+            child: GestureDetector(
+              onTap: () => _switchMode(m.index),
+              behavior: HitTestBehavior.opaque,
+              child: _modePill(
+                active: _selectedMode == m.index,
+                badge: m.badge,
+                label: m.label,
+                completed: m.completed,
+                face: m.face,
+                ink: m.ink,
+                rim: m.rim,
+                bright: m.bright,
+                edge: m.edge,
               ),
             ),
           ),
+      ]),
+    );
+  }
+
+  Widget _modePill({
+    required bool active,
+    required String badge,
+    required String label,
+    required bool completed,
+    required Color face,
+    required Color ink,
+    required Color rim,
+    required List<Color> bright,
+    required Color edge,
+  }) {
+    final text = active ? Colors.white : ink;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      height: 50,
+      margin: const EdgeInsets.fromLTRB(4, 0, 4, 5),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        gradient: active
+            ? LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: bright,
+              )
+            : null,
+        color: active ? null : face,
+        borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: active ? edge : rim, width: 2.5),
+        boxShadow: [
+          BoxShadow(color: active ? edge : rim, offset: const Offset(0, 5)),
+        ],
+      ),
+      child: Center(
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+              decoration: BoxDecoration(
+                color: active
+                    ? Colors.white.withOpacity(0.28)
+                    : ink.withOpacity(0.14),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(badge,
+                  style: TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.w900, color: text)),
+            ),
+            const SizedBox(width: 6),
+            Text(label,
+                style: TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.w900, color: text)),
+            if (completed) ...[
+              const SizedBox(width: 4),
+              Icon(LucideIcons.circle_check, size: 16, color: text),
+            ],
+          ]),
         ),
+      ),
+    );
+  }
+}
+
+/// The page behind everything: a soft wash with faint doodles.
+class _TraceBackdrop extends StatelessWidget {
+  const _TraceBackdrop();
+
+  @override
+  Widget build(BuildContext context) {
+    return const DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFFFBFCFF), Color(0xFFF1F4FB)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: DoodleBackground(),
+    );
+  }
+}
+
+/// A round, glossy button with a solid 3D edge — the back button and the
+/// arrows either side of the character.
+class _RoundButton extends StatelessWidget {
+  final List<Color> colors;
+  final Color edge;
+  final IconData icon;
+  final double size;
+  final VoidCallback? onTap;
+
+  const _RoundButton({
+    required this.colors,
+    required this.edge,
+    required this.icon,
+    required this.size,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: size,
+        height: size,
+        margin: const EdgeInsets.only(bottom: 4),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: colors,
+          ),
+          border: Border.all(color: edge, width: 3),
+          boxShadow: [BoxShadow(color: edge, offset: const Offset(0, 4))],
+        ),
+        child: Icon(icon, color: Colors.white, size: size * 0.6),
+      ),
+    );
+  }
+}
+
+/// The character being traced, in a glossy teal bubble with a white rim
+/// round its letters.
+class _CharBubble extends StatelessWidget {
+  final String char;
+  const _CharBubble(this.char);
+
+  @override
+  Widget build(BuildContext context) {
+    const size = 76.0;
+    const style = TextStyle(fontSize: 42, fontWeight: FontWeight.w900);
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: const RadialGradient(
+          center: Alignment(-0.3, -0.4),
+          radius: 0.95,
+          colors: [Color(0xFF9DEEF8), Color(0xFF2EB8D3), Color(0xFF0E7F9E)],
+          stops: [0, 0.55, 1],
+        ),
+        border: Border.all(color: const Color(0xFF0B6E8A), width: 3),
+        boxShadow: const [
+          BoxShadow(color: Color(0xFF0B6E8A), offset: Offset(0, 4)),
+        ],
+      ),
+      child: Stack(alignment: Alignment.center, children: [
+        // The shine at the top left.
+        Positioned(
+          top: 8,
+          left: 14,
+          child: Container(
+            width: 24,
+            height: 12,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.55),
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(10),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Stack(alignment: Alignment.center, children: [
+              Text(char,
+                  style: style.copyWith(
+                    foreground: Paint()
+                      ..style = PaintingStyle.stroke
+                      ..strokeWidth = 7
+                      ..strokeJoin = StrokeJoin.round
+                      ..color = Colors.white,
+                  )),
+              Text(char, style: style.copyWith(color: const Color(0xFF0B5D78))),
+            ]),
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+/// A glossy green bar with a smiling star riding its end, and the count.
+class _GlossyProgress extends StatelessWidget {
+  final double value;
+  final String label;
+  const _GlossyProgress({required this.value, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    const barH = 22.0;
+    const star = 44.0;
+    return Row(children: [
+      Expanded(
+        child: LayoutBuilder(builder: (_, box) {
+          final fill = (box.maxWidth * value.clamp(0.0, 1.0));
+          return SizedBox(
+            height: star,
+            child: Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.centerLeft,
+                children: [
+                  Container(
+                    height: barH,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(barH),
+                      border:
+                          Border.all(color: const Color(0xFFCFE3D3), width: 2),
+                    ),
+                  ),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 400),
+                    height: barH,
+                    width: fill < barH && fill > 0 ? barH : fill,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(barH),
+                      gradient: const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0xFF8BE38F), Color(0xFF3FB34F)],
+                      ),
+                      border:
+                          Border.all(color: const Color(0xFF2E8F3C), width: 2),
+                    ),
+                    child: Align(
+                      alignment: const Alignment(0, -0.5),
+                      child: FractionallySizedBox(
+                        widthFactor: 0.92,
+                        child: Container(
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.45),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: (fill - star / 2)
+                        .clamp(-star / 4, box.maxWidth - star * 0.6),
+                    child: Image.asset('assets/images/star_happy_3.webp',
+                        width: star, height: star),
+                  ),
+                ]),
+          );
+        }),
+      ),
+      const SizedBox(width: 12),
+      Text(label,
+          style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              color: Color(0xFF8A5A00))),
+    ]);
+  }
+}
+
+/// Little dots and leaf shapes in the tracing card's green frame.
+class _FrameSpeckles extends Decoration {
+  const _FrameSpeckles();
+
+  @override
+  BoxPainter createBoxPainter([VoidCallback? onChanged]) => _SpecklePainter();
+}
+
+class _SpecklePainter extends BoxPainter {
+  @override
+  void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
+    final size = configuration.size;
+    if (size == null) return;
+    final rect = offset & size;
+    final paint = Paint()..color = const Color(0xFF8CC796).withOpacity(0.8);
+    final random = math.Random(3);
+    // Inside the frame band only: 4 to 13 px in from the card's edge.
+    void dot(double x, double y) {
+      final r = 1.6 + random.nextDouble() * 2.4;
+      if (random.nextBool()) {
+        canvas.drawCircle(Offset(x, y), r, paint);
+      } else {
+        canvas.save();
+        canvas.translate(x, y);
+        canvas.rotate(random.nextDouble() * math.pi);
+        canvas.drawOval(
+            Rect.fromCenter(
+                center: Offset.zero, width: r * 3.2, height: r * 1.4),
+            paint);
+        canvas.restore();
+      }
+    }
+
+    double band() => 5 + random.nextDouble() * 6;
+    for (double x = rect.left + 30; x < rect.right - 30; x += 18) {
+      dot(x + random.nextDouble() * 8, rect.top + band());
+      dot(x + random.nextDouble() * 8, rect.bottom - band());
+    }
+    for (double y = rect.top + 30; y < rect.bottom - 30; y += 18) {
+      dot(rect.left + band(), y + random.nextDouble() * 8);
+      dot(rect.right - band(), y + random.nextDouble() * 8);
+    }
+  }
+}
+
+/// A full-width rounded button with a solid 3D edge — "Clear".
+class _ChunkyPill extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color top, bottom, edge;
+  final VoidCallback onTap;
+
+  const _ChunkyPill({
+    required this.label,
+    required this.icon,
+    required this.top,
+    required this.bottom,
+    required this.edge,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 54,
+        margin: const EdgeInsets.only(bottom: 5),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [top, bottom],
+          ),
+          borderRadius: BorderRadius.circular(27),
+          border: Border.all(color: edge, width: 3),
+          boxShadow: [BoxShadow(color: edge, offset: const Offset(0, 5))],
+        ),
+        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Icon(icon, color: Colors.white, size: 24),
+          const SizedBox(width: 8),
+          Text(label,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900)),
+        ]),
       ),
     );
   }
