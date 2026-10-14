@@ -54,14 +54,32 @@ class _SuccessModalState extends State<SuccessModal> {
     super.dispose();
   }
 
+  // The celebration as the team drew it: a rainbow-rimmed card, a party
+  // popper over it, the title in bold orange-red with a white rim, three
+  // smiling stars, the score in a bubble with a trophy and the mascot, and
+  // two chunky buttons. The pictures are cut from that design.
+  static const _popper = 'assets/images/celebrate_popper.webp';
+  static const _trophy = 'assets/images/trophy_happy.webp';
+  static const _mascot = 'assets/images/mascot_dino.webp';
+  static const _stars = [
+    'assets/images/star_happy_1.webp',
+    'assets/images/star_happy_2.webp',
+    'assets/images/star_happy_3.webp',
+  ];
+
+  static const _rainbow = [
+    Color(0xFF4FA3F7),
+    Color(0xFF7B6CF6),
+    Color(0xFFF06BA8),
+    Color(0xFFFF9F43),
+    Color(0xFF4FA3F7),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      // The celebration badge is deliberately hung 40px above the card with
-      // clipBehavior: Clip.none, so the dialog has to reserve room for it.
-      // At the old symmetric 24px it had nowhere to go and landed on top of
-      // the app bar behind the dialog.
+      // Room above the card for the popper that hangs over its top edge.
       insetPadding: const EdgeInsets.only(
         left: 20,
         right: 20,
@@ -72,258 +90,188 @@ class _SuccessModalState extends State<SuccessModal> {
         clipBehavior: Clip.none,
         alignment: Alignment.center,
         children: [
-          // Main Card
+          // The card: a rainbow rim around a white face.
           Container(
             constraints: const BoxConstraints(maxWidth: 400),
-            padding: const EdgeInsets.fromLTRB(24, 64, 24, 24),
+            padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(32),
+              gradient: const SweepGradient(colors: _rainbow),
+              borderRadius: BorderRadius.circular(40),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withOpacity(0.15),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
               ],
             ),
-            // Scrollable so a long card — three stars, the breakdown note,
-            // score, streak, a badge list and two buttons — cannot overflow
-            // on a short phone.
-            child: SingleChildScrollView(
-              child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  widget.title,
-                  style: const TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textDark,
-                  ),
-                  textAlign: TextAlign.center,
-                ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2),
-
-                const SizedBox(height: 8),
-
-                Text(
-                  widget.subtitle,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColors.textLight.withOpacity(0.8),
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ).animate().fadeIn(delay: 200.ms),
-
-                const SizedBox(height: 24),
-
-                // Stars
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(3, (index) {
-                    final bool isFull = index < widget.stars;
-                    return GestureDetector(
-                      onTap: () => _showStarBreakdownDialog(context),
-                      child: Icon(
-                        isFull ? Icons.star_rounded : Icons.star_outline_rounded,
-                        color: isFull ? const Color(0xFFFFB800) : const Color(0xFFCBD5E1),
-                        size: 52,
-                      )
-                          .animate(delay: (400 + (index * 150)).ms)
-                          .scale(duration: 400.ms, curve: Curves.easeOutBack)
-                          .shimmer(delay: 1200.ms, duration: 800.ms),
-                    );
-                  }),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Star Details Banner
-                GestureDetector(
-                  onTap: () => _showStarBreakdownDialog(context),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: widget.stars == 3
-                          ? const Color(0xFFFFFBEB)
-                          : const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: widget.stars == 3
-                            ? const Color(0xFFFFD700)
-                            : Colors.grey.shade300,
-                        width: 1.2,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          LucideIcons.info,
-                          size: 16,
-                          color: widget.stars == 3
-                              ? const Color(0xFFD97706)
-                              : Colors.grey.shade600,
-                        ),
-                        const SizedBox(width: 6),
-                        Flexible(
-                          child: Text(
-                            _getStarDetailSummary(widget.stars),
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: widget.stars == 3
-                                  ? const Color(0xFFB45309)
-                                  : Colors.grey.shade800,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ).animate().fadeIn(delay: 600.ms),
-
-                const SizedBox(height: 20),
-
-                // Stats Container
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: widget.mainColor.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: widget.mainColor.withOpacity(0.15),
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildStatItem('Score', widget.score.toString(),
-                          LucideIcons.trophy, Colors.orange),
-                      if (widget.streak != null) ...[
-                        Container(
-                            width: 1.5,
-                            height: 30,
-                            color: widget.mainColor.withOpacity(0.15)),
-                        _buildStatItem(
-                            'Streak',
-                            widget.streak.toString(),
-                            LucideIcons.flame,
-                            Colors.deepOrange),
-                      ],
-                    ],
-                  ),
-                )
-                    .animate()
-                    .fadeIn(delay: 800.ms)
-                    .scale(duration: 400.ms, curve: Curves.easeOutBack),
-
-                // Badges
-                if (widget.badges != null && widget.badges!.isNotEmpty) ...[
-                  const SizedBox(height: 20),
-                  Wrap(
-                    spacing: 8,
-                    children:
-                        widget.badges!.map((b) => _buildBadge(b)).toList(),
-                  ).animate().fadeIn(delay: 1000.ms),
-                ],
-
-                const SizedBox(height: 32),
-
-                // Buttons
-                Column(
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(20, 62, 20, 20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(35),
+              ),
+              // Scrollable so a long card — stars, the breakdown note,
+              // score, streak, a badge list and two buttons — cannot
+              // overflow on a short phone.
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: ElevatedButton(
-                        onPressed: widget.onPrimaryTap,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: widget.mainColor,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18),
+                    _RimmedTitle(widget.title)
+                        .animate()
+                        .fadeIn(duration: 400.ms)
+                        .slideY(begin: 0.2),
+                    const SizedBox(height: 6),
+                    Text(
+                      widget.subtitle,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Color(0xFF4F5BB5),
+                        fontWeight: FontWeight.w800,
+                      ),
+                      textAlign: TextAlign.center,
+                    ).animate().fadeIn(delay: 200.ms),
+                    const SizedBox(height: 16),
+
+                    // Three smiling stars; the ones not earned are grey.
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(3, (index) {
+                        final earned = index < widget.stars;
+                        Widget star = Image.asset(_stars[index],
+                            width: 74, height: 74, fit: BoxFit.contain);
+                        if (!earned) {
+                          star = Opacity(
+                            opacity: 0.35,
+                            child: ColorFiltered(
+                              colorFilter: const ColorFilter.matrix([
+                                0.33, 0.33, 0.33, 0, 0, //
+                                0.33, 0.33, 0.33, 0, 0, //
+                                0.33, 0.33, 0.33, 0, 0, //
+                                0, 0, 0, 1, 0,
+                              ]),
+                              child: star,
+                            ),
+                          );
+                        }
+                        return GestureDetector(
+                          onTap: () => _showStarBreakdownDialog(context),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 3),
+                            child: star
+                                .animate(delay: (400 + (index * 150)).ms)
+                                .scale(
+                                    duration: 400.ms,
+                                    curve: Curves.easeOutBack),
                           ),
-                          elevation: 4,
-                          shadowColor: widget.mainColor.withOpacity(0.5),
+                        );
+                      }),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // The breakdown, in a pill with a rainbow rim.
+                    GestureDetector(
+                      onTap: () => _showStarBreakdownDialog(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(2.5),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(colors: _rainbow),
+                          borderRadius: BorderRadius.circular(30),
                         ),
-                        child: Text(
-                          widget.primaryLabel,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFFBF2),
+                            borderRadius: BorderRadius.circular(28),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset(_trophy, width: 34, height: 34),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                  child: _summaryText(
+                                      _getStarDetailSummary(widget.stars))),
+                            ],
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextButton(
-                      onPressed: widget.onSecondaryTap,
-                      style: TextButton.styleFrom(
-                        foregroundColor: AppColors.textLight,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12, horizontal: 24),
-                      ),
-                      child: Text(
-                        widget.secondaryLabel,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                    ).animate().fadeIn(delay: 600.ms),
+                    const SizedBox(height: 16),
+
+                    // The score: a trophy, the number in a bubble, the
+                    // mascot cheering — and the streak beside it, if any.
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset(_trophy, width: 62, height: 62),
+                        const SizedBox(width: 4),
+                        _scoreBubble('Score', widget.score.toString(),
+                            const Color(0xFF9B2D7F)),
+                        if (widget.streak != null) ...[
+                          const SizedBox(width: 8),
+                          _scoreBubble(AppLocalizations.of(context)!.streakWord,
+                              widget.streak.toString(), Colors.deepOrange),
+                        ],
+                        const SizedBox(width: 4),
+                        Image.asset(_mascot, height: 70),
+                      ],
+                    )
+                        .animate()
+                        .fadeIn(delay: 800.ms)
+                        .scale(duration: 400.ms, curve: Curves.easeOutBack),
+
+                    // Badges
+                    if (widget.badges != null && widget.badges!.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      Wrap(
+                        spacing: 8,
+                        children:
+                            widget.badges!.map((b) => _buildBadge(b)).toList(),
+                      ).animate().fadeIn(delay: 1000.ms),
+                    ],
+                    const SizedBox(height: 22),
+
+                    Column(
+                      children: [
+                        _ChunkyButton(
+                          label: widget.primaryLabel,
+                          onTap: widget.onPrimaryTap,
+                          top: const Color(0xFFFF7A98),
+                          bottom: const Color(0xFFE8405F),
+                          edge: const Color(0xFFB42A48),
+                          height: 58,
+                          fontSize: 22,
                         ),
-                      ),
-                    ),
+                        const SizedBox(height: 14),
+                        _ChunkyButton(
+                          label: widget.secondaryLabel,
+                          onTap: widget.onSecondaryTap,
+                          top: const Color(0xFF45DCCB),
+                          bottom: const Color(0xFF18A8B6),
+                          edge: const Color(0xFF0F7A85),
+                          height: 48,
+                          fontSize: 19,
+                          icon: Icons.refresh_rounded,
+                          widthFactor: 0.62,
+                        ),
+                      ],
+                    ).animate().fadeIn(delay: 1200.ms).slideY(begin: 0.1),
                   ],
-                ).animate().fadeIn(delay: 1200.ms).slideY(begin: 0.1),
-              ],
+                ),
               ),
             ),
           ),
 
-          // Header Icon Banner
+          // The party popper over the top edge.
           Positioned(
-            top: -40,
-            child: Container(
-              width: 90,
-              height: 90,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 15,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: Container(
-                  width: 74,
-                  height: 74,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        widget.mainColor,
-                        widget.mainColor.withOpacity(0.7)
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    LucideIcons.party_popper,
-                    color: Colors.white,
-                    size: 40,
-                  ),
-                ),
-              ),
-            ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
+            top: -58,
+            child: Image.asset(_popper, width: 112, height: 112)
+                .animate()
+                .scale(duration: 500.ms, curve: Curves.easeOutBack),
           ),
 
           // Confetti
@@ -349,30 +297,52 @@ class _SuccessModalState extends State<SuccessModal> {
     );
   }
 
-  Widget _buildStatItem(
-      String label, String value, IconData icon, Color color) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 28),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textDark,
-          ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: AppColors.textLight,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
+  /// The breakdown line: the star count in orange, the rest in teal.
+  Widget _summaryText(String summary) {
+    final dot = summary.indexOf('•');
+    final head = dot < 0 ? summary : summary.substring(0, dot);
+    final tail = dot < 0 ? '' : summary.substring(dot);
+    return Text.rich(
+      TextSpan(children: [
+        TextSpan(text: head, style: const TextStyle(color: Color(0xFFE36414))),
+        TextSpan(text: tail, style: const TextStyle(color: Color(0xFF0F7C8C))),
+      ]),
+      textAlign: TextAlign.center,
+      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
     );
+  }
+
+  /// A number in a glossy bubble, with its label under it.
+  Widget _scoreBubble(String label, String value, Color ink) {
+    return Column(mainAxisSize: MainAxisSize.min, children: [
+      Container(
+        width: 78,
+        height: 78,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFFFD6EC), Color(0xFFC9E8FF), Color(0xFF9FD3FF)],
+          ),
+          border: Border.all(color: const Color(0xFF7DB6F0), width: 2.5),
+        ),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Text(value,
+                style: TextStyle(
+                    fontSize: 34, fontWeight: FontWeight.w900, color: ink)),
+          ),
+        ),
+      ),
+      const SizedBox(height: 2),
+      Text(label,
+          style:
+              TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: ink)),
+    ]);
   }
 
   Widget _buildBadge(String label) {
@@ -386,8 +356,7 @@ class _SuccessModalState extends State<SuccessModal> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(LucideIcons.award,
-              color: Colors.amber, size: 16),
+          const Icon(LucideIcons.award, color: Colors.amber, size: 16),
           const SizedBox(width: 4),
           Text(
             label,
@@ -506,8 +475,8 @@ class _SuccessModalState extends State<SuccessModal> {
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(AppLocalizations.of(ctx)!.gotIt,
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 16)),
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           ),
         ],
       ),
@@ -540,7 +509,8 @@ class _SuccessModalState extends State<SuccessModal> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: isEarned ? AppColors.textDark : Colors.grey.shade600,
+                      color:
+                          isEarned ? AppColors.textDark : Colors.grey.shade600,
                     ),
                   ),
                   const SizedBox(width: 6),
@@ -548,7 +518,9 @@ class _SuccessModalState extends State<SuccessModal> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: isEarned ? Colors.green.shade50 : Colors.grey.shade100,
+                      color: isEarned
+                          ? Colors.green.shade50
+                          : Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -556,7 +528,9 @@ class _SuccessModalState extends State<SuccessModal> {
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: isEarned ? Colors.green.shade700 : Colors.grey.shade600,
+                        color: isEarned
+                            ? Colors.green.shade700
+                            : Colors.grey.shade600,
                       ),
                     ),
                   ),
@@ -571,6 +545,124 @@ class _SuccessModalState extends State<SuccessModal> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// The title in bold orange-red with a white rim, as in the design.
+class _RimmedTitle extends StatelessWidget {
+  final String text;
+  const _RimmedTitle(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    const style =
+        TextStyle(fontSize: 32, fontWeight: FontWeight.w900, height: 1.05);
+    return Stack(alignment: Alignment.center, children: [
+      Text(
+        text,
+        textAlign: TextAlign.center,
+        style: style.copyWith(
+          foreground: Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 7
+            ..strokeJoin = StrokeJoin.round
+            ..color = Colors.white,
+          shadows: [
+            Shadow(
+                color: Colors.black.withOpacity(0.18),
+                blurRadius: 4,
+                offset: const Offset(0, 2)),
+          ],
+        ),
+      ),
+      ShaderMask(
+        blendMode: BlendMode.srcIn,
+        shaderCallback: (r) => const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFFF2385A), Color(0xFFFF8A1F)],
+        ).createShader(r),
+        child: Text(text,
+            textAlign: TextAlign.center,
+            style: style.copyWith(color: Colors.white)),
+      ),
+    ]);
+  }
+}
+
+/// A rounded button with a solid 3D edge under it.
+class _ChunkyButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+  final Color top, bottom, edge;
+  final double height;
+  final double fontSize;
+  final IconData? icon;
+  final double widthFactor;
+
+  const _ChunkyButton({
+    required this.label,
+    required this.onTap,
+    required this.top,
+    required this.bottom,
+    required this.edge,
+    required this.height,
+    required this.fontSize,
+    this.icon,
+    this.widthFactor = 1,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FractionallySizedBox(
+      widthFactor: widthFactor,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: height,
+          margin: const EdgeInsets.only(bottom: 5),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [top, bottom],
+            ),
+            borderRadius: BorderRadius.circular(height / 2),
+            border: Border.all(color: edge, width: 2.5),
+            boxShadow: [
+              BoxShadow(color: edge, offset: const Offset(0, 5)),
+              BoxShadow(
+                  color: edge.withOpacity(0.35),
+                  blurRadius: 10,
+                  offset: const Offset(0, 8)),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              if (icon != null) ...[
+                Icon(icon, color: Colors.white, size: fontSize + 4),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                label,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.w900,
+                  shadows: [
+                    Shadow(
+                        color: edge.withOpacity(0.8),
+                        offset: const Offset(0, 2)),
+                  ],
+                ),
+              ),
+            ]),
+          ),
+        ),
+      ),
     );
   }
 }

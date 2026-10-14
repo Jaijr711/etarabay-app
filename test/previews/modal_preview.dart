@@ -10,7 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// difference between them can be looked at instead of imagined. Not part of
 /// the suite — run by hand:
 ///
-///   flutter test --update-goldens test/modal_preview.dart
+///   flutter test --update-goldens test/previews/modal_preview.dart
 void main() {
   setUpAll(() async {
     final file = File(r'C:\Windows\Fonts\arialbd.ttf');
@@ -25,6 +25,7 @@ void main() {
       await tester.binding.setSurfaceSize(const Size(420, 900));
       await tester.pumpWidget(MaterialApp(
         debugShowCheckedModeBanner: false,
+        theme: ThemeData(fontFamily: 'Roboto'),
         locale: const Locale('fil'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
@@ -43,6 +44,14 @@ void main() {
           ),
         ),
       ));
+      // The card's pictures are real assets; load them before the shot. Only
+      // the loading runs in real time — the animations' timers must stay on
+      // the test's clock, or the pumps below never start them.
+      await tester.runAsync(() async {
+        for (final e in tester.widgetList<Image>(find.byType(Image))) {
+          await precacheImage(e.image, tester.element(find.byWidget(e)));
+        }
+      });
       // In steps, not one jump: each star's entrance is started by a timer,
       // and a timer that fires inside a frame still needs later frames to
       // drive the animation it started.
