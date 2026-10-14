@@ -2251,138 +2251,109 @@ class _PamilyaScreenState extends State<PamilyaScreen>
       child: Column(children: [
         Expanded(
           child: _gameCard(
-              child: Column(children: [
-            // Capped, so a long question cannot squeeze the pictures.
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 120),
-              child: _questionBox(game['question']),
-            ),
-            const SizedBox(height: 4),
-            Text(game['description'],
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
-                textAlign: TextAlign.center),
-            const SizedBox(height: 10),
-            Expanded(
-              child: LayoutBuilder(builder: (_, box) {
-                // A GridView works its row height out from the *width* and a
-                // fixed aspect ratio, and simply overflows if the rows do not
-                // happen to fit the height it was given — which is why the
-                // bottom row kept losing its labels. Derive the ratio from the
-                // space actually available instead.
-                const cols = 2;
-                const gap = 12.0;
-                final rows = (options.length / cols).ceil();
-                final cellW = (box.maxWidth - gap * (cols - 1)) / cols;
-                final cellH = (box.maxHeight - gap * (rows - 1)) / rows;
-                return GridView.count(
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: cols,
-                  childAspectRatio: cellW / (cellH <= 0 ? 1 : cellH),
-                  crossAxisSpacing: gap,
-                  mainAxisSpacing: gap,
-                  children: List.generate(options.length, (i) {
-                    bool sel = false;
-                    if (type == 'food') {
-                      sel = _selectedFoodIndex == i;
-                    } else if (type == 'color') {
-                      sel = _selectedColorIndex == i;
-                    } else if (type == 'game') {
-                      sel = _selectedGameIndex == i;
-                    } else if (type == 'animal') {
-                      sel = _selectedAnimalIndex == i;
-                    }
-
-                    return GestureDetector(
-                      onTap: () => _handlePreferenceSelection(
-                          i, type, emojis[i], options[i]),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        // Green when chosen, never the module's red.
-                        //
-                        // This board lit the chosen tile in the category
-                        // colour, and "Ang Aking Sarili" is red — the exact
-                        // red every other game in the module uses to mark a
-                        // wrong answer. A child picking their favourite food
-                        // watched it turn the colour of a mistake. Green is
-                        // what "yes, that one" looks like everywhere else
-                        // here, so it is what it looks like here.
-                        decoration: BoxDecoration(
-                          color: sel ? const Color(0xFF2E9E5B) : Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                              color: sel
-                                  ? const Color(0xFF2E9E5B)
-                                  : Colors.grey.shade300,
-                              width: 2),
-                          // The same lift every other answer in the module
-                          // now has: a flat outline reads as a label, and a
-                          // label does not invite a small hand to push it.
-                          boxShadow: [
-                            BoxShadow(
-                              color: sel
-                                  ? const Color(0xFF2E9E5B).withOpacity(0.35)
-                                  : Colors.black.withOpacity(0.06),
-                              blurRadius: sel ? 12 : 6,
-                              offset: Offset(0, sel ? 4 : 3),
-                            )
-                          ],
+              background: const DoodleBackground(),
+              child: LayoutBuilder(
+                  builder: (_, card) => Column(children: [
+                        // A share of the card, as on the other boards: a fixed 120 px
+                        // squashed the cloud and its mascot into a strip over four big
+                        // tiles, and the board looked lopsided.
+                        SizedBox(
+                          height: card.maxHeight * 0.30,
+                          child: _questionBox(game['question']),
                         ),
-                        // The picture takes the tile; the word sits under it.
-                        //
-                        // These answers are pictures first — a scene of
-                        // children playing piko tells a three-year-old what
-                        // the tile means long before the word does. The tile
-                        // used to draw a fixed 46-pixel picture into whatever
-                        // cell the grid handed it, so most of the tile was
-                        // empty and the picture was too small to read. Both
-                        // now take their size from the cell: the word gets a
-                        // band at the bottom deep enough to hold it, and the
-                        // picture gets everything left over.
-                        child: LayoutBuilder(builder: (_, cell) {
-                          final band =
-                              (cell.maxHeight * 0.26).clamp(20.0, 38.0);
-                          final art = (cell.maxHeight - band - 14)
-                              .clamp(28.0, cell.maxWidth - 16);
-                          return Padding(
-                            padding: const EdgeInsets.all(6),
-                            child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ObjectPicture(
-                                      emoji: emojis[i] as String, size: art),
-                                  SizedBox(
-                                    height: band,
-                                    // Never wraps and never clips — a long
-                                    // answer like "Tumbang Preso" shrinks to
-                                    // fit its band instead of losing its tail.
-                                    child: FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Text(
-                                          _withoutLeadingEmoji(options[i]),
-                                          style: TextStyle(
-                                              color: sel
-                                                  ? Colors.white
-                                                  : Colors.grey.shade700,
-                                              fontWeight: sel
-                                                  ? FontWeight.bold
-                                                  : FontWeight.normal,
-                                              fontSize: 16),
-                                          textAlign: TextAlign.center),
-                                    ),
+                        const SizedBox(height: 4),
+                        Text(game['description'],
+                            style: TextStyle(
+                                fontSize: 13, color: Colors.grey.shade500),
+                            textAlign: TextAlign.center),
+                        const SizedBox(height: 10),
+                        Expanded(
+                          child: LayoutBuilder(builder: (_, box) {
+                            // A GridView works its row height out from the *width* and a
+                            // fixed aspect ratio, and simply overflows if the rows do not
+                            // happen to fit the height it was given — which is why the
+                            // bottom row kept losing its labels. Derive the ratio from the
+                            // space actually available instead.
+                            const cols = 2;
+                            const gap = 12.0;
+                            final rows = (options.length / cols).ceil();
+                            final cellW =
+                                (box.maxWidth - gap * (cols - 1)) / cols;
+                            final cellH =
+                                (box.maxHeight - gap * (rows - 1)) / rows;
+                            return GridView.count(
+                              physics: const NeverScrollableScrollPhysics(),
+                              crossAxisCount: cols,
+                              childAspectRatio:
+                                  cellW / (cellH <= 0 ? 1 : cellH),
+                              crossAxisSpacing: gap,
+                              mainAxisSpacing: gap,
+                              children: List.generate(options.length, (i) {
+                                bool sel = false;
+                                if (type == 'food') {
+                                  sel = _selectedFoodIndex == i;
+                                } else if (type == 'color') {
+                                  sel = _selectedColorIndex == i;
+                                } else if (type == 'game') {
+                                  sel = _selectedGameIndex == i;
+                                } else if (type == 'animal') {
+                                  sel = _selectedAnimalIndex == i;
+                                }
+
+                                // The same bright 3D buttons as the other boards, green
+                                // once chosen.
+                                final ink = ToneFrame.inkFor(i,
+                                    verdict: sel ? true : null);
+                                return GestureDetector(
+                                  onTap: () => _handlePreferenceSelection(
+                                      i, type, emojis[i], options[i]),
+                                  child: ToneFrame(
+                                    index: i,
+                                    verdict: sel ? true : null,
+                                    padding: const EdgeInsets.all(6),
+                                    child: _preferenceTileFace(
+                                        emojis[i] as String,
+                                        options[i] as String,
+                                        ink),
                                   ),
-                                ]),
-                          );
-                        }),
-                      ),
-                    );
-                  }),
-                );
-              }),
-            ),
-          ])),
+                                );
+                              }),
+                            );
+                          }),
+                        ),
+                      ]))),
         ),
       ]),
     );
+  }
+
+  /// A preference tile's face: the picture takes the tile, the word sits in
+  /// a band under it.
+  ///
+  /// These answers are pictures first — a scene of children playing piko
+  /// tells a three-year-old what the tile means long before the word does —
+  /// so the picture gets everything the band leaves. The word was a light
+  /// 16 px grey under it; it is bold in the tile's own colour now, and as big
+  /// as its band allows. It never wraps and never clips: a long answer like
+  /// "Tumbang Preso" shrinks to fit instead of losing its tail.
+  Widget _preferenceTileFace(String emoji, String option, Color ink) {
+    return LayoutBuilder(builder: (_, cell) {
+      final band = (cell.maxHeight * 0.28).clamp(22.0, 44.0);
+      final art = (cell.maxHeight - band - 8).clamp(28.0, cell.maxWidth - 16);
+      return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        ObjectPicture(emoji: emoji, size: art),
+        SizedBox(
+          height: band,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(_withoutLeadingEmoji(option),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: ink, fontWeight: FontWeight.w900, fontSize: 26)),
+          ),
+        ),
+      ]);
+    });
   }
 
   // ─────────────────────────────────────────────────────────────────────────

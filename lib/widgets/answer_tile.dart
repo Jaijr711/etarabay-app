@@ -123,6 +123,100 @@ const _wrongTone = _Tone(
     Icons.close_rounded,
     Color(0xFFE5484D));
 
+/// The bright, chunky button the boards' answers are drawn as: a coloured
+/// face, a rim with a solid 3D edge under it, and a small decoration in two
+/// corners. [AnswerTile] uses it, and so can any board whose tiles hold
+/// something else (a picture and a word, say) but should look the same.
+class ToneFrame extends StatelessWidget {
+  final _Tone _tone;
+  final Widget child;
+  final EdgeInsets padding;
+  final double minHeight;
+
+  /// Colour slot [index] (teal, cream, green, lavender, then round again);
+  /// [verdict] true paints it green, false red.
+  ToneFrame({
+    super.key,
+    required int index,
+    bool? verdict,
+    required this.child,
+    this.padding = const EdgeInsets.all(8),
+    this.minHeight = 0,
+  }) : _tone = verdict == true
+            ? _rightTone
+            : verdict == false
+                ? _wrongTone
+                : _tones[index % _tones.length];
+
+  const ToneFrame._withTone({
+    required _Tone tone,
+    required this.child,
+    this.padding = const EdgeInsets.all(8),
+    this.minHeight = 0,
+  }) : _tone = tone;
+
+  /// The colour words are drawn in on this frame.
+  Color get ink => _tone.ink;
+
+  /// The colour words are drawn in on frame [index] with [verdict].
+  static Color inkFor(int index, {bool? verdict}) => verdict == true
+      ? _rightTone.ink
+      : verdict == false
+          ? _wrongTone.ink
+          : _tones[index % _tones.length].ink;
+
+  @override
+  Widget build(BuildContext context) {
+    final tone = _tone;
+    return LayoutBuilder(builder: (_, box) {
+      final height = box.maxHeight.isFinite ? box.maxHeight : 100.0;
+      final corner = (height * 0.16).clamp(12.0, 20.0);
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: double.infinity,
+        height: double.infinity,
+        // Room under the face for the 3D edge.
+        margin: const EdgeInsets.only(bottom: 5),
+        constraints: BoxConstraints(minHeight: minHeight),
+        padding: padding,
+        decoration: BoxDecoration(
+          color: tone.face,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: tone.rim, width: 3),
+          boxShadow: [
+            // The solid edge underneath that makes it a button.
+            BoxShadow(color: tone.rim, offset: const Offset(0, 5)),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.10),
+              blurRadius: 8,
+              offset: const Offset(0, 7),
+            ),
+          ],
+        ),
+        child: Stack(clipBehavior: Clip.none, children: [
+          Positioned.fill(child: child),
+          // Small flowers, stars and leaves in two corners, kept in the
+          // padding so they never sit on the words.
+          Positioned(
+            top: -6,
+            left: -8,
+            child: IgnorePointer(
+                child:
+                    Icon(tone.cornerA, size: corner, color: tone.cornerColorA)),
+          ),
+          Positioned(
+            bottom: -6,
+            right: -8,
+            child: IgnorePointer(
+                child:
+                    Icon(tone.cornerB, size: corner, color: tone.cornerColorB)),
+          ),
+        ]),
+      );
+    });
+  }
+}
+
 class AnswerTile extends StatelessWidget {
   /// The size every answer on a board shares, from the longest of them.
   /// Pictures are left out of the count: they are drawn, not typed.
@@ -390,49 +484,12 @@ class AnswerTile extends StatelessWidget {
                   ));
 
         if (tone != null) {
-          final corner = (height * 0.16).clamp(12.0, 20.0);
-          return AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: double.infinity,
-            height: double.infinity,
-            // Room under the face for the 3D edge.
-            margin: const EdgeInsets.only(bottom: 5),
-            constraints: BoxConstraints(minHeight: minHeight),
+          return ToneFrame._withTone(
+            tone: tone,
+            minHeight: minHeight,
             padding: EdgeInsets.symmetric(
                 horizontal: 12, vertical: stacked ? 10 : 8),
-            decoration: BoxDecoration(
-              color: tone.face,
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: tone.rim, width: 3),
-              boxShadow: [
-                // The solid edge underneath that makes it a button.
-                BoxShadow(color: tone.rim, offset: const Offset(0, 5)),
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.10),
-                  blurRadius: 8,
-                  offset: const Offset(0, 7),
-                ),
-              ],
-            ),
-            child: Stack(clipBehavior: Clip.none, children: [
-              Positioned.fill(child: content),
-              // Small flowers, stars and leaves in two corners, kept in the
-              // padding so they never sit on the words.
-              Positioned(
-                top: -6,
-                left: -8,
-                child: IgnorePointer(
-                    child: Icon(tone.cornerA,
-                        size: corner, color: tone.cornerColorA)),
-              ),
-              Positioned(
-                bottom: -6,
-                right: -8,
-                child: IgnorePointer(
-                    child: Icon(tone.cornerB,
-                        size: corner, color: tone.cornerColorB)),
-              ),
-            ]),
+            child: content,
           );
         }
 
