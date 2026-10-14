@@ -1371,8 +1371,11 @@ class _TraceItScreenState extends State<TraceItScreen>
               alignment: Alignment.centerLeft,
               child: Text(
                 _selectedMode == 2
-                    ? loc.numberLabel(_currentLetter.letter)
-                    : loc.letterLabel(_currentLetter.letter),
+                    // The word alone: the bubble beside it already shows
+                    // the character, and "Letter X" next to an X said it
+                    // twice.
+                    ? loc.numberWord
+                    : loc.letterWord,
                 maxLines: 1,
                 style: const TextStyle(
                   fontSize: 30,

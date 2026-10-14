@@ -782,5 +782,7 @@
   "yesAnswer": "Oo",
   "noAnswer": "Hindi",
   "resetActivitiesDone": "Matagumpay na na-reset ang napiling activities.",
-  "resetActivitiesFailed": "Hindi na-reset ang activities. Subukan muli."
+  "resetActivitiesFailed": "Hindi na-reset ang activities. Subukan muli.",
+  "letterWord": "Titik",
+  "numberWord": "Numero"
 }

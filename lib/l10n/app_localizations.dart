@@ -3532,6 +3532,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The activities could not be reset. Please try again.'**
   String get resetActivitiesFailed;
+
+  /// No description provided for @letterWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Letter'**
+  String get letterWord;
+
+  /// No description provided for @numberWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Number'**
+  String get numberWord;
 }
 
 class _AppLocalizationsDelegate

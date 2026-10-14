@@ -1900,4 +1900,10 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get resetActivitiesFailed =>
       'Hindi na-reset ang activities. Subukan muli.';
+
+  @override
+  String get letterWord => 'Titik';
+
+  @override
+  String get numberWord => 'Numero';
 }

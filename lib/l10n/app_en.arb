@@ -1398,5 +1398,7 @@
   "yesAnswer": "Yes",
   "noAnswer": "No",
   "resetActivitiesDone": "The selected activities were reset.",
-  "resetActivitiesFailed": "The activities could not be reset. Please try again."
+  "resetActivitiesFailed": "The activities could not be reset. Please try again.",
+  "letterWord": "Letter",
+  "numberWord": "Number"
 }

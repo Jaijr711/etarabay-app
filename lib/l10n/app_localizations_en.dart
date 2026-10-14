@@ -1882,4 +1882,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get resetActivitiesFailed =>
       'The activities could not be reset. Please try again.';
+
+  @override
+  String get letterWord => 'Letter';
+
+  @override
+  String get numberWord => 'Number';
 }

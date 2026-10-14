@@ -1892,4 +1892,10 @@ class AppLocalizationsIlo extends AppLocalizations {
   @override
   String get resetActivitiesFailed =>
       'Saan a na-reset dagiti aktibidad. Padasem manen.';
+
+  @override
+  String get letterWord => 'Letra';
+
+  @override
+  String get numberWord => 'Numero';
 }
