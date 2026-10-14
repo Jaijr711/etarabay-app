@@ -12,9 +12,11 @@ import 'package:flutter_lucide/flutter_lucide.dart';
 ///   floating stars.
 /// * [AnswerFeedback.wrong] — states plainly that the answer was wrong (the
 ///   games move on to the next question rather than re-asking, so promising a
-///   retry here would be misleading), but softens the delivery: warm amber
-///   instead of alarm-red and a gentle wobble instead of a hard shake, so
-///   getting one wrong stays safe.
+///   retry here would be misleading), with a gentle wobble instead of a hard
+///   shake, so getting one wrong stays safe.
+///
+/// Right and wrong are the team's pictures: the mascot cheering in a green
+/// circle, or crying in a red one, over a cloud with the word.
 /// * [AnswerFeedback.timeUp] — the clock ran out. Deliberately neither of the
 ///   above: a calm blue clock that neither celebrates nor scolds. Running out
 ///   of time says nothing about whether the child knew the answer, so it must
@@ -100,23 +102,30 @@ class _AnswerFeedbackState extends State<AnswerFeedback>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      SizedBox(
-                        width: 240,
-                        height: 240,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            if (_isCorrect)
-                              CustomPaint(
-                                size: const Size(240, 240),
-                                painter: _CelebrationPainter(progress: t),
-                              ),
-                            _badge(colors, t),
-                          ],
+                      if (widget._kind == _FeedbackKind.timeUp) ...[
+                        SizedBox(
+                          width: 240,
+                          height: 240,
+                          child: Center(child: _badge(colors, t)),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      _messagePill(colors),
+                        const SizedBox(height: 4),
+                        _messagePill(colors),
+                      ] else
+                        SizedBox(
+                          width: 300,
+                          height: 300,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              if (_isCorrect)
+                                CustomPaint(
+                                  size: const Size(300, 300),
+                                  painter: _CelebrationPainter(progress: t),
+                                ),
+                              _pictureBadge(t),
+                            ],
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -124,6 +133,71 @@ class _AnswerFeedbackState extends State<AnswerFeedback>
             ),
           );
         },
+      ),
+    );
+  }
+
+  /// Right and wrong as the team drew them: the mascot cheering in a green
+  /// circle, or crying in a red one, over a cloud saying "Correct!" or
+  /// "Wrong". In another language — or for another word, like "Good Job!" —
+  /// the cloud's words are covered with [AnswerFeedback.message].
+  Widget _pictureBadge(double t) {
+    final correct = _isCorrect;
+    final asset = correct
+        ? 'assets/images/feedback_correct.webp'
+        : 'assets/images/feedback_wrong.webp';
+    final baked = correct ? 'correct' : 'wrong';
+    final message = widget.message
+        .replaceAll(RegExp(r'[^\p{L}\p{N}!? ]', unicode: true), '')
+        .trim();
+    final same =
+        message.toLowerCase().replaceAll(RegExp(r'[^a-z]'), '') == baked;
+    // Where the words sit on the cloud, as fractions of the picture.
+    final label = correct
+        ? const Rect.fromLTRB(0.15, 0.755, 0.85, 0.925)
+        : const Rect.fromLTRB(0.21, 0.755, 0.78, 0.925);
+    // Soft heartbeat once the badge has landed.
+    final beat = 1 + math.sin(t * math.pi * 4) * 0.03;
+
+    return Transform.scale(
+      scale: beat,
+      child: AspectRatio(
+        aspectRatio: correct ? 289 / 302 : 280 / 308,
+        child: LayoutBuilder(builder: (_, box) {
+          final w = box.maxWidth, h = box.maxHeight;
+          return Stack(children: [
+            Positioned.fill(child: Image.asset(asset, fit: BoxFit.contain)),
+            if (!same && message.isNotEmpty)
+              Positioned(
+                left: label.left * w,
+                top: label.top * h,
+                width: label.width * w,
+                height: label.height * h,
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(label.height * h / 2),
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      message,
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.w900,
+                        color: correct
+                            ? const Color(0xFF1F4D1A)
+                            : const Color(0xFF5E0E14),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ]);
+        }),
       ),
     );
   }
