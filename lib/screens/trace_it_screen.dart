@@ -10,6 +10,7 @@ import '../l10n/app_localizations.dart';
 import '../providers/user_provider.dart';
 import '../utils/constants.dart';
 import '../utils/path_smoothing.dart';
+import '../widgets/custom_back_button.dart';
 import '../widgets/question_cloud.dart' show DoodleBackground;
 import '../widgets/success_modal.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
@@ -1084,18 +1085,63 @@ class _TraceItScreenState extends State<TraceItScreen>
     final size = MediaQuery.of(context).size;
     final loc = AppLocalizations.of(context)!;
 
-    // As the team drew it: doodles behind everything, a big blue title with
-    // sparkles between a round back button and the star counter, chunky 3D
+    // As the team drew it, under the usual app bar: doodles behind, chunky 3D
     // mode pills, the character in a glossy bubble between two round arrows,
     // a glossy progress bar ending in a smiling star, and the tracing card in
     // a thick green frame.
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FC),
+      // The app bar is the plain one the app always had — kept at the team's
+      // request; the page under it follows the design.
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leadingWidth: 60,
+        leading: Center(
+          child: CustomBackButton(
+            iconColor: AppColors.textDark,
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(loc.traceItTitle,
+              maxLines: 1,
+              style: const TextStyle(
+                  color: AppColors.textDark,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold)),
+        ),
+        actions: [
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.amber.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(20),
+              border:
+                  Border.all(color: Colors.amber.withOpacity(0.3), width: 1.5),
+            ),
+            child: Row(children: [
+              const Icon(Icons.star_rounded,
+                  color: Color(0xFFFFB800), size: 16),
+              const SizedBox(width: 4),
+              // The child's one star total, read straight from the profile.
+              Text('${Provider.of<UserProvider>(context).displayStars}',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber,
+                      fontSize: 14)),
+            ]),
+          ),
+          const SizedBox(width: 4),
+        ],
+      ),
       body: Stack(children: [
         const Positioned.fill(child: _TraceBackdrop()),
         SafeArea(
           child: Column(children: [
-            _traceHeader(loc),
             _buildModeTabs(),
             _letterHeader(loc),
 
@@ -1288,89 +1334,6 @@ class _TraceItScreenState extends State<TraceItScreen>
                   onTap: _resetTracing,
                 ),
               ),
-          ]),
-        ),
-      ]),
-    );
-  }
-
-  /// Back button, title and star counter, drawn into the page rather than
-  /// an app bar, as in the design.
-  Widget _traceHeader(AppLocalizations loc) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-      child: Row(children: [
-        _RoundButton(
-          colors: const [Color(0xFF9AA6B8), Color(0xFF66748A)],
-          edge: const Color(0xFF4B5668),
-          icon: Icons.arrow_back_rounded,
-          size: 50,
-          onTap: () => Navigator.pop(context),
-        ),
-        Expanded(
-          child: Stack(
-              alignment: Alignment.center,
-              clipBehavior: Clip.none,
-              children: [
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    child: Text(
-                      loc.traceItTitle,
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 38,
-                        fontWeight: FontWeight.w900,
-                        color: Color(0xFF2266B8),
-                        shadows: [
-                          Shadow(
-                              color: Colors.white,
-                              blurRadius: 0,
-                              offset: Offset(0, 2)),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                for (final s in const [
-                  (-0.92, -0.9, 13.0, Color(0xFF2266B8)),
-                  (-0.98, 0.2, 9.0, Color(0xFF6FB4F0)),
-                  (-0.75, 0.95, 10.0, Color(0xFF2266B8)),
-                  (0.72, -0.95, 10.0, Color(0xFF6FB4F0)),
-                  (0.95, -0.4, 12.0, Color(0xFF2266B8)),
-                  (0.85, 0.9, 9.0, Color(0xFF6FB4F0)),
-                ])
-                  Align(
-                    alignment: Alignment(s.$1, s.$2),
-                    child: Icon(Icons.star_rounded, size: s.$3, color: s.$4),
-                  ),
-              ]),
-        ),
-        // The child's one star total, read straight from the profile.
-        Container(
-          padding: const EdgeInsets.fromLTRB(4, 3, 14, 3),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFFFFE07A), Color(0xFFF5B92E)],
-            ),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: const Color(0xFFC98A12), width: 2.5),
-            boxShadow: const [
-              BoxShadow(color: Color(0xFFC98A12), offset: Offset(0, 3)),
-            ],
-          ),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Image.asset('assets/images/star_happy_1.webp',
-                width: 32, height: 32),
-            const SizedBox(width: 4),
-            Text('${Provider.of<UserProvider>(context).displayStars}',
-                style: const TextStyle(
-                    fontWeight: FontWeight.w900,
-                    color: Color(0xFF7A4A00),
-                    fontSize: 20)),
           ]),
         ),
       ]),
