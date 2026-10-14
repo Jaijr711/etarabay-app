@@ -277,7 +277,7 @@ class _TandaanScreenState extends State<TandaanScreen>
     },
     {
       'title_en': 'Letters',
-      'title_tl': 'Letra',
+      'title_tl': 'Titik',
       'title_il': 'Letra',
       'color': AppColors.alphabet,
       'pairs': [

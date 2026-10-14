@@ -2480,7 +2480,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
           'question': _currentLang == 'en'
               ? 'Where does Nanang cook delicious meals?'
               : (_currentLang == 'fil'
-                  ? 'Saan nagluluto ng masasarap na pagkain si Nanay?'
+                  ? 'Saan nagluluto si Nanay ng masarap na pagkain?'
                   : 'Adino ti paglutlutoan ni Nanang iti naimbag a taraon?'),
         },
         {
