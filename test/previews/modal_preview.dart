@@ -22,24 +22,25 @@ void main() {
 
   for (final stars in [1, 2, 3]) {
     testWidgets('card at $stars', (tester) async {
-      await tester.binding.setSurfaceSize(const Size(420, 900));
+      await tester.binding.setSurfaceSize(const Size(400, 860));
       await tester.pumpWidget(MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(fontFamily: 'Roboto'),
-        locale: const Locale('fil'),
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Container(
           color: const Color(0xFFEFEDF7),
           child: SuccessModal(
-            title: 'Nakumpleto ang Level 7!',
-            subtitle: 'Pagkakasunod ng Numero',
-            score: 50,
+            title: 'Level 4 Completed!',
+            subtitle: 'My Preferences',
+            score: 40,
             stars: stars,
-            streak: 1,
-            primaryLabel: 'Tapos',
+            // The design has no streak; show one on the one-star card.
+            streak: stars == 1 ? 1 : null,
+            primaryLabel: 'Finished! 🏆',
             onPrimaryTap: () {},
-            secondaryLabel: 'Bumalik',
+            secondaryLabel: 'Repeat',
             onSecondaryTap: () {},
           ),
         ),
