@@ -1510,7 +1510,6 @@ class _MatematikaScreenState extends State<MatematikaScreen>
             // the clock — the same three in every game in the module.
             if (_playing && _showCorrectOverlay) _buildCorrectOverlay(),
             if (_playing && _showWrongOverlay) _buildWrongOverlay(),
-            if (_playing && _showTimeUpOverlay) _buildTimeUpOverlay(),
           ],
         ),
       ),
@@ -1920,19 +1919,12 @@ class _MatematikaScreenState extends State<MatematikaScreen>
 
   Widget _buildCorrectOverlay() {
     return AnswerFeedback.correct(
-        message: AppLocalizations.of(context)!.goodJob);
+        message: AppLocalizations.of(context)!.correct);
   }
 
   Widget _buildWrongOverlay() {
     return AnswerFeedback.wrong(
         message: AppLocalizations.of(context)!.wrongShort);
-  }
-
-  /// The clock ran out. Calm blue with a clock face — never the amber ✕ of a
-  /// wrong answer, because the child did not answer wrongly.
-  Widget _buildTimeUpOverlay() {
-    return AnswerFeedback.timeUp(
-        message: AppLocalizations.of(context)!.timesUp);
   }
 
   Widget _buildFeedbackBanner() {

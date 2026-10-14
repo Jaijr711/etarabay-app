@@ -1006,7 +1006,6 @@ class _TandaanScreenState extends State<TandaanScreen>
                   : _buildLevelPicker(),
             ),
             if (_playing && _showCorrectOverlay) _buildCorrectOverlay(),
-            if (_playing && _showTimeUpOverlay) _buildTimeUpOverlay(),
           ],
         ),
       ),
@@ -1676,14 +1675,7 @@ class _TandaanScreenState extends State<TandaanScreen>
 
   Widget _buildCorrectOverlay() {
     return AnswerFeedback.correct(
-        message: AppLocalizations.of(context)!.goodJob);
-  }
-
-  /// The clock ran out. Calm blue with a clock face — never the amber ✕ of a
-  /// wrong answer, because the child did not answer wrongly.
-  Widget _buildTimeUpOverlay() {
-    return AnswerFeedback.timeUp(
-        message: AppLocalizations.of(context)!.timesUp);
+        message: AppLocalizations.of(context)!.correct);
   }
 
   Widget _buildFeedbackBanner() {
