@@ -1,8 +1,8 @@
-# E-Tarabay Project Overview (v1.2.48)
+# E-Tarabay Project Overview (v1.2.49)
 
 E-Tarabay is a modern, interactive Flutter-based educational mobile application designed for early childhood learning, primarily for daycare learners in Ilocos. It teaches in **Ilokano**, **Filipino** and **English**. The app’s tagline, **"Ang Kabataan ay Pag-asa ng Bayan"** (The Youth are the Hope of the Nation), reflects its core mission of fostering foundational knowledge in young students.
 
-**Current version:** 1.2.48 (build 60) — see [`pubspec.yaml`](pubspec.yaml).
+**Current version:** 1.2.49 (build 61) — see [`pubspec.yaml`](pubspec.yaml).
 
 ## Core Modules & Features
 
@@ -43,6 +43,18 @@ E-Tarabay is a modern, interactive Flutter-based educational mobile application 
     - **Shared Preferences**: App settings and per-activity progress.
 - **State Management**: Provider package for app state (language, user session, audio).
 - **Security**: `flutter_secure_storage` and `local_auth` for PINs, credentials and fingerprint login.
+
+## What's New in 1.2.49
+
+- A new opening video, and the app starts faster.
+- My Home and Family Tree are illustrated pictures with tappable rooms and family members.
+- Color Fun: a new daisy page ("Flower"); finished drawings show in My Creations.
+- Everything shows in English when English is chosen.
+- Answer choices on a board share one font size, and words are never broken in the middle.
+- Family Roles accepts every answer; Trace It shows Clear only while tracing.
+- Android only: the iOS project is removed.
+- Signed with a new key (the old one was lost): updating from 1.2.48 or earlier
+  needs the old app uninstalled first. Progress comes back after signing in.
 
 ## What's New in 1.2.48
 
