@@ -19,6 +19,7 @@ import '../widgets/success_modal.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../main.dart';
 import '../widgets/pressable.dart';
+import '../widgets/question_cloud.dart';
 import '../widgets/staggered_entrance.dart';
 import '../widgets/star_tally.dart';
 import 'dart:async';
@@ -1981,9 +1982,11 @@ class _PamilyaScreenState extends State<PamilyaScreen>
   // ─────────────────────────────────────────────────────────────────────────
 
   Widget _gameCard(
-      {required Widget child, EdgeInsets padding = const EdgeInsets.all(22)}) {
+      {required Widget child,
+      EdgeInsets padding = const EdgeInsets.all(22),
+      Widget? background}) {
     return Container(
-      padding: padding,
+      clipBehavior: background == null ? Clip.none : Clip.antiAlias,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(28),
@@ -1995,7 +1998,12 @@ class _PamilyaScreenState extends State<PamilyaScreen>
               offset: const Offset(0, 8))
         ],
       ),
-      child: child,
+      child: background == null
+          ? Padding(padding: padding, child: child)
+          : Stack(children: [
+              Positioned.fill(child: background),
+              Padding(padding: padding, child: child),
+            ]),
     );
   }
 
@@ -2036,6 +2044,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
         children: [
           Expanded(
             child: _gameCard(
+              background: const DoodleBackground(),
               child: LayoutBuilder(
                 builder: (_, box) => Column(
                   children: [
@@ -2046,9 +2055,8 @@ class _PamilyaScreenState extends State<PamilyaScreen>
                     // tall enough to hold three lines each — the small thing
                     // was the one that had to be read, and the big things
                     // were single words. The question is the board.
-                    ConstrainedBox(
-                      constraints:
-                          BoxConstraints(maxHeight: box.maxHeight * 0.46),
+                    SizedBox(
+                      height: box.maxHeight * 0.42,
                       child: _questionBox(question),
                     ),
                     if (beneathQuestion != null) ...[
@@ -2098,6 +2106,8 @@ class _PamilyaScreenState extends State<PamilyaScreen>
                           child: labels == null || labels.isEmpty
                               ? grid
                               : AnswerTileGroup(
+                                  // Each tile its own bright colour.
+                                  labels: labels,
                                   fontSize: AnswerTile.fitFontSize(
                                     labels,
                                     cellW: cellW,
@@ -2127,41 +2137,9 @@ class _PamilyaScreenState extends State<PamilyaScreen>
     );
   }
 
-  Widget _questionBox(String question) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 18),
-      decoration: BoxDecoration(
-        color: _currentMainColor.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      // The question is the one thing on the board that must stay readable,
-      // so it is set large and allowed to wrap. A bare FittedBox only ever
-      // shrinks — it never grows text into the room it has — which left short
-      // questions small with an empty card around them.
-      child: LayoutBuilder(
-        builder: (_, box) => FittedBox(
-          fit: BoxFit.scaleDown,
-          child: SizedBox(
-            width: box.maxWidth,
-            child: Text(
-              question,
-              style: TextStyle(
-                // The base size, not the final one: the box scales it down to
-                // fit, so this only sets how big a short question is allowed
-                // to become.
-                fontSize: 40,
-                fontWeight: FontWeight.w800,
-                color: _currentMainColor,
-                height: 1.12,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  /// The question, said by the mascot in a speech cloud — see
+  /// [QuestionCloud]. Fills the height it is given.
+  Widget _questionBox(String question) => QuestionCloud(question);
 
   /// One answer, drawn by [AnswerTile].
   ///

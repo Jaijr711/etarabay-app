@@ -56,6 +56,8 @@ void main() {
           await tester.pumpWidget(MaterialApp(
             home: Material(
               child: AnswerTileGroup(
+                // Coloured tiles, as the boards draw them: the heaviest text.
+                labels: choices,
                 fontSize: size,
                 child: Wrap(children: [
                   for (final c in choices)

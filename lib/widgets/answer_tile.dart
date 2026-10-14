@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 
 import 'object_picture.dart';
@@ -28,22 +29,99 @@ import '../utils/word_fit.dart';
 /// looked unequal, as if one mattered more. The board wraps its tiles in this
 /// with a size worked out from its longest answer ([AnswerTile.groupFontSize]),
 /// and every tile under it uses that size.
+///
+/// Given the board's [labels] too, each tile takes a colour by its place among
+/// them — teal, cream, green, lavender — so the answers look like the bright
+/// buttons in the design rather than four white boxes.
 class AnswerTileGroup extends InheritedWidget {
   final double fontSize;
+
+  /// The board's answers in order, for the tiles' colours. Empty: plain tiles.
+  final List<String> labels;
 
   const AnswerTileGroup({
     super.key,
     required this.fontSize,
+    this.labels = const [],
     required super.child,
   });
 
   static double? maybeOf(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<AnswerTileGroup>()?.fontSize;
 
+  /// The colour slot for [label] on this board, or null for a plain tile.
+  static int? toneOf(BuildContext context, String label) {
+    final group = context.dependOnInheritedWidgetOfExactType<AnswerTileGroup>();
+    final i = group?.labels.indexOf(label) ?? -1;
+    return i < 0 ? null : i;
+  }
+
   @override
   bool updateShouldNotify(AnswerTileGroup oldWidget) =>
-      oldWidget.fontSize != fontSize;
+      oldWidget.fontSize != fontSize || !listEquals(oldWidget.labels, labels);
 }
+
+/// One colour scheme for a tile: its face, its rim (and the 3D edge under
+/// it), its words, and the two small decorations in its corners.
+class _Tone {
+  final Color face, rim, ink;
+  final IconData cornerA, cornerB;
+  final Color cornerColorA, cornerColorB;
+  const _Tone(this.face, this.rim, this.ink, this.cornerA, this.cornerColorA,
+      this.cornerB, this.cornerColorB);
+}
+
+const _tones = [
+  _Tone(
+      Color(0xFF9EE6EF),
+      Color(0xFF2FA3B5),
+      Color(0xFF0D4B5A),
+      Icons.local_florist_rounded,
+      Color(0xFFF28AB2),
+      Icons.local_florist_rounded,
+      Color(0xFFFFC94A)), // teal
+  _Tone(
+      Color(0xFFFFEAA6),
+      Color(0xFFE0679A),
+      Color(0xFF8C1F4F),
+      Icons.local_florist_rounded,
+      Color(0xFFF07AA0),
+      Icons.star_rounded,
+      Color(0xFFFFB800)), // cream and pink
+  _Tone(
+      Color(0xFFA8E063),
+      Color(0xFFF0892A),
+      Color(0xFF1E5A17),
+      Icons.eco_rounded,
+      Color(0xFF3E8E2F),
+      Icons.bolt_rounded,
+      Color(0xFFFFC107)), // green and orange
+  _Tone(
+      Color(0xFFDCCBFF),
+      Color(0xFF8B61D6),
+      Color(0xFF3D2283),
+      Icons.favorite_rounded,
+      Color(0xFFFF7FA8),
+      Icons.star_rounded,
+      Color(0xFFFFB800)), // lavender
+];
+
+const _rightTone = _Tone(
+    Color(0xFFC9F3C1),
+    Color(0xFF2E9E3E),
+    Color(0xFF14561E),
+    Icons.check_circle_rounded,
+    Color(0xFF2E9E3E),
+    Icons.star_rounded,
+    Color(0xFFFFB800));
+const _wrongTone = _Tone(
+    Color(0xFFFFD3D5),
+    Color(0xFFE5484D),
+    Color(0xFFA31220),
+    Icons.cancel_rounded,
+    Color(0xFFE5484D),
+    Icons.close_rounded,
+    Color(0xFFE5484D));
 
 class AnswerTile extends StatelessWidget {
   /// The size every answer on a board shares, from the longest of them.
@@ -76,24 +154,26 @@ class AnswerTile extends StatelessWidget {
     final list = labels.toList();
     var size = groupFontSize(list);
     if (cellW <= 0 || cellH <= 0 || list.isEmpty) return size;
-    const border = 4.0;
+    // A coloured tile's rim is 3 px each side.
+    const border = 6.0;
     bool fits(double s) {
       for (final label in list) {
         final hasPicture = leadingEmoji(label) != null;
         final stacked = hasPicture && cellH >= 96;
         var w = cellW - 24 - border;
-        var h = cellH - (stacked ? 20 : 16) - border;
+        // 5 more for a coloured tile's 3D edge under its face.
+        var h = cellH - (stacked ? 20 : 16) - border - 5;
         if (stacked) {
           h -= (cellH * 0.56).clamp(40.0, 92.0) + 4;
         } else if (hasPicture) {
           w -= (cellH * 0.62).clamp(28.0, 64.0) + 10;
         }
         if (w <= 0 || h <= 0) return false;
-        // Bold is the wider of the two weights a tile uses.
+        // The heaviest weight a tile uses, so none is wider than measured.
         final style = TextStyle(
             fontFamily: fontFamily,
             fontSize: s,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w900,
             height: 1.1);
         final words = withoutLeadingEmoji(label);
         // Every word whole on one line. Checking the laid-out lines missed
@@ -195,6 +275,17 @@ class AnswerTile extends StatelessWidget {
       textColor = Colors.grey.shade800;
     }
 
+    // On a board that hands out colours, the tile is a bright, chunky button
+    // with a 3D edge — still green when right and red when wrong.
+    final toneIndex = AnswerTileGroup.toneOf(context, label);
+    final _Tone? tone = toneIndex == null
+        ? null
+        : (selected && correct == true)
+            ? _rightTone
+            : (selected && correct == false)
+                ? _wrongTone
+                : _tones[toneIndex % _tones.length];
+
     final emoji = leadingEmoji(label);
     final text = withoutLeadingEmoji(label);
     final short = label.trim().length <= shortLabelLimit;
@@ -241,8 +332,10 @@ class AnswerTile extends StatelessWidget {
             // length, as before.
             fontSize: AnswerTileGroup.maybeOf(context) ??
                 (text.length <= 5 ? 44 : (short ? 28 : 20)),
-            color: textColor,
-            fontWeight: selected ? FontWeight.bold : FontWeight.w600,
+            color: tone?.ink ?? textColor,
+            fontWeight: tone != null
+                ? FontWeight.w900
+                : (selected ? FontWeight.bold : FontWeight.w600),
             height: 1.1,
           );
           // And never a word broken in two, whatever the board worked out.
@@ -263,6 +356,73 @@ class AnswerTile extends StatelessWidget {
             ),
           );
         });
+
+        final Widget content = emoji == null
+            ? Center(child: words)
+            : (stacked
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ObjectPicture(emoji: emoji, size: picture),
+                      const SizedBox(height: 4),
+                      Flexible(child: words),
+                    ],
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ObjectPicture(emoji: emoji, size: picture),
+                      const SizedBox(width: 10),
+                      Flexible(child: words),
+                    ],
+                  ));
+
+        if (tone != null) {
+          final corner = (height * 0.16).clamp(12.0, 20.0);
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: double.infinity,
+            height: double.infinity,
+            // Room under the face for the 3D edge.
+            margin: const EdgeInsets.only(bottom: 5),
+            constraints: BoxConstraints(minHeight: minHeight),
+            padding: EdgeInsets.symmetric(
+                horizontal: 12, vertical: stacked ? 10 : 8),
+            decoration: BoxDecoration(
+              color: tone.face,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: tone.rim, width: 3),
+              boxShadow: [
+                // The solid edge underneath that makes it a button.
+                BoxShadow(color: tone.rim, offset: const Offset(0, 5)),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.10),
+                  blurRadius: 8,
+                  offset: const Offset(0, 7),
+                ),
+              ],
+            ),
+            child: Stack(clipBehavior: Clip.none, children: [
+              Positioned.fill(child: content),
+              // Small flowers, stars and leaves in two corners, kept in the
+              // padding so they never sit on the words.
+              Positioned(
+                top: -6,
+                left: -8,
+                child: IgnorePointer(
+                    child: Icon(tone.cornerA,
+                        size: corner, color: tone.cornerColorA)),
+              ),
+              Positioned(
+                bottom: -6,
+                right: -8,
+                child: IgnorePointer(
+                    child: Icon(tone.cornerB,
+                        size: corner, color: tone.cornerColorB)),
+              ),
+            ]),
+          );
+        }
 
         return AnimatedContainer(
           duration: const Duration(milliseconds: 200),
@@ -288,25 +448,7 @@ class AnswerTile extends StatelessWidget {
               ),
             ],
           ),
-          child: emoji == null
-              ? Center(child: words)
-              : (stacked
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ObjectPicture(emoji: emoji, size: picture),
-                        const SizedBox(height: 4),
-                        Flexible(child: words),
-                      ],
-                    )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ObjectPicture(emoji: emoji, size: picture),
-                        const SizedBox(width: 10),
-                        Flexible(child: words),
-                      ],
-                    )),
+          child: content,
         );
       }),
     );
