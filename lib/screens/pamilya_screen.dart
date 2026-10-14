@@ -20,6 +20,7 @@ import 'package:audioplayers/audioplayers.dart';
 import '../main.dart';
 import '../widgets/pressable.dart';
 import '../widgets/question_cloud.dart';
+import '../widgets/tip_cloud.dart';
 import '../widgets/staggered_entrance.dart';
 import '../widgets/star_tally.dart';
 import 'dart:async';
@@ -1849,48 +1850,12 @@ class _PamilyaScreenState extends State<PamilyaScreen>
               scale: 0.85 + 0.15 * t,
               child: Opacity(opacity: t.clamp(0.0, 1.0), child: child),
             ),
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 28),
-              padding: const EdgeInsets.fromLTRB(26, 24, 26, 26),
-              constraints: const BoxConstraints(maxWidth: 380),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: const Color(0xFF3EA8E5), width: 3),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF3EA8E5).withOpacity(0.35),
-                    blurRadius: 30,
-                    spreadRadius: 4,
-                    offset: const Offset(0, 10),
-                  )
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFEAF6FE),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(LucideIcons.lightbulb,
-                        color: Color(0xFF2B8FCC), size: 34),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    tip,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      height: 1.3,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1E3A4C),
-                    ),
-                  ),
-                ],
+            // The design's cloud, bulb and waving mascot — see [TipCloud].
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 22),
+                child: TipCloud(tip),
               ),
             ),
           ),
