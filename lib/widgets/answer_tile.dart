@@ -30,13 +30,12 @@ import '../utils/word_fit.dart';
 /// with a size worked out from its longest answer ([AnswerTile.groupFontSize]),
 /// and every tile under it uses that size.
 ///
-/// Given the board's [labels] too, each tile takes a colour by its place among
-/// them — teal, cream, green, lavender — so the answers look like the bright
-/// buttons in the design rather than four white boxes.
+/// Given the board's [labels] too, the tiles are drawn as chunky 3D buttons
+/// ([ToneFrame]) — white until answered, then green or red.
 class AnswerTileGroup extends InheritedWidget {
   final double fontSize;
 
-  /// The board's answers in order, for the tiles' colours. Empty: plain tiles.
+  /// The board's answers in order. Empty: the flat tile style.
   final List<String> labels;
 
   const AnswerTileGroup({
@@ -49,7 +48,7 @@ class AnswerTileGroup extends InheritedWidget {
   static double? maybeOf(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<AnswerTileGroup>()?.fontSize;
 
-  /// The colour slot for [label] on this board, or null for a plain tile.
+  /// [label]'s place on this board, or null for the flat tile style.
   static int? toneOf(BuildContext context, String label) {
     final group = context.dependOnInheritedWidgetOfExactType<AnswerTileGroup>();
     final i = group?.labels.indexOf(label) ?? -1;
@@ -62,79 +61,39 @@ class AnswerTileGroup extends InheritedWidget {
 }
 
 /// One colour scheme for a tile: its face, its rim (and the 3D edge under
-/// it), its words, and the two small decorations in its corners.
+/// it), and its words.
 class _Tone {
   final Color face, rim, ink;
-  final IconData cornerA, cornerB;
-  final Color cornerColorA, cornerColorB;
-  const _Tone(this.face, this.rim, this.ink, this.cornerA, this.cornerColorA,
-      this.cornerB, this.cornerColorB);
+  const _Tone(this.face, this.rim, this.ink);
 }
 
+/// Every answer starts the same: white, with a grey rim and edge.
+///
+/// They were teal, cream, green and lavender with flowers and stars in the
+/// corners, and children were confused — a green tile looked already right,
+/// a red-rimmed one already wrong. Now the only colours on a board are the
+/// two that mean something: green for right, red for wrong.
 const _tones = [
-  _Tone(
-      Color(0xFF9EE6EF),
-      Color(0xFF2FA3B5),
-      Color(0xFF0D4B5A),
-      Icons.local_florist_rounded,
-      Color(0xFFF28AB2),
-      Icons.local_florist_rounded,
-      Color(0xFFFFC94A)), // teal
-  _Tone(
-      Color(0xFFFFEAA6),
-      Color(0xFFE0679A),
-      Color(0xFF8C1F4F),
-      Icons.local_florist_rounded,
-      Color(0xFFF07AA0),
-      Icons.star_rounded,
-      Color(0xFFFFB800)), // cream and pink
-  _Tone(
-      Color(0xFFA8E063),
-      Color(0xFFF0892A),
-      Color(0xFF1E5A17),
-      Icons.eco_rounded,
-      Color(0xFF3E8E2F),
-      Icons.bolt_rounded,
-      Color(0xFFFFC107)), // green and orange
-  _Tone(
-      Color(0xFFDCCBFF),
-      Color(0xFF8B61D6),
-      Color(0xFF3D2283),
-      Icons.favorite_rounded,
-      Color(0xFFFF7FA8),
-      Icons.star_rounded,
-      Color(0xFFFFB800)), // lavender
+  _Tone(Colors.white, Color(0xFFCDD3DD), Color(0xFF2D3142)),
 ];
 
-const _rightTone = _Tone(
-    Color(0xFFC9F3C1),
-    Color(0xFF2E9E3E),
-    Color(0xFF14561E),
-    Icons.check_circle_rounded,
-    Color(0xFF2E9E3E),
-    Icons.star_rounded,
-    Color(0xFFFFB800));
-const _wrongTone = _Tone(
-    Color(0xFFFFD3D5),
-    Color(0xFFE5484D),
-    Color(0xFFA31220),
-    Icons.cancel_rounded,
-    Color(0xFFE5484D),
-    Icons.close_rounded,
-    Color(0xFFE5484D));
+const _rightTone =
+    _Tone(Color(0xFFC9F3C1), Color(0xFF2E9E3E), Color(0xFF14561E));
+const _wrongTone =
+    _Tone(Color(0xFFFFD3D5), Color(0xFFE5484D), Color(0xFFA31220));
 
-/// The bright, chunky button the boards' answers are drawn as: a coloured
-/// face, a rim with a solid 3D edge under it, and a small decoration in two
-/// corners. [AnswerTile] uses it, and so can any board whose tiles hold
-/// something else (a picture and a word, say) but should look the same.
+/// The chunky button the boards' answers are drawn as: a face, a rim with a
+/// solid 3D edge under it. [AnswerTile] uses it, and so can any board whose
+/// tiles hold something else (a picture and a word, say) but should look the
+/// same.
 class ToneFrame extends StatelessWidget {
   final _Tone _tone;
   final Widget child;
   final EdgeInsets padding;
   final double minHeight;
 
-  /// Colour slot [index] (teal, cream, green, lavender, then round again);
-  /// [verdict] true paints it green, false red.
+  /// Answer [index] (all alike for now; see [_tones]); [verdict] true
+  /// paints it green, false red.
   ToneFrame({
     super.key,
     required int index,
@@ -168,52 +127,30 @@ class ToneFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tone = _tone;
-    return LayoutBuilder(builder: (_, box) {
-      final height = box.maxHeight.isFinite ? box.maxHeight : 100.0;
-      final corner = (height * 0.16).clamp(12.0, 20.0);
-      return AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: double.infinity,
-        height: double.infinity,
-        // Room under the face for the 3D edge.
-        margin: const EdgeInsets.only(bottom: 5),
-        constraints: BoxConstraints(minHeight: minHeight),
-        padding: padding,
-        decoration: BoxDecoration(
-          color: tone.face,
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: tone.rim, width: 3),
-          boxShadow: [
-            // The solid edge underneath that makes it a button.
-            BoxShadow(color: tone.rim, offset: const Offset(0, 5)),
-            BoxShadow(
-              color: Colors.black.withOpacity(0.10),
-              blurRadius: 8,
-              offset: const Offset(0, 7),
-            ),
-          ],
-        ),
-        child: Stack(clipBehavior: Clip.none, children: [
-          Positioned.fill(child: child),
-          // Small flowers, stars and leaves in two corners, kept in the
-          // padding so they never sit on the words.
-          Positioned(
-            top: -6,
-            left: -8,
-            child: IgnorePointer(
-                child:
-                    Icon(tone.cornerA, size: corner, color: tone.cornerColorA)),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      width: double.infinity,
+      height: double.infinity,
+      // Room under the face for the 3D edge.
+      margin: const EdgeInsets.only(bottom: 5),
+      constraints: BoxConstraints(minHeight: minHeight),
+      padding: padding,
+      decoration: BoxDecoration(
+        color: tone.face,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: tone.rim, width: 3),
+        boxShadow: [
+          // The solid edge underneath that makes it a button.
+          BoxShadow(color: tone.rim, offset: const Offset(0, 5)),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.10),
+            blurRadius: 8,
+            offset: const Offset(0, 7),
           ),
-          Positioned(
-            bottom: -6,
-            right: -8,
-            child: IgnorePointer(
-                child:
-                    Icon(tone.cornerB, size: corner, color: tone.cornerColorB)),
-          ),
-        ]),
-      );
-    });
+        ],
+      ),
+      child: child,
+    );
   }
 }
 

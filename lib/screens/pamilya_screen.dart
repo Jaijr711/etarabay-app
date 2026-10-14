@@ -2106,7 +2106,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
                           child: labels == null || labels.isEmpty
                               ? grid
                               : AnswerTileGroup(
-                                  // Each tile its own bright colour.
+                                  // Chunky 3D buttons, white until answered.
                                   labels: labels,
                                   fontSize: AnswerTile.fitFontSize(
                                     labels,
@@ -2300,7 +2300,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
                                   sel = _selectedAnimalIndex == i;
                                 }
 
-                                // The same bright 3D buttons as the other boards, green
+                                // The same 3D buttons as the other boards, green
                                 // once chosen.
                                 final ink = ToneFrame.inkFor(i,
                                     verdict: sel ? true : null);
