@@ -152,15 +152,31 @@ class _AnswerFeedbackState extends State<AnswerFeedback>
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
+                    // Fredoka, round and chunky like the pictures' own
+                    // lettering, with a soft shadow so it stands up off the
+                    // cloud.
                     child: Text(
                       message,
                       maxLines: 1,
                       style: TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.w900,
+                        fontFamily: 'Fredoka',
+                        fontSize: 44,
+                        fontVariations: const [FontVariation('wght', 700)],
+                        fontWeight: FontWeight.w700,
+                        height: 1.0,
+                        letterSpacing: 0.5,
                         color: correct
-                            ? const Color(0xFF1F4D1A)
+                            ? const Color(0xFF1E5A1C)
                             : const Color(0xFF5E0E14),
+                        shadows: [
+                          Shadow(
+                            color: (correct
+                                    ? const Color(0xFF1E5A1C)
+                                    : const Color(0xFF5E0E14))
+                                .withOpacity(0.25),
+                            offset: const Offset(0, 2.5),
+                          ),
+                        ],
                       ),
                     ),
                   ),

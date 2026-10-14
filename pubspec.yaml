@@ -97,6 +97,13 @@ flutter:
     - assets/audio/family/
     - assets/audio/sfx/
     - assets/audio/birthday/
+  # Fredoka (SIL Open Font License, see assets/fonts/Fredoka-OFL.txt): the
+  # round, chunky lettering of the team's pictures, used where the app writes
+  # words onto them. Bundled, not fetched, so it is the same offline.
+  fonts:
+    - family: Fredoka
+      fonts:
+        - asset: assets/fonts/Fredoka.ttf
 flutter_launcher_icons:
   android: true
   # Android only — the iOS project was removed (2026-10-13).

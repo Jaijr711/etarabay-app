@@ -16,6 +16,11 @@ void main() {
       final bytes = ByteData.view(file.readAsBytesSync().buffer);
       await (FontLoader('Roboto')..addFont(Future.value(bytes))).load();
     }
+    // The word on the cloud is in the bundled Fredoka.
+    final fredoka = File('assets/fonts/Fredoka.ttf').readAsBytesSync();
+    await (FontLoader('Fredoka')
+          ..addFont(Future.value(ByteData.view(fredoka.buffer))))
+        .load();
   });
 
   testWidgets('answer feedback', (tester) async {
