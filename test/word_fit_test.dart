@@ -44,7 +44,8 @@ void main() {
 
   // One grid cell on a small phone (two columns on a 320-wide screen), and
   // on a very small one.
-  const cells = [Size(130, 110), Size(112, 92)];
+  // A wide one-per-row tile too, where the picture sits beside the words.
+  const cells = [Size(130, 110), Size(112, 92), Size(300, 108)];
 
   for (final lang in const ['en', 'fil', 'ilo']) {
     testWidgets('no broken words ($lang)', (tester) async {

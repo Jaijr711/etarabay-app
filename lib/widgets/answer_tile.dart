@@ -132,10 +132,12 @@ class AnswerTile extends StatelessWidget {
       final n = withoutLeadingEmoji(l).length;
       if (n > longest) longest = n;
     }
+    // Ceilings, not sizes: [fitFontSize] comes down from here to what fits.
+    // A sentence was capped at 20 even in a tile the width of the screen.
     if (longest <= 5) return 40;
-    if (longest <= shortLabelLimit) return 26;
-    if (longest <= 32) return 20;
-    return 17;
+    if (longest <= shortLabelLimit) return 28;
+    if (longest <= 32) return 26;
+    return 22;
   }
 
   /// The largest size, up to [groupFontSize], at which EVERY answer fits the
@@ -159,7 +161,7 @@ class AnswerTile extends StatelessWidget {
     bool fits(double s) {
       for (final label in list) {
         final hasPicture = leadingEmoji(label) != null;
-        final stacked = hasPicture && cellH >= 96;
+        final stacked = hasPicture && stacks(cellW, cellH);
         var w = cellW - 24 - border;
         // 5 more for a coloured tile's 3D edge under its face.
         var h = cellH - (stacked ? 20 : 16) - border - 5;
@@ -226,6 +228,15 @@ class AnswerTile extends StatelessWidget {
 
   /// Longest answer that still reads comfortably at half the board's width.
   static const int shortLabelLimit = 16;
+
+  /// Whether a tile this size puts its picture above its words.
+  ///
+  /// Only when it is tall and not much wider than tall. A wide tile stacked
+  /// its picture on top all the same, and the sentence under it was left a
+  /// strip about 13 px high across a tile the width of the screen. Side by
+  /// side, the words get the whole height.
+  static bool stacks(double width, double height) =>
+      height >= 96 && (!width.isFinite || width <= height * 1.5);
 
   /// The picture at the front of [label], or null when it starts with a word.
   ///
@@ -299,8 +310,9 @@ class AnswerTile extends StatelessWidget {
             ? box.maxHeight
             : minHeight;
         // Stacked once there is room for a picture that still looks like a
-        // picture. Below that the two sit in a row.
-        final stacked = emoji != null && height >= 96;
+        // picture and the tile is not wide — see [stacks]. Otherwise the two
+        // sit in a row.
+        final stacked = emoji != null && stacks(box.maxWidth, height);
         // Generous on purpose: the artwork is drawn with air around the
         // figure, so a picture measured at "half the tile" arrives on screen
         // looking like a third of it.

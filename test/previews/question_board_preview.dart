@@ -24,7 +24,7 @@ void main() {
   });
 
   Widget board(String question, List<String> labels,
-      {int? picked, bool? right}) {
+      {int? picked, bool? right, int cols = 2}) {
     return SizedBox(
       width: 340,
       height: 600,
@@ -45,8 +45,8 @@ void main() {
                 Expanded(
                   child: LayoutBuilder(builder: (_, inner) {
                     const gap = 10.0;
-                    final cellW = (inner.maxWidth - gap) / 2;
-                    const cellH = 132.0;
+                    final cellW = (inner.maxWidth - gap * (cols - 1)) / cols;
+                    final cellH = cols == 2 ? 132.0 : 108.0;
                     return Center(
                       child: AnswerTileGroup(
                         labels: labels,
@@ -54,7 +54,7 @@ void main() {
                             cellW: cellW, cellH: cellH, fontFamily: 'Roboto'),
                         child: GridView.count(
                           shrinkWrap: true,
-                          crossAxisCount: 2,
+                          crossAxisCount: cols,
                           childAspectRatio: cellW / cellH,
                           crossAxisSpacing: gap,
                           mainAxisSpacing: gap,
@@ -81,7 +81,7 @@ void main() {
   }
 
   testWidgets('question board', (tester) async {
-    await tester.binding.setSurfaceSize(const Size(340 * 3 + 64, 624));
+    await tester.binding.setSurfaceSize(const Size(340 * 4 + 84, 624));
     await tester.runAsync(() async {
       await tester.pumpWidget(MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -100,6 +100,17 @@ void main() {
               board('Sino ang nanay ng tatay mo?',
                   const ['Lola', 'Ate', 'Tita', 'Pinsan'],
                   picked: 2, right: false),
+              const SizedBox(width: 20),
+              // Sentences, one per row: the picture goes beside the words.
+              board(
+                  'What is the first thing you do in the MORNING after '
+                  'waking up?',
+                  const [
+                    '🛏️ Wake up and get out of bed',
+                    '🍳 Eat breakfast',
+                    '📺 Watch TV'
+                  ],
+                  cols: 1),
             ]),
           ),
         ),
