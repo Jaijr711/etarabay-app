@@ -553,16 +553,20 @@ class _SuccessModalState extends State<SuccessModal> {
     return path;
   }
 
+  /// What the stars mean, in words a child can take in: the count, and
+  /// praise for a perfect round. Instructions like "Replay with 0 errors!"
+  /// were dropped — a three-year-old cannot act on them, and the parent can
+  /// tap the stars for the full rules.
   String _getStarDetailSummary(int stars) {
     switch (stars) {
       case 3:
         return '3/3 Stars • Perfect Score! Outstanding!';
       case 2:
-        return '2/3 Stars • 1 empty star remaining. Replay with 0 errors!';
+        return '2/3 Stars • 1 empty star remaining.';
       case 1:
-        return '1/3 Star • 2 empty stars remaining. Practice to earn all 3!';
+        return '1/3 Star • 2 empty stars remaining.';
       default:
-        return '0/3 Stars • Replay to fill your stars!';
+        return '0/3 Stars';
     }
   }
 
