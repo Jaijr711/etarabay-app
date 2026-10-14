@@ -886,6 +886,22 @@ class AwardsScreen extends StatelessWidget {
   void _showViewBadgeModal(BuildContext context, Map<String, dynamic> badge) {
     final color = Color(badge['color'] as int);
     final loc = AppLocalizations.of(context)!;
+    // A deeper relative of the badge's colour. A light badge (the amber
+    // About Me one) left white words, an amber pill and a gold medal all on
+    // yellow, where none of them could be read; the card now darkens towards
+    // its foot and the pill, medal and button sit on white instead.
+    final hsl = HSLColor.fromColor(color);
+    final deep =
+        hsl.withLightness((hsl.lightness - 0.16).clamp(0.12, 1.0)).toColor();
+    final ink =
+        hsl.withLightness((hsl.lightness - 0.26).clamp(0.10, 1.0)).toColor();
+    final wordShadow = [
+      Shadow(
+        color: Colors.black.withOpacity(0.28),
+        offset: const Offset(0, 2),
+        blurRadius: 3,
+      ),
+    ];
     showDialog(
       context: context,
       builder: (_) => Dialog(
@@ -894,14 +910,15 @@ class AwardsScreen extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [color, color.withOpacity(0.85)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [color, deep],
             ),
             borderRadius: BorderRadius.circular(32),
+            border: Border.all(color: Colors.white, width: 4),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.4),
+                color: deep.withOpacity(0.45),
                 blurRadius: 30,
                 offset: const Offset(0, 15),
               ),
@@ -916,34 +933,50 @@ class AwardsScreen extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.amber,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     loc.badgeClaimed,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                      color: ink,
                       letterSpacing: 2,
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
-                // The moment the badge is won, at the size it deserves.
-                BadgeEmblem(
-                  icon: badge['icon'] as IconData,
-                  color: const Color(0xFFFFC542),
-                  size: 118,
+                // The moment the badge is won, at the size it deserves — on
+                // a white halo, so the gold medal stands off any card colour.
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.6),
+                        blurRadius: 24,
+                        spreadRadius: 4,
+                      ),
+                    ],
+                  ),
+                  child: BadgeEmblem(
+                    icon: badge['icon'] as IconData,
+                    color: const Color(0xFFFFC542),
+                    size: 118,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 Text(
                   _badgeTitle(context, badge['id'] as String),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w900,
                     color: Colors.white,
+                    shadows: wordShadow,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -954,10 +987,11 @@ class AwardsScreen extends StatelessWidget {
                   _badgeHint(context, badge['id'] as String),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 16,
                     height: 1.3,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white.withOpacity(0.92),
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    shadows: wordShadow,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -967,18 +1001,19 @@ class AwardsScreen extends StatelessWidget {
                     onPressed: () => Navigator.of(context).pop(),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: color,
+                      foregroundColor: ink,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      elevation: 0,
+                      elevation: 4,
+                      shadowColor: Colors.black.withOpacity(0.3),
                     ),
                     child: Text(
                       loc.awesome,
                       style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ),
