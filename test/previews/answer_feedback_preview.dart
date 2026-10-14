@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Right and wrong, in English (the picture's own words) and in Filipino
-/// (the words laid over the cloud). Not part of the suite — run by hand:
+/// Right and wrong, in English and in Filipino — the app writes the word on
+/// the cloud the same way for both. Not part of the suite — run by hand:
 ///
 ///   flutter test --update-goldens test/previews/answer_feedback_preview.dart
 void main() {
@@ -30,7 +30,7 @@ void main() {
         child: Row(children: [
           cell(AnswerFeedback.correct(message: 'Correct!')),
           cell(AnswerFeedback.wrong(message: 'Wrong')),
-          cell(AnswerFeedback.correct(message: 'Tama')),
+          cell(AnswerFeedback.correct(message: 'Tama!')),
           cell(AnswerFeedback.wrong(message: 'Mali')),
         ]),
       ),

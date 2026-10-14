@@ -113,20 +113,19 @@ class _AnswerFeedbackState extends State<AnswerFeedback>
   }
 
   /// Right and wrong as the team drew them: the mascot cheering in a green
-  /// circle, or crying in a red one, over a cloud saying "Correct!" or
-  /// "Wrong". In another language the cloud's words are covered with
-  /// [AnswerFeedback.message].
+  /// circle, or crying in a red one, over a cloud with the word on it.
+  ///
+  /// The word is written by the app, not the picture: the pictures' own
+  /// "Correct!" and "Wrong" were erased, so "Tama!", "Kusto!" or "Mali" look
+  /// exactly like the English instead of a patch laid over a picture.
   Widget _pictureBadge(double t) {
     final correct = _isCorrect;
     final asset = correct
         ? 'assets/images/feedback_correct.webp'
         : 'assets/images/feedback_wrong.webp';
-    final baked = correct ? 'correct' : 'wrong';
     final message = widget.message
         .replaceAll(RegExp(r'[^\p{L}\p{N}!? ]', unicode: true), '')
         .trim();
-    final same =
-        message.toLowerCase().replaceAll(RegExp(r'[^a-z]'), '') == baked;
     // Where the words sit on the cloud, as fractions of the picture.
     final label = correct
         ? const Rect.fromLTRB(0.13, 0.77, 0.87, 0.935)
@@ -142,7 +141,7 @@ class _AnswerFeedbackState extends State<AnswerFeedback>
           final w = box.maxWidth, h = box.maxHeight;
           return Stack(children: [
             Positioned.fill(child: Image.asset(asset, fit: BoxFit.contain)),
-            if (!same && message.isNotEmpty)
+            if (message.isNotEmpty)
               Positioned(
                 left: label.left * w,
                 top: label.top * h,
@@ -150,11 +149,7 @@ class _AnswerFeedbackState extends State<AnswerFeedback>
                 height: label.height * h,
                 child: Container(
                   alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(label.height * h / 2),
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
