@@ -1980,9 +1980,10 @@ class _PamilyaScreenState extends State<PamilyaScreen>
   //  SHARED CARD WRAPPER
   // ─────────────────────────────────────────────────────────────────────────
 
-  Widget _gameCard({required Widget child}) {
+  Widget _gameCard(
+      {required Widget child, EdgeInsets padding = const EdgeInsets.all(22)}) {
     return Container(
-      padding: const EdgeInsets.all(22),
+      padding: padding,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(28),
@@ -2636,46 +2637,25 @@ class _PamilyaScreenState extends State<PamilyaScreen>
     final safeIndex = _homeChallengeIndex.clamp(0, challenges.length - 1);
     final activeChallenge = challenges[safeIndex];
 
-    // A house, drawn, with the rooms inside it.
-    //
-    // The rooms used to be a flat 2x3 grid of cards under a tall banner. The
-    // banner and the step dots are fixed height, the grid took what was left,
-    // and on a phone what was left was not enough for three rows — so the
-    // cards overlapped each other and their captions ran out the sides. It
-    // also asked a child to imagine that six rounded rectangles were a home.
-    //
-    // Now the rooms sit under a roof, inside walls, with the yard on the
-    // grass below — and the banner has been flattened to a single row so the
-    // house gets the height it needs.
+    // The house is the board, so it gets every pixel it can: on a small
+    // phone the height runs out first, and a heading, a tall banner and the
+    // usual card padding left the picture too small for a child to make out
+    // the rooms. No heading (the house is the heading), a tighter card, and
+    // the banner kept to one row.
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+      padding: const EdgeInsets.fromLTRB(10, 6, 10, 8),
       child: Column(children: [
         Expanded(
           child: _gameCard(
+            padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
             child: Column(children: [
-              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Icon(LucideIcons.house, color: _currentMainColor, size: 22),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(AppLocalizations.of(context)!.ourHomeTitle,
-                        style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
-                            color: _currentMainColor)),
-                  ),
-                ),
-              ]),
-              const SizedBox(height: 8),
-
               // What to place, on one line. The stacked version of this card
               // was 190 pixels tall on its own — most of the board, spent on
               // one word and one question.
               Container(
                 width: double.infinity,
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: isFinished
@@ -2688,8 +2668,8 @@ class _PamilyaScreenState extends State<PamilyaScreen>
                 ),
                 child: Row(children: [
                   Container(
-                    width: 52,
-                    height: 52,
+                    width: 44,
+                    height: 44,
                     decoration: const BoxDecoration(
                         color: Colors.white, shape: BoxShape.circle),
                     child: Center(
@@ -2697,10 +2677,10 @@ class _PamilyaScreenState extends State<PamilyaScreen>
                           emoji: isFinished
                               ? '🏡'
                               : activeChallenge['itemEmoji'] as String,
-                          size: 34),
+                          size: 30),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2731,7 +2711,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
                 ]),
               ),
 
-              const SizedBox(height: 6),
+              const SizedBox(height: 5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(challenges.length, (idx) {
@@ -2752,7 +2732,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
                   );
                 }),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
 
               Expanded(
                 child: HomeHouse(
