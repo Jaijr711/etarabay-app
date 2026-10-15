@@ -2567,59 +2567,69 @@ class _MatematikaScreenState extends State<MatematikaScreen>
                 ),
 
                 // ── Nodes layer ────────────────────────────────────────
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // LEFT – emoji groups
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: List.generate(count, (i) {
-                            final objs = (pairs[i]['objects'] as List<dynamic>)
-                                .cast<String>();
-                            final isMatch = _lineMatches.containsKey(i);
-                            final isSel = _selectedLeftIndex == i;
-                            final isWrong = _wrongFlash[i] == true;
-                            return _buildLeftNode(
-                              nodeKey: _leftNodeKeys[i],
-                              emojis: objs,
-                              selected: isSel,
-                              matched: isMatch,
-                              isWrong: isWrong,
-                              checked: _lineChecked,
-                              onTap: () => _handleLeftTap(i),
-                            );
-                          }),
+                // Every box as tall as the room allows. They were a fixed
+                // 66 pixels with 26-pixel pictures, floating in a board with
+                // half its height spare — too small to count three apples in.
+                LayoutBuilder(builder: (_, box) {
+                  final nodeH =
+                      ((box.maxHeight / count) - 18).clamp(66.0, 150.0);
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // LEFT – emoji groups
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: List.generate(count, (i) {
+                              final objs =
+                                  (pairs[i]['objects'] as List<dynamic>)
+                                      .cast<String>();
+                              final isMatch = _lineMatches.containsKey(i);
+                              final isSel = _selectedLeftIndex == i;
+                              final isWrong = _wrongFlash[i] == true;
+                              return _buildLeftNode(
+                                height: nodeH,
+                                nodeKey: _leftNodeKeys[i],
+                                emojis: objs,
+                                selected: isSel,
+                                matched: isMatch,
+                                isWrong: isWrong,
+                                checked: _lineChecked,
+                                onTap: () => _handleLeftTap(i),
+                              );
+                            }),
+                          ),
                         ),
-                      ),
 
-                      // Centre gap (lines pass through here)
-                      const SizedBox(width: 56),
+                        // Centre gap (lines pass through here)
+                        const SizedBox(width: 56),
 
-                      // RIGHT – numbers (shuffled)
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: List.generate(count, (shuffled) {
-                            final orig = _shuffledRightIndices[shuffled];
-                            final isMatch =
-                                _lineMatches.containsValue(shuffled);
-                            return _buildRightNode(
-                              nodeKey: _rightNodeKeys[shuffled],
-                              number: orig + 1,
-                              matched: isMatch,
-                              isWrong: wrongRights.contains(shuffled),
-                              checked: _lineChecked,
-                              onTap: () => _handleRightTap(shuffled),
-                            );
-                          }),
+                        // RIGHT – numbers (shuffled)
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: List.generate(count, (shuffled) {
+                              final orig = _shuffledRightIndices[shuffled];
+                              final isMatch =
+                                  _lineMatches.containsValue(shuffled);
+                              return _buildRightNode(
+                                height: nodeH,
+                                nodeKey: _rightNodeKeys[shuffled],
+                                number: orig + 1,
+                                matched: isMatch,
+                                isWrong: wrongRights.contains(shuffled),
+                                checked: _lineChecked,
+                                onTap: () => _handleRightTap(shuffled),
+                              );
+                            }),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
+                      ],
+                    ),
+                  );
+                }),
 
                 // The old full-screen red circle sat in the middle of the
                 // board and hid the very lines that show which pairs were
@@ -2644,6 +2654,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   // ── Left node widget ──────────────────────────────────────────────────────
 
   Widget _buildLeftNode({
+    required double height,
     required Key nodeKey,
     required List<String> emojis,
     required bool selected,
@@ -2678,44 +2689,20 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       onTap: (checked || isWrong) ? null : onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        height: 66,
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: border, width: 2.2),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                      color: AppColors.primary.withOpacity(0.22),
-                      blurRadius: 10)
-                ]
-              : [
-                  const BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 4,
-                      offset: Offset(0, 2))
-                ],
-        ),
+        height: height,
+        margin: const EdgeInsets.only(top: 4, bottom: 9),
+        padding: const EdgeInsets.all(8),
+        decoration: _nodeDecoration(bg, border, glow: selected),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
             // The same pictures as the counting boards, in a row. Drawn one
             // by one rather than as a joined string so each object can be an
             // image; a single Text could only ever be emoji.
-            Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  for (final e in emojis)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
-                      child: ObjectPicture(emoji: e, size: 26),
-                    ),
-                ],
-              ),
-            ),
+            //
+            // Laid out like the counting boards too: as big as the box
+            // allows, in whatever grid makes them biggest.
+            Positioned.fill(child: _countableObjects(emojis)),
             // Right-edge connector dot
             Positioned(
               right: -19,
@@ -2754,9 +2741,35 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     );
   }
 
+  /// A match box as the other boards' answers are drawn: a white face, a
+  /// rim, and a solid edge under it in the rim's colour — the rim carrying
+  /// whether it is picked (blue), joined, right (green) or wrong (red).
+  BoxDecoration _nodeDecoration(Color bg, Color rim, {bool glow = false}) {
+    // The plain grey rim is the white tiles' own grey.
+    final edge = rim == Colors.grey.shade300 ? const Color(0xFFCDD3DD) : rim;
+    return BoxDecoration(
+      color: bg == Colors.white
+          ? Colors.white
+          : Color.alphaBlend(bg, Colors.white),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: edge, width: 3),
+      boxShadow: [
+        BoxShadow(color: edge, offset: const Offset(0, 5)),
+        BoxShadow(
+          color: glow
+              ? AppColors.primary.withOpacity(0.28)
+              : Colors.black.withOpacity(0.10),
+          blurRadius: glow ? 12 : 8,
+          offset: const Offset(0, 7),
+        ),
+      ],
+    );
+  }
+
   // ── Right node widget ─────────────────────────────────────────────────────
 
   Widget _buildRightNode({
+    required double height,
     required Key nodeKey,
     required int number,
     required bool matched,
@@ -2777,17 +2790,9 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       onTap: matched ? null : onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        height: 66,
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: border, width: 2.2),
-          boxShadow: const [
-            BoxShadow(
-                color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
-          ],
-        ),
+        height: height,
+        margin: const EdgeInsets.only(top: 4, bottom: 9),
+        decoration: _nodeDecoration(bg, border),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
@@ -2795,8 +2800,8 @@ class _MatematikaScreenState extends State<MatematikaScreen>
               child: Text(
                 '$number',
                 style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+                  fontSize: (height * 0.5).clamp(28.0, 64.0),
+                  fontWeight: FontWeight.w900,
                   color: matched ? linked : AppColors.textDark,
                 ),
               ),
