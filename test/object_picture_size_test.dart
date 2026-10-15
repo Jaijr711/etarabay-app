@@ -48,10 +48,10 @@ void main() {
 
   test('a known object resolves to a path, an unknown one does not', () {
     expect(ObjectPicture.assetFor('🍎'),
-        'assets/images/apple.png');
+        'assets/images/apple.webp');
     expect(ObjectPicture.assetFor('🍌'),
-        'assets/images/banana.png');
-    expect(ObjectPicture.assetFor('🐟'), 'assets/images/fish.png');
+        'assets/images/banana.webp');
+    expect(ObjectPicture.assetFor('🐟'), 'assets/images/fish.webp');
     expect(ObjectPicture.assetFor('🦕'), isNull);
   });
 
@@ -60,9 +60,9 @@ void main() {
     // the same and is a different string; before this it silently resolved to
     // no picture at all.
     expect(ObjectPicture.assetFor('🛋️'),
-        'assets/images/sopa.png');
+        'assets/images/sopa.webp');
     expect(ObjectPicture.assetFor('🛏️'),
-        'assets/images/kama.png');
+        'assets/images/kama.webp');
   });
 
   test('a variation selector does not hide the picture', () {
@@ -70,9 +70,9 @@ void main() {
     // the same and is a different string; before this it silently resolved to
     // no picture at all.
     expect(ObjectPicture.assetFor('🛋️'),
-        'assets/images/sopa.png');
+        'assets/images/sopa.webp');
     expect(ObjectPicture.assetFor('🛏️'),
-        'assets/images/kama.png');
+        'assets/images/kama.webp');
   });
 
   // ── The fault that hid three pictures ─────────────────────────────────────
@@ -90,7 +90,9 @@ void main() {
         .listSync()
         .whereType<File>()
         .map((f) => f.uri.pathSegments.last)
-        .where((n) => n.endsWith('.jpg'))
+        // Since the pictures went to WebP (2026-10-15) a .png is reached the
+        // same way a .jpg was, and fails on web the same way.
+        .where((n) => n.endsWith('.jpg') || n.endsWith('.png'))
         .where((n) => stems.contains(n.substring(0, n.length - 4)))
         .toList();
 
@@ -104,8 +106,8 @@ void main() {
         .listSync()
         .whereType<File>()
         .map((f) => f.uri.pathSegments.last)
-        .where((n) => n.endsWith('.png'))
-        .map((n) => n.substring(0, n.length - 4))
+        .where((n) => n.endsWith('.webp'))
+        .map((n) => n.substring(0, n.length - 5))
         .toSet();
 
     // Which objects are still waiting for artwork. Not a failure — they draw

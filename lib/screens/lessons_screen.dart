@@ -316,25 +316,25 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
             icon: LucideIcons.house,
             label: AppLocalizations.of(context)!.home,
             color: AppColors.navHome,
-            assetPath: 'assets/images/home.png',
+            assetPath: 'assets/images/home.webp',
           ),
           NavItemData(
             icon: LucideIcons.book_open,
             label: AppLocalizations.of(context)!.lessons,
             color: AppColors.navLessons,
-            assetPath: 'assets/images/aral.png',
+            assetPath: 'assets/images/aral.webp',
           ),
           NavItemData(
             icon: LucideIcons.trophy,
             label: AppLocalizations.of(context)!.awards,
             color: AppColors.navAwards,
-            assetPath: 'assets/images/gantimpala.png',
+            assetPath: 'assets/images/gantimpala.webp',
           ),
           NavItemData(
             icon: LucideIcons.settings,
             label: AppLocalizations.of(context)!.settings,
             color: AppColors.navSettings,
-            assetPath: 'assets/images/setting.png',
+            assetPath: 'assets/images/setting.webp',
           ),
         ],
       ),
@@ -575,7 +575,7 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
       title: AppLocalizations.of(context)!.matematika,
       subtitle:
           '$_matDone/$_matTotal ${AppLocalizations.of(context)!.activities}',
-      imagePath: 'assets/images/card1.png',
+      imagePath: 'assets/images/card1.webp',
       color: AppColors.numbers,
       progress: _matTotal > 0 ? _matDone / _matTotal : 0.0,
       onTap: () async {
@@ -593,7 +593,7 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
       title: AppLocalizations.of(context)!.angAkingSariliTitle,
       subtitle:
           '$_pamilyaDone/$_pamilyaTotal ${AppLocalizations.of(context)!.levels}',
-      imagePath: 'assets/images/card2.png',
+      imagePath: 'assets/images/card2.webp',
       color: AppColors.family,
       progress: _pamilyaTotal > 0 ? _pamilyaDone / _pamilyaTotal : 0.0,
       onTap: () async {
@@ -610,7 +610,7 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
       title: AppLocalizations.of(context)!.kulaySaya,
       subtitle:
           '$_kulayDone/$_kulayTotal ${AppLocalizations.of(context)!.activities}',
-      imagePath: 'assets/images/card3.png',
+      imagePath: 'assets/images/card3.webp',
       color: AppColors.colors,
       progress: _kulayTotal > 0 ? _kulayDone / _kulayTotal : 0.0,
       onTap: () async {
@@ -627,7 +627,7 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
       title: AppLocalizations.of(context)!.traceItTitle,
       subtitle:
           '$_traceItDone/$_traceItTotal ${AppLocalizations.of(context)!.activities}',
-      imagePath: 'assets/images/card4.png',
+      imagePath: 'assets/images/card4.webp',
       color: AppColors.success,
       progress: _traceItTotal > 0 ? _traceItDone / _traceItTotal : 0.0,
       onTap: () async {
@@ -644,7 +644,7 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
       title: AppLocalizations.of(context)!.magbasaTitle,
       subtitle:
           '$_magbasaDone/$_magbasaTotal ${AppLocalizations.of(context)!.activities}',
-      imagePath: 'assets/images/card5.png',
+      imagePath: 'assets/images/card5.webp',
       color: AppColors.alphabet,
       progress: _magbasaTotal > 0 ? _magbasaDone / _magbasaTotal : 0.0,
       onTap: () async {
@@ -661,7 +661,7 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
       title: AppLocalizations.of(context)!.tandaanTitle,
       subtitle:
           '$_tandaanDone/$_tandaanTotal ${AppLocalizations.of(context)!.activities}',
-      imagePath: 'assets/images/intro4.png',
+      imagePath: 'assets/images/intro4.webp',
       color: AppColors.shapes,
       progress: _tandaanTotal > 0 ? _tandaanDone / _tandaanTotal : 0.0,
       onTap: () async {

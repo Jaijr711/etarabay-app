@@ -53,22 +53,22 @@ class AwardsScreen extends StatelessWidget {
               icon: LucideIcons.house,
               label: loc.home,
               color: AppColors.navHome,
-              assetPath: 'assets/images/home.png'),
+              assetPath: 'assets/images/home.webp'),
           NavItemData(
               icon: LucideIcons.book_open,
               label: loc.lessons,
               color: AppColors.navLessons,
-              assetPath: 'assets/images/aral.png'),
+              assetPath: 'assets/images/aral.webp'),
           NavItemData(
               icon: LucideIcons.trophy,
               label: loc.awards,
               color: AppColors.navAwards,
-              assetPath: 'assets/images/gantimpala.png'),
+              assetPath: 'assets/images/gantimpala.webp'),
           NavItemData(
               icon: LucideIcons.settings,
               label: loc.settings,
               color: AppColors.navSettings,
-              assetPath: 'assets/images/setting.png'),
+              assetPath: 'assets/images/setting.webp'),
         ],
       ),
       body: Stack(

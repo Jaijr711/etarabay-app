@@ -239,7 +239,7 @@ class _TeacherLoginScreenState extends State<TeacherLoginScreen> {
             // and the form below no longer draws its own.
             Positioned.fill(
               child: Image.asset(
-                'assets/images/login_background.png',
+                'assets/images/login_background.webp',
                 fit: BoxFit.cover,
               ),
             ),

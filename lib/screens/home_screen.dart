@@ -687,7 +687,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                             .matematika,
                                         subtitle: AppLocalizations.of(context)!
                                             .letsCount,
-                                        imagePath: 'assets/images/card1.png',
+                                        imagePath: 'assets/images/card1.webp',
                                         color: AppColors.numbers,
                                         badgeStars: matBadge,
                                         onTap: () {
@@ -710,7 +710,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                             .angAkingSarili,
                                         subtitle: AppLocalizations.of(context)!
                                             .atAkingPamilya,
-                                        imagePath: 'assets/images/card2.png',
+                                        imagePath: 'assets/images/card2.webp',
                                         color: AppColors.family,
                                         badgeStars: pamilyaBadge,
                                         onTap: () {
@@ -740,7 +740,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                             .kulaySaya,
                                         subtitle: AppLocalizations.of(context)!
                                             .magkulayTayo,
-                                        imagePath: 'assets/images/card3.png',
+                                        imagePath: 'assets/images/card3.webp',
                                         color: AppColors.colors,
                                         badgeStars: kulayBadge,
                                         onTap: () {
@@ -763,7 +763,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                             .traceItTitle,
                                         subtitle: AppLocalizations.of(context)!
                                             .traceItSubtitle,
-                                        imagePath: 'assets/images/card4.png',
+                                        imagePath: 'assets/images/card4.webp',
                                         color: AppColors.success,
                                         badgeStars: traceBadge,
                                         onTap: () {
@@ -793,7 +793,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                             .magbasaTitle,
                                         subtitle: AppLocalizations.of(context)!
                                             .alpabetoAtMgaSalita,
-                                        imagePath: 'assets/images/card5.png',
+                                        imagePath: 'assets/images/card5.webp',
                                         color: AppColors.alphabet,
                                         badgeStars: magbasaBadge,
                                         onTap: () {
@@ -854,25 +854,25 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
             icon: LucideIcons.house,
             label: AppLocalizations.of(context)!.home,
             color: AppColors.navHome,
-            assetPath: 'assets/images/home.png',
+            assetPath: 'assets/images/home.webp',
           ),
           NavItemData(
             icon: LucideIcons.book_open,
             label: AppLocalizations.of(context)!.lessons,
             color: AppColors.navLessons,
-            assetPath: 'assets/images/aral.png',
+            assetPath: 'assets/images/aral.webp',
           ),
           NavItemData(
             icon: LucideIcons.trophy,
             label: AppLocalizations.of(context)!.awards,
             color: AppColors.navAwards,
-            assetPath: 'assets/images/gantimpala.png',
+            assetPath: 'assets/images/gantimpala.webp',
           ),
           NavItemData(
             icon: LucideIcons.settings,
             label: AppLocalizations.of(context)!.settings,
             color: AppColors.navSettings,
-            assetPath: 'assets/images/setting.png',
+            assetPath: 'assets/images/setting.webp',
           ),
         ],
       ),

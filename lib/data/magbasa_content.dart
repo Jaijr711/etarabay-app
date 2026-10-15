@@ -32,35 +32,35 @@ class MagbasaContent {
       'title': 'Sipsipat',
       'completed': false,
       'type': 'poem',
-      'image': 'assets/images/poem1.png'
+      'image': 'assets/images/poem1.webp'
     },
     {
       'id': 'adda_asok',
       'title': 'Adda Asok',
       'completed': false,
       'type': 'poem',
-      'image': 'assets/images/poem2.png'
+      'image': 'assets/images/poem2.webp'
     },
     {
       'id': 'ti_pusak',
       'title': 'Ti Pusak',
       'completed': false,
       'type': 'poem',
-      'image': 'assets/images/poem3.png'
+      'image': 'assets/images/poem3.webp'
     },
     {
       'id': 'ni_tatang',
       'title': 'Ni Tatang',
       'completed': false,
       'type': 'poem',
-      'image': 'assets/images/poem4.png'
+      'image': 'assets/images/poem4.webp'
     },
     {
       'id': 'panagsepilio',
       'title': 'Panagsepilio',
       'completed': false,
       'type': 'poem',
-      'image': 'assets/images/poem5.png'
+      'image': 'assets/images/poem5.webp'
     },
   ];
 
@@ -70,7 +70,7 @@ class MagbasaContent {
       'title': 'Ni Marti ken Kalapati',
       'completed': false,
       'type': 'story',
-      'image': 'assets/images/kwento1.png'
+      'image': 'assets/images/kwento1.webp'
     },
     {
       'id': 'ni_didi',
@@ -81,28 +81,28 @@ class MagbasaContent {
       // title they were filed under (kwento2 shows tooth-brushing, which
       // is ni_milio's story) — the ids below now point at the file that
       // actually matches the title.
-      'image': 'assets/images/kwento4.png'
+      'image': 'assets/images/kwento4.webp'
     },
     {
       'id': 'ni_milio',
       'title': 'Ni Milio a Managsepilio',
       'completed': false,
       'type': 'story',
-      'image': 'assets/images/kwento2.png'
+      'image': 'assets/images/kwento2.webp'
     },
     {
       'id': 'ni_neneng',
       'title': 'Ni Neneng a Dina Kayat ti Nateng',
       'completed': false,
       'type': 'story',
-      'image': 'assets/images/kwento5.png'
+      'image': 'assets/images/kwento5.webp'
     },
     {
       'id': 'ni_kikay',
       'title': 'Ni Kikay a di Agsagaysay',
       'completed': false,
       'type': 'story',
-      'image': 'assets/images/kwento3.png'
+      'image': 'assets/images/kwento3.webp'
     },
   ];
 
@@ -112,63 +112,63 @@ class MagbasaContent {
       'title': 'Ania ti Nagan Mo',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/category_kanta.png'
+      'image': 'assets/images/category_kanta.webp'
     },
     {
       'id': 'uppat_a_pato',
       'title': 'Uppat a Pato',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/category_kanta.png'
+      'image': 'assets/images/category_kanta.webp'
     },
     {
       'id': 'duat_imak',
       'title': 'Duat\' Imak',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/category_kanta.png'
+      'image': 'assets/images/category_kanta.webp'
     },
     {
       'id': 'bassit_a_lawwalawwa',
       'title': 'Bassit a Lawwalawwa',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/category_kanta.png'
+      'image': 'assets/images/category_kanta.webp'
     },
     {
       'id': 'maysa_dua_baduya',
       'title': 'Maysa, Dua, Baduya',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/category_kanta.png'
+      'image': 'assets/images/category_kanta.webp'
     },
     {
       'id': 'ni_nanangko',
       'title': 'Ni Nanangko',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/category_kanta.png'
+      'image': 'assets/images/category_kanta.webp'
     },
     {
       'id': 'da_tarong',
       'title': 'Da Tarong, Kamatis ken Paria',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/category_kanta.png'
+      'image': 'assets/images/category_kanta.webp'
     },
     {
       'id': 'nagmulaak_iti_katuday',
       'title': 'Nagmulaak iti Katuday',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/category_kanta.png'
+      'image': 'assets/images/category_kanta.webp'
     },
     {
       'id': 'lima_a_tinapay',
       'title': 'Lima a Tinapay ken dua nga Ikan',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/category_kanta.png'
+      'image': 'assets/images/category_kanta.webp'
     },
   ];
 
@@ -186,7 +186,7 @@ class MagbasaContent {
         'Kanek ti agpatpatnag',
         'Bayat ti panagbasak',
       ],
-      'image': 'assets/images/poem1.png',
+      'image': 'assets/images/poem1.webp',
       // _v2: cleaned up 2026-09-02, see the note on the ni_marti story's
       // audioPath in _storyData.
       'audioPath': 'audio/poems/Sipsipat_v2.mp3',
@@ -202,7 +202,7 @@ class MagbasaContent {
         'Titit, asok, gog-gog-gog',
         'Titit, asok, gog-gog-gog-gog!',
       ],
-      'image': 'assets/images/poem2.png',
+      'image': 'assets/images/poem2.webp',
       // _v2: cleaned up 2026-09-02, see the note on Sipsipat's audioPath.
       'audioPath': 'audio/poems/adda_asok__v2.mp3',
       'lineTimestampsMs': [0, 1459, 3291, 4059, 6036, 8942],
@@ -220,7 +220,7 @@ class MagbasaContent {
         'Miaw-miaw-miaw kunana',
         'Ikkak metten iti kanenna',
       ],
-      'image': 'assets/images/poem3.png',
+      'image': 'assets/images/poem3.webp',
       // _v2: cleaned up 2026-09-02, see the note on Sipsipat's audioPath.
       'audioPath': 'audio/poems/Ti_Pusak_v2.mp3',
       'lineTimestampsMs': [
@@ -248,7 +248,7 @@ class MagbasaContent {
         'Agmulmulat nadumaduma',
         'A taraon ti pamiliana.',
       ],
-      'image': 'assets/images/poem4.png',
+      'image': 'assets/images/poem4.webp',
       // _v2: cleaned up 2026-09-02, see the note on Sipsipat's audioPath.
       'audioPath': 'audio/poems/Ni_Tatang_v2.mp3',
       'lineTimestampsMs': [
@@ -271,7 +271,7 @@ class MagbasaContent {
         'Sang-aw, nabanglo',
         'Nakaprespresko',
       ],
-      'image': 'assets/images/poem5.png',
+      'image': 'assets/images/poem5.webp',
       // _v2: cleaned up 2026-09-02, see the note on Sipsipat's audioPath.
       'audioPath': 'audio/poems/Panagsepelio_v2.mp3',
       'lineTimestampsMs': [0, 1895, 3672, 5428],
@@ -296,7 +296,7 @@ class MagbasaContent {
         'Idi immimbagen, pinalsutan ni Marti ti kalapati.',
         'Makaay-ayat ni Marti ta natulonganna ti kalapati.',
       ],
-      'image': 'assets/images/kwento1.png',
+      'image': 'assets/images/kwento1.webp',
       // _v2: cleaned up 2026-09-02 — highpass + FFT denoise cut background
       // hiss, loudnorm brought the narration up to a consistent, clearer
       // level. Renamed rather than overwritten in place: the offline
@@ -310,14 +310,14 @@ class MagbasaContent {
       // the line being read, so a child who cannot read follows the story in
       // pictures while the voice reads it to them.
       'linePictures': [
-        'assets/images/story_marti_1.png',
-        'assets/images/story_marti_2.png',
-        'assets/images/story_marti_3.png',
-        'assets/images/story_marti_4.png',
-        'assets/images/story_marti_5.png',
-        'assets/images/story_marti_6.png',
-        'assets/images/story_marti_7.png',
-        'assets/images/story_marti_8.png',
+        'assets/images/story_marti_1.webp',
+        'assets/images/story_marti_2.webp',
+        'assets/images/story_marti_3.webp',
+        'assets/images/story_marti_4.webp',
+        'assets/images/story_marti_5.webp',
+        'assets/images/story_marti_6.webp',
+        'assets/images/story_marti_7.webp',
+        'assets/images/story_marti_8.webp',
       ],
     },
     'ni_didi': {
@@ -333,7 +333,7 @@ class MagbasaContent {
         'Naduktalan ti dentista nga adu ti naperdi a ngipen ni Didi.',
         'Nanipud idin, saanen a mangmangan ni Didi iti kendi.',
       ],
-      'image': 'assets/images/kwento2.png',
+      'image': 'assets/images/kwento2.webp',
       // _v2: cleaned up 2026-09-02, see the note on ni_marti's audioPath.
       'audioPath': 'audio/stories/Ni_didi_a_naayat_iti_kendi_v2.mp3',
       'lineTimestampsMs': [
@@ -348,15 +348,15 @@ class MagbasaContent {
         33716
       ],
       'linePictures': [
-        'assets/images/story_didi_1.png',
-        'assets/images/story_didi_2.png',
-        'assets/images/story_didi_3.png',
-        'assets/images/story_didi_4.png',
-        'assets/images/story_didi_5.png',
-        'assets/images/story_didi_6.png',
-        'assets/images/story_didi_7.png',
-        'assets/images/story_didi_8.png',
-        'assets/images/story_didi_9.png',
+        'assets/images/story_didi_1.webp',
+        'assets/images/story_didi_2.webp',
+        'assets/images/story_didi_3.webp',
+        'assets/images/story_didi_4.webp',
+        'assets/images/story_didi_5.webp',
+        'assets/images/story_didi_6.webp',
+        'assets/images/story_didi_7.webp',
+        'assets/images/story_didi_8.webp',
+        'assets/images/story_didi_9.webp',
       ],
     },
     'ni_milio': {
@@ -370,7 +370,7 @@ class MagbasaContent {
         'Naragsak a nagawid ni Milio.',
         'Intultuloy ni Milio ti kanayon nga inna panagsepilio.',
       ],
-      'image': 'assets/images/kwento3.png',
+      'image': 'assets/images/kwento3.webp',
       // _v2: cleaned up 2026-09-02, see the note on ni_marti's audioPath.
       'audioPath': 'audio/stories/Ni_milio_a_manag_sepelio_v2.mp3',
       'lineTimestampsMs': [0, 4366, 7853, 13053, 17104, 19703, 22128],
@@ -379,13 +379,13 @@ class MagbasaContent {
       // the line being read, so a child who cannot read follows the story in
       // pictures while the voice reads it to them.
       'linePictures': [
-        'assets/images/story_milio_1.png',
-        'assets/images/story_milio_2.png',
-        'assets/images/story_milio_3.png',
-        'assets/images/story_milio_4.png',
-        'assets/images/story_milio_5.png',
-        'assets/images/story_milio_6.png',
-        'assets/images/story_milio_7.png',
+        'assets/images/story_milio_1.webp',
+        'assets/images/story_milio_2.webp',
+        'assets/images/story_milio_3.webp',
+        'assets/images/story_milio_4.webp',
+        'assets/images/story_milio_5.webp',
+        'assets/images/story_milio_6.webp',
+        'assets/images/story_milio_7.webp',
       ],
     },
     'ni_neneng': {
@@ -399,7 +399,7 @@ class MagbasaContent {
         'Imbaga ti doktor nga agsida ni Neneng iti nateng.',
         'Manipud idin, kanayonen nga agsidsida ni Neneng iti nateng.',
       ],
-      'image': 'assets/images/kwento4.png',
+      'image': 'assets/images/kwento4.webp',
       // _v2: cleaned up 2026-09-02, see the note on ni_marti's audioPath.
       'audioPath':
           'audio/stories/Ni_Neneng_a_dina_kayat_ag_sida_iti_nateng_v2.mp3',
@@ -410,13 +410,13 @@ class MagbasaContent {
       // the box reads as gutter — the cutter grows each row down to the box's
       // own gold border so no caption loses its last line.
       'linePictures': [
-        'assets/images/story_neneng_1.png',
-        'assets/images/story_neneng_2.png',
-        'assets/images/story_neneng_3.png',
-        'assets/images/story_neneng_4.png',
-        'assets/images/story_neneng_5.png',
-        'assets/images/story_neneng_6.png',
-        'assets/images/story_neneng_7.png',
+        'assets/images/story_neneng_1.webp',
+        'assets/images/story_neneng_2.webp',
+        'assets/images/story_neneng_3.webp',
+        'assets/images/story_neneng_4.webp',
+        'assets/images/story_neneng_5.webp',
+        'assets/images/story_neneng_6.webp',
+        'assets/images/story_neneng_7.webp',
       ],
     },
     'ni_kikay': {
@@ -433,7 +433,7 @@ class MagbasaContent {
         'Manipud idin, kanayonen nga agsagsagaysay ni Kikay.',
         'Immadu dagiti gagayyemna ket kanayon payen a naragsak ni Kikay.',
       ],
-      'image': 'assets/images/kwento5.png',
+      'image': 'assets/images/kwento5.webp',
       // _v2: cleaned up 2026-09-02, see the note on ni_marti's audioPath.
       'audioPath': 'audio/stories/Ni_kikay_a_di_ag_sagaysay_v2.mp3',
       'lineTimestampsMs': [
@@ -453,16 +453,16 @@ class MagbasaContent {
       // edge: the magnifying glass drawn in panel 4 overhangs the seam, so a
       // cut on the seam itself left a black arc sitting in panel 5.
       'linePictures': [
-        'assets/images/story_kikay_1.png',
-        'assets/images/story_kikay_2.png',
-        'assets/images/story_kikay_3.png',
-        'assets/images/story_kikay_4.png',
-        'assets/images/story_kikay_5.png',
-        'assets/images/story_kikay_6.png',
-        'assets/images/story_kikay_7.png',
-        'assets/images/story_kikay_8.png',
-        'assets/images/story_kikay_9.png',
-        'assets/images/story_kikay_10.png',
+        'assets/images/story_kikay_1.webp',
+        'assets/images/story_kikay_2.webp',
+        'assets/images/story_kikay_3.webp',
+        'assets/images/story_kikay_4.webp',
+        'assets/images/story_kikay_5.webp',
+        'assets/images/story_kikay_6.webp',
+        'assets/images/story_kikay_7.webp',
+        'assets/images/story_kikay_8.webp',
+        'assets/images/story_kikay_9.webp',
+        'assets/images/story_kikay_10.webp',
       ],
     },
   };
@@ -490,7 +490,7 @@ class MagbasaContent {
         'Agsala, agkanta',
         'Itung-ed ti ulo.',
       ],
-      'image': 'assets/images/category_kanta.png',
+      'image': 'assets/images/category_kanta.webp',
       // Re-recorded and cleaned up 2026-09-02 (highpass + FFT denoise +
       // loudnorm, see the note on Sipsipat's audioPath) — replaces the
       // earlier Kurtjam Kyle Silva Nono recording entirely. Lyrics rewritten
@@ -523,7 +523,7 @@ class MagbasaContent {
         'Maringgoran, kunana',
         '"Kuak-kuak-kuak!"',
       ],
-      'image': 'assets/images/category_kanta.png',
+      'image': 'assets/images/category_kanta.webp',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Uppat_a_Pato.mp3',
@@ -560,7 +560,7 @@ class MagbasaContent {
         'Agsipatak, maysa, dua',
         'Kitam ida ket nadalus da.',
       ],
-      'image': 'assets/images/category_kanta.png',
+      'image': 'assets/images/category_kanta.webp',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Duat_Imak.mp3',
@@ -584,7 +584,7 @@ class MagbasaContent {
         'Ket bassit a lawwalawwa',
         'Immuli diay sanga.',
       ],
-      'image': 'assets/images/category_kanta.png',
+      'image': 'assets/images/category_kanta.webp',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Bassit_a_Lawwalawwa.mp3',
@@ -613,7 +613,7 @@ class MagbasaContent {
         'Siam, pullo, mangantayo',
         'Ti ruskaldo.',
       ],
-      'image': 'assets/images/category_kanta.png',
+      'image': 'assets/images/category_kanta.webp',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Maysa_Dua_Baduya.mp3',
@@ -651,7 +651,7 @@ class MagbasaContent {
         'Pinaglalangto ti kaykayo',
         'Bungbunganat adu.',
       ],
-      'image': 'assets/images/category_kanta.png',
+      'image': 'assets/images/category_kanta.webp',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Ni_Nanangko.mp3',
@@ -679,7 +679,7 @@ class MagbasaContent {
         'Ta no addaak iti dinengdeng',
         'Diay pinakbet naimimas manen.',
       ],
-      'image': 'assets/images/category_kanta.png',
+      'image': 'assets/images/category_kanta.webp',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Da_Tarong_Kamatis_ken_Paria.mp3',
@@ -716,7 +716,7 @@ class MagbasaContent {
         'Aramidek a sagaysay',
         'Sagaysay ni Nanang Ikay.',
       ],
-      'image': 'assets/images/category_kanta.png',
+      'image': 'assets/images/category_kanta.webp',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Nagmulaak_iti_Katuday.mp3',
@@ -736,7 +736,7 @@ class MagbasaContent {
         'Immadu diay tinapay, immadu met diay ikan (3x)',
         'Ket nabsogda amin.',
       ],
-      'image': 'assets/images/category_kanta.png',
+      'image': 'assets/images/category_kanta.webp',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Lima_a_Tinapay.mp3',

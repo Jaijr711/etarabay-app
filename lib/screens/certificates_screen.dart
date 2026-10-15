@@ -770,7 +770,7 @@ class _CertificateDetailScreenState extends State<CertificateDetailScreen>
     final date = DateTime.now();
 
     // ── Template layout (fractions of the 1492 x 1054 background image) ──
-    // Measured directly off assets/images/E-TarabayCertificate.png's actual
+    // Measured directly off assets/images/E-TarabayCertificate.webp's actual
     // pixels (the underlines the design already draws), not eyeballed — see
     // the PowerShell pixel scan this was built from. Adjust these first if a
     // field ever drifts off the blank it belongs on, e.g. after a redesign
@@ -839,7 +839,7 @@ class _CertificateDetailScreenState extends State<CertificateDetailScreen>
                       // per child.
                       Positioned.fill(
                         child: Image.asset(
-                          'assets/images/E-TarabayCertificate.png',
+                          'assets/images/E-TarabayCertificate.webp',
                           fit: BoxFit.fill,
                         ),
                       ),

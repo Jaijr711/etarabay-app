@@ -482,7 +482,7 @@ class _KulayScreenState extends State<KulayScreen>
     ColoringCategory(name: 'Flowers', icon: '🌸', color: Colors.pink, pages: [
       ColoringPage(
           name: 'Flower Basket',
-          imagePath: 'assets/images/paint_daisy.png',
+          imagePath: 'assets/images/paint_daisy.webp',
           formerImagePaths: ['assets/images/paint4.png'],
           difficulty: 'Medium',
           timeEstimate: '10 min',

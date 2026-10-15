@@ -48,9 +48,9 @@ class AppStyles {
 String avatarAssetForPreset(String preset) {
   final p = preset.toLowerCase();
   if (p.startsWith('girl') || p == 'female') {
-    return 'assets/images/female.png';
+    return 'assets/images/female.webp';
   }
-  return 'assets/images/male.png';
+  return 'assets/images/male.webp';
 }
 
 /// Soft background tint behind a character avatar, based on gender.

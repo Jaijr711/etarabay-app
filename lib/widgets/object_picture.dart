@@ -27,17 +27,21 @@ class ObjectPicture extends StatelessWidget {
   /// declared in pubspec, so a new picture needs no configuration at all.
   static String? assetFor(String emoji) {
     final name = _fileNames[_normalise(emoji)];
-    return name == null ? null : 'assets/images/$name.png';
+    return name == null ? null : 'assets/images/$name.webp';
   }
 
-  /// Some artwork arrives as .jpg rather than .png.
+  /// The same picture under the other names artwork arrives with.
   ///
-  /// Whoever draws a picture should not have to remember which extension the
-  /// code expects, so the widget tries the png first and falls back to the
-  /// jpg before it gives up and draws the emoji.
-  static String? _alternateFor(String emoji) {
+  /// The app's pictures are WebP (a fraction of a PNG's size, which on the
+  /// web is most of the wait for a picture to appear). A .png or a .jpg
+  /// dropped in under the same name is found too — on a phone. On the web an
+  /// image's errorBuilder never fires, so there a picture must be a .webp;
+  /// test/object_picture_size_test.dart insists on it.
+  static List<String> _alternatesFor(String emoji) {
     final name = _fileNames[_normalise(emoji)];
-    return name == null ? null : 'assets/images/$name.jpg';
+    return name == null
+        ? const []
+        : ['assets/images/$name.png', 'assets/images/$name.jpg'];
   }
 
   /// Strips the invisible characters that make the same picture two keys.
@@ -226,25 +230,29 @@ class ObjectPicture extends StatelessWidget {
             // A missing or misnamed file falls back to the emoji rather than
             // to a broken-image box. A three-year-old counting objects must
             // never be shown a grey square where a thing should be.
-            // png, then jpg, then the emoji. Each step only happens when
-            // the one before it is genuinely missing, so a child never sees
-            // the grey broken-image box while artwork is being swapped in.
-            errorBuilder: (_, __, ___) {
-              final jpg = _alternateFor(emoji);
-              if (jpg == null) return _emoji();
-              return Image.asset(
-                jpg,
-                width: side,
-                height: side,
-                fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => _emoji(),
-              );
-            },
+            // webp, then png, then jpg, then the emoji. Each step only
+            // happens when the one before it is genuinely missing, so a child
+            // never sees the grey broken-image box while artwork is being
+            // swapped in.
+            errorBuilder: (_, __, ___) =>
+                _fallback(_alternatesFor(emoji), side),
           ),
         ),
       );
     }
     return _emoji();
+  }
+
+  /// The first of [paths] that loads, or the emoji.
+  Widget _fallback(List<String> paths, double side) {
+    if (paths.isEmpty) return _emoji();
+    return Image.asset(
+      paths.first,
+      width: side,
+      height: side,
+      fit: BoxFit.contain,
+      errorBuilder: (_, __, ___) => _fallback(paths.sublist(1), side),
+    );
   }
 
   Widget _emoji() {

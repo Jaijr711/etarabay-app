@@ -44,42 +44,42 @@ class _MagbasaScreenState extends State<MagbasaScreen>
       'completed': 0,
       'icon': '📖',
       'color': const Color(0xFFFF6B6B),
-      'image': 'assets/images/category_tula.png',
+      'image': 'assets/images/category_tula.webp',
       'activities': [
         {
           'id': 'sipsipat',
           'title': 'Sipsipat',
           'completed': false,
           'type': 'poem',
-          'image': 'assets/images/poem1.png'
+          'image': 'assets/images/poem1.webp'
         },
         {
           'id': 'adda_asok',
           'title': 'Adda Asok',
           'completed': false,
           'type': 'poem',
-          'image': 'assets/images/poem2.png'
+          'image': 'assets/images/poem2.webp'
         },
         {
           'id': 'ti_pusak',
           'title': 'Ti Pusak',
           'completed': false,
           'type': 'poem',
-          'image': 'assets/images/poem3.png'
+          'image': 'assets/images/poem3.webp'
         },
         {
           'id': 'ni_tatang',
           'title': 'Ni Tatang',
           'completed': false,
           'type': 'poem',
-          'image': 'assets/images/poem4.png'
+          'image': 'assets/images/poem4.webp'
         },
         {
           'id': 'panagsepilio',
           'title': 'Panagsepilio',
           'completed': false,
           'type': 'poem',
-          'image': 'assets/images/poem5.png'
+          'image': 'assets/images/poem5.webp'
         },
       ]
     },
@@ -88,42 +88,42 @@ class _MagbasaScreenState extends State<MagbasaScreen>
       'completed': 0,
       'icon': '📚',
       'color': const Color(0xFFFFB347),
-      'image': 'assets/images/category_kwento.png',
+      'image': 'assets/images/category_kwento.webp',
       'activities': [
         {
           'id': 'ni_marti',
           'title': 'Ni Marti ken Kalapati',
           'completed': false,
           'type': 'story',
-          'image': 'assets/images/kwento1.png'
+          'image': 'assets/images/kwento1.webp'
         },
         {
           'id': 'ni_didi',
           'title': 'Ni Didi a Naayat iti Kendi',
           'completed': false,
           'type': 'story',
-          'image': 'assets/images/kwento4.png'
+          'image': 'assets/images/kwento4.webp'
         },
         {
           'id': 'ni_milio',
           'title': 'Ni Milio a Managsepilio',
           'completed': false,
           'type': 'story',
-          'image': 'assets/images/kwento2.png'
+          'image': 'assets/images/kwento2.webp'
         },
         {
           'id': 'ni_neneng',
           'title': 'Ni Neneng a Dina Kayat ti Nateng',
           'completed': false,
           'type': 'story',
-          'image': 'assets/images/kwento5.png'
+          'image': 'assets/images/kwento5.webp'
         },
         {
           'id': 'ni_kikay',
           'title': 'Ni Kikay a di Agsagaysay',
           'completed': false,
           'type': 'story',
-          'image': 'assets/images/kwento3.png'
+          'image': 'assets/images/kwento3.webp'
         },
       ]
     },
@@ -132,70 +132,70 @@ class _MagbasaScreenState extends State<MagbasaScreen>
       'completed': 0,
       'icon': '🎵',
       'color': const Color(0xFFA8E6CF),
-      'image': 'assets/images/category_kanta.png',
+      'image': 'assets/images/category_kanta.webp',
       'activities': [
         {
           'id': 'ania_ti_naganmo_full',
           'title': 'Ania ti Nagan Mo',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/category_kanta.png'
+          'image': 'assets/images/category_kanta.webp'
         },
         {
           'id': 'uppat_a_pato',
           'title': 'Uppat a Pato',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/category_kanta.png'
+          'image': 'assets/images/category_kanta.webp'
         },
         {
           'id': 'duat_imak',
           'title': 'Duat\' Imak',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/category_kanta.png'
+          'image': 'assets/images/category_kanta.webp'
         },
         {
           'id': 'bassit_a_lawwalawwa',
           'title': 'Bassit a Lawwalawwa',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/category_kanta.png'
+          'image': 'assets/images/category_kanta.webp'
         },
         {
           'id': 'maysa_dua_baduya',
           'title': 'Maysa, Dua, Baduya',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/category_kanta.png'
+          'image': 'assets/images/category_kanta.webp'
         },
         {
           'id': 'ni_nanangko',
           'title': 'Ni Nanangko',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/category_kanta.png'
+          'image': 'assets/images/category_kanta.webp'
         },
         {
           'id': 'da_tarong',
           'title': 'Da Tarong, Kamatis ken Paria',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/category_kanta.png'
+          'image': 'assets/images/category_kanta.webp'
         },
         {
           'id': 'nagmulaak_iti_katuday',
           'title': 'Nagmulaak iti Katuday',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/category_kanta.png'
+          'image': 'assets/images/category_kanta.webp'
         },
         {
           'id': 'lima_a_tinapay',
           'title': 'Lima a Tinapay ken dua nga Ikan',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/category_kanta.png'
+          'image': 'assets/images/category_kanta.webp'
         },
       ]
     },
@@ -1320,7 +1320,7 @@ class _PoemScreenState extends State<PoemScreen>
   /// top of the card the way the design draws it. The originals stay as
   /// they are for the list's cards.
   static String _artFor(String image) {
-    final m = RegExp(r'assets/images/(poem\d+)\.png').firstMatch(image);
+    final m = RegExp(r'assets/images/(poem\d+)\.(png|webp)').firstMatch(image);
     return m == null ? image : 'assets/images/${m.group(1)}_art.webp';
   }
 
@@ -1695,6 +1695,25 @@ class _StoryScreenState extends State<StoryScreen> with WidgetsBindingObserver {
     return raw[i]?.toString();
   }
 
+  bool _panelsWarmed = false;
+
+  /// Fetches every page of the story as it opens, so turning a page shows
+  /// the next one at once. On the web each picture is downloaded the first
+  /// time it is shown, and a page that arrived only when the voice reached
+  /// it showed blank for a moment, mid-sentence.
+  void _warmPanels() {
+    if (_panelsWarmed) return;
+    _panelsWarmed = true;
+    final raw = widget.storyData['linePictures'];
+    if (raw is! List) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      for (final p in raw.whereType<String>().toSet()) {
+        precacheImage(AssetImage(p), context, onError: (_, __) {});
+      }
+    });
+  }
+
   void _onPlaybackComplete() {
     final content = widget.storyData['content'] as List;
     setState(() {
@@ -1809,6 +1828,7 @@ class _StoryScreenState extends State<StoryScreen> with WidgetsBindingObserver {
     final content = widget.storyData['content'] as List;
     final imagePath = widget.storyData['image'] as String;
     final List<List<String>> paragraphs = _splitIntoParagraphs(content);
+    _warmPanels();
 
     return StorybookScaffold(
       title: widget.storyTitle,

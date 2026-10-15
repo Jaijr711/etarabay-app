@@ -255,7 +255,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   /// A gold star for either end of the Log In button.
   Widget _buttonStar() => Image.asset(
-        'assets/images/star_gold.png',
+        'assets/images/star_gold.webp',
         width: 33,
         height: 26,
         fit: BoxFit.contain,
@@ -305,7 +305,7 @@ class _LoginScreenState extends State<LoginScreen> {
             // form below draws none of those three as text.
             Positioned.fill(
               child: Image.asset(
-                'assets/images/login_bg_student.png',
+                'assets/images/login_bg_student.webp',
                 fit: BoxFit.cover,
               ),
             ),
@@ -341,11 +341,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             controller: _usernameController,
                             decoration: _modernInputDecoration(
                               label: AppLocalizations.of(context)!.username,
-                              iconAsset: 'assets/images/icon_username.png',
+                              iconAsset: 'assets/images/icon_username.webp',
                               suffix: Padding(
                                 padding: const EdgeInsets.only(right: 14),
                                 child: Image.asset(
-                                  'assets/images/star_gold.png',
+                                  'assets/images/star_gold.webp',
                                   width: 33,
                                   height: 26,
                                   fit: BoxFit.contain,
@@ -368,7 +368,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               label: AppLocalizations.of(context)!
                                   .studentNumberField,
                               iconAsset:
-                                  'assets/images/icon_student_number.png',
+                                  'assets/images/icon_student_number.webp',
                               suffix: IconButton(
                                 icon: Icon(
                                   _obscurePassword
