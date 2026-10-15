@@ -3203,6 +3203,12 @@ abstract class AppLocalizations {
   /// **'Picture'**
   String get chooseAvatar;
 
+  /// No description provided for @chooseYourAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Avatar'**
+  String get chooseYourAvatar;
+
   /// Teacher sheet section heading
   ///
   /// In en, this message translates to:

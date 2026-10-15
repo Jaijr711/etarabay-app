@@ -1,5 +1,6 @@
 import 'parents_lock_screen.dart';
 import '../services/parent_pin.dart';
+import 'choose_avatar_screen.dart';
 import 'dart:convert';
 
 import 'package:e_tarabay/l10n/app_localizations.dart';
@@ -175,6 +176,30 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
       if (!mounted) return;
+
+      // A new account picks its picture next, while the parent who just made
+      // the PIN is still there to help. Asked once: `avatarChosen` is set on
+      // the class record when they pick, and a child who already has one of
+      // the animals (the teacher may have chosen it) is not asked at all.
+      final avatarNow =
+          (profileMap?['avatar'] ?? studentData['avatar'] ?? '').toString();
+      if (studentData['avatarChosen'] != true && !isAnimalAvatar(avatarNow)) {
+        final picked = await Navigator.push<String>(
+          context,
+          PremiumPageRoute<String>(
+              child: const ChooseAvatarScreen(firstTime: true)),
+        );
+        if (!mounted) return;
+        if (picked != null) {
+          // The face offered on this phone next time.
+          await _rememberChild(
+            studentId,
+            (profileMap?['name'] ?? studentData['name'] ?? username).toString(),
+            picked,
+          );
+          if (!mounted) return;
+        }
+      }
 
       // Navigate to home immediately — no blocking spinner. The full progress
       // sync runs in the background and the UI updates silently once it lands

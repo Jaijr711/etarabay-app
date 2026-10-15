@@ -1689,6 +1689,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chooseAvatar => 'Picture';
 
   @override
+  String get chooseYourAvatar => 'Choose Avatar';
+
+  @override
   String get manageStudent => 'Manage this student';
 
   @override

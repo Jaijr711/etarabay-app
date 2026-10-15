@@ -1700,6 +1700,9 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get chooseAvatar => 'Ladawan';
 
   @override
+  String get chooseYourAvatar => 'Agpili ti Avatar';
+
+  @override
   String get manageStudent => 'Aywanan daytoy nga estudiante';
 
   @override

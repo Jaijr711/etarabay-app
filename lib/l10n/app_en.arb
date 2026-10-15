@@ -1200,6 +1200,7 @@
     "description": "Removing a child from this device"
   },
   "chooseAvatar": "Picture",
+  "chooseYourAvatar": "Choose Avatar",
   "@chooseAvatar": {
     "description": "Teacher sheet section heading"
   },

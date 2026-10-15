@@ -837,6 +837,9 @@ class UserProvider extends ChangeNotifier {
       parentName: parentName ?? _userProfile!.parentName,
       parentContact: parentContact ?? _userProfile!.parentContact,
       lrn: lrn ?? _userProfile!.lrn,
+      // Kept. It was left out here, so saving the edit sheet reset the
+      // child's picture to none.
+      avatar: _userProfile!.avatar,
       stars: _userProfile!.stars,
       lessonsCompleted: _userProfile!.lessonsCompleted,
       achievements: Map<String, int>.from(_userProfile!.achievements),
@@ -850,6 +853,38 @@ class UserProvider extends ChangeNotifier {
     await _profileBox.put('currentUser', _userProfile!.toJson());
     await _syncToFirebase();
     notifyListeners();
+  }
+
+  /// The child's own choice of picture (one of [animalAvatars]).
+  ///
+  /// Saved on this device, and on the class record — both the top-level
+  /// `avatar` the teacher's dashboard reads first and `profile.avatar` — so
+  /// the teacher sees the new face without anyone editing the student.
+  /// `avatarChosen` marks that the child has picked once, so the first-login
+  /// "Choose Avatar" screen is not shown again.
+  ///
+  /// Not awaited, like every other write here: offline, Firestore keeps the
+  /// change and sends it once the signal is back.
+  Future<void> setAvatar(String preset) async {
+    await _ensureInitialized();
+    if (_userProfile == null) return;
+    _userProfile!.avatar = preset;
+    await _profileBox.put('currentUser', _userProfile!.toJson());
+    notifyListeners();
+    final id = _currentStudentId;
+    if (id == null) return;
+    try {
+      unawaited(FirebaseFirestore.instance
+          .collection('students')
+          .doc(id)
+          .update({
+        'avatar': preset,
+        'profile.avatar': preset,
+        'avatarChosen': true,
+      }).catchError((Object e) => debugPrint('Avatar sync failed: $e')));
+    } catch (e) {
+      debugPrint('Avatar sync unavailable: $e');
+    }
   }
 
   Future<void> syncFromFirebase() async {

@@ -263,14 +263,18 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                         AppLocalizations.of(context)!.chooseAvatar),
                     _buildAvatarPicker(
                       selectedAvatar: selectedAvatar,
+                      selectedGender: selectedGender,
                       onSelect: (preset) {
                         setSheetState(() {
                           selectedAvatar = preset;
                           // The picker is the only place this is asked now.
                           // It used to set the picture and leave the gender on
-                          // its default of 'Male'.
-                          selectedGender =
-                              preset.startsWith('girl') ? 'Female' : 'Male';
+                          // its default of 'Male'. An animal is only a
+                          // picture; the boy/girl cards set the gender.
+                          if (!isAnimalAvatar(preset)) {
+                            selectedGender =
+                                preset.startsWith('girl') ? 'Female' : 'Male';
+                          }
                         });
                       },
                     ),
@@ -821,12 +825,16 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                 _buildSectionHeader(AppLocalizations.of(context)!.chooseAvatar),
                 _buildAvatarPicker(
                   selectedAvatar: selectedAvatar,
+                  selectedGender: selectedGender,
                   onSelect: (preset) {
                     setSheetState(() {
                       selectedAvatar = preset;
-                      // The only place the gender is asked here now.
-                      selectedGender =
-                          preset.startsWith('girl') ? 'Female' : 'Male';
+                      // The only place the gender is asked here now. An
+                      // animal is only a picture.
+                      if (!isAnimalAvatar(preset)) {
+                        selectedGender =
+                            preset.startsWith('girl') ? 'Female' : 'Male';
+                      }
                     });
                   },
                 ),
@@ -1598,6 +1606,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
 
   Widget _buildAvatarPicker({
     required String selectedAvatar,
+    required String selectedGender,
     required Function(String) onSelect,
   }) {
     // These were English literals, so this pair never went through the ARB
@@ -1608,11 +1617,16 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
       {'key': 'girl1', 'label': AppLocalizations.of(context)!.female},
     ];
 
-    return Row(
+    final genderRow = Row(
       children: List.generate(options.length, (i) {
         final preset = options[i]['key']!;
         final label = options[i]['label']!;
-        final isSelected = _isSameGenderAvatar(selectedAvatar, preset);
+        // The boy/girl cards are the gender too, so they follow it — an
+        // animal can be the picture of a boy or of a girl.
+        final isSelected = isAnimalAvatar(selectedAvatar)
+            ? preset.startsWith('girl') ==
+                (selectedGender.toLowerCase() == 'female')
+            : _isSameGenderAvatar(selectedAvatar, preset);
         return Expanded(
           child: Padding(
             padding: EdgeInsets.only(
@@ -1686,6 +1700,49 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
           ),
         );
       }),
+    );
+
+    // The twelve animals the children can choose for themselves, under the
+    // boy and girl. Choosing one changes the picture only, not the gender.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        genderRow,
+        const SizedBox(height: 14),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            for (final name in animalAvatars)
+              () {
+                final preset = animalAvatarPreset(name);
+                final picked = selectedAvatar == preset;
+                return GestureDetector(
+                  onTap: () => onSelect(preset),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 160),
+                    width: 52,
+                    height: 52,
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      border: Border.all(
+                        color:
+                            picked ? AppColors.primary : Colors.grey.shade300,
+                        width: picked ? 3 : 1.5,
+                      ),
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(avatarAssetForPreset(preset),
+                          fit: BoxFit.cover),
+                    ),
+                  ),
+                );
+              }(),
+          ],
+        ),
+      ],
     );
   }
 

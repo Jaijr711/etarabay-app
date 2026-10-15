@@ -728,6 +728,7 @@
   "removeFromDeviceNote": "Hindi na lalabas si {name} dito o sa sign-in. Hindi nabubura ang account at ang mga nagawa niya — kayang ipasok siyang muli ng guro.",
   "childRemoved": "Naalis sa teleponong ito.",
   "chooseAvatar": "Larawan",
+  "chooseYourAvatar": "Pumili ng Avatar",
   "manageStudent": "Pamahalaan ang mag-aaral",
   "noStudentNumbersLeft": "Wala nang natitirang student number para sa taong ito.",
   "moreModules": "+{count} pa",

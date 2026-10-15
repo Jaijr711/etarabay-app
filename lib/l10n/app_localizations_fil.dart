@@ -1710,6 +1710,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get chooseAvatar => 'Larawan';
 
   @override
+  String get chooseYourAvatar => 'Pumili ng Avatar';
+
+  @override
   String get manageStudent => 'Pamahalaan ang mag-aaral';
 
   @override

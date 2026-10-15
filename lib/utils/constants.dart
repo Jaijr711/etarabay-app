@@ -43,10 +43,40 @@ class AppStyles {
   );
 }
 
-/// Maps an avatar preset key (e.g. 'boy1', 'girl2', 'female') to the matching
-/// character image so kids can easily tell male from female.
+/// The twelve animal avatars a child can choose for themselves (see
+/// lib/screens/choose_avatar_screen.dart), saved as `animal_<name>`.
+const List<String> animalAvatars = [
+  'dino',
+  'bunny',
+  'tiger',
+  'koala',
+  'unicorn',
+  'penguin',
+  'lion',
+  'monkey',
+  'giraffe',
+  'panda',
+  'owl',
+  'puppy',
+];
+
+/// The `animal_<name>` preset for [name].
+String animalAvatarPreset(String name) => 'animal_$name';
+
+/// Whether [preset] is one of the animals (rather than the boy/girl
+/// pictures, which also stand for the child's gender).
+bool isAnimalAvatar(String preset) {
+  final p = preset.toLowerCase();
+  return p.startsWith('animal_') && animalAvatars.contains(p.substring(7));
+}
+
+/// Maps an avatar preset key (e.g. 'boy1', 'girl2', 'female', 'animal_lion')
+/// to its picture. Every screen that shows a child's face goes through here,
+/// so an animal chosen once shows everywhere — the home screen, the profile,
+/// the parents' page and the teacher's dashboard.
 String avatarAssetForPreset(String preset) {
   final p = preset.toLowerCase();
+  if (isAnimalAvatar(p)) return 'assets/images/avatar_${p.substring(7)}.webp';
   if (p.startsWith('girl') || p == 'female') {
     return 'assets/images/female.webp';
   }
@@ -56,6 +86,8 @@ String avatarAssetForPreset(String preset) {
 /// Soft background tint behind a character avatar, based on gender.
 Color avatarTintForPreset(String preset) {
   final p = preset.toLowerCase();
+  // The animals bring their own white disc.
+  if (isAnimalAvatar(p)) return Colors.white;
   if (p.startsWith('girl') || p == 'female') {
     return const Color(0xFFFFE1EC);
   }

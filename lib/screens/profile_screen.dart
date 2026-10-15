@@ -4,6 +4,7 @@ import '../providers/user_provider.dart';
 import '../utils/constants.dart';
 import '../utils/page_transitions.dart';
 import 'login_screen.dart';
+import 'choose_avatar_screen.dart';
 import 'package:confetti/confetti.dart';
 import '../widgets/custom_header_app_bar.dart';
 import '../widgets/cached_avatar.dart';
@@ -151,7 +152,37 @@ class ProfileScreen extends StatelessWidget {
                             userProfile.name.trim().split(RegExp(r'\s+')).first,
                           ),
                         ),
-                        _BirthdayAvatar(userProfile: userProfile),
+                        // Tap the face to choose another picture.
+                        GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            PremiumPageRoute(child: const ChooseAvatarScreen()),
+                          ),
+                          child: Stack(clipBehavior: Clip.none, children: [
+                            _BirthdayAvatar(userProfile: userProfile),
+                            // A pencil, so it reads as something to press.
+                            Positioned(
+                              right: 2,
+                              bottom: 6,
+                              child: Container(
+                                padding: const EdgeInsets.all(7),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: const Color(0xFFFF7A59),
+                                  border:
+                                      Border.all(color: Colors.white, width: 3),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                        color: Color(0xFFC9502F),
+                                        offset: Offset(0, 3)),
+                                  ],
+                                ),
+                                child: const Icon(LucideIcons.pencil,
+                                    color: Colors.white, size: 18),
+                              ),
+                            ),
+                          ]),
+                        ),
                       ],
                     ),
 

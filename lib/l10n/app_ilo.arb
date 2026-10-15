@@ -724,6 +724,7 @@
   "removeFromDeviceNote": "Saanton nga agparang ni {name} ditoy wenno iti sign-in. Saan a mapukaw ti account ken dagiti inaramidna — mabalin ida a pastreken manen ti maestra.",
   "childRemoved": "Naikkat iti daytoy a telepono.",
   "chooseAvatar": "Ladawan",
+  "chooseYourAvatar": "Agpili ti Avatar",
   "manageStudent": "Aywanan daytoy nga estudiante",
   "noStudentNumbersLeft": "Awanen ti nabati a student number para iti daytoy a tawen.",
   "moreModules": "+{count} pay",
