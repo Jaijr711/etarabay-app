@@ -1,17 +1,21 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 /// The basket the child drops their answer into, in Matematika's
 /// "Drag the Number".
 ///
-/// Drawn rather than assembled from a dashed rectangle and an arrow: a
-/// three-year-old understands "put it in the basket" from the picture alone,
-/// without being able to read a word of the instruction above it.
+/// A picture rather than a dashed rectangle and an arrow: a three-year-old
+/// understands "put it in the basket" from the picture alone, without being
+/// able to read a word of the instruction above it. It is the team's
+/// drawing — a woven basket with a round handle — cut out of its background.
 class BasketPicture extends StatelessWidget {
+  static const asset = 'assets/images/drop_basket.webp';
+
+  /// The picture's own proportions (267 × 239).
+  static const double aspect = 267 / 239;
+
   final double size;
 
-  /// Darkens the cane while a number is being held over it, so the child can
+  /// Swells and glows while a number is being held over it, so the child can
   /// see the basket is ready to receive the drop.
   final bool highlighted;
 
@@ -28,16 +32,44 @@ class BasketPicture extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size * 0.82,
-      child: CustomPaint(
-        painter: _BasketPainter(highlighted: highlighted),
-        child: holding == null
-            ? null
-            : Center(
-                child: Padding(
-                  padding: EdgeInsets.only(top: size * 0.16),
+    final height = size / aspect;
+    return AnimatedScale(
+      scale: highlighted ? 1.12 : 1.0,
+      duration: const Duration(milliseconds: 160),
+      curve: Curves.easeOutBack,
+      child: SizedBox(
+        width: size,
+        height: height,
+        child: Stack(clipBehavior: Clip.none, children: [
+          // A warm glow behind it while a number hovers over it.
+          if (highlighted)
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFFC542).withOpacity(0.55),
+                      blurRadius: 30,
+                      spreadRadius: 6,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          Positioned.fill(
+            child: Image.asset(asset,
+                fit: BoxFit.contain, filterQuality: FilterQuality.medium),
+          ),
+          // The number, in the woven body below the rim.
+          if (holding != null)
+            Positioned(
+              left: 0,
+              right: 0,
+              top: height * 0.50,
+              bottom: height * 0.06,
+              child: Center(
+                child: FittedBox(
                   child: Text(
                     '$holding',
                     style: TextStyle(
@@ -45,76 +77,19 @@ class BasketPicture extends StatelessWidget {
                       fontWeight: FontWeight.w900,
                       color: Colors.white,
                       shadows: const [
-                        Shadow(color: Colors.black26, blurRadius: 4)
+                        Shadow(
+                            color: Color(0xFF5A3410),
+                            blurRadius: 0,
+                            offset: Offset(0, 2.5)),
+                        Shadow(color: Colors.black38, blurRadius: 6),
                       ],
                     ),
                   ),
                 ),
               ),
+            ),
+        ]),
       ),
     );
   }
-}
-
-class _BasketPainter extends CustomPainter {
-  final bool highlighted;
-
-  _BasketPainter({required this.highlighted});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Authored against a 100×82 box and scaled, so one set of coordinates
-    // works at every size.
-    canvas.save();
-    canvas.scale(size.width / 100, size.height / 82);
-
-    final cane = highlighted ? const Color(0xFFB4711F) : const Color(0xFFC98A3C);
-    final caneDark =
-        highlighted ? const Color(0xFF8A5314) : const Color(0xFFA96F26);
-
-    Paint f(Color c) => Paint()
-      ..color = c
-      ..isAntiAlias = true;
-    Paint l(Color c, double w) => Paint()
-      ..color = c
-      ..strokeWidth = w
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke
-      ..isAntiAlias = true;
-
-    // Handle, drawn first so the body covers where it meets the rim.
-    canvas.drawArc(const Rect.fromLTWH(24, 2, 52, 52), math.pi, math.pi, false,
-        l(caneDark, 7));
-
-    final body = Path()
-      ..moveTo(10, 32)
-      ..lineTo(90, 32)
-      ..lineTo(78, 78)
-      ..quadraticBezierTo(50, 84, 22, 78)
-      ..close();
-    canvas.drawPath(body, f(cane));
-
-    // Weave, clipped to the body so it never spills past the edge.
-    canvas.save();
-    canvas.clipPath(body);
-    for (double y = 40; y < 78; y += 10) {
-      canvas.drawLine(Offset(8, y), Offset(92, y), l(caneDark, 3));
-    }
-    for (double x = 18; x < 90; x += 12) {
-      canvas.drawLine(Offset(x, 32), Offset(x - 6, 84), l(caneDark, 2.5));
-    }
-    canvas.restore();
-
-    // Rim last, sitting on top of the weave.
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-          const Rect.fromLTWH(6, 26, 88, 13), const Radius.circular(7)),
-      f(caneDark),
-    );
-
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(_BasketPainter old) => old.highlighted != highlighted;
 }

@@ -137,15 +137,12 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   bool _dropCorrect = false;
   bool _dropWrong = false;
 
-  /// Where the basket sits on screen, so a tapped number knows where to
-  /// fly to — see [_flyNumberToBasket].
+  /// The basket the Game 2 numbers are dragged onto.
   final GlobalKey _basketKeyGame2 = GlobalKey();
 
-  /// Index of the Game 2 choice currently mid-flight (or just landed), so
-  /// its own chip can be hidden — by opacity, not removal — while its flying
-  /// copy is what the child actually sees moving. Also doubles as "a flight
-  /// is already in progress" so a second tap mid-animation cannot start a
-  /// second chip flying before the first has been graded.
+  /// Index of the Game 2 choice just dropped in the basket, so its place in
+  /// the row is left empty. Also doubles as "an answer is already in" so a
+  /// second number cannot be dropped before the first has been graded.
   int? _flownChipIndexGame2;
 
   // Game 3 – node matching state
@@ -1092,59 +1089,6 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       setState(() => _dropWrong = true);
       _onWrong();
     }
-  }
-
-  /// Sends the tapped number flying from where the finger landed to the
-  /// basket, then grades it exactly as a drop would have — Game 2 used to
-  /// ask a three-year-old to drag the chip there themselves, which tested
-  /// carrying it steady more than counting. A tap keeps the counting and
-  /// gives the "it went in the basket" moment back as an animation instead.
-  void _flyNumberToBasket(int n, int correct, Offset startGlobal) {
-    HapticFeedback.selectionClick();
-    final basketBox =
-        _basketKeyGame2.currentContext?.findRenderObject() as RenderBox?;
-    if (basketBox == null || !basketBox.attached) {
-      _handleDrop(n, correct);
-      return;
-    }
-    final basketCenter =
-        basketBox.localToGlobal(basketBox.size.center(Offset.zero));
-
-    final controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 420),
-    );
-    final curved = CurvedAnimation(parent: controller, curve: Curves.easeIn);
-    late final OverlayEntry entry;
-    entry = OverlayEntry(
-      builder: (context) => AnimatedBuilder(
-        animation: controller,
-        builder: (context, _) {
-          final t = curved.value;
-          final pos = Offset.lerp(startGlobal, basketCenter, t)!;
-          final scale = 1.0 - (t * 0.55);
-          return Positioned(
-            left: pos.dx - 38,
-            top: pos.dy - 38,
-            child: IgnorePointer(
-              child: Opacity(
-                opacity: (1.0 - t * 0.3).clamp(0.0, 1.0),
-                child: Transform.scale(
-                  scale: scale,
-                  child: _numberChip(n, floating: true),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-    Overlay.of(context).insert(entry);
-    controller.forward().whenCompleteOrCancel(() {
-      entry.remove();
-      controller.dispose();
-      if (mounted) _handleDrop(n, correct);
-    });
   }
 
   // ── Game 3: node tap handlers ─────────────────────────────────────────────
@@ -2361,76 +2305,82 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     );
 
     // The basket. Landing the right number in it is the whole move, so it
-    // is drawn as a real basket rather than a dashed rectangle — a
-    // three-year-old understands "put it in the basket" without being
-    // able to read a word of the instruction. Keyed so a tapped number
-    // knows where on screen to fly to.
-    final basket = Column(
+    // is a real basket rather than a dashed rectangle — a three-year-old
+    // understands "put it in the basket" without being able to read a word
+    // of the instruction. It catches a number dragged onto it, swelling and
+    // glowing while one is held over it.
+    final basket = DragTarget<int>(
       key: _basketKeyGame2,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Stack(
+      onWillAcceptWithDetails: (_) =>
+          !_feedbackShowing && !_dropCorrect && _flownChipIndexGame2 == null,
+      onAcceptWithDetails: (d) {
+        HapticFeedback.mediumImpact();
+        setState(() => _flownChipIndexGame2 = choices.indexOf(d.data));
+        _handleDrop(d.data, correct);
+      },
+      builder: (_, candidate, __) => Padding(
+        // A wider catch than the picture, so a drop near the rim still lands.
+        padding: const EdgeInsets.all(12),
+        child: Stack(
           alignment: Alignment.center,
+          clipBehavior: Clip.none,
           children: [
             BasketPicture(
-              // Was 170 — a third of everything below the card, on a
-              // screen where the objects being counted were the part
-              // too small to use.
-              size: 110,
+              size: 120,
+              highlighted: candidate.isNotEmpty,
               holding: _dropCorrect ? correct : null,
             ),
             if (_dropCorrect)
               const Positioned(
-                top: 0,
+                top: -6,
                 child: Icon(LucideIcons.circle_check,
                     color: Colors.green, size: 42),
               ),
             if (_dropWrong)
               const Positioned(
-                top: 0,
+                top: -6,
                 child: Icon(LucideIcons.circle_x,
                     color: Color(0xFFF59E0B), size: 42),
               ),
           ],
         ),
-      ],
+      ),
     );
 
-    // The numbers to choose from, kept clear of the objects so a raised
-    // finger never covers what the child is counting.
-    //
-    // A tap sends the number flying into the basket (see
-    // _flyNumberToBasket) rather than asking a three-year-old to carry it
-    // there themselves — dragging is a separate fine-motor skill from
-    // counting, and this game is about counting.
+    // The numbers to choose from, along the bottom, a good way from the
+    // basket. They are dragged there — tapping does nothing. Carrying the
+    // answer across the board and letting go over the basket is the game's
+    // fun; a tap that flew the number there by itself left the child
+    // nothing to do but point.
     final numbers = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: choices.asMap().entries.map((entry) {
         final idx = entry.key;
         final n = entry.value as int;
+        final locked = _dropCorrect || _flownChipIndexGame2 != null;
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          // Hidden by opacity rather than removed the moment it starts
-          // flying — removing it would shrink the row by one chip and slide
-          // every number after it sideways to fill the gap, which is not a
-          // response to a tap this age reads as "my answer went in", it
-          // reads as the whole board rearranging itself. The blank space
-          // holds its place until the next question replaces it outright.
-          child: Opacity(
-            opacity: idx == _flownChipIndexGame2 ? 0 : 1,
-            child: GestureDetector(
-              onTapDown: (details) {
-                if (_feedbackShowing ||
-                    _dropCorrect ||
-                    _flownChipIndexGame2 != null) {
-                  return;
-                }
-                setState(() => _flownChipIndexGame2 = idx);
-                _flyNumberToBasket(n, correct, details.globalPosition);
-              },
-              child: _numberChip(n),
-            ),
-          ),
+          // A number that went in leaves its place empty rather than being
+          // removed — removing it would slide every number after it sideways,
+          // which this age reads as the whole board rearranging itself.
+          child: idx == _flownChipIndexGame2
+              ? const SizedBox(width: 76, height: 81)
+              : Draggable<int>(
+                  data: n,
+                  maxSimultaneousDrags: locked ? 0 : 1,
+                  onDragStarted: HapticFeedback.selectionClick,
+                  // Held up a little bigger under the finger, so it is plain
+                  // which number is being carried.
+                  feedback: Material(
+                    color: Colors.transparent,
+                    child: Transform.scale(scale: 1.15, child: _numberChip(n)),
+                  ),
+                  childWhenDragging: Opacity(
+                    opacity: 0.25,
+                    child: _numberChip(n),
+                  ),
+                  child: _numberChip(n),
+                ),
         );
       }).toList(),
     );
@@ -2439,18 +2389,24 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
       child: Column(
         children: [
-          Expanded(flex: 5, child: card),
-          const SizedBox(height: 12),
-          basket,
-          const SizedBox(height: 12),
+          Expanded(child: card),
+          const SizedBox(height: 4),
+          // Over to one side, and the side changes from one question to the
+          // next — the drop is a trip across the board, not straight up.
+          Align(
+            alignment: _currentGameIndex.isEven
+                ? const Alignment(0.75, 0)
+                : const Alignment(-0.75, 0),
+            child: basket,
+          ),
+          const SizedBox(height: 40),
           numbers,
         ],
       ),
     );
   }
 
-  Widget _numberChip(int n, {bool floating = false}) =>
-      _chunkyNumber(n, 76, 36);
+  Widget _numberChip(int n) => _chunkyNumber(n, 76, 36);
 
   // ─── Game 3: Node-to-node line matching ──────────────────────────────────────
 
