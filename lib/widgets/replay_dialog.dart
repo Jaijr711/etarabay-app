@@ -1,9 +1,8 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 
 import '../l10n/app_localizations.dart';
+import 'sparkle_decor.dart';
 
 /// "Finished already!" — what tapping a finished level (or category) shows
 /// before offering to play it again.
@@ -224,7 +223,7 @@ class _ReplayDialog extends StatelessWidget {
       ),
       // Sparkles, little stars and flowers round the edges.
       const Positioned.fill(
-        child: IgnorePointer(child: CustomPaint(painter: _DecorPainter())),
+        child: IgnorePointer(child: CustomPaint(painter: _decor)),
       ),
       // The dino, cheering at the top right, leaning out over the frame.
       Positioned(
@@ -391,94 +390,22 @@ class _GlossyButtonState extends State<_GlossyButton> {
 }
 
 /// The scattered sparkles, small stars and pink flowers round the card.
-class _DecorPainter extends CustomPainter {
-  const _DecorPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width, h = size.height;
-    Offset at(double x, double y) => Offset(x * w, y * h);
-
-    // Four-point sparkles.
-    for (final s in const [
-      (0.07, 0.04, 9.0, Colors.white),
-      (0.26, 0.05, 8.0, Color(0xFFFFC94A)),
-      // Kept to the margins, clear of the title and the stars.
-      (0.07, 0.34, 8.0, Color(0xFFB59BF0)),
-      (0.93, 0.33, 9.0, Color(0xFFB59BF0)),
-      (0.09, 0.71, 7.0, Color(0xFFB59BF0)),
-      (0.91, 0.70, 8.0, Color(0xFFB59BF0)),
-      (0.04, 0.84, 6.0, Colors.white),
-    ]) {
-      _sparkle(canvas, at(s.$1, s.$2), s.$3, s.$4);
-    }
-    // Little five-point stars.
-    for (final s in const [
-      (0.15, 0.03, 9.0, Color(0xFFFFB13B)),
-      (0.04, 0.55, 10.0, Color(0xFFFFB13B)),
-      (0.11, 0.60, 7.0, Color(0xFFFFC94A)),
-      (0.96, 0.58, 9.0, Color(0xFF7FD6D2)),
-      (0.03, 0.74, 10.0, Color(0xFFFFB13B)),
-      (0.12, 0.97, 8.0, Color(0xFFFFB13B)),
-    ]) {
-      _star(canvas, at(s.$1, s.$2), s.$3, s.$4);
-    }
-    // Pink flowers on the frame.
-    for (final f in const [
-      (0.02, 0.21, 11.0),
-      (0.03, 0.93, 11.0),
-      (0.97, 0.80, 10.0),
-    ]) {
-      _flower(canvas, at(f.$1, f.$2), f.$3);
-    }
-  }
-
-  void _sparkle(Canvas canvas, Offset c, double r, Color color) {
-    final p = Path()
-      ..moveTo(c.dx, c.dy - r)
-      ..quadraticBezierTo(c.dx, c.dy, c.dx + r, c.dy)
-      ..quadraticBezierTo(c.dx, c.dy, c.dx, c.dy + r)
-      ..quadraticBezierTo(c.dx, c.dy, c.dx - r, c.dy)
-      ..quadraticBezierTo(c.dx, c.dy, c.dx, c.dy - r)
-      ..close();
-    canvas.drawPath(p, Paint()..color = color);
-  }
-
-  void _star(Canvas canvas, Offset c, double r, Color color) {
-    final p = Path();
-    for (int i = 0; i < 10; i++) {
-      final rr = i.isEven ? r : r * 0.48;
-      final a = -math.pi / 2 + i * math.pi / 5;
-      final pt = c + Offset(math.cos(a), math.sin(a)) * rr;
-      i == 0 ? p.moveTo(pt.dx, pt.dy) : p.lineTo(pt.dx, pt.dy);
-    }
-    p.close();
-    canvas.drawPath(p, Paint()..color = color);
-    canvas.drawPath(
-        p,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.4
-          ..strokeJoin = StrokeJoin.round
-          ..color = const Color(0xFF9A5A1E).withOpacity(0.6));
-  }
-
-  void _flower(Canvas canvas, Offset c, double r) {
-    final petal = Paint()..color = const Color(0xFFF7708A);
-    final edge = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.4
-      ..color = const Color(0xFFB8364F);
-    for (int i = 0; i < 5; i++) {
-      final a = -math.pi / 2 + i * 2 * math.pi / 5;
-      final pc = c + Offset(math.cos(a), math.sin(a)) * r * 0.62;
-      canvas.drawCircle(pc, r * 0.5, petal);
-      canvas.drawCircle(pc, r * 0.5, edge);
-    }
-    canvas.drawCircle(c, r * 0.36, Paint()..color = Colors.white);
-    canvas.drawCircle(c, r * 0.2, Paint()..color = const Color(0xFFFFD45A));
-  }
-
-  @override
-  bool shouldRepaint(_DecorPainter oldDelegate) => false;
-}
+const _decor = DecorPainter([
+  DecorMark.sparkle(0.07, 0.04, 9, Colors.white),
+  DecorMark.sparkle(0.26, 0.05, 8, Color(0xFFFFC94A)),
+  // Kept to the margins, clear of the title and the stars.
+  DecorMark.sparkle(0.07, 0.34, 8, Color(0xFFB59BF0)),
+  DecorMark.sparkle(0.93, 0.33, 9, Color(0xFFB59BF0)),
+  DecorMark.sparkle(0.09, 0.71, 7, Color(0xFFB59BF0)),
+  DecorMark.sparkle(0.91, 0.70, 8, Color(0xFFB59BF0)),
+  DecorMark.sparkle(0.04, 0.84, 6, Colors.white),
+  DecorMark.star(0.15, 0.03, 9, Color(0xFFFFB13B)),
+  DecorMark.star(0.04, 0.55, 10, Color(0xFFFFB13B)),
+  DecorMark.star(0.11, 0.60, 7, Color(0xFFFFC94A)),
+  DecorMark.star(0.96, 0.58, 9, Color(0xFF7FD6D2)),
+  DecorMark.star(0.03, 0.74, 10, Color(0xFFFFB13B)),
+  DecorMark.star(0.12, 0.97, 8, Color(0xFFFFB13B)),
+  DecorMark.flower(0.02, 0.21, 11),
+  DecorMark.flower(0.03, 0.93, 11),
+  DecorMark.flower(0.97, 0.80, 10),
+]);

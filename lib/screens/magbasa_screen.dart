@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:confetti/confetti.dart';
 import '../widgets/custom_back_button.dart';
+import '../widgets/storybook.dart';
 import '../widgets/success_modal.dart';
 import '../utils/page_transitions.dart';
 import '../data/magbasa_content.dart';
@@ -827,148 +828,6 @@ double fractionAtLine(List<int> weights, int index) {
   return ((before + weights[i] / 2) / total).clamp(0.0, 1.0);
 }
 
-/// The listening controls, pinned to the bottom of the screen.
-///
-/// In all three reading screens these used to sit in the scrolling content,
-/// underneath the poem or the story — so the button that starts the reading
-/// was below the reading, off the bottom of the screen until the child
-/// scrolled past the very thing they wanted read aloud.
-///
-/// Pinned here it cannot be scrolled away from, and it carries the progress
-/// itself. The two readouts that used to accompany it — an elapsed clock and
-/// a line counter — are gone: neither means anything at three, and the bar
-/// shows the same thing without asking the child to read a number.
-class _PlayerBar extends StatelessWidget {
-  final Color color;
-  final bool isPlaying;
-
-  /// How far through, 0 to 1.
-  final double progress;
-
-  final VoidCallback onPlayPause;
-
-  /// One line back — "say that again".
-  final VoidCallback? onBack;
-
-  /// All the way back to the beginning. The thing a child actually asks for,
-  /// and what balances the row against [onBack]; both go backwards, which is
-  /// the only direction offered here. Skipping forward was a way to reach the
-  /// end, and the star, without hearing any of it.
-  final VoidCallback? onRestart;
-
-  const _PlayerBar({
-    required this.color,
-    required this.isPlaying,
-    required this.progress,
-    required this.onPlayPause,
-    this.onBack,
-    this.onRestart,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: color.withOpacity(0.18), width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: color.withOpacity(0.28),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            // A pill with room around it, so an almost-empty bar still reads
-            // as a bar. Welded to the edge at full width it looked like a
-            // stray mark on the screen.
-            ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: LinearProgressIndicator(
-                value: progress.clamp(0.0, 1.0),
-                minHeight: 8,
-                backgroundColor: color.withOpacity(0.15),
-                valueColor: AlwaysStoppedAnimation<Color>(color),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _side(Icons.skip_previous_rounded, onBack),
-                // The one thing the child is looking for, at the size that
-                // makes it the one thing they see. Filled, not outlined: at
-                // this age a solid shape reads as an object to press and a
-                // hairline reads as a picture of one.
-                GestureDetector(
-                  onTap: onPlayPause,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    width: 76,
-                    height: 76,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [color, color.withOpacity(0.78)],
-                      ),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: color.withOpacity(0.5),
-                          blurRadius: 18,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      isPlaying
-                          ? Icons.pause_rounded
-                          : Icons.play_arrow_rounded,
-                      color: Colors.white,
-                      size: 46,
-                    ),
-                  ),
-                ),
-                _side(Icons.replay_rounded, onRestart),
-              ],
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
-
-  /// One of the two smaller controls either side of play.
-  ///
-  /// Kept at 52 across — smaller than play so it cannot be mistaken for it,
-  /// and still large enough for a small hand to hit on purpose. A null
-  /// callback draws the space but no button, so the row stays balanced
-  /// without offering a control that does nothing.
-  Widget _side(IconData icon, VoidCallback? onTap) {
-    if (onTap == null) return const SizedBox(width: 52, height: 52);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 52,
-        height: 52,
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.12),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, color: color, size: 30),
-      ),
-    );
-  }
-}
-
 /// Runs a player command, giving up rather than waiting for ever.
 ///
 /// Everything the play button waits for goes through here. A web audio
@@ -1457,263 +1316,128 @@ class _PoemScreenState extends State<PoemScreen>
     );
   }
 
+  /// The poem's picture cut out of its page, so it can stand up out of the
+  /// top of the card the way the design draws it. The originals stay as
+  /// they are for the list's cards.
+  static String _artFor(String image) {
+    final m = RegExp(r'assets/images/(poem\d+)\.png').firstMatch(image);
+    return m == null ? image : 'assets/images/${m.group(1)}_art.webp';
+  }
+
   @override
   Widget build(BuildContext context) {
     final content = _lines;
-    final imagePath = widget.poemData['image'] as String;
+    final art = _artFor(widget.poemData['image'] as String);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF5F5),
-      bottomNavigationBar: _PlayerBar(
-        color: _poemColor,
-        isPlaying: _isPlaying,
-        progress: _totalDurationMs > 0
-            ? _currentPositionMs / _totalDurationMs
-            : (content.isEmpty
-                ? 0.0
-                : (_currentLineIndex + 1) / content.length),
-        onPlayPause: _togglePlay,
-        onRestart: _restart,
-        onBack: () => _seekToLine(_currentLineIndex - 1),
+    return StorybookScaffold(
+      title: widget.poemTitle,
+      // The music is handed back here, inside the tap. Chrome will not let a
+      // page start audio outside a user gesture, and dispose runs long after
+      // the tap is over.
+      onClose: () => Navigator.pop(context, _isCompleted),
+      banner:
+          StorybookHint(AppLocalizations.of(context)!.readFullPoemBeforeBack),
+      progress: _totalDurationMs > 0
+          ? _currentPositionMs / _totalDurationMs
+          : (content.isEmpty ? 0.0 : (_currentLineIndex + 1) / content.length),
+      fill: const Color(0xFF4CD68A),
+      playColor: const Color(0xFFF2453F),
+      isPlaying: _isPlaying,
+      onPlayPause: _togglePlay,
+      onRestart: _restart,
+      onBack: () => _seekToLine(_currentLineIndex - 1),
+      overlay: Align(
+        alignment: Alignment.topCenter,
+        child: ConfettiWidget(
+          confettiController: _confettiController,
+          blastDirectionality: BlastDirectionality.explosive,
+          shouldLoop: false,
+          colors: const [
+            Colors.pink,
+            Colors.red,
+            Colors.orange,
+            Colors.yellow,
+            Colors.white
+          ],
+          numberOfParticles: 25,
+          gravity: 0.15,
+        ),
       ),
-      body: Stack(
-        children: [
-          // Confetti
-          Align(
-            alignment: Alignment.topCenter,
-            child: ConfettiWidget(
-              confettiController: _confettiController,
-              blastDirectionality: BlastDirectionality.explosive,
-              shouldLoop: false,
-              colors: const [
-                Colors.pink,
-                Colors.red,
-                Colors.orange,
-                Colors.yellow,
-                Colors.white,
-              ],
-              numberOfParticles: 25,
-              gravity: 0.15,
-            ),
-          ),
-
-          Column(children: [
-            // ── Decorative header ───────────────────────────────────────
-            //
-            // Fixed, like the story's. It shared a scroll view with the
-            // words, so a long poem carried the picture off the top while
-            // the child was still reading from it.
-            SizedBox(
-              height: 190,
-              child: Stack(fit: StackFit.expand, children: [
-                Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    color: _poemColor.withOpacity(0.4),
-                    child: const Center(
-                        child: Text('📖', style: TextStyle(fontSize: 80))),
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        _poemColor.withOpacity(0.85),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 4,
-                  top: 4,
-                  child: CustomBackButton(
-                    iconColor: Colors.white,
-                    backgroundColor: Colors.black26,
-                    // The music is handed back here, inside the tap. Chrome
-                    // will not let a page start audio outside a user gesture,
-                    // and dispose runs long after the tap is over.
-                    onPressed: () {
-                      Navigator.pop(context, _isCompleted);
-                    },
-                  ),
-                ),
-                Positioned(
-                  left: 16,
-                  right: 16,
-                  bottom: 12,
-                  child: Text(
-                    widget.poemTitle,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      shadows: [Shadow(color: Colors.black26, blurRadius: 4)],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ]),
-            ),
-
-            // ── Poem content with karaoke highlighting ──────────────────
-            //
-            // The only thing that moves.
-            Expanded(
+      body: LayoutBuilder(builder: (_, box) {
+        // The picture stands half out of the top of the card.
+        final artH = (box.maxHeight * 0.32).clamp(80.0, 210.0);
+        return Stack(clipBehavior: Clip.none, children: [
+          Positioned.fill(
+            top: artH * 0.5,
+            child: CoralCard(
+              padding: EdgeInsets.fromLTRB(12, artH * 0.5, 12, 8),
+              // The only thing that moves.
               child: SingleChildScrollView(
                 controller: _scrollController,
-                child: Column(children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(28),
-                        boxShadow: [
-                          BoxShadow(
-                            color: _poemColor.withOpacity(0.15),
-                            blurRadius: 20,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
+                padding: const EdgeInsets.only(bottom: 70),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: List.generate(content.length, (index) {
+                    final text = content[index];
+                    if (text.isEmpty) {
+                      return const SizedBox(height: 18); // stanza break
+                    }
+                    final isCurrent = index == _currentLineIndex && _isPlaying;
+                    final isPast = _isPlaying && index < _currentLineIndex;
+                    return AnimatedContainer(
+                      key: _lineKey(index),
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeInOut,
+                      margin: const EdgeInsets.only(bottom: 4),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 32),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // All lines with karaoke highlighting
-                          ...List.generate(content.length, (index) {
-                            final text = content[index];
-                            if (text.isEmpty) {
-                              return const SizedBox(height: 18); // stanza break
-                            }
-
-                            final isCurrent =
-                                index == _currentLineIndex && _isPlaying;
-                            final isPast =
-                                _isPlaying && index < _currentLineIndex;
-
-                            return AnimatedContainer(
-                              key: _lineKey(index),
-                              duration: const Duration(milliseconds: 400),
-                              curve: Curves.easeInOut,
-                              margin: const EdgeInsets.only(bottom: 6),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 8),
-                              decoration: BoxDecoration(
-                                // A filled band, not a 10% tint behind a
-                                // hairline. A child following along with a
-                                // finger has to be able to find the line
-                                // without hunting for it.
-                                //
-                                color: isCurrent
-                                    ? _karaokeHighlight.withOpacity(0.22)
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: AnimatedDefaultTextStyle(
-                                duration: const Duration(milliseconds: 250),
-                                curve: Curves.easeInOut,
-                                style: TextStyle(
-                                  // One scale across poem, song and story.
-                                  // A line already read is stepped back by
-                                  // colour, not by shrinking: a child
-                                  // rereading it should not find it smaller
-                                  // than it was a moment ago.
-                                  // One size and one weight for every
-                                  // line. Growing the current line by four
-                                  // points and bolding it changed how wide
-                                  // its glyphs are, so a line that fitted on
-                                  // one row wrapped to two the moment it was
-                                  // highlighted and pushed everything below
-                                  // it down — the words moving under the eye
-                                  // of a child trying to follow them.
-                                  //
-                                  // It is marked by the things that cost no
-                                  // space: its colour, and the tinted panel
-                                  // and border already behind it.
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.w600,
-                                  color: isCurrent
-                                      ? _poemColor
-                                      : (isPast
-                                          // Stepped back, not
-                                          // faded out: shade400
-                                          // on white is about
-                                          // 2.6:1, and a child
-                                          // rereads these.
-                                          ? Colors.grey.shade600
-                                          : const Color(0xFF2D2D2D)),
-                                  // Upright, not italic. A slanted letter is a
-                                  // different shape from the one the child is
-                                  // being taught, and they are still matching
-                                  // shapes to sounds.
-                                  letterSpacing: 0.2,
-                                  height: 1.45,
-                                  shadows: isCurrent
-                                      ? [
-                                          Shadow(
-                                            blurRadius: 10,
-                                            color: _karaokeHighlight
-                                                .withOpacity(0.3),
-                                          ),
-                                        ]
-                                      : null,
-                                ),
-                                child: Text(
-                                  text,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            );
-                          }),
-                        ],
+                          horizontal: 10, vertical: 6),
+                      // A filled band for the line being read, so a child
+                      // following along with a finger can find it.
+                      decoration: BoxDecoration(
+                        color: isCurrent
+                            ? _karaokeHighlight.withOpacity(0.22)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                    ),
-                  ),
-
-                  // ── "I read the poem" button ────────────────────────
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
-                    child: Column(children: [
-                      // Small reading hint
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: _poemColor.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(16),
+                      // One size and weight for every line, so the line
+                      // being read never re-wraps and pushes the rest down;
+                      // only its colour marks it. Upright, never italic.
+                      child: AnimatedDefaultTextStyle(
+                        duration: const Duration(milliseconds: 250),
+                        style: StorybookScaffold.fredoka(
+                          27,
+                          isCurrent
+                              ? _poemColor
+                              : (isPast
+                                  ? Colors.grey.shade600
+                                  : StorybookScaffold.navy),
+                          weight: 650,
                         ),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(LucideIcons.info,
-                                  color: _poemColor, size: 16),
-                              const SizedBox(width: 8),
-                              Flexible(
-                                child: Text(
-                                  AppLocalizations.of(context)!
-                                      .readFullPoemBeforeBack,
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      color: _poemColor.withOpacity(0.9)),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ]),
+                        child: Text(text, textAlign: TextAlign.center),
                       ),
-                    ]),
-                  ),
-                ]),
+                    );
+                  }),
+                ),
               ),
             ),
-          ]),
-        ],
-      ),
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: artH,
+            child: IgnorePointer(
+              child: Image.asset(
+                art,
+                fit: BoxFit.contain,
+                filterQuality: FilterQuality.medium,
+                errorBuilder: (_, __, ___) => const Center(
+                    child: Text('📖', style: TextStyle(fontSize: 64))),
+              ),
+            ),
+          ),
+        ]);
+      }),
     );
   }
 }
@@ -2084,217 +1808,92 @@ class _StoryScreenState extends State<StoryScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final content = widget.storyData['content'] as List;
     final imagePath = widget.storyData['image'] as String;
-
     final List<List<String>> paragraphs = _splitIntoParagraphs(content);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFFAF0),
-      bottomNavigationBar: _PlayerBar(
-        color: _storyColor,
-        isPlaying: _isPlaying,
-        progress: _totalDurationMs > 0
-            ? _currentPositionMs / _totalDurationMs
-            : (content.isEmpty
-                ? 0.0
-                : (_currentLineIndex + 1) / content.length),
-        onPlayPause: _togglePlay,
-        onRestart: _restart,
-      ),
-      body: Stack(children: [
-        Align(
-          alignment: Alignment.topCenter,
-          child: ConfettiWidget(
-            confettiController: _confettiController,
-            blastDirectionality: BlastDirectionality.explosive,
-            shouldLoop: false,
-            colors: const [
-              Colors.orange,
-              Colors.amber,
-              Colors.pink,
-              Colors.lightGreen,
-              Colors.white,
-            ],
-            numberOfParticles: 25,
-            gravity: 0.15,
-          ),
+    return StorybookScaffold(
+      title: widget.storyTitle,
+      // Inside the tap, so the module music can come back — see the poem.
+      onClose: () => Navigator.pop(context, _isCompleted),
+      progress: _totalDurationMs > 0
+          ? _currentPositionMs / _totalDurationMs
+          : (content.isEmpty ? 0.0 : (_currentLineIndex + 1) / content.length),
+      fill: const Color(0xFFFF9B3D),
+      playColor: const Color(0xFFF2453F),
+      isPlaying: _isPlaying,
+      onPlayPause: _togglePlay,
+      onRestart: _restart,
+      overlay: Align(
+        alignment: Alignment.topCenter,
+        child: ConfettiWidget(
+          confettiController: _confettiController,
+          blastDirectionality: BlastDirectionality.explosive,
+          shouldLoop: false,
+          colors: const [
+            Colors.orange,
+            Colors.amber,
+            Colors.pink,
+            Colors.lightGreen,
+            Colors.white
+          ],
+          numberOfParticles: 25,
+          gravity: 0.15,
         ),
-        Column(children: [
-          // ── Cover header ────────────────────────────────────────────────
-          //
-          // Fixed. It used to be a SliverAppBar sharing a scroll view with
-          // the words, so a long story dragged the picture off the top.
-          //
-          // A story with a panel per line gives the panel the whole screen:
-          // the caption is drawn into the picture, so the words below it
-          // would be the same words again and would leave the picture 200
-          // pixels tall — the one thing a child who cannot read is reading.
-          Flexible(
-            fit: _pictureForLine != null ? FlexFit.tight : FlexFit.loose,
-            child: SizedBox(
-              height: _pictureForLine != null ? double.infinity : 200,
-              child: Stack(fit: StackFit.expand, children: [
-                // The picture for the line being read, where the story has one
-                // per line; otherwise its single cover. A child who cannot read
-                // follows the story here while the voice reads it.
-                //
-                // Centred, and said so rather than left to the defaults of
-                // two widgets: the switcher fills the screen and `contain`
-                // letterboxes the panel inside it. The padding keeps the
-                // picture off the edges of the phone.
-                Padding(
-                  padding: _pictureForLine != null
-                      ? const EdgeInsets.fromLTRB(12, 12, 12, 8)
-                      : EdgeInsets.zero,
-                  // A clean cut between panels, not a cross-fade.
-                  //
-                  // This was an AnimatedSwitcher on a 350ms fade. Its default
-                  // layout stacks the outgoing panel under the incoming one
-                  // for the length of the transition, and every one of these
-                  // panels has its caption drawn INTO the picture — so for a
-                  // third of a second the child was reading two sentences
-                  // printed on top of each other, plus a strip of the old
-                  // panel showing past the letterboxed edges of the new one.
-                  // A picture book turns the page in one movement; so does
-                  // this now.
-                  child: Image.asset(
-                    _pictureForLine ?? imagePath,
-                    key: ValueKey(_pictureForLine ?? imagePath),
-                    // The caption sits at the bottom of each panel and `cover`
-                    // crops it off — the words cut out of the picture that
-                    // replaced the words.
-                    fit:
-                        _pictureForLine != null ? BoxFit.contain : BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: _storyColor.withOpacity(0.4),
-                      child: const Center(
+      ),
+      body: CoralCard(
+        inside: const BoxDecoration(color: Color(0xFFF3F9FD)),
+        child: _pictureForLine != null
+            // A story with a panel per line: the panel is the page, its
+            // number and caption drawn into it, so it gets the whole card.
+            // A clean cut between panels, never a cross-fade — the captions
+            // would print over each other for the length of it.
+            ? Padding(
+                padding: const EdgeInsets.all(6),
+                child: Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset(
+                      _pictureForLine!,
+                      key: ValueKey(_pictureForLine),
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) =>
+                          const Text('📚', style: TextStyle(fontSize: 80)),
+                    ),
+                  ),
+                ),
+              )
+            // A story with one cover: the cover above, the words below on
+            // paper, scrolling with the voice.
+            : Column(children: [
+                Expanded(
+                  flex: 4,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Image.asset(
+                      imagePath,
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => const Center(
                           child: Text('📚', style: TextStyle(fontSize: 80))),
                     ),
                   ),
                 ),
-                // Only over a cover. Across a panel it would darken the
-                // bottom third, which is where the caption is.
-                if (_pictureForLine == null)
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          _storyColor.withOpacity(0.9)
-                        ],
+                Expanded(
+                  flex: 6,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                    child: ParchmentBox(
+                      child: SingleChildScrollView(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.fromLTRB(8, 12, 8, 70),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: _buildStoryContent(paragraphs, content),
+                        ),
                       ),
                     ),
-                  ),
-                Positioned(
-                  left: 4,
-                  top: 4,
-                  child: CustomBackButton(
-                    iconColor: Colors.white,
-                    backgroundColor: Colors.black26,
-                    // The music is handed back here, inside the tap. Chrome
-                    // will not let a page start audio outside a user gesture,
-                    // and dispose runs long after the tap is over — so resuming
-                    // there was rejected, and the module music never came back.
-                    onPressed: () {
-                      Navigator.pop(context, _isCompleted);
-                    },
                   ),
                 ),
-                if (_pictureForLine == null)
-                  Positioned(
-                    left: 16,
-                    right: 16,
-                    bottom: 12,
-                    child: Text(
-                      widget.storyTitle,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        shadows: [Shadow(color: Colors.black26, blurRadius: 4)],
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
               ]),
-            ),
-          ),
-
-          // ── Story body ──────────────────────────────────────────────────
-          //
-          // The only thing that moves — and only where there are no panels.
-          if (_pictureForLine == null)
-            Expanded(
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                child: Column(children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(28),
-                        boxShadow: [
-                          BoxShadow(
-                            color: _storyColor.withOpacity(0.15),
-                            blurRadius: 20,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                        border: Border.all(
-                          color: _storyColor.withOpacity(0.2),
-                          width: 1.5,
-                        ),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 28),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: _buildStoryContent(paragraphs, content),
-                      ),
-                    ),
-                  ),
-
-                  // ── "Nabasa Kon" button ─────────────────────────────────
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 28, 20, 40),
-                    child: Column(children: [
-                      // Reading progress hint
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: _storyColor.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(LucideIcons.book_open,
-                                  color: _storyColor, size: 16),
-                              const SizedBox(width: 8),
-                              Flexible(
-                                child: Text(
-                                  AppLocalizations.of(context)!
-                                      .readFullStoryBeforeBack,
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      color: _storyColor.withOpacity(0.9)),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ]),
-                      ),
-                    ]),
-                  ),
-                ]),
-              ),
-            ),
-        ]),
-      ]),
+      ),
     );
   }
 
@@ -2358,7 +1957,7 @@ class _StoryScreenState extends State<StoryScreen> with WidgetsBindingObserver {
               fontSize: 26,
               height: 1.6,
               fontWeight: FontWeight.w600,
-              color: isCurrent ? _storyColor : const Color(0xFF2D2D2D),
+              color: isCurrent ? _storyColor : StorybookScaffold.navy,
               letterSpacing: 0.2,
             ),
             child: Text(
@@ -2479,7 +2078,6 @@ class _SongScreenState extends State<SongScreen>
   StreamSubscription? _durationSubscription;
   StreamSubscription? _completeSubscription;
 
-  static const Color _songColor = Color(0xFFA8E6CF);
   static const Color _karaokeHighlight = Color(0xFF6C63FF);
 
   List<String> get _lyrics {
@@ -2819,264 +2417,143 @@ class _SongScreenState extends State<SongScreen>
   Widget build(BuildContext context) {
     final lyrics = _lyrics;
     final tune = widget.songData['tune'] as String;
-    final imagePath = widget.songData['image'] as String;
+    final loc = AppLocalizations.of(context)!;
     // The action is an instruction to the child — "clap", "sway" — not part
-    // of the song, so unlike the lyrics it does follow the app's language
-    // setting. It used to be one English string shown under an "Aksyon:"
-    // label that WAS translated, so an Ilokano reader got a Filipino label
-    // in front of an English sentence.
+    // of the song, so unlike the lyrics it follows the app's language.
     final action = _localizedAction(
         widget.songData['action'],
         Provider.of<LanguageProvider>(context, listen: false)
             .currentLanguageCode);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FF),
-      bottomNavigationBar: _PlayerBar(
-        color: AppColors.primary,
-        isPlaying: _isPlaying,
-        progress: _totalDurationMs > 0
-            ? _currentPositionMs / _totalDurationMs
-            : (lyrics.isEmpty ? 0.0 : (_currentLineIndex + 1) / lyrics.length),
-        onPlayPause: _togglePlay,
-        onRestart: _restart,
-        onBack: () => _seekToLine(_currentLineIndex - 1),
+    return StorybookScaffold(
+      title: widget.songTitle,
+      // Inside the tap — see the poem screen's copy.
+      onClose: () => Navigator.pop(context, _isCompleted),
+      progress: _totalDurationMs > 0
+          ? _currentPositionMs / _totalDurationMs
+          : (lyrics.isEmpty ? 0.0 : (_currentLineIndex + 1) / lyrics.length),
+      fill: const Color(0xFF8B6CF5),
+      playColor: const Color(0xFF7A55E8),
+      isPlaying: _isPlaying,
+      onPlayPause: _togglePlay,
+      onRestart: _restart,
+      onBack: () => _seekToLine(_currentLineIndex - 1),
+      overlay: Align(
+        alignment: Alignment.topCenter,
+        child: ConfettiWidget(
+          confettiController: _confettiController,
+          blastDirectionality: BlastDirectionality.explosive,
+          shouldLoop: false,
+          colors: const [
+            Colors.pink,
+            Colors.purple,
+            Colors.blue,
+            Colors.green,
+            Colors.yellow
+          ],
+          numberOfParticles: 25,
+          gravity: 0.15,
+        ),
       ),
-      body: Stack(
-        children: [
-          // Confetti
-          Align(
-            alignment: Alignment.topCenter,
-            child: ConfettiWidget(
-              confettiController: _confettiController,
-              blastDirectionality: BlastDirectionality.explosive,
-              shouldLoop: false,
-              colors: const [
-                Colors.pink,
-                Colors.purple,
-                Colors.blue,
-                Colors.green,
-                Colors.yellow,
-              ],
-              numberOfParticles: 25,
-              gravity: 0.15,
-            ),
-          ),
-
-          SafeArea(
-            child: Column(
-              children: [
-                // Header
+      body: CoralCard(
+        child: CustomPaint(
+          painter: const SkyPainter(),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 12, 10, 10),
+            child: LayoutBuilder(builder: (_, box) {
+              final icon = (box.maxHeight * 0.26).clamp(64.0, 150.0);
+              return Column(children: [
+                // The music, smiling — every song's picture in the sky.
+                Image.asset('assets/images/reading_music.webp',
+                    width: icon,
+                    height: icon,
+                    filterQuality: FilterQuality.medium),
+                const SizedBox(height: 6),
+                Text('${loc.tune}: $tune',
+                    textAlign: TextAlign.center,
+                    style: StorybookScaffold.fredoka(16, StorybookScaffold.navy,
+                        weight: 600)),
+                const SizedBox(height: 8),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [AppColors.primary, AppColors.secondary],
-                    ),
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(20),
-                      bottomRight: Radius.circular(20),
-                    ),
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(22),
+                    border:
+                        Border.all(color: const Color(0xFF8DB4E6), width: 2.5),
                   ),
-                  child: Row(
-                    children: [
-                      CustomBackButton(
-                        iconColor: Colors.white,
-                        backgroundColor: Colors.black26,
-                        // Inside the tap — see the poem screen's copy.
-                        onPressed: () {
-                          Navigator.pop(context, _isCompleted);
-                        },
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          widget.songTitle,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // The picture and its labels stay put. They used to ride
-                // up with the lyrics, which also kept changing how much room
-                // the words had — so a line centred a moment ago was not.
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                  child: Column(children: [
-                    // Song image
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        height: 140,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                                color: _songColor.withOpacity(0.3),
-                                blurRadius: 15,
-                                offset: const Offset(0, 5))
-                          ],
-                        ),
-                        child: Image.asset(
-                          imagePath,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
-                            color: _songColor.withOpacity(0.1),
-                            child: const Icon(LucideIcons.music,
-                                size: 50, color: _songColor),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-                    Text(
-                      '${AppLocalizations.of(context)!.tune}: $tune',
-                      style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey.shade500,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Action chip
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: _songColor.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: _songColor.withOpacity(0.3)),
-                      ),
-                      child: Row(mainAxisSize: MainAxisSize.min, children: [
-                        const Icon(LucideIcons.footprints,
-                            color: _songColor, size: 18),
-                        const SizedBox(width: 8),
-                        Flexible(
-                          child: Text(
-                              '${AppLocalizations.of(context)!.action}: $action',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w500, fontSize: 12)),
-                        ),
-                      ]),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    const Icon(Icons.waving_hand_rounded,
+                        color: Color(0xFF35B8A8), size: 22),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text('${loc.action}: $action',
+                          style: StorybookScaffold.fredoka(
+                              15, StorybookScaffold.navy,
+                              weight: 600)),
                     ),
                   ]),
                 ),
-
-                // The only thing that moves.
+                const SizedBox(height: 10),
+                // The words on paper; the only thing that moves.
                 Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-                    child: Column(children: [
-                      // Lyrics with karaoke highlight
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.08),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4))
-                          ],
-                        ),
-                        child: Column(
-                          children: List.generate(lyrics.length, (index) {
-                            final isCurrent =
-                                index == _currentLineIndex && _isPlaying;
-                            final isPast = index < _currentLineIndex;
-                            final line = lyrics[index];
-
-                            if (line.trim().isEmpty) {
-                              return const SizedBox(height: 10);
-                            }
-
-                            return AnimatedContainer(
-                              key: _lineKey(index),
-                              duration: const Duration(milliseconds: 250),
-                              curve: Curves.easeInOut,
-                              margin: const EdgeInsets.only(bottom: 8),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 14, vertical: 10),
-                              decoration: BoxDecoration(
-                                color: isCurrent
-                                    ? _karaokeHighlight.withOpacity(0.08)
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(14),
-                                // Always drawn, only the colour changes:
-                                // a border that appeared only on the current
-                                // line took 3px of width from it.
-                                border: Border.all(
-                                    color: isCurrent
-                                        ? _karaokeHighlight.withOpacity(0.4)
-                                        : Colors.transparent,
-                                    width: 1.5),
-                              ),
-                              child: AnimatedDefaultTextStyle(
-                                duration: const Duration(milliseconds: 250),
-                                curve: Curves.easeInOut,
-                                style: TextStyle(
-                                  // One size and one weight for every
-                                  // line. Growing the current line by four
-                                  // points and bolding it changed how wide
-                                  // its glyphs are, so a line that fitted on
-                                  // one row wrapped to two the moment it was
-                                  // highlighted and pushed everything below
-                                  // it down — the words moving under the eye
-                                  // of a child trying to follow them.
-                                  //
-                                  // It is marked by the things that cost no
-                                  // space: its colour, and the tinted panel
-                                  // and border already behind it.
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.w600,
+                  child: ParchmentBox(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(8, 10, 8, 70),
+                      child: Column(
+                        children: List.generate(lyrics.length, (index) {
+                          final isCurrent =
+                              index == _currentLineIndex && _isPlaying;
+                          final isPast = index < _currentLineIndex;
+                          final line = lyrics[index];
+                          if (line.trim().isEmpty) {
+                            return const SizedBox(height: 10);
+                          }
+                          return AnimatedContainer(
+                            key: _lineKey(index),
+                            duration: const Duration(milliseconds: 250),
+                            curve: Curves.easeInOut,
+                            margin: const EdgeInsets.only(bottom: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: isCurrent
+                                  ? _karaokeHighlight.withOpacity(0.14)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(14),
+                              // Always drawn, only the colour changes: a
+                              // border on the current line alone took width
+                              // from it and could re-wrap it.
+                              border: Border.all(
                                   color: isCurrent
-                                      ? AppColors.primary
-                                      : (isPast
-                                          // Stepped back, not
-                                          // faded out: shade400
-                                          // on white is about
-                                          // 2.6:1, and a child
-                                          // rereads these.
-                                          ? Colors.grey.shade600
-                                          : Colors.grey.shade700),
-                                  height: 1.4,
-                                  shadows: isCurrent
-                                      ? [
-                                          Shadow(
-                                            blurRadius: 10,
-                                            color: _karaokeHighlight
-                                                .withOpacity(0.3),
-                                          ),
-                                        ]
-                                      : null,
-                                ),
-                                child: Text(
-                                  line,
-                                  textAlign: TextAlign.center,
-                                ),
+                                      ? _karaokeHighlight.withOpacity(0.45)
+                                      : Colors.transparent,
+                                  width: 1.5),
+                            ),
+                            child: AnimatedDefaultTextStyle(
+                              duration: const Duration(milliseconds: 250),
+                              style: StorybookScaffold.fredoka(
+                                23,
+                                isCurrent
+                                    ? AppColors.primary
+                                    : (isPast
+                                        ? Colors.grey.shade600
+                                        : StorybookScaffold.navy),
+                                weight: 650,
                               ),
-                            );
-                          }),
-                        ),
+                              child: Text(line, textAlign: TextAlign.center),
+                            ),
+                          );
+                        }),
                       ),
-                    ]),
+                    ),
                   ),
                 ),
-              ],
-            ),
+              ]);
+            }),
           ),
-        ],
+        ),
       ),
     );
   }
