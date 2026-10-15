@@ -1173,9 +1173,12 @@ class _PamilyaScreenState extends State<PamilyaScreen>
       HapticFeedback.mediumImpact();
       final room = _homeRooms[roomIdx];
       setState(() => _matchedHomeItems.add(_homeChallengeIndex));
+      // A whole sentence where the room has one ("The Kitchen is where a
+      // family cooks and eats together"); otherwise its name and activity.
+      final popup = room['popup'] as String?;
       _raiseTip(
         '${currentChallenge['itemEmoji']} '
-        '${room['name']}: ${room['activity']}',
+        '${popup ?? '${room['name']}: ${room['activity']}'}',
         then: () {
           if (_homeChallengeIndex + 1 < challenges.length) {
             setState(() => _homeChallengeIndex++);

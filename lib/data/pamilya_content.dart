@@ -1532,30 +1532,36 @@ class PamilyaContent {
         'name': 'Living Room',
         'emoji': '🛋️',
         'activity': 'family relaxes and watches TV together',
+        'popup':
+            'The Living Room is where a family relaxes and watches TV together',
         'color': Color(0xFFE74C3C)
       },
       {
         'name': 'The Kitchen',
         'emoji': '🍳',
         'activity': 'family cooks and eats together',
+        'popup': 'The Kitchen is where a family cooks and eats together',
         'color': Color(0xFFE67E22)
       },
       {
         'name': 'The Bedroom',
         'emoji': '🛏️',
         'activity': 'family rests and talks together',
+        'popup': 'The Bedroom is where a family rests and talks together',
         'color': Color(0xFF3498DB)
       },
       {
         'name': 'Bathroom',
         'emoji': '🚿',
         'activity': 'family bathes and washes up',
+        'popup': 'The Bathroom is where family bathes and washes up',
         'color': Color(0xFF1ABC9C)
       },
       {
         'name': 'Yard',
         'emoji': '🌿',
         'activity': 'family plays and spends time together',
+        'popup': 'The Yard is where a family plays and spends time together',
         'color': Color(0xFF2ECC71)
       },
     ],
