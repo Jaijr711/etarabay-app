@@ -1529,6 +1529,12 @@ abstract class AppLocalizations {
   /// **'Count and drag the correct number!'**
   String get countAndDragCorrectNumber;
 
+  /// No description provided for @countThenDragToBasket.
+  ///
+  /// In en, this message translates to:
+  /// **'Count the {items} then drag them to the basket'**
+  String countThenDragToBasket(String items);
+
   /// No description provided for @whatIsMissingNumber.
   ///
   /// In en, this message translates to:

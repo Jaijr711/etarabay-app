@@ -773,6 +773,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get countAndDragCorrectNumber => 'Count and drag the correct number!';
 
   @override
+  String countThenDragToBasket(String items) {
+    return 'Count the $items then drag them to the basket';
+  }
+
+  @override
   String get whatIsMissingNumber => 'What number is missing?';
 
   @override

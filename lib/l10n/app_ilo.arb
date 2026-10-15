@@ -357,6 +357,7 @@
   "checkAnswer": "Kitaen",
   "noGamesAvailable2": "Awan ti ay-ayam",
   "countAndDragCorrectNumber": "Bilangen ken iyakar ti kusto a numero!",
+  "countThenDragToBasket": "Bilangen dagiti {items} ket iyakar iti basket",
   "whatIsMissingNumber": "Ania ti mapukpukaw a numero?",
   "straightOrCorrect": "Kusto!",
   "iKnowIt": "Ammok dayta!",

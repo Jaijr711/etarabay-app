@@ -259,26 +259,41 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   final List<Map<String, dynamic>> _game2Levels = const [
     {
       'emoji': '🌸',
+      'item_name_en': 'flowers',
+      'item_name_il': 'sabong',
+      'item_name_tl': 'bulaklak',
       'correct': 2,
       'choices': [1, 2, 3]
     },
     {
       'emoji': '🎈',
+      'item_name_en': 'balloons',
+      'item_name_il': 'lobo',
+      'item_name_tl': 'lobo',
       'correct': 4,
       'choices': [3, 4, 5]
     },
     {
       'emoji': '🚗',
+      'item_name_en': 'cars',
+      'item_name_il': 'lugan',
+      'item_name_tl': 'kotse',
       'correct': 3,
       'choices': [2, 3, 4]
     },
     {
       'emoji': '⭐',
+      'item_name_en': 'stars',
+      'item_name_il': 'bituen',
+      'item_name_tl': 'bituin',
       'correct': 5,
       'choices': [4, 5, 6]
     },
     {
       'emoji': '⚽',
+      'item_name_en': 'balls',
+      'item_name_il': 'bola',
+      'item_name_tl': 'bola',
       'correct': 6,
       'choices': [5, 6, 7]
     },
@@ -893,6 +908,21 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     final english = game['question_en'] as String?;
     if (key == 'item_name_en' && english != null) return english;
     return AppLocalizations.of(context)!.howMany(game[key] ?? 'items');
+  }
+
+  /// "Count the flowers then drag them to the basket" — the question names
+  /// what is on the board, in the app's language, instead of the one line
+  /// every board used to share.
+  String _getDragFromMap(Map<String, dynamic> game) {
+    final lang = Provider.of<LanguageProvider>(context, listen: false);
+    final key = lang.currentLanguage == 'ilo'
+        ? 'item_name_il'
+        : (lang.currentLanguage == 'fil' ? 'item_name_tl' : 'item_name_en');
+    final items = game[key] as String?;
+    final loc = AppLocalizations.of(context)!;
+    return items == null
+        ? loc.countAndDragCorrectNumber
+        : loc.countThenDragToBasket(items);
   }
 
   String _getMatchFromMap(Map<String, dynamic> game) {
@@ -2207,8 +2237,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
           LayoutBuilder(
             builder: (_, box) => ConstrainedBox(
               constraints: BoxConstraints(maxHeight: box.maxHeight * 0.36),
-              child: _questionText(
-                  AppLocalizations.of(context)!.countAndDragCorrectNumber),
+              child: _questionText(_getDragFromMap(game)),
             ),
           ),
           const SizedBox(height: 10),

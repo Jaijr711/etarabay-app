@@ -357,6 +357,7 @@
   "checkAnswer": "Suriin",
   "noGamesAvailable2": "Walang larong magagamit.",
   "countAndDragCorrectNumber": "Bilangin at itapat ang tamang numero!",
+  "countThenDragToBasket": "Bilangin ang mga {items} at itapat sa basket",
   "whatIsMissingNumber": "Ano ang nawawalang bilang?",
   "straightOrCorrect": "Tama!",
   "iKnowIt": "Natutuhan ko na",

@@ -782,6 +782,11 @@ class AppLocalizationsFil extends AppLocalizations {
       'Bilangin at itapat ang tamang numero!';
 
   @override
+  String countThenDragToBasket(String items) {
+    return 'Bilangin ang mga $items at itapat sa basket';
+  }
+
+  @override
   String get whatIsMissingNumber => 'Ano ang nawawalang bilang?';
 
   @override

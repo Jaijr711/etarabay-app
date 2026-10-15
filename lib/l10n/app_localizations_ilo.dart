@@ -777,6 +777,11 @@ class AppLocalizationsIlo extends AppLocalizations {
       'Bilangen ken iyakar ti kusto a numero!';
 
   @override
+  String countThenDragToBasket(String items) {
+    return 'Bilangen dagiti $items ket iyakar iti basket';
+  }
+
+  @override
   String get whatIsMissingNumber => 'Ania ti mapukpukaw a numero?';
 
   @override

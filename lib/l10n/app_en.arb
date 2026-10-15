@@ -381,6 +381,14 @@
   "checkAnswer": "Check",
   "noGamesAvailable2": "No games available",
   "countAndDragCorrectNumber": "Count and drag the correct number!",
+  "countThenDragToBasket": "Count the {items} then drag them to the basket",
+  "@countThenDragToBasket": {
+    "placeholders": {
+      "items": {
+        "type": "String"
+      }
+    }
+  },
   "whatIsMissingNumber": "What number is missing?",
   "straightOrCorrect": "Correct!",
   "iKnowIt": "I learned it!",
