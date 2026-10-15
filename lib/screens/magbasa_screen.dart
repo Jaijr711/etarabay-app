@@ -139,7 +139,7 @@ class _MagbasaScreenState extends State<MagbasaScreen>
           'title': 'Ania ti Nagan Mo',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/boy.png'
+          'image': 'assets/images/category_kanta.png'
         },
         {
           'id': 'uppat_a_pato',
@@ -174,7 +174,7 @@ class _MagbasaScreenState extends State<MagbasaScreen>
           'title': 'Ni Nanangko',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/nanay.png'
+          'image': 'assets/images/category_kanta.png'
         },
         {
           'id': 'da_tarong',
@@ -188,14 +188,14 @@ class _MagbasaScreenState extends State<MagbasaScreen>
           'title': 'Nagmulaak iti Katuday',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/flower.png'
+          'image': 'assets/images/category_kanta.png'
         },
         {
           'id': 'lima_a_tinapay',
           'title': 'Lima a Tinapay ken dua nga Ikan',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/fish.png'
+          'image': 'assets/images/category_kanta.png'
         },
       ]
     },

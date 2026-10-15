@@ -112,7 +112,7 @@ class MagbasaContent {
       'title': 'Ania ti Nagan Mo',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/boy.png'
+      'image': 'assets/images/category_kanta.png'
     },
     {
       'id': 'uppat_a_pato',
@@ -147,7 +147,7 @@ class MagbasaContent {
       'title': 'Ni Nanangko',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/nanay.png'
+      'image': 'assets/images/category_kanta.png'
     },
     {
       'id': 'da_tarong',
@@ -161,14 +161,14 @@ class MagbasaContent {
       'title': 'Nagmulaak iti Katuday',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/flower.png'
+      'image': 'assets/images/category_kanta.png'
     },
     {
       'id': 'lima_a_tinapay',
       'title': 'Lima a Tinapay ken dua nga Ikan',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/fish.png'
+      'image': 'assets/images/category_kanta.png'
     },
   ];
 
@@ -490,7 +490,7 @@ class MagbasaContent {
         'Agsala, agkanta',
         'Itung-ed ti ulo.',
       ],
-      'image': 'assets/images/boy.png',
+      'image': 'assets/images/category_kanta.png',
       // Re-recorded and cleaned up 2026-09-02 (highpass + FFT denoise +
       // loudnorm, see the note on Sipsipat's audioPath) — replaces the
       // earlier Kurtjam Kyle Silva Nono recording entirely. Lyrics rewritten
@@ -651,7 +651,7 @@ class MagbasaContent {
         'Pinaglalangto ti kaykayo',
         'Bungbunganat adu.',
       ],
-      'image': 'assets/images/nanay.png',
+      'image': 'assets/images/category_kanta.png',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Ni_Nanangko.mp3',
@@ -716,7 +716,7 @@ class MagbasaContent {
         'Aramidek a sagaysay',
         'Sagaysay ni Nanang Ikay.',
       ],
-      'image': 'assets/images/flower.png',
+      'image': 'assets/images/category_kanta.png',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Nagmulaak_iti_Katuday.mp3',
@@ -736,7 +736,7 @@ class MagbasaContent {
         'Immadu diay tinapay, immadu met diay ikan (3x)',
         'Ket nabsogda amin.',
       ],
-      'image': 'assets/images/fish.png',
+      'image': 'assets/images/category_kanta.png',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Lima_a_Tinapay.mp3',

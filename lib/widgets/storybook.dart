@@ -3,6 +3,8 @@ import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/user_provider.dart';
+import '../utils/constants.dart';
+import 'custom_back_button.dart';
 import 'question_cloud.dart' show DoodleBackground;
 import 'sparkle_decor.dart';
 
@@ -84,11 +86,11 @@ class StorybookScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFDFCFF),
+      appBar: _header(context),
       body: Stack(children: [
         const Positioned.fill(child: DoodleBackground()),
         SafeArea(
           child: Column(children: [
-            _header(context),
             if (banner != null)
               Padding(
                 padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
@@ -129,36 +131,53 @@ class StorybookScaffold extends StatelessWidget {
     );
   }
 
-  Widget _header(BuildContext context) {
+  /// The app's own header, the same as the Magbasa list it was opened
+  /// from: a white bar, the back button, the title and the star total.
+  PreferredSizeWidget _header(BuildContext context) {
     final stars = Provider.of<UserProvider>(context).displayStars;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.92),
-        border: const Border(
-            bottom: BorderSide(color: Color(0xFFE2E5F2), width: 2)),
+    return AppBar(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
+      elevation: 0,
+      leading: CustomBackButton(
+        iconColor: AppColors.textDark,
+        onPressed: onClose,
       ),
-      child: Row(children: [
-        _BackButton(onTap: onClose),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Stack(clipBehavior: Clip.none, children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(title,
-                    maxLines: 1,
-                    style: fredoka(30, navy, weight: 650).copyWith(shadows: [
-                      const Shadow(color: Colors.white, blurRadius: 4),
-                    ])),
-              ),
-            ),
+      title: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(
+            color: AppColors.textDark,
+            fontSize: 20,
+            fontWeight: FontWeight.bold),
+      ),
+      actions: [
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.amber.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(20),
+            border:
+                Border.all(color: Colors.amber.withOpacity(0.3), width: 1.5),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.star_rounded, color: Color(0xFFFFB800), size: 17),
+            const SizedBox(width: 4),
+            Text('$stars',
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFF5A300),
+                    fontSize: 14)),
           ]),
         ),
-        const SizedBox(width: 8),
-        _StarPill(stars: stars),
-      ]),
+        const SizedBox(width: 4),
+      ],
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(1),
+        child: Container(color: Colors.grey.shade200, height: 1),
+      ),
     );
   }
 
@@ -602,84 +621,6 @@ class _SprigPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_SprigPainter oldDelegate) => oldDelegate.left != left;
-}
-
-/// The grey round back button with a curved arrow.
-class _BackButton extends StatelessWidget {
-  final VoidCallback onTap;
-  const _BackButton({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 54,
-        height: 54,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: const Color(0xFF5E6470),
-          boxShadow: [
-            const BoxShadow(color: Color(0xFF3C414B), offset: Offset(0, 4)),
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 6,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.all(4),
-        child: Container(
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFFB4B9C3), Color(0xFF858B97)],
-            ),
-          ),
-          child: const Icon(Icons.reply_rounded,
-              color: Color(0xFFF2F4F8), size: 32),
-        ),
-      ),
-    );
-  }
-}
-
-/// The child's star total in a gold pill.
-class _StarPill extends StatelessWidget {
-  final int stars;
-  const _StarPill({required this.stars});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(6, 4, 14, 4),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFFFDB5C), Color(0xFFF5A623)],
-        ),
-        border: Border.all(color: const Color(0xFFC98A10), width: 2.5),
-        boxShadow: const [
-          BoxShadow(color: Color(0xFFB57A0C), offset: Offset(0, 3)),
-        ],
-      ),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        const Image(
-          image: AssetImage('assets/images/star_happy_1.webp'),
-          width: 34,
-          height: 34,
-          filterQuality: FilterQuality.medium,
-        ),
-        const SizedBox(width: 4),
-        Text('$stars',
-            style: StorybookScaffold.fredoka(22, const Color(0xFF7A4A00))),
-      ]),
-    );
-  }
 }
 
 /// The song card's sky: blue running pale towards the foot, with clouds
