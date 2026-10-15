@@ -14,9 +14,10 @@ class UserProfile {
   List<String> certificates;
   List<String> claimedBadges;
 
-  /// When each badge/certificate id was earned, in epoch milliseconds — the
-  /// class-wide "recent achievements" feed on the teacher dashboard is the
-  /// only reader. Client clock rather than a server timestamp, in keeping
+  /// When each badge/certificate id was earned, in epoch milliseconds. The
+  /// teacher dashboard's "recent achievements" feed that read these was
+  /// removed (2026-10-15); they are still recorded, so a feed could come back
+  /// without losing the history. Client clock rather than a server timestamp, in keeping
   /// with the rest of this offline-first sync: the moment that matters is
   /// when the child on this device earned it, not when the write reached
   /// Firestore.

@@ -6,9 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../data/badge_catalog.dart';
-import '../models/certificate_model.dart';
-import '../providers/language_provider.dart';
 import '../providers/user_provider.dart';
 import '../services/auth_service.dart';
 import '../services/auth_messages.dart';
@@ -28,23 +25,6 @@ import 'package:flutter_lucide/flutter_lucide.dart';
 /// shows the children it counted and nobody else, so a teacher can read a
 /// number and then go straight to the names behind it.
 enum _ClassFilter { none, needHelp, unseen }
-
-/// One row of the class-wide "recent achievements" feed — a badge claimed or
-/// a certificate awarded, by whom, and when. Built fresh from every loaded
-/// student doc on each snapshot rather than stored anywhere of its own.
-class _RecentAchievement {
-  const _RecentAchievement({
-    required this.studentName,
-    required this.id,
-    required this.isCertificate,
-    required this.atMillis,
-  });
-
-  final String studentName;
-  final String id;
-  final bool isCertificate;
-  final int atMillis;
-}
 
 class TeacherDashboardScreen extends StatefulWidget {
   const TeacherDashboardScreen({super.key});
@@ -1962,46 +1942,6 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
               }
             }
 
-            // Who just earned what, across the whole class — the one thing
-            // this dashboard could not show before: it could open any child
-            // and see their badges, but never learn of a new one without
-            // going looking for it.
-            final recentAchievements = <_RecentAchievement>[];
-            for (final doc in studentDocs) {
-              final data = doc.data();
-              final name = (data['name'] ?? '').toString();
-              if (name.isEmpty) continue;
-              final profile = data['profile'] as Map<String, dynamic>?;
-              final badgeClaimedAt =
-                  profile?['badgeClaimedAt'] as Map<String, dynamic>?;
-              badgeClaimedAt?.forEach((id, at) {
-                final millis = (at as num?)?.toInt();
-                if (millis != null) {
-                  recentAchievements.add(_RecentAchievement(
-                    studentName: name,
-                    id: id,
-                    isCertificate: false,
-                    atMillis: millis,
-                  ));
-                }
-              });
-              final certAwardedAt =
-                  profile?['certificateAwardedAt'] as Map<String, dynamic>?;
-              certAwardedAt?.forEach((id, at) {
-                final millis = (at as num?)?.toInt();
-                if (millis != null) {
-                  recentAchievements.add(_RecentAchievement(
-                    studentName: name,
-                    id: id,
-                    isCertificate: true,
-                    atMillis: millis,
-                  ));
-                }
-              });
-            }
-            recentAchievements.sort((a, b) => b.atMillis.compareTo(a.atMillis));
-            final topAchievements = recentAchievements.take(8).toList();
-
             final q = _searchQuery.trim().toLowerCase();
             var filteredDocs = q.isEmpty
                 ? studentDocs
@@ -2089,10 +2029,6 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                     ),
                   ),
                 ),
-
-                // Who just earned what, class-wide.
-                if (topAchievements.isNotEmpty)
-                  _buildRecentAchievements(topAchievements),
 
                 // Birthday notification banner
                 if (birthdayStudents.isNotEmpty)
@@ -2431,151 +2367,6 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
               const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
       ),
-    );
-  }
-
-  /// Looked up by id from the recent-achievements feed — keyed once here
-  /// rather than a linear search per row.
-  static final Map<String, BadgeDef> _badgeById = {
-    for (final b in badgeCatalog) b.id: b,
-  };
-
-  IconData _achievementIcon(_RecentAchievement entry) {
-    if (entry.isCertificate) {
-      return allCertificates[entry.id]?.icon ?? LucideIcons.award;
-    }
-    return _badgeById[entry.id]?.icon ?? LucideIcons.award;
-  }
-
-  Color _achievementColor(_RecentAchievement entry) {
-    if (entry.isCertificate) {
-      return allCertificates[entry.id]?.primaryColor ?? AppColors.primary;
-    }
-    final def = _badgeById[entry.id];
-    return def != null ? Color(def.color) : AppColors.primary;
-  }
-
-  String _achievementTitle(_RecentAchievement entry) {
-    if (entry.isCertificate) {
-      final cert = allCertificates[entry.id];
-      if (cert == null) return entry.id;
-      final langCode = Provider.of<LanguageProvider>(context, listen: false)
-          .currentLanguageCode;
-      switch (langCode) {
-        case 'fil':
-          return cert.titleFil;
-        case 'ilo':
-          return cert.titleIlo;
-        default:
-          return cert.title;
-      }
-    }
-    return _badgeTitle(context, entry.id);
-  }
-
-  String _badgeTitle(BuildContext context, String id) {
-    final loc = AppLocalizations.of(context)!;
-    switch (id) {
-      case 'firstSteps':
-        return loc.badgeFirstStepsTitle;
-      case 'alphabet':
-        return loc.badgeAlphabetTitle;
-      case 'numbers':
-        return loc.badgeNumbersTitle;
-      case 'colors':
-        return loc.badgeColorsTitle;
-      case 'shapes':
-        return loc.badgeShapesTitle;
-      case 'animals':
-        return loc.badgeAnimalsTitle;
-      case 'bookworm':
-        return loc.badgeBookwormTitle;
-      case 'starStudent':
-        return loc.badgeStarStudentTitle;
-      case 'mathWhiz':
-        return loc.badgeMathWhizTitle;
-      case 'familyHero':
-        return loc.badgeFamilyHeroTitle;
-      case 'writingStar':
-        return loc.badgeWritingStarTitle;
-      case 'songbird':
-        return loc.badgeSongbirdTitle;
-      case 'streakFive':
-        return loc.badgeStreakFiveTitle;
-      default:
-        return id;
-    }
-  }
-
-  String _relativeTime(int millis) {
-    final loc = AppLocalizations.of(context)!;
-    final diff =
-        DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(millis));
-    if (diff.inMinutes < 1) return loc.justNow;
-    if (diff.inMinutes < 60) return loc.timeAgo(diff.inMinutes);
-    if (diff.inHours < 24) return loc.hoursAgo(diff.inHours);
-    return loc.daysAgo(diff.inDays);
-  }
-
-  /// Badges claimed and certificates awarded, newest first, across every
-  /// student loaded on this snapshot — capped by the caller (see
-  /// `topAchievements`) since this is a glance, not a log.
-  Widget _buildRecentAchievements(List<_RecentAchievement> entries) {
-    final loc = AppLocalizations.of(context)!;
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 2, 16, 6),
-      padding: const EdgeInsets.fromLTRB(14, 11, 14, 4),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 12,
-              offset: const Offset(0, 4)),
-        ],
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Icon(LucideIcons.sparkles, size: 15, color: Colors.grey.shade500),
-          const SizedBox(width: 7),
-          Text(loc.recentAchievements,
-              style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textDark)),
-        ]),
-        const SizedBox(height: 9),
-        for (final entry in entries) ...[
-          Row(children: [
-            Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: _achievementColor(entry).withOpacity(0.12),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(_achievementIcon(entry),
-                  size: 14, color: _achievementColor(entry)),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                loc.achievementEarnedBy(
-                    entry.studentName, _achievementTitle(entry)),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                    fontSize: 12.5, fontWeight: FontWeight.w600),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(_relativeTime(entry.atMillis),
-                style: TextStyle(fontSize: 11, color: Colors.grey.shade400)),
-          ]),
-          const SizedBox(height: 9),
-        ],
-      ]),
     );
   }
 
