@@ -20,12 +20,42 @@ Future<void> showReplayDialog(
   required int stars,
   int? points,
   required VoidCallback onRepeat,
+}) =>
+    _show(context, stars: stars, points: points, onRepeat: onRepeat);
+
+/// The same card for a whole lesson finished (the lesson tiles): its name as
+/// the title, "You finished this lesson! Great job!" under the coin, and the
+/// same Repeat and OK. No stars — a lesson is many levels, each with its own.
+Future<void> showLessonFinishedDialog(
+  BuildContext context, {
+  required String title,
+  required VoidCallback onRepeat,
+}) {
+  final loc = AppLocalizations.of(context)!;
+  return _show(context,
+      title: title,
+      headline: loc.lessonFinishedPrompt,
+      note: '',
+      onRepeat: onRepeat);
+}
+
+Future<void> _show(
+  BuildContext context, {
+  int? stars,
+  int? points,
+  String? title,
+  String? headline,
+  String? note,
+  required VoidCallback onRepeat,
 }) {
   return showDialog(
     context: context,
     builder: (dialogContext) => _ReplayDialog(
       stars: stars,
       points: points,
+      title: title,
+      headline: headline,
+      note: note,
       onRepeat: () {
         Navigator.pop(dialogContext);
         onRepeat();
@@ -36,8 +66,19 @@ Future<void> showReplayDialog(
 }
 
 class _ReplayDialog extends StatelessWidget {
-  final int stars;
+  /// The level's stars; null leaves the row out.
+  final int? stars;
   final int? points;
+
+  /// "Finished already!" unless given.
+  final String? title;
+
+  /// "Done already!" unless given.
+  final String? headline;
+
+  /// "Playing again replaces this star." unless given; empty leaves it out.
+  final String? note;
+
   final VoidCallback onRepeat;
   final VoidCallback onOk;
 
@@ -46,6 +87,9 @@ class _ReplayDialog extends StatelessWidget {
     required this.points,
     required this.onRepeat,
     required this.onOk,
+    this.title,
+    this.headline,
+    this.note,
   });
 
   static const coin = 'assets/images/replay_coin.webp';
@@ -182,7 +226,7 @@ class _ReplayDialog extends StatelessWidget {
             FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(
-                loc.finishedAlready,
+                title ?? loc.finishedAlready,
                 maxLines: 1,
                 style:
                     _fredoka(31, _navy, weight: 650).copyWith(shadows: const [
@@ -190,34 +234,38 @@ class _ReplayDialog extends StatelessWidget {
                 ]),
               ),
             ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                for (int i = 0; i < 3; i++)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 3),
-                    child: _star(i < stars),
-                  ),
-              ],
-            ),
+            if (stars != null) ...[
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  for (int i = 0; i < 3; i++)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 3),
+                      child: _star(i < stars!),
+                    ),
+                ],
+              ),
+            ],
             if (points != null) ...[
               const SizedBox(height: 8),
               _PointsText('$points ${loc.pointsLabel}'),
             ],
             const SizedBox(height: 12),
-            Text(loc.doneAlready,
+            Text(headline ?? loc.doneAlready,
                 textAlign: TextAlign.center,
-                style: _fredoka(22, _navy, weight: 600)),
-            const SizedBox(height: 6),
-            Text(
-              loc.replayReplacesStar,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF4A4A5E),
-                  fontWeight: FontWeight.w500),
-            ),
+                style: _fredoka(22, _navy, weight: 600).copyWith(height: 1.2)),
+            if ((note ?? loc.replayReplacesStar).isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Text(
+                note ?? loc.replayReplacesStar,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF4A4A5E),
+                    fontWeight: FontWeight.w500),
+              ),
+            ],
           ]),
         ),
       ),

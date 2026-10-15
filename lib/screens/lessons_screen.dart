@@ -1,5 +1,6 @@
 import 'package:e_tarabay/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import '../widgets/replay_dialog.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -679,61 +680,9 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
   /// Celebrates a finished lesson but still lets the child back in — young
   /// children learn by repeating an activity, so completion must not lock it.
   void _showCompletedDialog(String title, VoidCallback onReplay) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-        title: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFFBEB),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.star_rounded,
-                  color: Color(0xFFFFB800), size: 44),
-            ),
-            const SizedBox(height: 12),
-            Text(title,
-                textAlign: TextAlign.center,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 21)),
-          ],
-        ),
-        content: Text(
-          AppLocalizations.of(context)!.lessonFinishedPrompt,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 16),
-        ),
-        actionsAlignment: MainAxisAlignment.center,
-        actions: [
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-            ),
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              onReplay();
-            },
-            icon: const Icon(LucideIcons.rotate_ccw, size: 20),
-            label: Text(AppLocalizations.of(context)!.ulitin,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(AppLocalizations.of(context)!.okButton,
-                style: const TextStyle(fontSize: 16)),
-          ),
-        ],
-      ),
-    );
+    // The same card as a finished level's "Finished already!", with the
+    // lesson's name as its title.
+    showLessonFinishedDialog(context, title: title, onRepeat: onReplay);
   }
 
   Widget _buildLessonCard({

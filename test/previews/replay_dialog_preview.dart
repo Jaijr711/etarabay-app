@@ -26,8 +26,9 @@ void main() {
   for (final c in [
     ('en', 3, 50),
     ('fil', 1, null),
+    ('en', -1, null),
   ]) {
-    testWidgets('replay ${c.$1}', (tester) async {
+    testWidgets('replay ${c.$1} ${c.$2}', (tester) async {
       await tester.binding.setSurfaceSize(const Size(400, 820));
       await tester.pumpWidget(MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -40,8 +41,12 @@ void main() {
             backgroundColor: const Color(0xFFEFEDF7),
             body: Center(
               child: ElevatedButton(
-                onPressed: () => showReplayDialog(context,
-                    stars: c.$2, points: c.$3, onRepeat: () {}),
+                // Stars of -1: the lesson-finished card instead.
+                onPressed: () => c.$2 < 0
+                    ? showLessonFinishedDialog(context,
+                        title: 'Numbers', onRepeat: () {})
+                    : showReplayDialog(context,
+                        stars: c.$2, points: c.$3, onRepeat: () {}),
                 child: const Text('open'),
               ),
             ),
@@ -59,7 +64,7 @@ void main() {
         await tester.pump(const Duration(milliseconds: 200));
       }
       await expectLater(find.byType(MaterialApp),
-          matchesGoldenFile('../../docs/previews/replay_${c.$1}.png'));
+          matchesGoldenFile('../../docs/previews/replay_${c.$1}_${c.$2}.png'));
     });
   }
 }
