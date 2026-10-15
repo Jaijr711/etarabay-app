@@ -30,8 +30,9 @@ class QuestionCloud extends StatelessWidget {
       final mascotH = (h * 0.40).clamp(40.0, 120.0);
       // The words stop where the mascot's head begins, so the megaphone
       // never covers the end of the question.
-      final wordsTop = cloudH * 0.16;
+      final wordsTop = cloudH * 0.17;
       final wordsBottom = min(cloudH * 0.78, h - mascotH);
+      final wordsSide = w * 0.12;
 
       return SizedBox(
         width: w,
@@ -45,25 +46,29 @@ class QuestionCloud extends StatelessWidget {
             child: CustomPaint(painter: _CloudPainter()),
           ),
           // The words, inside the cloud's body and clear of its bumps.
-          Positioned(
-            left: w * 0.11,
-            right: w * 0.11,
-            top: wordsTop,
-            height: max(0.0, wordsBottom - wordsTop),
-            child: _OutlinedQuestion(question, ink: _ink),
-          ),
-          // Sparkles on the cloud.
+          // Sparkles on the cloud — only in its margins, round the outside
+          // of the words' box: up on the top bumps, and on the left edge.
+          // They used to sit inside it, where a long question's first or
+          // top-right letters ran into them.
           for (final s in const [
-            (0.80, 0.10, 0.10),
-            (0.88, 0.22, 0.06),
-            (0.08, 0.50, 0.08),
+            (0.40, 0.01, 0.09),
+            (0.61, 0.04, 0.06),
+            (0.035, 0.42, 0.07),
           ])
             Positioned(
               left: w * s.$1,
               top: cloudH * s.$2,
               child: Icon(Icons.auto_awesome,
-                  size: max(10.0, cloudH * s.$3), color: Colors.white),
+                  size: max(9.0, min(cloudH * s.$3, wordsTop * 0.9)),
+                  color: Colors.white),
             ),
+          Positioned(
+            left: wordsSide,
+            right: wordsSide,
+            top: wordsTop,
+            height: max(0.0, wordsBottom - wordsTop),
+            child: _OutlinedQuestion(question, ink: _ink),
+          ),
           Positioned(
             right: -w * 0.01,
             bottom: 0,
@@ -90,32 +95,61 @@ class _OutlinedQuestion extends StatelessWidget {
 
   /// The largest size, up to [_base], at which the question wraps between
   /// words into [box] — measured, rather than wrapped at 40 and shrunk, which
-  /// turned a long question into a narrow column of one word per line.
-  double _fit(BuildContext context, Size box) {
+  /// turned a long question into a narrow column of one word per line — and
+  /// the width to wrap it in.
+  ///
+  /// The width is the narrowest that keeps the same number of lines, so the
+  /// lines come out about even: wrapped at full width, "Putukin ang lahat ng
+  /// lobo na may bilang na 3" left the 3 alone on a line of its own.
+  ({double size, double width}) _fit(BuildContext context, Size box) {
     final base = DefaultTextStyle.of(context).style;
     final scaler = MediaQuery.textScalerOf(context);
     for (var size = _base; size > 10; size -= 1) {
       final style = base.merge(_style(size));
-      if (widestWordWidth(text, style, textScaler: scaler) > box.width) {
-        continue;
-      }
+      // The white rim is drawn half outside the letters, so it is room the
+      // words need too — measured without it, a question that "fit" still
+      // pushed its rim onto the cloud's edge.
+      final rim = _rimWidth(size);
+      final room = Size(box.width - rim, box.height - rim);
+      final widest = widestWordWidth(text, style, textScaler: scaler);
+      if (widest > room.width) continue;
       final painter = TextPainter(
         text: TextSpan(text: text, style: style),
         textAlign: TextAlign.center,
         textDirection: TextDirection.ltr,
         textScaler: scaler,
-      )..layout(maxWidth: box.width);
-      final fits = painter.height <= box.height;
+      )..layout(maxWidth: room.width);
+      if (painter.height > room.height) {
+        painter.dispose();
+        continue;
+      }
+      final lines = painter.computeLineMetrics().length;
+      var lo = widest, hi = room.width;
+      if (lines > 1) {
+        for (var i = 0; i < 12; i++) {
+          final mid = (lo + hi) / 2;
+          painter.layout(maxWidth: mid);
+          if (painter.computeLineMetrics().length > lines) {
+            lo = mid;
+          } else {
+            hi = mid;
+          }
+        }
+      }
       painter.dispose();
-      if (fits) return size;
+      // A hair over, so rounding never tips the last word onto a new line.
+      return (size: size, width: min(room.width, hi + 1));
     }
-    return 10;
+    return (size: 10, width: box.width);
   }
+
+  static double _rimWidth(double size) => max(3.0, size * 0.18);
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (_, box) {
-      final size = _fit(context, box.biggest);
+      final fit = _fit(context, box.biggest);
+      final size = fit.size;
       Text layer(Paint? stroke) => Text(
             text,
             textAlign: TextAlign.center,
@@ -127,14 +161,19 @@ class _OutlinedQuestion extends StatelessWidget {
       // A white rim around bold red letters, as in the design.
       final rim = Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = max(3.0, size * 0.18)
+        ..strokeWidth = _rimWidth(size)
         ..strokeJoin = StrokeJoin.round
         ..color = Colors.white;
+      // Laid out in the same narrower width it was measured in, so it
+      // wraps exactly where the measuring said it would.
       return Center(
-        child: Stack(alignment: Alignment.center, children: [
-          layer(rim),
-          layer(null),
-        ]),
+        child: SizedBox(
+          width: max(0.0, fit.width),
+          child: Stack(alignment: Alignment.center, children: [
+            layer(rim),
+            layer(null),
+          ]),
+        ),
       );
     });
   }

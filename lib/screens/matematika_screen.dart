@@ -2104,7 +2104,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   /// from the rest. The cloud is as tall as a share of its width (less when
   /// it is given less), and the words inside shrink to fit it.
   Widget _questionText(String text) => LayoutBuilder(builder: (_, box) {
-        final byWidth = box.maxWidth * 0.40;
+        final byWidth = box.maxWidth * 0.50;
         final h =
             box.maxHeight.isFinite ? min(box.maxHeight, byWidth) : byWidth;
         return SizedBox(
