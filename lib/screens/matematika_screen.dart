@@ -14,6 +14,8 @@ import '../providers/user_provider.dart';
 import '../services/sfx.dart';
 import '../utils/constants.dart';
 import '../widgets/answer_feedback.dart';
+import '../widgets/answer_tile.dart';
+import '../widgets/question_cloud.dart';
 import '../widgets/basket_picture.dart';
 import '../widgets/object_picture.dart';
 import '../widgets/pop_balloon.dart';
@@ -1485,6 +1487,8 @@ class _MatematikaScreenState extends State<MatematikaScreen>
         ),
         child: Stack(
           children: [
+            // The notebook doodles of the About Me boards, behind every game.
+            if (_playing) const Positioned.fill(child: DoodleBackground()),
             // Nothing under a feedback card is tappable while it is up.
             //
             // Guarding each handler separately never held: there are a dozen
@@ -1961,6 +1965,8 @@ class _MatematikaScreenState extends State<MatematikaScreen>
 
   Widget _mcqTile(int answer, {required int correct}) {
     final selected = _selectedAnswer == answer;
+    // White until tapped, then green or red — the About Me answer buttons.
+    final verdict = selected ? answer == correct : null;
     return Pressable(
       onTap: () {
         if (_feedbackShowing || _selectedAnswer != null) return;
@@ -1970,51 +1976,8 @@ class _MatematikaScreenState extends State<MatematikaScreen>
           if (mounted) _checkMCQ(correct);
         });
       },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        // Large tap target: small fingers need room to hit it reliably.
-        width: 92,
-        height: 92,
-        decoration: BoxDecoration(
-          gradient: selected
-              ? const LinearGradient(
-                  colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-              : null,
-          color: selected ? null : Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: selected ? AppColors.primary : Colors.grey.shade300,
-            width: selected ? 3 : 2,
-          ),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.45),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  )
-                ]
-              : [
-                  const BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 6,
-                      offset: Offset(0, 3))
-                ],
-        ),
-        child: Center(
-          child: Text(
-            answer.toString(),
-            style: TextStyle(
-              fontSize: 44,
-              fontWeight: FontWeight.w900,
-              color: selected ? Colors.white : AppColors.textDark,
-            ),
-          ),
-        ),
-      ),
+      // Large tap target: small fingers need room to hit it reliably.
+      child: _chunkyNumber(answer, 92, 44, verdict: verdict),
     );
   }
 
@@ -2134,37 +2097,47 @@ class _MatematikaScreenState extends State<MatematikaScreen>
 
   // ─── Game 1: Count & pick ────────────────────────────────────────────────────
 
-  /// The question, at the one size that matters most on the board.
+  /// The question, said by the dino in the coral speech cloud — the same
+  /// [QuestionCloud] the About Me boards ask with.
   ///
   /// Every game asks its question through this, so none of them can drift
-  /// smaller than the rest — and it shrinks to fit rather than wrapping into
-  /// a wall of small text on a narrow phone.
-  Widget _questionText(String text) => LayoutBuilder(
-        builder: (_, box) => FittedBox(
-          fit: BoxFit.scaleDown,
-          // Pinned to the width it actually has, so the words wrap onto a
-          // second line at full size instead of being squeezed onto one.
-          //
-          // A bare FittedBox only ever shrinks — it will not grow text to fill
-          // the room available — so a short question sat at its base size with
-          // half the card empty above it. Setting the base size large and
-          // letting long questions wrap gets both: big words, and nothing
-          // running off the edge.
-          child: SizedBox(
-            width: box.maxWidth,
-            child: Text(
-              text,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 38,
-                fontWeight: FontWeight.w800,
-                color: AppColors.textDark,
-                height: 1.12,
-              ),
+  /// from the rest. The cloud is as tall as a share of its width (less when
+  /// it is given less), and the words inside shrink to fit it.
+  Widget _questionText(String text) => LayoutBuilder(builder: (_, box) {
+        final byWidth = box.maxWidth * 0.40;
+        final h =
+            box.maxHeight.isFinite ? min(box.maxHeight, byWidth) : byWidth;
+        return SizedBox(
+          width: box.maxWidth,
+          height: h,
+          child: QuestionCloud(text),
+        );
+      });
+
+  /// A number on a white 3D button, as the About Me answers are drawn —
+  /// turning green or red once [verdict] is known. [width] is the face; the
+  /// solid edge under it adds 5.
+  Widget _chunkyNumber(int n, double width, double fontSize, {bool? verdict}) {
+    return SizedBox(
+      width: width,
+      height: width + 5,
+      child: ToneFrame(
+        index: 0,
+        verdict: verdict,
+        padding: EdgeInsets.zero,
+        child: Center(
+          child: Text(
+            '$n',
+            style: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.w900,
+              color: ToneFrame.inkFor(0, verdict: verdict),
             ),
           ),
         ),
-      );
+      ),
+    );
+  }
 
   /// The things to be counted, drawn as large as the space allows.
   ///
@@ -2209,8 +2182,12 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       final maxCols = sizeN < 4 ? sizeN : 4;
       for (int cols = 1; cols <= (maxCols < 1 ? 1 : maxCols); cols++) {
         final rows = (sizeN / cols).ceil();
-        final w = (box.maxWidth - gap * (cols - 1)) / cols;
-        final h = (box.maxHeight - gap * (rows - 1)) / rows;
+        // Every picture carries half a gap of padding on each side, so a
+        // line of them is a whole gap per picture wider (and a column a
+        // whole gap per row taller) than the pictures alone — counting one
+        // gap fewer ran the last picture 10 pixels off the card.
+        final w = (box.maxWidth - gap * cols) / cols;
+        final h = (box.maxHeight - gap * rows) / rows;
         final candidate = w < h ? w : h;
         if (candidate > side) {
           side = candidate;
@@ -2472,42 +2449,8 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     );
   }
 
-  Widget _numberChip(int n, {bool floating = false}) {
-    return Container(
-      width: 76,
-      height: 76,
-      decoration: BoxDecoration(
-        color: floating ? AppColors.primary : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-            color: floating
-                ? AppColors.primary
-                : AppColors.primary.withOpacity(0.4),
-            width: 2),
-        boxShadow: floating
-            ? [
-                BoxShadow(
-                    color: AppColors.primary.withOpacity(0.5),
-                    blurRadius: 18,
-                    offset: const Offset(0, 8))
-              ]
-            : [
-                const BoxShadow(
-                    color: Colors.black12, blurRadius: 6, offset: Offset(0, 2))
-              ],
-      ),
-      child: Center(
-        child: Text(
-          n.toString(),
-          style: TextStyle(
-            fontSize: 34,
-            fontWeight: FontWeight.bold,
-            color: floating ? Colors.white : AppColors.textDark,
-          ),
-        ),
-      ),
-    );
-  }
+  Widget _numberChip(int n, {bool floating = false}) =>
+      _chunkyNumber(n, 76, 36);
 
   // ─── Game 3: Node-to-node line matching ──────────────────────────────────────
 
@@ -2893,56 +2836,34 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     final popped = _poppedBalloons.length;
 
     return _boardFrame(
-      question: _gameCard(
-        child: Column(
-          children: [
-            RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(
-                style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textDark),
-                children: [
-                  TextSpan(
-                      text:
-                          '${AppLocalizations.of(context)!.popAllBalloonsWith} '),
-                  TextSpan(
-                    text: '$target',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 34,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
+      question: Column(
+        children: [
+          _questionText(
+              '${AppLocalizations.of(context)!.popAllBalloonsWith} $target'),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '$popped / $totalCorrect  ',
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
               ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '$popped / $totalCorrect  ',
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+              // One dot per balloon that has to go, filling as they do.
+              // Both branches used to name the same outline icon, so the
+              // row never moved and told the child nothing.
+              ...List.generate(
+                totalCorrect,
+                (i) => Icon(
+                  i < popped ? LucideIcons.circle_check : LucideIcons.circle,
+                  color: i < popped
+                      ? AppColors.primary
+                      : AppColors.primary.withOpacity(0.3),
+                  size: 14,
                 ),
-                // One dot per balloon that has to go, filling as they do.
-                // Both branches used to name the same outline icon, so the
-                // row never moved and told the child nothing.
-                ...List.generate(
-                  totalCorrect,
-                  (i) => Icon(
-                    i < popped ? LucideIcons.circle_check : LucideIcons.circle,
-                    color: i < popped
-                        ? AppColors.primary
-                        : AppColors.primary.withOpacity(0.3),
-                    size: 14,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
       play: LayoutBuilder(builder: (_, box) {
         // Size the cells to the space that is actually there, so every
@@ -3011,16 +2932,14 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Column(
         children: [
-          _gameCard(
-            child: _questionText(
-              game['type'] == 'more'
-                  ? AppLocalizations.of(context)!.whichIsMore
-                  : game['type'] == 'less'
-                      ? AppLocalizations.of(context)!.whichIsLess
-                      : AppLocalizations.of(context)!.isSameNumber,
-            ),
+          _questionText(
+            game['type'] == 'more'
+                ? AppLocalizations.of(context)!.whichIsMore
+                : game['type'] == 'less'
+                    ? AppLocalizations.of(context)!.whichIsLess
+                    : AppLocalizations.of(context)!.isSameNumber,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 14),
           Expanded(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -3050,57 +2969,9 @@ class _MatematikaScreenState extends State<MatematikaScreen>
             const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _handleEqualChoice(true),
-                    icon: const Icon(LucideIcons.circle_check,
-                        color: Colors.white, size: 28),
-                    label: Text(
-                      AppLocalizations.of(context)!.yesAnswer,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      elevation: 4,
-                    ),
-                  ),
-                ),
+                Expanded(child: _yesNoButton(true)),
                 const SizedBox(width: 14),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _handleEqualChoice(false),
-                    icon: const Icon(LucideIcons.circle_x,
-                        color: Colors.white, size: 28),
-                    label: Text(
-                      AppLocalizations.of(context)!.noAnswer,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      elevation: 4,
-                    ),
-                  ),
-                ),
+                Expanded(child: _yesNoButton(false)),
               ],
             ),
           ],
@@ -3120,61 +2991,85 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     final selected = _selectedSide == sideKey;
     final answered = _selectedSide != null;
 
-    Color borderColor;
-    Color bgColor;
-    if (answered) {
-      if (correct == 'equal') {
-        borderColor = Colors.orange;
-        bgColor = Colors.orange.withOpacity(0.08);
-      } else if (sideKey == correct) {
-        borderColor = Colors.green;
-        bgColor = Colors.green.withOpacity(0.08);
-      } else if (selected) {
-        borderColor = Colors.red;
-        bgColor = Colors.red.withOpacity(0.08);
-      } else {
-        borderColor = Colors.grey.shade300;
-        bgColor = Colors.white;
-      }
-    } else {
-      borderColor = selected ? AppColors.primary : Colors.grey.shade300;
-      bgColor = selected ? AppColors.primary.withOpacity(0.08) : Colors.white;
-    }
+    // White until answered; then the right side turns green and a wrongly
+    // chosen one red. "Same number" boards are answered with Yes / No, so
+    // their sides stay white.
+    final bool? verdict = !answered || correct == 'equal'
+        ? null
+        : sideKey == correct
+            ? true
+            : selected
+                ? false
+                : null;
 
     return Expanded(
       child: GestureDetector(
         onTap: isEqualMode ? null : () => _handleSideSelection(sideKey),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          margin: const EdgeInsets.symmetric(horizontal: 6),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: borderColor, width: 2.5),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8)
-            ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          child: ToneFrame(
+            index: 0,
+            verdict: verdict,
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: _countableObjects(objects, sizeForCount: sizeForCount),
+                ),
+                const SizedBox(height: 6),
+                // The count is not printed here.
+                //
+                // It used to sit under each side as a numeral, which answered
+                // the question outright: "which is more" needs no counting once
+                // 3 and 1 are written on the board. Reading the pictures is the
+                // whole exercise, and the space the badge took is space the
+                // pictures needed on a small phone.
+                Text(label,
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: ToneFrame.inkFor(0, verdict: verdict))),
+              ],
+            ),
           ),
-          child: Column(
+        ),
+      ),
+    );
+  }
+
+  /// "Same number?" is answered Yes or No — on the white 3D buttons, with a
+  /// green tick and a red cross to say which is which.
+  Widget _yesNoButton(bool yes) {
+    final loc = AppLocalizations.of(context)!;
+    return Pressable(
+      onTap: () => _handleEqualChoice(yes),
+      child: SizedBox(
+        height: 79,
+        child: ToneFrame(
+          index: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
-                child: _countableObjects(objects, sizeForCount: sizeForCount),
+              Icon(yes ? LucideIcons.circle_check : LucideIcons.circle_x,
+                  color:
+                      yes ? const Color(0xFF2E9E3E) : const Color(0xFFE5484D),
+                  size: 30),
+              const SizedBox(width: 8),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    yes ? loc.yesAnswer : loc.noAnswer,
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w900,
+                      color: ToneFrame.inkFor(0),
+                    ),
+                  ),
+                ),
               ),
-              const SizedBox(height: 6),
-              // The count is not printed here.
-              //
-              // It used to sit under each side as a numeral, which answered
-              // the question outright: "which is more" needs no counting once
-              // 3 and 1 are written on the board. Reading the pictures is the
-              // whole exercise, and the space the badge took is space the
-              // pictures needed on a small phone.
-              Text(label,
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade500)),
             ],
           ),
         ),
@@ -3184,36 +3079,8 @@ class _MatematikaScreenState extends State<MatematikaScreen>
 
   // ─── Game 6: Number puzzle ────────────────────────────────────────────────────
 
-  Widget _puzzleTile(int n, {bool floating = false}) {
-    return Container(
-      width: 74,
-      height: 74,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-            color: floating ? AppColors.primary : Colors.grey.shade300,
-            width: floating ? 3 : 2.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(floating ? 0.22 : 0.08),
-            blurRadius: floating ? 16 : 8,
-            offset: Offset(0, floating ? 8 : 3),
-          )
-        ],
-      ),
-      child: Center(
-        child: Text(
-          '$n',
-          style: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.w900,
-            color: floating ? AppColors.primary : AppColors.textDark,
-          ),
-        ),
-      ),
-    );
-  }
+  Widget _puzzleTile(int n, {bool floating = false}) =>
+      _chunkyNumber(n, 74, 34);
 
   Widget _buildGame6() {
     final game = _currentGame;
@@ -3222,19 +3089,16 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
       child: Column(
         children: [
-          _gameCard(
-            child: Column(
-              children: [
-                _questionText(AppLocalizations.of(context)!
-                    .arrange(game['sequence'] as String)),
-                const SizedBox(height: 6),
-                Text(
-                  AppLocalizations.of(context)!.putNumbersInOrder,
-                  style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
+          _questionText(AppLocalizations.of(context)!
+              .arrange(game['sequence'] as String)),
+          const SizedBox(height: 6),
+          Text(
+            AppLocalizations.of(context)!.putNumbersInOrder,
+            style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: Colors.grey.shade700),
+            textAlign: TextAlign.center,
           ),
 
           const Spacer(),
@@ -3334,7 +3198,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
                   ),
                   // Holds the gap open so the other tiles do not jump around
                   // mid-drag, but shows nothing at all.
-                  childWhenDragging: const SizedBox(width: 74, height: 74),
+                  childWhenDragging: const SizedBox(width: 74, height: 79),
                   child: _puzzleTile(n),
                 ),
               );
@@ -3359,12 +3223,11 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
       child: Column(
         children: [
+          _questionText(AppLocalizations.of(context)!.whatIsMissingNumber),
+          const SizedBox(height: 12),
           _gameCard(
             child: Column(
               children: [
-                _questionText(
-                    AppLocalizations.of(context)!.whatIsMissingNumber),
-                const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: sequence.map((item) {
