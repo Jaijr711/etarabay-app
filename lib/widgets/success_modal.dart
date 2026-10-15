@@ -426,6 +426,9 @@ class _SuccessModalState extends State<SuccessModal> {
   /// place for it in the score's row, where the mascot stands.
   Widget _streakPill(int streak) {
     return Container(
+      // The oval card is narrow down here; a long word shrinks to fit the
+      // pill rather than running out of the card and being cut.
+      constraints: const BoxConstraints(maxWidth: 230),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       decoration: BoxDecoration(
         color: const Color(0xFFFFF1E6),
@@ -436,11 +439,17 @@ class _SuccessModalState extends State<SuccessModal> {
         const Icon(Icons.local_fire_department_rounded,
             color: Colors.deepOrange, size: 22),
         const SizedBox(width: 4),
-        Text('${AppLocalizations.of(context)!.streakWord}: $streak',
-            style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w900,
-                color: Color(0xFFD9480F))),
+        Flexible(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text('${AppLocalizations.of(context)!.streakWord}: $streak',
+                maxLines: 1,
+                style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFFD9480F))),
+          ),
+        ),
       ]),
     );
   }

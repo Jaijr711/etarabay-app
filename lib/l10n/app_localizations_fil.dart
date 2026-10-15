@@ -1851,7 +1851,7 @@ class AppLocalizationsFil extends AppLocalizations {
   String get scoreWord => 'Marka';
 
   @override
-  String get streakWord => 'Magkakasunod na tagumpay';
+  String get streakWord => 'Sunod-sunod na tama';
 
   @override
   String get notifPermissionDenied =>
