@@ -5,6 +5,7 @@ import 'widgets/tablet_scale.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
+import 'package:flutter/gestures.dart' show GestureBinding;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
@@ -105,9 +106,48 @@ class AudioManager extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
+  /// Whether the page has been touched yet.
+  ///
+  /// A browser will not start sound until the person has interacted with the
+  /// page; asking before that (the splash and the home screen both start the
+  /// music as they open) is refused, with "The AudioContext was not allowed
+  /// to start" in the console. On the web the music therefore waits for the
+  /// first touch and starts then. A phone app has no such rule.
+  bool _heardGesture = !kIsWeb;
+  String? _waitingAsset;
+  bool _listeningForGesture = false;
+
+  void _waitForGesture(String assetPath) {
+    // The latest request wins: the home track asked for at launch, or a
+    // module's own if the child got into one before touching anything.
+    _waitingAsset = assetPath;
+    if (_listeningForGesture) return;
+    _listeningForGesture = true;
+    GestureBinding.instance.pointerRouter.addGlobalRoute(_onFirstPointer);
+  }
+
+  void _onFirstPointer(PointerEvent event) {
+    // The lift of a finger (or a click's release) is what the browser
+    // counts as the person interacting; a touch going down is not.
+    if (event is! PointerUpEvent) return;
+    _heardGesture = true;
+    // Not removed mid-dispatch; the router is still walking its routes.
+    scheduleMicrotask(() {
+      GestureBinding.instance.pointerRouter.removeGlobalRoute(_onFirstPointer);
+      _listeningForGesture = false;
+    });
+    final asset = _waitingAsset;
+    _waitingAsset = null;
+    if (asset != null) startBackgroundMusic(asset);
+  }
+
   Future<void> startBackgroundMusic(String assetPath) async {
     if (!_isInitialized) await initialize();
     if (!_isMusicEnabled) return;
+    if (!_heardGesture) {
+      _waitForGesture(assetPath);
+      return;
+    }
 
     // Smart Check: Don't restart if already playing the same song
     if (_isPlaying && _currentAssetPath == assetPath) return;
