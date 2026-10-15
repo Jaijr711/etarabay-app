@@ -26,6 +26,7 @@ import '../widgets/staggered_entrance.dart';
 import '../widgets/star_tally.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import '../utils/word_fit.dart';
+import '../widgets/replay_dialog.dart';
 
 // ─── CustomPainter: draws animated lines between matched nodes ───────────────
 class _Game3LinePainter extends CustomPainter {
@@ -1665,97 +1666,11 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   /// rating rather than adding to it.
   void _confirmReplay(int i) {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFFBEB),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.star_rounded,
-                  color: Color(0xFFFFB800), size: 40),
-            ),
-            const SizedBox(height: 10),
-            Text(AppLocalizations.of(context)!.finishedAlready,
-                textAlign: TextAlign.center,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-          ],
-        ),
-        // Show what this level is currently worth before
-        // offering a replay, so the child can see the star they
-        // are about to put back on the table.
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(3, (s) {
-                final earned = s < userProvider.matematikaLevelStars(i);
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: Icon(
-                    earned ? Icons.star_rounded : Icons.star_outline_rounded,
-                    size: 40,
-                    color:
-                        earned ? const Color(0xFFFFB800) : Colors.grey.shade300,
-                  ),
-                );
-              }),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '${userProvider.matematikaLevelScore(i)} '
-              '${AppLocalizations.of(context)!.pointsLabel}',
-              style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary),
-            ),
-            const SizedBox(height: 12),
-            Text(AppLocalizations.of(context)!.doneAlready,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 6),
-            Text(
-              AppLocalizations.of(context)!.replayReplacesStar,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
-            ),
-          ],
-        ),
-        actionsAlignment: MainAxisAlignment.center,
-        actions: [
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.numbers,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 13),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-            ),
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              _openLevel(i);
-            },
-            icon: const Icon(LucideIcons.rotate_ccw, size: 19),
-            label: Text(AppLocalizations.of(context)!.ulitin,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(AppLocalizations.of(context)!.okButton,
-                style: const TextStyle(fontSize: 16)),
-          )
-        ],
-      ),
+    showReplayDialog(
+      context,
+      stars: userProvider.matematikaLevelStars(i),
+      points: userProvider.matematikaLevelScore(i),
+      onRepeat: () => _openLevel(i),
     );
   }
 

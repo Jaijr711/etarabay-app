@@ -26,6 +26,7 @@ import '../widgets/star_tally.dart';
 import 'dart:async';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import '../utils/word_fit.dart';
+import '../widgets/replay_dialog.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  BADGE MODEL
@@ -1649,84 +1650,10 @@ class _PamilyaScreenState extends State<PamilyaScreen>
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final levelStars = userProvider.pamilyaLevelStars(cat, i);
     final stars = levelStars;
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFFBEB),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.star_rounded,
-                  color: Color(0xFFFFB800), size: 40),
-            ),
-            const SizedBox(height: 10),
-            Text(AppLocalizations.of(context)!.finishedAlready,
-                textAlign: TextAlign.center,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(3, (sIdx) {
-                final got = sIdx < stars;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: Icon(
-                    got ? Icons.star_rounded : Icons.star_outline_rounded,
-                    size: 40,
-                    color: got ? const Color(0xFFFFB800) : Colors.grey.shade300,
-                  ),
-                );
-              }),
-            ),
-            const SizedBox(height: 12),
-            Text(AppLocalizations.of(context)!.doneAlready,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 6),
-            Text(
-              AppLocalizations.of(context)!.replayReplacesStar,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
-            ),
-          ],
-        ),
-        actionsAlignment: MainAxisAlignment.center,
-        actions: [
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _currentMainColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 13),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-            ),
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              _openLevel(cat, i);
-            },
-            icon: const Icon(LucideIcons.rotate_ccw, size: 19),
-            label: Text(AppLocalizations.of(context)!.ulitin,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(AppLocalizations.of(context)!.okButton,
-                style: const TextStyle(fontSize: 16)),
-          )
-        ],
-      ),
+    showReplayDialog(
+      context,
+      stars: stars,
+      onRepeat: () => _openLevel(cat, i),
     );
   }
 
