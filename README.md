@@ -1,8 +1,8 @@
-# E-Tarabay Project Overview (v1.2.49)
+# E-Tarabay Project Overview (v1.2.50)
 
 E-Tarabay is a modern, interactive Flutter-based educational mobile application designed for early childhood learning, primarily for daycare learners in Ilocos. It teaches in **Ilokano**, **Filipino** and **English**. The app’s tagline, **"Ang Kabataan ay Pag-asa ng Bayan"** (The Youth are the Hope of the Nation), reflects its core mission of fostering foundational knowledge in young students.
 
-**Current version:** 1.2.49 (build 61) — see [`pubspec.yaml`](pubspec.yaml).
+**Current version:** 1.2.50 (build 62) — see [`pubspec.yaml`](pubspec.yaml).
 
 ## Core Modules & Features
 
@@ -43,6 +43,25 @@ E-Tarabay is a modern, interactive Flutter-based educational mobile application 
     - **Shared Preferences**: App settings and per-activity progress.
 - **State Management**: Provider package for app state (language, user session, audio).
 - **Security**: `flutter_secure_storage` and `local_auth` for PINs, credentials and fingerprint login.
+
+## What's New in 1.2.50
+
+- New look across the learning games, from the team's designs: the question
+  said by the dino in a speech cloud, white 3D answer buttons that turn green or
+  red, new Correct/Wrong badges, tip cloud, level-complete card, and the
+  "Finished already" and lesson-finished cards.
+- Numbers: the same look as About Me; Drag the Number is drag-only, the basket
+  moves from side to side, and the question names what is counted ("Count the
+  flowers…"); bigger boxes in Match with Line.
+- Poems, stories and songs: a storybook card with the dino, a chunky progress
+  bar and round play buttons; poem pictures cut out of their pages.
+- Profile in the new card design; the child picks one of twelve animal avatars
+  (after the parent's PIN on a new account, or from the profile), and the
+  teacher sees it.
+- Validated Filipino translations applied.
+- Pictures are much smaller (WebP), so they load faster.
+- My Home tips are whole sentences; the teacher dashboard no longer shows
+  Recent Achievements.
 
 ## What's New in 1.2.49
 

@@ -1,7 +1,7 @@
 name: e_tarabay
 description: "Ang Kabataan ay Pagasa ng Bayan"
 publish_to: 'none'
-version: 1.2.49+61
+version: 1.2.50+62
 
 environment:
   sdk: ^3.5.4
