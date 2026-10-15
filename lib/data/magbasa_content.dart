@@ -112,63 +112,63 @@ class MagbasaContent {
       'title': 'Ania ti Nagan Mo',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/song_nagan.png'
+      'image': 'assets/images/boy.png'
     },
     {
       'id': 'uppat_a_pato',
       'title': 'Uppat a Pato',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/song_pato.png'
+      'image': 'assets/images/category_kanta.png'
     },
     {
       'id': 'duat_imak',
       'title': 'Duat\' Imak',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/song_imak.png'
+      'image': 'assets/images/category_kanta.png'
     },
     {
       'id': 'bassit_a_lawwalawwa',
       'title': 'Bassit a Lawwalawwa',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/song_lawwa.png'
+      'image': 'assets/images/category_kanta.png'
     },
     {
       'id': 'maysa_dua_baduya',
       'title': 'Maysa, Dua, Baduya',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/song_baduya.png'
+      'image': 'assets/images/category_kanta.png'
     },
     {
       'id': 'ni_nanangko',
       'title': 'Ni Nanangko',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/song_nanang.png'
+      'image': 'assets/images/nanay.png'
     },
     {
       'id': 'da_tarong',
       'title': 'Da Tarong, Kamatis ken Paria',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/song_tarong.png'
+      'image': 'assets/images/category_kanta.png'
     },
     {
       'id': 'nagmulaak_iti_katuday',
       'title': 'Nagmulaak iti Katuday',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/song_katuday.png'
+      'image': 'assets/images/flower.png'
     },
     {
       'id': 'lima_a_tinapay',
       'title': 'Lima a Tinapay ken dua nga Ikan',
       'completed': false,
       'type': 'song',
-      'image': 'assets/images/song_tinapay.png'
+      'image': 'assets/images/fish.png'
     },
   ];
 
@@ -490,7 +490,7 @@ class MagbasaContent {
         'Agsala, agkanta',
         'Itung-ed ti ulo.',
       ],
-      'image': 'assets/images/song_nagan.png',
+      'image': 'assets/images/boy.png',
       // Re-recorded and cleaned up 2026-09-02 (highpass + FFT denoise +
       // loudnorm, see the note on Sipsipat's audioPath) — replaces the
       // earlier Kurtjam Kyle Silva Nono recording entirely. Lyrics rewritten
@@ -523,7 +523,7 @@ class MagbasaContent {
         'Maringgoran, kunana',
         '"Kuak-kuak-kuak!"',
       ],
-      'image': 'assets/images/song_pato.png',
+      'image': 'assets/images/category_kanta.png',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Uppat_a_Pato.mp3',
@@ -560,7 +560,7 @@ class MagbasaContent {
         'Agsipatak, maysa, dua',
         'Kitam ida ket nadalus da.',
       ],
-      'image': 'assets/images/song_imak.png',
+      'image': 'assets/images/category_kanta.png',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Duat_Imak.mp3',
@@ -584,7 +584,7 @@ class MagbasaContent {
         'Ket bassit a lawwalawwa',
         'Immuli diay sanga.',
       ],
-      'image': 'assets/images/song_lawwa.png',
+      'image': 'assets/images/category_kanta.png',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Bassit_a_Lawwalawwa.mp3',
@@ -613,7 +613,7 @@ class MagbasaContent {
         'Siam, pullo, mangantayo',
         'Ti ruskaldo.',
       ],
-      'image': 'assets/images/song_baduya.png',
+      'image': 'assets/images/category_kanta.png',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Maysa_Dua_Baduya.mp3',
@@ -651,7 +651,7 @@ class MagbasaContent {
         'Pinaglalangto ti kaykayo',
         'Bungbunganat adu.',
       ],
-      'image': 'assets/images/song_nanang.png',
+      'image': 'assets/images/nanay.png',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Ni_Nanangko.mp3',
@@ -679,7 +679,7 @@ class MagbasaContent {
         'Ta no addaak iti dinengdeng',
         'Diay pinakbet naimimas manen.',
       ],
-      'image': 'assets/images/song_tarong.png',
+      'image': 'assets/images/category_kanta.png',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Da_Tarong_Kamatis_ken_Paria.mp3',
@@ -716,7 +716,7 @@ class MagbasaContent {
         'Aramidek a sagaysay',
         'Sagaysay ni Nanang Ikay.',
       ],
-      'image': 'assets/images/song_katuday.png',
+      'image': 'assets/images/flower.png',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Nagmulaak_iti_Katuday.mp3',
@@ -736,7 +736,7 @@ class MagbasaContent {
         'Immadu diay tinapay, immadu met diay ikan (3x)',
         'Ket nabsogda amin.',
       ],
-      'image': 'assets/images/song_tinapay.png',
+      'image': 'assets/images/fish.png',
       // Added and cleaned up 2026-09-02, see the note on Sipsipat's
       // audioPath. Lyrics rewritten 2026-09-05.
       'audioPath': 'audio/songs/Lima_a_Tinapay.mp3',

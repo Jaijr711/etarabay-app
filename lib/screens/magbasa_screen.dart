@@ -138,63 +138,63 @@ class _MagbasaScreenState extends State<MagbasaScreen>
           'title': 'Ania ti Nagan Mo',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/song_nagan.png'
+          'image': 'assets/images/boy.png'
         },
         {
           'id': 'uppat_a_pato',
           'title': 'Uppat a Pato',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/song_pato.png'
+          'image': 'assets/images/category_kanta.png'
         },
         {
           'id': 'duat_imak',
           'title': 'Duat\' Imak',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/song_imak.png'
+          'image': 'assets/images/category_kanta.png'
         },
         {
           'id': 'bassit_a_lawwalawwa',
           'title': 'Bassit a Lawwalawwa',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/song_lawwa.png'
+          'image': 'assets/images/category_kanta.png'
         },
         {
           'id': 'maysa_dua_baduya',
           'title': 'Maysa, Dua, Baduya',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/song_baduya.png'
+          'image': 'assets/images/category_kanta.png'
         },
         {
           'id': 'ni_nanangko',
           'title': 'Ni Nanangko',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/song_nanang.png'
+          'image': 'assets/images/nanay.png'
         },
         {
           'id': 'da_tarong',
           'title': 'Da Tarong, Kamatis ken Paria',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/song_tarong.png'
+          'image': 'assets/images/category_kanta.png'
         },
         {
           'id': 'nagmulaak_iti_katuday',
           'title': 'Nagmulaak iti Katuday',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/song_katuday.png'
+          'image': 'assets/images/flower.png'
         },
         {
           'id': 'lima_a_tinapay',
           'title': 'Lima a Tinapay ken dua nga Ikan',
           'completed': false,
           'type': 'song',
-          'image': 'assets/images/song_tinapay.png'
+          'image': 'assets/images/fish.png'
         },
       ]
     },

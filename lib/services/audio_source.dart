@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
 /// Where a bundled recording lives, in a way this platform can fetch twice.
 ///
@@ -29,3 +30,20 @@ import 'package:flutter/foundation.dart';
 /// Android check it was written for.
 Source audioSourceFor(String assetPath) =>
     kIsWeb ? UrlSource('assets/assets/$assetPath') : AssetSource(assetPath);
+
+/// Whether [assetPath] (as passed to [audioSourceFor]) was actually bundled.
+///
+/// Some recordings are named in the content before they exist — the family
+/// voices are still to be recorded (see assets/audio/family/README.txt).
+/// Asking for one anyway put a 404 in the console on every answer and, on a
+/// phone, an error from the player; checking the app's own list of assets
+/// first lets a missing recording simply stay silent.
+Future<bool> audioAssetBundled(String assetPath) async {
+  _bundled ??= AssetManifest.loadFromAssetBundle(rootBundle)
+      .then((m) => m.listAssets().toSet(), onError: (_) => <String>{});
+  final all = await _bundled!;
+  // An empty list means the manifest could not be read: play and see.
+  return all.isEmpty || all.contains('assets/$assetPath');
+}
+
+Future<Set<String>>? _bundled;

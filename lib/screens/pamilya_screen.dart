@@ -1376,6 +1376,8 @@ class _PamilyaScreenState extends State<PamilyaScreen>
   }
 
   Future<void> _playItemAudio(String path) async {
+    // A voice not yet recorded stays silent instead of erroring.
+    if (!await audioAssetBundled(path)) return;
     try {
       await AudioManager.instance.duckMusic();
       await _audioPlayer.stop();
