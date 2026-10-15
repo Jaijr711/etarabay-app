@@ -7,6 +7,8 @@ import 'login_screen.dart';
 import 'package:confetti/confetti.dart';
 import '../widgets/custom_header_app_bar.dart';
 import '../widgets/cached_avatar.dart';
+import '../widgets/question_cloud.dart' show DoodleBackground;
+import '../widgets/storybook.dart';
 import 'package:e_tarabay/l10n/app_localizations.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 
@@ -128,301 +130,403 @@ class ProfileScreen extends StatelessWidget {
       ),
       body: userProfile == null
           ? Center(child: Text(AppLocalizations.of(context)!.noProfileData))
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  // Profile Avatar
-                  _BirthdayAvatar(userProfile: userProfile),
-
-                  const SizedBox(height: 20),
-
-                  // Name (Responsive)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      // First name, the way the dashboard greets them. The
-                      // full version is in the card below, where a record
-                      // belongs.
-                      child: Text(
-                        userProfile.name.trim().split(RegExp(r'\s+')).first,
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 34,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.textDark,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // Age and Gender
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Text(
-                      '${AppLocalizations.of(context)!.yearsOld(userProfile.age)} • ${userProfile.gender.toLowerCase() == 'male' ? '👦 ${AppLocalizations.of(context)!.male}' : '👧 ${AppLocalizations.of(context)!.female}'}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade700,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  // Student Profile Card
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(25),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 15,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Column(
+          : Stack(children: [
+              // The notebook doodles of the learning boards.
+              const Positioned.fill(child: DoodleBackground()),
+              SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
+                child: Column(
+                  children: [
+                    // The child: their picture standing up out of a framed
+                    // card, their first name under it.
+                    Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.topCenter,
                       children: [
-                        _buildProfileField(
-                          AppLocalizations.of(context)!.fullName,
-                          userProfile.name,
-                          LucideIcons.user,
-                        ),
-                        const Divider(height: 20),
-                        _buildProfileField(
-                          AppLocalizations.of(context)!.birthday,
-                          _formatBirthday(context, userProfile.birthday),
-                          LucideIcons.cake,
-                        ),
-                        const Divider(height: 20),
-                        _buildProfileField(
-                          AppLocalizations.of(context)!.profileAge,
-                          AppLocalizations.of(context)!
-                              .yearsOld(userProfile.age),
-                          LucideIcons.calendar,
-                        ),
-                        const Divider(height: 20),
-                        _buildProfileField(
-                          AppLocalizations.of(context)!.gender,
-                          userProfile.gender.toLowerCase() == 'male'
-                              ? AppLocalizations.of(context)!.male
-                              : AppLocalizations.of(context)!.female,
-                          // Was LucideIcons.toilet — a restroom sign, not a
-                          // gender symbol. The edit dialog below already uses
-                          // mars/venus for the same field; this just did not
-                          // match it.
-                          userProfile.gender.toLowerCase() == 'male'
-                              ? LucideIcons.mars
-                              : LucideIcons.venus,
-                        ),
-                        const Divider(height: 20),
-
-                        // Everything from here down is a record rather
-                        // than something the child owns: a parent's name and
-                        // phone number, and the date the account was made.
-                        // They sat between the birthday and the stars at the
-                        // same weight, which put a contact number on a page a
-                        // four-year-old opens by tapping their own face.
-                        _recordsHeading(context),
-
-                        // Parents Info (if student)
-                        if (userProvider.currentStudentId != null) ...[
-                          _buildProfileField(
-                            AppLocalizations.of(context)!.parentNameLabel,
-                            userProfile.parentName.isNotEmpty
-                                ? userProfile.parentName
-                                : AppLocalizations.of(context)!.notSet,
-                            LucideIcons.users,
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 64, 12, 0),
+                          child: _nameCard(
+                            // First name, the way the dashboard greets them.
+                            // The full version is in the card below.
+                            userProfile.name.trim().split(RegExp(r'\s+')).first,
                           ),
-                          const Divider(height: 20),
-                          _buildProfileField(
-                            AppLocalizations.of(context)!.parentContactLabel,
-                            userProfile.parentContact.isNotEmpty
-                                ? userProfile.parentContact
-                                : AppLocalizations.of(context)!.notSet,
-                            LucideIcons.phone,
-                          ),
-                          const Divider(height: 20),
-                        ],
-
-                        // Member Since
-                        _buildProfileField(
-                          AppLocalizations.of(context)!.memberSince,
-                          _formatBirthday(
-                            context,
-                            userProfile.createdAt ?? DateTime.now(),
-                          ),
-                          LucideIcons.calendar,
                         ),
+                        _BirthdayAvatar(userProfile: userProfile),
                       ],
                     ),
-                  ),
 
-                  const SizedBox(height: 20),
-
-                  // Stats Card
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppColors.primary, AppColors.secondary],
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withOpacity(0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    // Two counts, not three. The lessons tally was a record
-                    // — a number the child never chose to collect and cannot
-                    // read — sitting between the two things they do.
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    // The record, in the coral frame. The age and gender
+                    // pill sits across its top edge, as in the design.
+                    Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.topCenter,
                       children: [
-                        _buildStatItem(
-                          // The same number the dashboard and every module
-                          // header show. Read straight from the profile, this
-                          // was the one star readout in the app that could
-                          // disagree with the rest: an older profile can carry
-                          // more stars than the app can now award, and
-                          // `displayStars` is what caps it.
-                          '${userProvider.displayStars}',
-                          AppLocalizations.of(context)!.stars,
-                          Icons.star_rounded,
+                        CoralCard(
+                          fillFrame: false,
+                          padding: const EdgeInsets.fromLTRB(12, 30, 12, 16),
+                          child: Column(children: [
+                            _fieldRow(
+                              _buildProfileField(
+                                AppLocalizations.of(context)!.fullName,
+                                userProfile.name,
+                                LucideIcons.user,
+                                const Color(0xFFF08A24),
+                              ),
+                              _buildProfileField(
+                                AppLocalizations.of(context)!.birthday,
+                                _formatBirthday(context, userProfile.birthday),
+                                LucideIcons.cake,
+                                const Color(0xFFE85A8A),
+                              ),
+                            ),
+                            _fieldRow(
+                              _buildProfileField(
+                                AppLocalizations.of(context)!.profileAge,
+                                AppLocalizations.of(context)!
+                                    .yearsOld(userProfile.age),
+                                LucideIcons.calendar,
+                                const Color(0xFF3FA36B),
+                              ),
+                              _buildProfileField(
+                                AppLocalizations.of(context)!.gender,
+                                userProfile.gender.toLowerCase() == 'male'
+                                    ? AppLocalizations.of(context)!.male
+                                    : AppLocalizations.of(context)!.female,
+                                // mars/venus, as in the edit dialog below —
+                                // not the restroom sign it once was.
+                                userProfile.gender.toLowerCase() == 'male'
+                                    ? LucideIcons.mars
+                                    : LucideIcons.venus,
+                                const Color(0xFF3F6FD8),
+                              ),
+                            ),
+
+                            // Everything from here down is a record rather
+                            // than something the child owns: a parent's name
+                            // and phone number, and the date the account was
+                            // made — set apart under its own heading.
+                            _recordsHeading(context),
+
+                            if (userProvider.currentStudentId != null)
+                              _fieldRow(
+                                _buildProfileField(
+                                  AppLocalizations.of(context)!.parentNameLabel,
+                                  userProfile.parentName.isNotEmpty
+                                      ? userProfile.parentName
+                                      : AppLocalizations.of(context)!.notSet,
+                                  LucideIcons.users,
+                                  const Color(0xFFD9558F),
+                                ),
+                                _buildProfileField(
+                                  AppLocalizations.of(context)!
+                                      .parentContactLabel,
+                                  userProfile.parentContact.isNotEmpty
+                                      ? userProfile.parentContact
+                                      : AppLocalizations.of(context)!.notSet,
+                                  LucideIcons.phone,
+                                  const Color(0xFF7A5BD9),
+                                ),
+                              ),
+                            // The whole width, short of where the dino
+                            // stands.
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 7, 72, 7),
+                              child: _buildProfileField(
+                                AppLocalizations.of(context)!.memberSince,
+                                _formatBirthday(
+                                  context,
+                                  userProfile.createdAt ?? DateTime.now(),
+                                ),
+                                LucideIcons.calendar_check,
+                                const Color(0xFF6B78C9),
+                              ),
+                            ),
+                          ]),
                         ),
-                        _buildStatItem(
-                          // Collected, not merely unlocked — matches the home
-                          // screen and the Awards gallery. See home_screen.
-                          '${userProvider.collectedBadgeIds.length}',
-                          AppLocalizations.of(context)!.badges,
-                          LucideIcons.trophy,
+                        Positioned(
+                          top: -20,
+                          child: _agePill(context, userProfile),
+                        ),
+                        const Positioned(
+                          right: -12,
+                          bottom: -18,
+                          width: 92,
+                          child: IgnorePointer(
+                            child: Image(
+                              image: AssetImage(StorybookScaffold.dinoAsset),
+                              filterQuality: FilterQuality.medium,
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                  ),
 
-                  const SizedBox(height: 30),
+                    const SizedBox(height: 26),
 
-                  // Edit Profile Button (Only if NOT student)
-                  if (userProvider.currentStudentId == null)
-                    OutlinedButton.icon(
-                      onPressed: () =>
-                          _showEditProfileDialog(context, userProvider),
-                      icon: const Icon(LucideIcons.pencil),
-                      label: Text(AppLocalizations.of(context)!.editProfile),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        side: BorderSide(
-                            color: AppColors.primary.withOpacity(0.5)),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
+                    // Two counts, not three — the two things the child
+                    // collects. The same star number the dashboard and every
+                    // module header show (`displayStars` is what caps an
+                    // older profile), and badges collected, not merely
+                    // unlocked, as on the home screen and the Awards wall.
+                    _statsBar(
+                      context,
+                      stars: userProvider.displayStars,
+                      badges: userProvider.collectedBadgeIds.length,
                     ),
 
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 22),
 
-                  // Logout Button
-                  TextButton.icon(
-                    onPressed: () => _logout(context),
-                    icon: const Icon(LucideIcons.log_out, color: Colors.red),
-                    label: Text(AppLocalizations.of(context)!.logout,
-                        style: const TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16)),
-                  ),
-                ],
+                    // Edit Profile (only when not signed in as a student).
+                    if (userProvider.currentStudentId == null) ...[
+                      OutlinedButton.icon(
+                        onPressed: () =>
+                            _showEditProfileDialog(context, userProvider),
+                        icon: const Icon(LucideIcons.pencil),
+                        label: Text(AppLocalizations.of(context)!.editProfile),
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: AppColors.primary,
+                          side: BorderSide(
+                              color: AppColors.primary.withOpacity(0.5)),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 30,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+
+                    _LogoutButton(
+                      label: AppLocalizations.of(context)!.logout,
+                      onTap: () => _logout(context),
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ]),
     );
   }
 
-  /// Marks where the child's page stops and the paperwork starts.
-  Widget _recordsHeading(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 4, bottom: 14),
-      child: Row(
-        children: [
-          Icon(LucideIcons.users, size: 15, color: Colors.grey.shade500),
-          const SizedBox(width: 7),
-          Text(
-            AppLocalizations.of(context)!.forParents.toUpperCase(),
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.8,
-              color: Colors.grey.shade500,
-            ),
+  static TextStyle _fredoka(double size, Color color, {double weight = 700}) =>
+      TextStyle(
+        fontFamily: 'Fredoka',
+        fontSize: size,
+        fontVariations: [FontVariation('wght', weight)],
+        fontWeight: FontWeight.w700,
+        color: color,
+        height: 1.15,
+      );
+
+  static const _navy = StorybookScaffold.navy;
+
+  /// The child's first name on a pale pink card in a blue frame; the
+  /// picture stands half out of its top.
+  Widget _nameCard(String name) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(9),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(32),
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF6C8FE6), Color(0xFF8B7FE0)],
+        ),
+        border: Border.all(color: const Color(0xFF4E63B8), width: 2),
+      ),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 74, 16, 34),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8E7EE),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.white, width: 3),
+        ),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            name,
+            maxLines: 1,
+            style: _fredoka(46, _navy, weight: 650),
           ),
-          const SizedBox(width: 10),
-          Expanded(child: Divider(color: Colors.grey.shade300, height: 1)),
+        ),
+      ),
+    );
+  }
+
+  /// "4 years old • 👦 Male", in a lavender pill.
+  Widget _agePill(BuildContext context, dynamic userProfile) {
+    final loc = AppLocalizations.of(context)!;
+    final male = userProfile.gender.toLowerCase() == 'male';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 7),
+      decoration: BoxDecoration(
+        color: const Color(0xFFDDE3FA),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFF7D93DC), width: 2.5),
+        boxShadow: const [
+          BoxShadow(color: Color(0xFFB7C3EE), offset: Offset(0, 3)),
+        ],
+      ),
+      child: Text(
+        '${loc.yearsOld(userProfile.age)} • '
+        '${male ? '👦 ${loc.male}' : '👧 ${loc.female}'}',
+        style: _fredoka(17, _navy, weight: 600),
+      ),
+    );
+  }
+
+  /// Two fields side by side.
+  Widget _fieldRow(Widget a, Widget b) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 7),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(child: a),
+          const SizedBox(width: 8),
+          Expanded(child: b),
         ],
       ),
     );
   }
 
-  Widget _buildProfileField(String label, String value, IconData icon) {
+  /// The heavy stars-and-badges bar.
+  Widget _statsBar(BuildContext context,
+      {required int stars, required int badges}) {
+    final loc = AppLocalizations.of(context)!;
+    final shadow = [
+      Shadow(color: Colors.black.withOpacity(0.3), offset: const Offset(0, 2)),
+    ];
+    Widget count(String image, int n, String label) => Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(image,
+                  width: 54, height: 54, filterQuality: FilterQuality.medium),
+              const SizedBox(width: 8),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('$n',
+                          style: _fredoka(34, Colors.white)
+                              .copyWith(height: 1.0, shadows: shadow)),
+                      Text(label,
+                          style: _fredoka(18, Colors.white, weight: 600)
+                              .copyWith(shadows: shadow)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF5B6BE0), Color(0xFF9A6BDF), Color(0xFFE065B6)],
+        ),
+        border: Border.all(color: const Color(0xFF3A2F7A), width: 3),
+        boxShadow: [
+          const BoxShadow(color: Color(0xFF2E2563), offset: Offset(0, 5)),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.18),
+            blurRadius: 10,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(children: [
+        count('assets/images/replay_star.webp', stars, loc.stars),
+        count('assets/images/trophy_happy.webp', badges, loc.badges),
+      ]),
+    );
+  }
+
+  /// Marks where the child's page stops and the paperwork starts.
+  Widget _recordsHeading(BuildContext context) {
+    final line = Expanded(
+      child: Container(
+        height: 2.5,
+        decoration: BoxDecoration(
+          color: const Color(0xFFC7D0EE),
+          borderRadius: BorderRadius.circular(2),
+        ),
+      ),
+    );
+    return Padding(
+      padding: const EdgeInsets.only(top: 10, bottom: 8),
+      child: Row(
+        children: [
+          line,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Text(
+              AppLocalizations.of(context)!.forParents.toUpperCase(),
+              style: _fredoka(17, _navy),
+            ),
+          ),
+          line,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileField(
+      String label, String value, IconData icon, Color tint) {
     return Row(
       children: [
+        // The picture in a round badge, the way the design draws each one.
         Container(
-          padding: const EdgeInsets.all(8),
+          width: 44,
+          height: 44,
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
             shape: BoxShape.circle,
+            color: Color.lerp(tint, Colors.white, 0.86),
+            border: Border.all(color: const Color(0xFF8FA4DF), width: 2.5),
           ),
-          child: Icon(
-            icon,
-            color: AppColors.primary,
-            size: 20,
-          ),
+          child: Icon(icon, color: tint, size: 22),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: 7),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade600,
+              // A long label ("Buong Pangalan") shrinks to fit its column
+              // rather than being cut off.
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  style: _fredoka(13.5, _navy, weight: 600),
                 ),
               ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textDark,
-                ),
-              ),
+              // A short value — a date, an age — stays on one line, shrinking
+              // a little if it must; "September / 23, 2022" broken in two
+              // read as two things. A long name still wraps.
+              value.length <= 20
+                  ? FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(value,
+                          maxLines: 1, style: _fredoka(15.5, _navy)),
+                    )
+                  : Text(
+                      value,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: _fredoka(15, _navy),
+                    ),
             ],
           ),
         ),
@@ -570,30 +674,6 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildStatItem(String value, String label, IconData icon) {
-    return Column(
-      children: [
-        Icon(icon, color: Colors.white, size: 28),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.white.withOpacity(0.9),
-          ),
-        ),
-      ],
-    );
-  }
 }
 
 class _GenderOption extends StatelessWidget {
@@ -718,7 +798,7 @@ class _BirthdayAvatarState extends State<_BirthdayAvatar> {
         style: const TextStyle(
           fontSize: 48,
           fontWeight: FontWeight.bold,
-          color: Colors.white,
+          color: Color(0xFF3C5BC4),
         ),
       ),
     );
@@ -744,25 +824,105 @@ class _BirthdayAvatarState extends State<_BirthdayAvatar> {
               Colors.purple
             ],
           ),
+        // A white disc in a deep blue ring with a pale halo, as the design
+        // draws it, standing half out of the name card.
         Container(
-          width: 120,
-          height: 120,
+          width: 136,
+          height: 136,
+          padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.primary, AppColors.secondary],
-            ),
             shape: BoxShape.circle,
+            color: Colors.white,
+            border: Border.all(color: const Color(0xFF3C5BC4), width: 5),
             boxShadow: [
+              const BoxShadow(color: Color(0xFFD5DEF7), spreadRadius: 5),
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.3),
-                blurRadius: 15,
+                color: const Color(0xFF3C5BC4).withOpacity(0.25),
+                blurRadius: 14,
                 offset: const Offset(0, 8),
               ),
             ],
           ),
-          child: _buildAvatarContent(),
+          child: Center(child: _buildAvatarContent()),
         ),
       ],
+    );
+  }
+}
+
+/// Logout as the design draws it: a glossy coral pill with a white rim.
+/// It still asks before signing out — see [ProfileScreen._logout].
+class _LogoutButton extends StatefulWidget {
+  final String label;
+  final VoidCallback onTap;
+  const _LogoutButton({required this.label, required this.onTap});
+
+  @override
+  State<_LogoutButton> createState() => _LogoutButtonState();
+}
+
+class _LogoutButtonState extends State<_LogoutButton> {
+  bool _down = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _down = true),
+      onTapCancel: () => setState(() => _down = false),
+      onTapUp: (_) => setState(() => _down = false),
+      onTap: widget.onTap,
+      child: AnimatedSlide(
+        duration: const Duration(milliseconds: 80),
+        offset: Offset(0, _down ? 0.05 : 0),
+        child: Container(
+          height: 62,
+          constraints: const BoxConstraints(minWidth: 200),
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(31),
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                  color: const Color(0xFFB3382B),
+                  offset: Offset(0, _down ? 2 : 5)),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 28),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(27),
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFFFF9384), Color(0xFFEE4B3B)],
+              ),
+              border: Border.all(color: const Color(0xFFC9392B), width: 1.5),
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(LucideIcons.log_out, color: Colors.white, size: 26),
+              const SizedBox(width: 10),
+              Text(
+                widget.label,
+                style: const TextStyle(
+                  fontFamily: 'Fredoka',
+                  fontSize: 26,
+                  fontVariations: [FontVariation('wght', 700)],
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  shadows: [
+                    Shadow(color: Color(0xFFA9301F), offset: Offset(0, 2)),
+                  ],
+                ),
+              ),
+            ]),
+          ),
+        ),
+      ),
     );
   }
 }

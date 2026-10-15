@@ -238,11 +238,17 @@ class CoralCard extends StatelessWidget {
 
   final EdgeInsets padding;
 
+  /// Whether the inside fills a frame sized from outside (the reading
+  /// screens), or the frame grows to fit what is inside (a card on a
+  /// scrolling page, like the profile).
+  final bool fillFrame;
+
   const CoralCard({
     super.key,
     required this.child,
     this.inside,
     this.padding = EdgeInsets.zero,
+    this.fillFrame = true,
   });
 
   static const _decor = DecorPainter([
@@ -296,29 +302,29 @@ class CoralCard extends StatelessWidget {
       ),
       // The inside fills the frame whatever the reading's length, so a
       // short poem never leaves the frame's colour showing under it.
-      Positioned.fill(
-        child: Padding(
-          padding: const EdgeInsets.all(13),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFFDDF1FA), width: 4),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: DecoratedBox(
-                decoration: inside ?? const BoxDecoration(color: Colors.white),
-                child: Padding(padding: padding, child: child),
-              ),
-            ),
-          ),
-        ),
-      ),
+      if (fillFrame) Positioned.fill(child: _inside()) else _inside(),
       const Positioned.fill(
         child: IgnorePointer(child: CustomPaint(painter: _decor)),
       ),
     ]);
   }
+
+  Widget _inside() => Padding(
+        padding: const EdgeInsets.all(13),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: const Color(0xFFDDF1FA), width: 4),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: DecoratedBox(
+              decoration: inside ?? const BoxDecoration(color: Colors.white),
+              child: Padding(padding: padding, child: child),
+            ),
+          ),
+        ),
+      );
 }
 
 /// The cream paper box the words sit on, with little stars at its corners.
