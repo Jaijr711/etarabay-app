@@ -1754,40 +1754,57 @@ class _KulayScreenState extends State<KulayScreen>
         Future.delayed(const Duration(seconds: 2), () {
           if (dialogContext.mounted) Navigator.of(dialogContext).pop();
         });
-        return Dialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                  color: (isError ? Colors.red : AppColors.primary)
-                      .withOpacity(0.2)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
+        // The same card as the other Color Fun dialogs: a green tick on a
+        // gold coin for "saved" and "deleted", a red mark for a failure.
+        final tone =
+            isError ? const Color(0xFFE5484D) : const Color(0xFF2E9E3E);
+        return FunDialog(
+          child: FunDialogCard(
+            frame: isError ? FunFrame.coral : FunFrame.purple,
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+            // Full width, like the other dialogs, however short the message.
+            child: SizedBox(
+              width: double.infinity,
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
                 Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: (isError ? Colors.red : AppColors.primary)
-                        .withOpacity(0.1),
+                  width: 92,
+                  height: 92,
+                  padding: const EdgeInsets.all(7),
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFFFFD86B), Color(0xFFE8A21E)],
+                    ),
+                    boxShadow: [
+                      BoxShadow(color: Color(0xFFC8861A), offset: Offset(0, 4)),
+                    ],
                   ),
-                  child: Icon(
-                      isError
-                          ? LucideIcons.circle_alert
-                          : LucideIcons.circle_check,
-                      color: isError ? Colors.red : AppColors.primary,
-                      size: 40),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color.lerp(tone, Colors.white, 0.85),
+                    ),
+                    child: Icon(
+                        isError
+                            ? Icons.priority_high_rounded
+                            : Icons.check_rounded,
+                        color: tone,
+                        size: 52),
+                  ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
                 Text(msg,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16)),
-              ],
+                      fontFamily: 'Fredoka',
+                      fontSize: 23,
+                      fontVariations: [FontVariation('wght', 650)],
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF2B2A5C),
+                    )),
+              ]),
             ),
           ),
         );

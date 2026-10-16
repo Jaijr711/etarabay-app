@@ -104,6 +104,12 @@ void main() {
       await tester.tap(find.text('Delete').last);
       await settle();
       await shot('delete');
+      await tester.tap(find.text('Delete').last);
+      await tester.runAsync(() => Future.delayed(const Duration(seconds: 1)));
+      for (int i = 0; i < 3; i++) {
+        await tester.pump(const Duration(milliseconds: 150));
+      }
+      await shot('deleted');
     } finally {
       FlutterError.onError = original;
     }
