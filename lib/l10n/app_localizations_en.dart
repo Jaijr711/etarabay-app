@@ -1604,6 +1604,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get howStarsEarned => 'How you earn stars here:';
 
   @override
+  String get starRequirements => 'Star Requirements';
+
+  @override
   String get starOneTitle => 'You finished it';
 
   @override

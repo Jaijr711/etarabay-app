@@ -1081,6 +1081,7 @@
     "description": "Result of saving a certificate"
   },
   "howStarsEarned": "How you earn stars here:",
+  "starRequirements": "Star Requirements",
   "@howStarsEarned": {
     "description": "Explains the 1-to-3 star rating"
   },

@@ -1,13 +1,13 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'fun_dialog.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
 
 import '../l10n/app_localizations.dart';
 import '../providers/user_provider.dart';
 import '../services/developer_service.dart';
-import '../utils/constants.dart';
 
 /// Tells the child, wherever they are, that their account is gone.
 ///
@@ -135,41 +135,29 @@ class _AccountWatcherState extends State<AccountWatcher> {
       barrierDismissible: false,
       builder: (context) => PopScope(
         canPop: false,
-        child: AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Icon(LucideIcons.triangle_alert,
-              color: Colors.orange, size: 60),
-          content: Text(
+        child: FunDialog(
+          child: FunMessage(
+            frame: FunFrame.coral,
+            picture: const FunCoin(
+                icon: LucideIcons.triangle_alert, tone: Color(0xFFF08A24)),
             // The developer dashboard's kill switch and one-time kick both
             // reuse this same dialog and logout — each ends with "you're
             // signed out, this device knows nothing more about it" — but
             // never with the deleted-account wording, which promises a
             // teacher can help and isn't true for either of the other two.
-            switch (reason) {
+            message: switch (reason) {
               _LogoutReason.paused => loc.accountPaused,
               _LogoutReason.forced => loc.forceLoggedOut,
               _LogoutReason.deleted => loc.accessExpired,
             },
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-          actions: [
-            Center(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                ),
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(loc.okButton),
+            buttons: [
+              FunPillButton(
+                label: loc.okButton,
+                colors: FunColors.purple,
+                onTap: () => Navigator.of(context).pop(),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -201,55 +189,27 @@ class _AdminMessageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final color = AdminMessageCategory.colorFor(category);
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 340),
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            blurRadius: 30,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(AdminMessageCategory.iconFor(category),
-                color: color, size: 40),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: color,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
+    // The same card as every other message to the child, in the colour of
+    // the message's kind.
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 360),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 22),
+        child: Material(
+          color: Colors.transparent,
+          child: FunMessage(
+            picture: FunCoin(
+                icon: AdminMessageCategory.iconFor(category), tone: color),
+            message: message,
+            buttons: [
+              FunPillButton(
+                label: loc.okButton,
+                colors: FunColors.of(color),
+                onTap: () => Navigator.of(context).pop(),
               ),
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(loc.okButton),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

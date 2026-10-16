@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/fun_dialog.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 
 import '../data/badge_catalog.dart';
@@ -711,50 +712,29 @@ class AwardsScreen extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: true,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        actionsAlignment: MainAxisAlignment.center,
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            BadgeEmblem(
-              icon: badge['icon'] as IconData,
-              color: color,
-              size: 88,
-              tier: tier,
+      builder: (dialogContext) => FunDialog(
+        child: FunMessage(
+          picture: BadgeEmblem(
+            icon: badge['icon'] as IconData,
+            color: color,
+            size: 96,
+            tier: tier,
+          ),
+          title: loc.claimBadge(_badgeTitle(context, badge['id'] as String)),
+          message: loc.claimBadgeBody,
+          buttons: [
+            FunPillButton(
+              label: loc.claimBadgeButton,
+              icon: LucideIcons.gift,
+              colors: FunColors.of(color),
+              onTap: () async {
+                await userProvider.claimBadge(badge['id'] as String);
+                if (dialogContext.mounted) Navigator.pop(dialogContext);
+                if (context.mounted) _showViewBadgeModal(context, badge);
+              },
             ),
-            const SizedBox(height: 16),
-            Text(
-              loc.claimBadge(_badgeTitle(context, badge['id'] as String)),
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              loc.claimBadgeBody,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-            ),
-            const SizedBox(height: 16),
           ],
         ),
-        actions: [
-          ElevatedButton(
-            onPressed: () async {
-              await userProvider.claimBadge(badge['id'] as String);
-              if (context.mounted) {
-                Navigator.pop(context);
-                _showViewBadgeModal(context, badge);
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: color,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
-            child: Text(loc.claimBadgeButton),
-          ),
-        ],
       ),
     );
   }
@@ -777,107 +757,48 @@ class AwardsScreen extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (dialogContext) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.all(24),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(30),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 24,
-                offset: const Offset(0, 12),
-              ),
-            ],
+      builder: (dialogContext) => FunDialog(
+        child: FunMessage(
+          picture: BadgeEmblem(
+            icon: badge['icon'] as IconData,
+            color: color,
+            size: 92,
+            locked: true,
           ),
-          padding: const EdgeInsets.fromLTRB(24, 28, 24, 22),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 96,
-                height: 96,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: BadgeEmblem(
-                    icon: badge['icon'] as IconData,
-                    color: color,
-                    size: 84,
-                    locked: true,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
-              Text(
-                _badgeTitle(context, badge['id'] as String),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textDark,
-                ),
-              ),
-              const SizedBox(height: 10),
-              // The whole point of this card.
-              Text(
-                _badgeHint(context, badge['id'] as String),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  height: 1.35,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey.shade700,
-                ),
-              ),
-              if (progress != null) ...[
-                const SizedBox(height: 20),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: LinearProgressIndicator(
-                    value: progress.fraction,
-                    minHeight: 10,
-                    backgroundColor: Colors.grey.shade200,
-                    valueColor: AlwaysStoppedAnimation<Color>(color),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '${progress.current}/${progress.target}',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                    color: color,
-                  ),
-                ),
-              ],
-              const SizedBox(height: 22),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: color,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+          title: _badgeTitle(context, badge['id'] as String),
+          // The whole point of this card.
+          message: _badgeHint(context, badge['id'] as String),
+          body: progress == null
+              ? null
+              : Column(children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: LinearProgressIndicator(
+                      value: progress.fraction,
+                      minHeight: 14,
+                      backgroundColor: Colors.white,
+                      valueColor: AlwaysStoppedAnimation<Color>(color),
                     ),
-                    elevation: 0,
                   ),
-                  child: Text(
-                    loc.okButton,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${progress.current}/${progress.target}',
+                    style: TextStyle(
+                      fontFamily: 'Fredoka',
+                      fontSize: 22,
+                      fontVariations: const [FontVariation('wght', 700)],
+                      fontWeight: FontWeight.w700,
+                      color: color,
+                    ),
                   ),
-                ),
-              ),
-            ],
-          ),
+                ]),
+          buttons: [
+            FunPillButton(
+              label: loc.okButton,
+              colors: FunColors.of(color),
+              onTap: () => Navigator.of(dialogContext).pop(),
+            ),
+          ],
         ),
       ),
     );

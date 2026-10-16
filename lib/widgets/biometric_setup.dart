@@ -1,5 +1,6 @@
 import 'package:e_tarabay/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'fun_dialog.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 
 import '../services/biometric_service.dart';
@@ -57,35 +58,39 @@ Future<bool> setBiometricEnabled({
   final passCtrl = TextEditingController();
   final confirmed = await showDialog<bool>(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: Text(loc.enableBiometric, style: const TextStyle(fontSize: 18)),
-      content: TextField(
-        controller: passCtrl,
-        obscureText: true,
-        keyboardType: numericPassword ? TextInputType.number : null,
-        decoration: InputDecoration(
-          labelText: passwordLabel,
-          prefixIcon: Icon(
-              numericPassword ? LucideIcons.key_round : LucideIcons.lock,
-              size: 20),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          isDense: true,
+    builder: (dialogContext) => FunDialog(
+      child: FunMessage(
+        picture: const FunCoin(
+            icon: LucideIcons.fingerprint_pattern, tone: Color(0xFF5B49D8)),
+        title: loc.enableBiometric,
+        body: TextField(
+          controller: passCtrl,
+          obscureText: true,
+          keyboardType: numericPassword ? TextInputType.number : null,
+          decoration: InputDecoration(
+            labelText: passwordLabel,
+            filled: true,
+            fillColor: Colors.white,
+            prefixIcon: Icon(
+                numericPassword ? LucideIcons.key_round : LucideIcons.lock,
+                size: 20),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+            isDense: true,
+          ),
         ),
+        buttons: [
+          FunPillButton(
+            label: loc.cancel,
+            colors: FunColors.grey,
+            onTap: () => Navigator.pop(dialogContext, false),
+          ),
+          FunPillButton(
+            label: loc.continueLabel,
+            colors: FunColors.purple,
+            onTap: () => Navigator.pop(dialogContext, true),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(dialogContext, false),
-          child: Text(loc.cancel, style: const TextStyle(color: Colors.grey)),
-        ),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(dialogContext, true),
-          style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white),
-          child: Text(loc.continueLabel),
-        ),
-      ],
     ),
   );
 

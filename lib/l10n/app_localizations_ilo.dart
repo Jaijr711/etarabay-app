@@ -1613,6 +1613,9 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get howStarsEarned => 'Kasano ti panagala kadagiti bituen ditoy:';
 
   @override
+  String get starRequirements => 'Kasano a Maala ti Bituen';
+
+  @override
   String get starOneTitle => 'Nalpasmo';
 
   @override

@@ -189,6 +189,15 @@ class FunColors {
       FunColors(Color(0xFF8E80FF), Color(0xFF5B49D8), Color(0xFF3B2DA3));
   static const grey =
       FunColors(Color(0xFFD3D5DD), Color(0xFF9296A3), Color(0xFF6B6F7C));
+  static const blue =
+      FunColors(Color(0xFF6FB8F2), Color(0xFF2F7FD6), Color(0xFF1F5AA0));
+
+  /// A button in [color]'s own shades (a badge's colour, say).
+  factory FunColors.of(Color color) => FunColors(
+        Color.lerp(color, Colors.white, 0.3)!,
+        color,
+        Color.lerp(color, Colors.black, 0.32)!,
+      );
 }
 
 /// A glossy 3D pill button: a gradient face, a solid edge under it and a
@@ -332,6 +341,114 @@ class FunCloseButton extends StatelessWidget {
           child: const Icon(Icons.close_rounded,
               color: Color(0xFF5E5262), size: 28),
         ),
+      ),
+    );
+  }
+}
+
+/// An icon on a gold coin, the picture at the top of a message card.
+class FunCoin extends StatelessWidget {
+  final IconData icon;
+  final Color tone;
+  final double size;
+
+  const FunCoin(
+      {super.key, required this.icon, required this.tone, this.size = 96});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      padding: EdgeInsets.all(size * 0.075),
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFFFD86B), Color(0xFFE8A21E)],
+        ),
+        boxShadow: [BoxShadow(color: Color(0xFFC8861A), offset: Offset(0, 4))],
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Color.lerp(tone, Colors.white, 0.86),
+        ),
+        child: Icon(icon, color: tone, size: size * 0.48),
+      ),
+    );
+  }
+}
+
+/// One message card in the team's style: a picture (a [FunCoin], a badge),
+/// a chunky title, the message, anything else, and glossy buttons — two
+/// short ones side by side, otherwise one under the other.
+class FunMessage extends StatelessWidget {
+  final FunFrame frame;
+  final Widget? picture;
+  final String? title;
+  final String? message;
+  final Widget? body;
+  final List<Widget> buttons;
+  final bool buttonsInRow;
+
+  const FunMessage({
+    super.key,
+    this.frame = FunFrame.purple,
+    this.picture,
+    this.title,
+    this.message,
+    this.body,
+    this.buttons = const [],
+    this.buttonsInRow = true,
+  });
+
+  static const navy = Color(0xFF2B2A5C);
+
+  @override
+  Widget build(BuildContext context) {
+    return FunDialogCard(
+      frame: frame,
+      padding: const EdgeInsets.fromLTRB(18, 22, 18, 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          if (picture != null) ...[picture!, const SizedBox(height: 14)],
+          if (title != null) ...[
+            FunTitle(title!, size: 26),
+            const SizedBox(height: 8),
+          ],
+          if (message != null)
+            Text(message!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontFamily: 'Fredoka',
+                  fontSize: 18,
+                  height: 1.3,
+                  fontVariations: [FontVariation('wght', 550)],
+                  fontWeight: FontWeight.w600,
+                  color: navy,
+                )),
+          if (body != null) ...[const SizedBox(height: 12), body!],
+          if (buttons.isNotEmpty) ...[
+            const SizedBox(height: 18),
+            if (buttonsInRow)
+              Row(children: [
+                for (int i = 0; i < buttons.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 12),
+                  Expanded(child: buttons[i]),
+                ],
+              ])
+            else
+              Column(children: [
+                for (int i = 0; i < buttons.length; i++) ...[
+                  if (i > 0) const SizedBox(height: 12),
+                  SizedBox(width: double.infinity, child: buttons[i]),
+                ],
+              ]),
+          ],
+        ]),
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:e_tarabay/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'fun_dialog.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../utils/constants.dart';
@@ -583,90 +584,81 @@ class _SuccessModalState extends State<SuccessModal> {
     final earned = widget.stars;
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Row(
-          children: [
-            Icon(Icons.star_rounded, color: Color(0xFFFFB800), size: 24),
-            SizedBox(width: 8),
-            Text(
-              'Star Requirements',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // What the app counts is wrong answers: none is three
-            // stars, one is two, more than that is one. The old text
-            // promised an accuracy percentage that exists nowhere in
-            // the app, so it described a rule nobody could meet on
-            // purpose.
-            Text(
-              AppLocalizations.of(ctx)!.howStarsEarned,
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-            ),
-            const SizedBox(height: 16),
-            _buildStarCriterionItem(
-              starNumber: 1,
-              title: AppLocalizations.of(ctx)!.starOneTitle,
-              description: AppLocalizations.of(ctx)!.starOneBody,
-              isEarned: earned >= 1,
-            ),
-            const SizedBox(height: 12),
-            _buildStarCriterionItem(
-              starNumber: 2,
-              title: AppLocalizations.of(ctx)!.starTwoTitle,
-              description: AppLocalizations.of(ctx)!.starTwoBody,
-              isEarned: earned >= 2,
-            ),
-            const SizedBox(height: 12),
-            _buildStarCriterionItem(
-              starNumber: 3,
-              title: AppLocalizations.of(ctx)!.starThreeTitle,
-              description: AppLocalizations.of(ctx)!.starThreeBody,
-              isEarned: earned >= 3,
-            ),
-            if (earned < 3) ...[
+      builder: (ctx) => FunDialog(
+        child: FunMessage(
+          title: AppLocalizations.of(ctx)!.starRequirements,
+          body: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // What the app counts is wrong answers: none is three
+              // stars, one is two, more than that is one. The old text
+              // promised an accuracy percentage that exists nowhere in
+              // the app, so it described a rule nobody could meet on
+              // purpose.
+              Text(
+                AppLocalizations.of(ctx)!.howStarsEarned,
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+              ),
               const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.amber.shade200),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(LucideIcons.lightbulb,
-                        color: Colors.amber, size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        AppLocalizations.of(ctx)!.starTip,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.amber.shade900,
+              _buildStarCriterionItem(
+                starNumber: 1,
+                title: AppLocalizations.of(ctx)!.starOneTitle,
+                description: AppLocalizations.of(ctx)!.starOneBody,
+                isEarned: earned >= 1,
+              ),
+              const SizedBox(height: 12),
+              _buildStarCriterionItem(
+                starNumber: 2,
+                title: AppLocalizations.of(ctx)!.starTwoTitle,
+                description: AppLocalizations.of(ctx)!.starTwoBody,
+                isEarned: earned >= 2,
+              ),
+              const SizedBox(height: 12),
+              _buildStarCriterionItem(
+                starNumber: 3,
+                title: AppLocalizations.of(ctx)!.starThreeTitle,
+                description: AppLocalizations.of(ctx)!.starThreeBody,
+                isEarned: earned >= 3,
+              ),
+              if (earned < 3) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.amber.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(LucideIcons.lightbulb,
+                          color: Colors.amber, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          AppLocalizations.of(ctx)!.starTip,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.amber.shade900,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ],
+          ),
+          buttons: [
+            FunPillButton(
+              label: AppLocalizations.of(ctx)!.gotIt,
+              colors: FunColors.purple,
+              onTap: () => Navigator.pop(ctx),
+            ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(AppLocalizations.of(ctx)!.gotIt,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          ),
-        ],
       ),
     );
   }
@@ -692,13 +684,18 @@ class _SuccessModalState extends State<SuccessModal> {
             children: [
               Row(
                 children: [
-                  Text(
-                    'Star $starNumber: $title',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color:
-                          isEarned ? AppColors.textDark : Colors.grey.shade600,
+                  // Wraps rather than running off the card ("Star 3: You got
+                  // them all right on your first try").
+                  Flexible(
+                    child: Text(
+                      'Star $starNumber: $title',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: isEarned
+                            ? AppColors.textDark
+                            : Colors.grey.shade600,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 6),

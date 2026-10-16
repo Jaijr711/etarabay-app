@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'fun_dialog.dart';
 
 import '../l10n/app_localizations.dart';
-import '../utils/constants.dart';
 
 /// Shown once, right after a parent turns "Notifications" on in Settings.
 ///
@@ -18,40 +18,20 @@ Future<void> showBackgroundPermissionDialog(BuildContext context) {
   return showDialog<void>(
     context: context,
     barrierDismissible: true,
-    builder: (dialogContext) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      title: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.12),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.notifications_active_rounded,
-                color: AppColors.primary),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(loc.bgPermissionTitle,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+    builder: (dialogContext) => FunDialog(
+      child: FunMessage(
+        picture: const FunCoin(
+            icon: Icons.notifications_active_rounded, tone: Color(0xFF2F7FD6)),
+        title: loc.bgPermissionTitle,
+        message: loc.bgPermissionBody,
+        buttons: [
+          FunPillButton(
+            label: loc.gotIt,
+            colors: FunColors.purple,
+            onTap: () => Navigator.pop(dialogContext),
           ),
         ],
       ),
-      content: Text(loc.bgPermissionBody),
-      actions: [
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          ),
-          onPressed: () => Navigator.pop(dialogContext),
-          child: Text(loc.gotIt),
-        ),
-      ],
     ),
   );
 }

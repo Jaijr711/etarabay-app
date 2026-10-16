@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import '../widgets/fun_dialog.dart';
 import '../main.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -757,20 +758,23 @@ class _TandaanScreenState extends State<TandaanScreen>
   }
 
   void _showAlreadyFinishedDialog() {
+    final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(AppLocalizations.of(context)!.finishedAlready,
-            textAlign: TextAlign.center),
-        content: Text(AppLocalizations.of(context)!.doneAlready,
-            textAlign: TextAlign.center),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)!.okButton),
-          )
-        ],
+      builder: (dialogContext) => FunDialog(
+        child: FunMessage(
+          picture:
+              const FunCoin(icon: Icons.check_rounded, tone: Color(0xFF2E9E3E)),
+          title: loc.finishedAlready,
+          message: loc.doneAlready,
+          buttons: [
+            FunPillButton(
+              label: loc.okButton,
+              colors: FunColors.purple,
+              onTap: () => Navigator.pop(dialogContext),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1624,6 +1624,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get howStarsEarned => 'Paano nakukuha ang bituin dito:';
 
   @override
+  String get starRequirements => 'Paano Makakuha ng Bituin';
+
+  @override
   String get starOneTitle => 'Natapos mo';
 
   @override

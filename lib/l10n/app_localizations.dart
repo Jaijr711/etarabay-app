@@ -3047,6 +3047,12 @@ abstract class AppLocalizations {
   /// **'How you earn stars here:'**
   String get howStarsEarned;
 
+  /// No description provided for @starRequirements.
+  ///
+  /// In en, this message translates to:
+  /// **'Star Requirements'**
+  String get starRequirements;
+
   /// Explains the 1-to-3 star rating
   ///
   /// In en, this message translates to:

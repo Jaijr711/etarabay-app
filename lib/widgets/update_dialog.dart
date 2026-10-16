@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'fun_dialog.dart';
 
 import '../l10n/app_localizations.dart';
 import '../services/update_checker.dart';
-import '../utils/constants.dart';
 
 /// The one prompt a sideloaded install gets in place of a store's own
 /// "update available" banner. Shown once per app open at most — see the
@@ -14,60 +14,48 @@ Future<void> showUpdateAvailableDialog(
   return showDialog<void>(
     context: context,
     barrierDismissible: true,
-    builder: (dialogContext) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      title: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.12),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.system_update_rounded,
-                color: AppColors.primary),
+    builder: (dialogContext) => FunDialog(
+      child: FunMessage(
+        picture: const FunCoin(
+            icon: Icons.system_update_rounded, tone: Color(0xFF2F7FD6)),
+        title: loc.updateAvailableTitle,
+        message: loc.updateAvailableBody(update.versionName),
+        body: update.notes == null || update.notes!.trim().isEmpty
+            ? null
+            // Release notes can run long; they scroll inside the card.
+            : ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 170),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Text(update.notes!,
+                        style: TextStyle(
+                            fontSize: 13, color: Colors.grey.shade700)),
+                  ),
+                ),
+              ),
+        buttons: [
+          FunPillButton(
+            label: loc.updateLater,
+            colors: FunColors.grey,
+            onTap: () => Navigator.pop(dialogContext),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(loc.updateAvailableTitle,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          FunPillButton(
+            label: loc.updateDownloadNow,
+            icon: Icons.download_rounded,
+            colors: FunColors.green,
+            onTap: () {
+              Navigator.pop(dialogContext);
+              UpdateChecker.instance.openDownload(update.apkUrl);
+            },
           ),
         ],
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(loc.updateAvailableBody(update.versionName)),
-          if (update.notes != null && update.notes!.trim().isNotEmpty) ...[
-            const SizedBox(height: 10),
-            Text(update.notes!,
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
-          ],
-        ],
-      ),
-      actionsAlignment: MainAxisAlignment.spaceBetween,
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(dialogContext),
-          child: Text(loc.updateLater),
-        ),
-        ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          ),
-          onPressed: () {
-            Navigator.pop(dialogContext);
-            UpdateChecker.instance.openDownload(update.apkUrl);
-          },
-          icon: const Icon(Icons.download_rounded, size: 18),
-          label: Text(loc.updateDownloadNow),
-        ),
-      ],
     ),
   );
 }

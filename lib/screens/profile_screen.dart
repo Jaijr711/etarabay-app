@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/fun_dialog.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 import '../utils/constants.dart';
@@ -71,25 +72,26 @@ class ProfileScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(loc.logout,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
-        content: Text(loc.logoutConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text(loc.cancel),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+      builder: (dialogContext) => FunDialog(
+        child: FunMessage(
+          frame: FunFrame.coral,
+          picture:
+              const FunCoin(icon: LucideIcons.log_out, tone: Color(0xFFE5484D)),
+          title: loc.logout,
+          message: loc.logoutConfirm,
+          buttons: [
+            FunPillButton(
+              label: loc.cancel,
+              colors: FunColors.grey,
+              onTap: () => Navigator.pop(dialogContext, false),
             ),
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(loc.logout),
-          ),
-        ],
+            FunPillButton(
+              label: loc.logout,
+              colors: FunColors.red,
+              onTap: () => Navigator.pop(dialogContext, true),
+            ),
+          ],
+        ),
       ),
     );
 
