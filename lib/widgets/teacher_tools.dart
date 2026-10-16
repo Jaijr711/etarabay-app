@@ -336,6 +336,7 @@ class TeacherTools extends StatelessWidget {
       'assets/images/paint1.png': l10n.pagePuppy,
       'assets/images/paint2.png': l10n.pageKuting,
       'assets/images/paint3.png': l10n.pageElepante,
+      'assets/images/paint_elephant.webp': l10n.pageElepante,
       'assets/images/paint4.png': l10n.pageFlowerBasket,
       'assets/images/paint_daisy.webp': l10n.pageFlowerBasket,
       'assets/images/paint5.png': l10n.pageRose,

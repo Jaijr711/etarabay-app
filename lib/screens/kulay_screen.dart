@@ -474,7 +474,8 @@ class _KulayScreenState extends State<KulayScreen>
           colors: 3),
       ColoringPage(
           name: 'Elephant',
-          imagePath: 'assets/images/paint3.png',
+          imagePath: 'assets/images/paint_elephant.webp',
+          formerImagePaths: ['assets/images/paint3.png'],
           difficulty: 'Medium',
           timeEstimate: '8 min',
           colors: 2),
@@ -715,6 +716,9 @@ class _KulayScreenState extends State<KulayScreen>
     // The page is shown as "Flower" but keeps this name, which its saves
     // are filed under.
     'Flower Basket': 2,
+    // The elephant was redrawn (2026-10-16), under a new file name for the
+    // same reason; paint3.png is gone and named in formerImagePaths.
+    'Elephant': 2,
   };
 
   Future<String> _autoSaveImagePath(String pageName) async {
