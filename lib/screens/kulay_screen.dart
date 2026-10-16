@@ -107,6 +107,14 @@ class ColoringStroke {
     );
   }
 
+  /// The same stroke on a canvas [f] times the size.
+  ColoringStroke scaled(double f) => ColoringStroke(
+        points: [for (final p in points) p * f],
+        color: color,
+        size: size * f,
+        isEraser: isEraser,
+      );
+
   Map<String, dynamic> toMap() {
     return {
       'points': points.map((p) => {'dx': p.dx, 'dy': p.dy}).toList(),
@@ -135,6 +143,15 @@ class MyCreation {
   final String sourcePagePath;
   final String base64Image;
   final List<ColoringStroke> strokes;
+
+  /// The bucket-filled picture (PNG, base64, at the page's own size). Kept
+  /// on this device only — the cloud copy carries the small picture alone.
+  /// Empty for creations saved before it was kept.
+  final String fillImage;
+
+  /// The side of the canvas the [strokes] were drawn on, in logical pixels;
+  /// 0 when not known (older creations).
+  final double canvasSide;
   bool isFavorite;
   int? stars;
   int durationSeconds; // time spent coloring
@@ -146,6 +163,8 @@ class MyCreation {
     this.sourcePagePath = '',
     this.base64Image = '',
     required this.strokes,
+    this.fillImage = '',
+    this.canvasSide = 0,
     this.isFavorite = false,
     this.stars,
     this.durationSeconds = 0,
@@ -736,6 +755,7 @@ class _KulayScreenState extends State<KulayScreen>
     // Save strokes
     final strokesJson = jsonEncode(_strokes.map((s) => s.toMap()).toList());
     await prefs.setString('${key}_strokes', strokesJson);
+    await prefs.setDouble('${key}_side', _lastSide);
 
     // Save bucket-fill image. The web has no files, so there it is kept in
     // the preferences as text instead — before, every fill was lost on the
@@ -775,6 +795,7 @@ class _KulayScreenState extends State<KulayScreen>
     final colorVal = prefs.getInt('${key}_color');
     final brushSize = prefs.getDouble('${key}_brushSize');
     final isEraser = prefs.getBool('${key}_isEraser');
+    final savedSide = prefs.getDouble('${key}_side');
 
     List<ColoringStroke>? loadedStrokes;
     img.Image? loadedColoredImage;
@@ -829,6 +850,9 @@ class _KulayScreenState extends State<KulayScreen>
         _strokePaths.addAll(loadedStrokes.map(_buildPathFromPoints));
         _bakedStrokes = null;
         _bakedCount = 0;
+        // Drawn on a canvas of this size; rescaled once the canvas is laid
+        // out — see [_drawingSurface].
+        _strokesDrawnAtSide = savedSide;
       }
       if (loadedColoredImage != null) _coloredImage = loadedColoredImage;
       if (loadedDisplayImage != null) _displayImage = loadedDisplayImage;
@@ -857,6 +881,7 @@ class _KulayScreenState extends State<KulayScreen>
     await prefs.remove('${key}_color');
     await prefs.remove('${key}_brushSize');
     await prefs.remove('${key}_isEraser');
+    await prefs.remove('${key}_side');
 
     try {
       final imagePath = await _autoSaveImagePath(pageName);
@@ -1344,8 +1369,8 @@ class _KulayScreenState extends State<KulayScreen>
   /// the small copy kept with it (all a creation restored from the cloud
   /// has), else the page it was colored on.
   Widget _creationPicture(MyCreation creation) {
-    Widget fallback() => Icon(LucideIcons.image,
-        size: 40, color: Colors.grey.shade300);
+    Widget fallback() =>
+        Icon(LucideIcons.image, size: 40, color: Colors.grey.shade300);
     Widget memory() {
       if (creation.base64Image.isEmpty) return fallback();
       try {
@@ -1515,6 +1540,8 @@ class _KulayScreenState extends State<KulayScreen>
           base64Image:
               base64Img.isNotEmpty ? base64Img : _editingCreation!.base64Image,
           strokes: List.from(_strokes),
+          fillImage: _encodeFill(),
+          canvasSide: _lastSide,
           isFavorite: _editingCreation!.isFavorite,
           stars: _editingCreation!.stars,
           durationSeconds: _editingCreation!.durationSeconds + elapsed,
@@ -1532,6 +1559,8 @@ class _KulayScreenState extends State<KulayScreen>
         sourcePagePath: _selectedPage!.imagePath,
         base64Image: base64Img,
         strokes: List.from(_strokes),
+        fillImage: _encodeFill(),
+        canvasSide: _lastSide,
         durationSeconds: elapsed,
       );
       setState(() => _myCreations.add(creation));
@@ -1587,6 +1616,18 @@ class _KulayScreenState extends State<KulayScreen>
     }
   }
 
+  /// The bucket fills as PNG text, or empty when nothing was filled.
+  String _encodeFill() {
+    final colored = _coloredImage;
+    if (colored == null || _filledPixelsCount == 0) return '';
+    try {
+      return base64Encode(img.encodePng(colored));
+    } catch (e) {
+      debugPrint('Fill not kept: $e');
+      return '';
+    }
+  }
+
   Future<void> _loadCreations() async {
     try {
       final box = await Hive.openBox('userProgress');
@@ -1624,6 +1665,8 @@ class _KulayScreenState extends State<KulayScreen>
                 sourcePagePath: item['sourcePagePath'] ?? '',
                 base64Image: item['base64Image'] ?? '',
                 strokes: strokes,
+                fillImage: item['fillImage'] as String? ?? '',
+                canvasSide: (item['canvasSide'] as num?)?.toDouble() ?? 0,
                 isFavorite: item['isFavorite'] ?? false,
                 stars: item['stars'],
                 durationSeconds: item['durationSeconds'] ?? 0,
@@ -1662,6 +1705,8 @@ class _KulayScreenState extends State<KulayScreen>
           'thumbnailPath': c.thumbnailPath,
           'sourcePagePath': c.sourcePagePath,
           'base64Image': c.base64Image,
+          'fillImage': c.fillImage,
+          'canvasSide': c.canvasSide,
           'isFavorite': c.isFavorite,
           'stars': c.stars,
           'durationSeconds': c.durationSeconds,
@@ -2175,8 +2220,41 @@ class _KulayScreenState extends State<KulayScreen>
   //    4. GestureDetector captures touch on the top-most layer
   // ─────────────────────────────────────────────────────────────────────────
 
+  /// The canvas side the current [_strokes] were drawn at, when they came
+  /// from a save made on a canvas that may not be this size. Null once they
+  /// match the canvas.
+  double? _strokesDrawnAtSide;
+
+  /// Moves [_strokes] onto a canvas of [side]: they are kept in canvas
+  /// pixels, so a drawing reopened on another phone, a turned screen or a
+  /// resized window would otherwise land off its regions.
+  void _fitStrokesTo(double side) {
+    final from = _strokesDrawnAtSide;
+    if (from == null) return;
+    _strokesDrawnAtSide = null;
+    if (from <= 0 || (from - side).abs() < 0.5 || _strokes.isEmpty) return;
+    final f = side / from;
+    final scaled = [for (final s in _strokes) s.scaled(f)];
+    _strokes
+      ..clear()
+      ..addAll(scaled);
+    _strokePaths
+      ..clear()
+      ..addAll(scaled.map(_buildPathFromPoints));
+    final oldBaked = _bakedStrokes;
+    _bakedStrokes = null;
+    _bakedCount = 0;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      oldBaked?.dispose();
+      if (!mounted) return;
+      _maskCache.clear();
+      _rebuildStrokeMasks();
+    });
+  }
+
   Widget _drawingSurface(double side) {
     _lastSide = side;
+    _fitStrokesTo(side);
     return RepaintBoundary(
       key: _canvasKey,
       child: ClipRect(
@@ -2942,23 +3020,7 @@ class _KulayScreenState extends State<KulayScreen>
                         for (final cat in _categories) {
                           for (final page in cat.pages) {
                             if (page.owns(creation)) {
-                              _clearZoom();
-                              setState(() {
-                                _selectedPage = page;
-                                _strokes
-                                  ..clear()
-                                  ..addAll(creation.strokes);
-                                _activeStroke = null;
-                                _editingCreation = creation;
-                                _selectedTab = 0;
-                                _coloringStartTime = DateTime.now();
-                              });
-                              _maskCache.clear();
-                              _loadPageImage().then((_) {
-                                if (!mounted) return;
-                                setState(() {});
-                                _rebuildStrokeMasks();
-                              });
+                              _editCreation(page, creation);
                               return;
                             }
                           }
@@ -2993,6 +3055,79 @@ class _KulayScreenState extends State<KulayScreen>
         ),
       ),
     );
+  }
+
+  /// Reopens [creation] on [page] with everything the child colored.
+  ///
+  /// A creation keeps its brush strokes, its bucket fills and the canvas
+  /// size they were drawn at. One saved before the fills were kept starts
+  /// from its own saved picture instead, with its strokes already in it —
+  /// opening it on the bare line art, as Edit used to, lost every filled
+  /// area. And one colored on a picture the page has since replaced (the
+  /// old elephant, the old flower pot) opens the new picture fresh, as a new
+  /// creation: its colors belong to a drawing that is no longer there.
+  void _editCreation(ColoringPage page, MyCreation creation) {
+    final samePicture = creation.sourcePagePath.isEmpty ||
+        creation.sourcePagePath == page.imagePath;
+    final hasFill = creation.fillImage.isNotEmpty;
+    final useStrokes = samePicture && (hasFill || creation.base64Image.isEmpty);
+    _clearZoom();
+    final oldBaked = _bakedStrokes;
+    setState(() {
+      _selectedPage = page;
+      _strokes.clear();
+      _strokePaths.clear();
+      if (useStrokes) {
+        _strokes.addAll(creation.strokes);
+        _strokePaths.addAll(creation.strokes.map(_buildPathFromPoints));
+        _strokesDrawnAtSide =
+            creation.canvasSide > 0 ? creation.canvasSide : null;
+      }
+      _bakedStrokes = null;
+      _bakedCount = 0;
+      // Counted afresh: the restored picture sets it below if it has fills.
+      _filledPixelsCount = 0;
+      _activeStroke = null;
+      _editingCreation = samePicture ? creation : null;
+      _selectedTab = 0;
+      _coloringStartTime = DateTime.now();
+    });
+    oldBaked?.dispose();
+    _maskCache.clear();
+    _loadPageImage().then((_) async {
+      if (!mounted || !samePicture) {
+        if (mounted) setState(() {});
+        return;
+      }
+      final base = _baseImage;
+      final source = hasFill ? creation.fillImage : creation.base64Image;
+      if (base != null && source.isNotEmpty) {
+        try {
+          var picture = img.decodeImage(base64Decode(source));
+          if (picture != null) {
+            if (picture.width != base.width || picture.height != base.height) {
+              picture = img.copyResize(picture,
+                  width: base.width,
+                  height: base.height,
+                  interpolation: img.Interpolation.average);
+            }
+            final display = await _imageToUi(picture);
+            if (!mounted) return;
+            setState(() {
+              _coloredImage = picture;
+              _displayImage = display;
+              // Something is colored: Save must not say otherwise.
+              if (_filledPixelsCount == 0) _filledPixelsCount = 1;
+            });
+          }
+        } catch (e) {
+          debugPrint('Could not restore the creation\'s colors: $e');
+        }
+      }
+      if (!mounted) return;
+      setState(() {});
+      _rebuildStrokeMasks();
+    });
   }
 
   void _confirmDeleteCreation(MyCreation creation) {
