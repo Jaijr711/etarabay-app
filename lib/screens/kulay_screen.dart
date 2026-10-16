@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 import '../widgets/custom_back_button.dart';
+import '../widgets/fun_dialog.dart';
 import 'package:e_tarabay/l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
@@ -1289,77 +1290,88 @@ class _KulayScreenState extends State<KulayScreen>
 
   void _showStarRatingDialog(MyCreation creation) {
     int selectedStars = 0;
+    final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) => StatefulBuilder(
-        builder: (dialogCtx, setDialogState) => AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          title: Text(AppLocalizations.of(context)!.rateYourArtwork,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(AppLocalizations.of(context)!.howManyStars,
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
-              const SizedBox(height: 20),
+        builder: (dialogCtx, setDialogState) => FunDialog(
+          child: FunDialogCard(
+            frame: FunFrame.purple,
+            padding: const EdgeInsets.fromLTRB(16, 22, 16, 22),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              FunTitle(loc.rateYourArtwork),
+              const SizedBox(height: 8),
+              Text(loc.howManyStars,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2B2A5C))),
+              const SizedBox(height: 16),
+              // The app's glossy star, grey and faint until chosen.
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(5, (i) {
                   final idx = i + 1;
+                  final on = idx <= selectedStars;
+                  final star = Image.asset('assets/images/replay_star.webp',
+                      width: 50,
+                      height: 48,
+                      filterQuality: FilterQuality.medium);
                   return GestureDetector(
                     onTap: () => setDialogState(() => selectedStars = idx),
-                    child: AnimatedContainer(
+                    child: AnimatedScale(
+                      scale: on ? 1.08 : 1.0,
                       duration: const Duration(milliseconds: 150),
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Icon(
-                        idx <= selectedStars
-                            ? Icons.star_rounded
-                            : Icons.star_outline_rounded,
-                        size: 40,
-                        color: idx <= selectedStars
-                            ? const Color(0xFFFFB800)
-                            : const Color(0xFFCBD5E1),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        child: on
+                            ? star
+                            : Opacity(
+                                opacity: 0.45,
+                                child: ColorFiltered(
+                                  colorFilter: const ColorFilter.matrix([
+                                    0.33, 0.33, 0.33, 0, 0, //
+                                    0.33, 0.33, 0.33, 0, 0, //
+                                    0.33, 0.33, 0.33, 0, 0, //
+                                    0, 0, 0, 1, 0,
+                                  ]),
+                                  child: star,
+                                ),
+                              ),
                       ),
                     ),
                   );
                 }),
               ),
-            ],
+              const SizedBox(height: 20),
+              SizedBox(
+                width: 200,
+                child: FunPillButton(
+                  label: loc.done,
+                  colors: FunColors.purple,
+                  onTap: () {
+                    creation.stars = selectedStars > 0 ? selectedStars : null;
+                    _saveCreationsToHive();
+                    Navigator.pop(context);
+                    _snack(AppLocalizations.of(context)!.saved);
+                    final oldBaked = _bakedStrokes;
+                    setState(() {
+                      _strokes.clear();
+                      _strokePaths.clear();
+                      _activeStroke = null;
+                      _editingCreation = null;
+                      _selectedPage = null;
+                      _bakedStrokes = null;
+                      _bakedCount = 0;
+                    });
+                    oldBaked?.dispose();
+                  },
+                ),
+              ),
+            ]),
           ),
-          actionsAlignment: MainAxisAlignment.center,
-          actions: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12)),
-              onPressed: () {
-                creation.stars = selectedStars > 0 ? selectedStars : null;
-                _saveCreationsToHive();
-                Navigator.pop(context);
-                _snack(AppLocalizations.of(context)!.saved);
-                final oldBaked = _bakedStrokes;
-                setState(() {
-                  _strokes.clear();
-                  _strokePaths.clear();
-                  _activeStroke = null;
-                  _editingCreation = null;
-                  _selectedPage = null;
-                  _bakedStrokes = null;
-                  _bakedCount = 0;
-                });
-                oldBaked?.dispose();
-              },
-              child: Text(AppLocalizations.of(context)!.done,
-                  style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
-          ],
         ),
       ),
     );
@@ -2528,18 +2540,21 @@ class _KulayScreenState extends State<KulayScreen>
           _tBtn(
             icon: LucideIcons.eraser,
             label: AppLocalizations.of(context)!.eraser,
+            tint: const Color(0xFFE76FB0),
             active: _isEraser,
             onTap: () => setState(() => _isEraser = !_isEraser),
           ),
           _tBtn(
               icon: LucideIcons.undo_2,
               label: AppLocalizations.of(context)!.undo,
+              tint: const Color(0xFFA8B82E),
               active: false,
               disabled: _strokes.isEmpty && _bucketUndoImages.isEmpty,
               onTap: _undo),
           _tBtn(
             icon: LucideIcons.trash_2,
             label: AppLocalizations.of(context)!.clear,
+            tint: const Color(0xFFE5484D),
             active: false,
             onTap: _confirmClearAll,
           ),
@@ -2556,6 +2571,7 @@ class _KulayScreenState extends State<KulayScreen>
                   : (_isCurrentPageSaved()
                       ? AppLocalizations.of(context)!.viewArtwork
                       : AppLocalizations.of(context)!.save),
+              tint: const Color(0xFF3F9BC9),
               active: false,
               onTap: _editingCreation != null
                   ? _saveCreation
@@ -2567,50 +2583,68 @@ class _KulayScreenState extends State<KulayScreen>
     );
   }
 
-  /// One of the three brush sizes, drawn as the dot it actually makes.
+  /// One of the three brush sizes: a glossy ball as big as the size, in
+  /// the design's orange, teal and purple, ringed when chosen. Shared with
+  /// the eraser, which reads its radius off the same [_brushSize].
   Widget _brushBtn(double size, String label) {
-    // Shared with the eraser — it needs the same three sizes to erase a
-    // small mistake versus a whole limb, and it reads its radius off this
-    // same [_brushSize].
     final selected = _brushSize == size;
-    final dot = (size / 48 * 26).clamp(8.0, 26.0);
+    final ball = size == 12 ? 20.0 : (size == 30 ? 30.0 : 40.0);
+    final color = size == 12
+        ? const Color(0xFFF07A3A)
+        : (size == 30 ? const Color(0xFF2E9DA6) : const Color(0xFFB04BD6));
     return GestureDetector(
-      onTap: () => setState(() {
-        _brushSize = size;
-      }),
+      onTap: () => setState(() => _brushSize = size),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          width: 54,
-          height: 54,
-          decoration: BoxDecoration(
-            color: selected
-                ? AppColors.primary
-                : AppColors.primary.withOpacity(0.08),
-            shape: BoxShape.circle,
-            border: Border.all(
-                color: selected ? AppColors.primary : Colors.transparent,
-                width: 2),
-          ),
+        SizedBox(
+          width: 52,
+          height: 48,
           child: Center(
-            child: Container(
-              width: dot,
-              height: dot,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              width: ball + (selected ? 8 : 0),
+              height: ball + (selected ? 8 : 0),
+              padding: EdgeInsets.all(selected ? 3 : 0),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                // The dot wears the colour the child is about to draw with,
-                // so one button previews both size and colour at once.
-                color: selected ? Colors.white : _selectedColor,
+                color: selected ? Colors.white : Colors.transparent,
+                border: selected ? Border.all(color: color, width: 2.5) : null,
+                boxShadow: selected
+                    ? [BoxShadow(color: color.withOpacity(0.6), blurRadius: 10)]
+                    : null,
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    center: const Alignment(-0.35, -0.45),
+                    radius: 0.9,
+                    colors: [
+                      Color.lerp(color, Colors.white, 0.55)!,
+                      color,
+                      Color.lerp(color, Colors.black, 0.25)!
+                    ],
+                    stops: const [0, 0.55, 1],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 3,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         Text(label,
             style: TextStyle(
-                fontSize: 11,
-                color: selected ? AppColors.primary : Colors.grey.shade600,
-                fontWeight: selected ? FontWeight.bold : FontWeight.normal)),
+                fontFamily: 'Fredoka',
+                fontSize: 14,
+                fontVariations: const [FontVariation('wght', 600)],
+                fontWeight: FontWeight.w600,
+                color: selected ? color : const Color(0xFF3A3F5C))),
       ]),
     );
   }
@@ -2627,95 +2661,127 @@ class _KulayScreenState extends State<KulayScreen>
     final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
-        contentPadding: const EdgeInsets.fromLTRB(22, 26, 22, 18),
-        content: Column(mainAxisSize: MainAxisSize.min, children: [
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1), shape: BoxShape.circle),
-            child: const Icon(LucideIcons.trash_2,
-                size: 42, color: Color(0xFFE5484D)),
-          ),
-          const SizedBox(height: 16),
-          Text(loc.clearCanvasQuestion,
-              textAlign: TextAlign.center,
-              style:
-                  const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(LucideIcons.brush, size: 20),
-              label: Text(loc.keepColoring,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2E9E5B),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
+      builder: (dialogContext) => FunDialog(
+        child: FunDialogCard(
+          frame: FunFrame.purple,
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            // The bin on a gold coin.
+            Container(
+              width: 104,
+              height: 104,
+              padding: const EdgeInsets.all(7),
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFFFFD86B), Color(0xFFE8A21E)],
+                ),
+                boxShadow: [
+                  BoxShadow(color: Color(0xFFC8861A), offset: Offset(0, 4)),
+                ],
+              ),
+              child: Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(0xFFFFE3E1),
+                ),
+                child: const Icon(LucideIcons.trash_2,
+                    size: 46, color: Color(0xFFE5484D)),
               ),
             ),
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () {
-                _clearAll();
-                Navigator.pop(context);
-              },
-              icon: const Icon(LucideIcons.rotate_ccw, size: 20),
-              label: Text(loc.startOverYes,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold)),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFFE5484D),
-                side: const BorderSide(color: Color(0xFFE5484D), width: 2),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
+            const SizedBox(height: 16),
+            Text(loc.clearCanvasQuestion,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontFamily: 'Fredoka',
+                  fontSize: 25,
+                  fontVariations: [FontVariation('wght', 650)],
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF2B2A5C),
+                )),
+            const SizedBox(height: 18),
+            // Keeping the drawing is the easier one to hit, because it is
+            // the one that cannot lose an hour of work.
+            SizedBox(
+              width: double.infinity,
+              child: FunPillButton(
+                label: loc.keepColoring,
+                icon: LucideIcons.brush,
+                colors: FunColors.green,
+                onTap: () => Navigator.pop(dialogContext),
               ),
             ),
-          ),
-        ]),
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: FunPillButton(
+                label: loc.startOverYes,
+                icon: LucideIcons.rotate_ccw,
+                colors: FunColors.red,
+                onTap: () {
+                  _clearAll();
+                  Navigator.pop(dialogContext);
+                },
+              ),
+            ),
+          ]),
+        ),
       ),
     );
   }
 
+  /// A tool as the design draws it: a round pastel button in a ring of its
+  /// own colour, the icon in that colour, its name under it. A tool that is
+  /// on (the eraser) glows.
   Widget _tBtn(
       {required IconData icon,
       required String label,
       required bool active,
       required VoidCallback onTap,
+      Color tint = const Color(0xFF5B8DEF),
       bool disabled = false}) {
+    final ink = Color.lerp(tint, Colors.black, 0.25)!;
     return GestureDetector(
       onTap: disabled ? null : onTap,
       child: Opacity(
-        opacity: disabled ? 0.3 : 1.0,
+        opacity: disabled ? 0.35 : 1.0,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           AnimatedContainer(
             duration: const Duration(milliseconds: 150),
-            padding: const EdgeInsets.all(13),
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
-              color: active
-                  ? AppColors.primary
-                  : AppColors.primary.withOpacity(0.1),
               shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color.lerp(tint, Colors.white, 0.82)!,
+                  Color.lerp(tint, Colors.white, 0.5)!,
+                ],
+              ),
+              border: Border.all(color: tint, width: 4),
+              boxShadow: [
+                BoxShadow(color: ink, offset: const Offset(0, 3)),
+                if (active)
+                  BoxShadow(
+                      color: tint.withOpacity(0.7),
+                      blurRadius: 12,
+                      spreadRadius: 3),
+              ],
             ),
-            child: Icon(icon,
-                color: active ? Colors.white : AppColors.primary, size: 24),
+            child: Icon(icon, color: ink, size: 26),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 5),
           Text(label,
               style: TextStyle(
-                  fontSize: 11,
-                  color: active ? AppColors.primary : Colors.grey.shade600,
-                  fontWeight: active ? FontWeight.bold : FontWeight.normal)),
+                  fontFamily: 'Fredoka',
+                  fontSize: 14,
+                  fontVariations: const [FontVariation('wght', 600)],
+                  fontWeight: FontWeight.w600,
+                  color: active ? ink : const Color(0xFF3A3F5C))),
         ]),
       ),
     );
@@ -2924,135 +2990,142 @@ class _KulayScreenState extends State<KulayScreen>
   }
 
   void _showCreationDetail(MyCreation creation) {
+    final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      builder: (_) => Dialog(
-        insetPadding: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(_creationTitle(creation),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            fontSize: 17, fontWeight: FontWeight.bold)),
-                  ),
-                  IconButton(
-                    icon: const Icon(LucideIcons.x, size: 20),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-            ),
-            if (creation.stars != null)
+      builder: (dialogContext) => FunDialog(
+        child: Stack(clipBehavior: Clip.none, children: [
+          FunDialogCard(
+            frame: FunFrame.rainbow,
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 20),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
               Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                          5,
-                          (i) => Icon(
-                                i < creation.stars!
-                                    ? Icons.star_rounded
-                                    : Icons.star_outline_rounded,
-                                size: 28,
-                                color: i < creation.stars!
-                                    ? const Color(0xFFFFB800)
-                                    : const Color(0xFFCBD5E1),
-                              )),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${creation.stars} / 5 Stars • Color Detail & Completeness',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade700,
-                      ),
-                    ),
-                  ],
+                padding: const EdgeInsets.only(right: 34),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(_creationTitle(creation),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontFamily: 'Fredoka',
+                        fontSize: 24,
+                        fontVariations: [FontVariation('wght', 650)],
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF2B2A5C),
+                      )),
                 ),
               ),
-            Flexible(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    color: const Color(0xFFF0F1FF),
-                    child: _creationPicture(creation),
+              if (creation.stars != null) ...[
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(5, (i) {
+                    final star = Image.asset('assets/images/replay_star.webp',
+                        width: 28, height: 27);
+                    return i < creation.stars!
+                        ? star
+                        : Opacity(
+                            opacity: 0.35,
+                            child: ColorFiltered(
+                              colorFilter: const ColorFilter.matrix([
+                                0.33, 0.33, 0.33, 0, 0, //
+                                0.33, 0.33, 0.33, 0, 0, //
+                                0.33, 0.33, 0.33, 0, 0, //
+                                0, 0, 0, 1, 0,
+                              ]),
+                              child: star,
+                            ),
+                          );
+                  }),
+                ),
+              ],
+              const SizedBox(height: 12),
+              // The picture in a rainbow-edged frame.
+              Flexible(
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFFFFC857),
+                        Color(0xFF8FD7A0),
+                        Color(0xFF6EC6F5),
+                        Color(0xFFB58BF0),
+                      ],
+                    ),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(18),
+                    child: Container(
+                      color: Colors.white,
+                      child: _creationPicture(creation),
+                    ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 8, bottom: 4),
-              child: Text(
-                '${creation.date.day}/${creation.date.month}/${creation.date.year}',
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      icon: const Icon(LucideIcons.pencil, size: 18),
-                      label: Text(AppLocalizations.of(context)!.edit),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        side: const BorderSide(color: AppColors.primary),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        for (final cat in _categories) {
-                          for (final page in cat.pages) {
-                            if (page.owns(creation)) {
-                              _editCreation(page, creation);
-                              return;
-                            }
+              const SizedBox(height: 10),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                const Icon(Icons.auto_awesome,
+                    size: 16, color: Color(0xFF5B7BE0)),
+                const SizedBox(width: 6),
+                Text(
+                  '${creation.date.day}/${creation.date.month}/${creation.date.year}',
+                  style: const TextStyle(
+                    fontFamily: 'Fredoka',
+                    fontSize: 18,
+                    fontVariations: [FontVariation('wght', 600)],
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF3550C8),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                const Icon(Icons.auto_awesome,
+                    size: 16, color: Color(0xFF5B7BE0)),
+              ]),
+              const SizedBox(height: 14),
+              Row(children: [
+                Expanded(
+                  child: FunPillButton(
+                    label: loc.edit,
+                    icon: LucideIcons.pencil,
+                    colors: FunColors.purple,
+                    onTap: () {
+                      Navigator.pop(dialogContext);
+                      for (final cat in _categories) {
+                        for (final page in cat.pages) {
+                          if (page.owns(creation)) {
+                            _editCreation(page, creation);
+                            return;
                           }
                         }
-                      },
-                    ),
+                      }
+                    },
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      icon: const Icon(LucideIcons.trash_2,
-                          size: 18, color: Colors.red),
-                      label: Text(AppLocalizations.of(context)!.delete,
-                          style: const TextStyle(color: Colors.red)),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.red,
-                        side: const BorderSide(color: Colors.red),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        _confirmDeleteCreation(creation);
-                      },
-                    ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FunPillButton(
+                    label: loc.delete,
+                    icon: LucideIcons.trash_2,
+                    colors: FunColors.red,
+                    onTap: () {
+                      Navigator.pop(dialogContext);
+                      _confirmDeleteCreation(creation);
+                    },
                   ),
-                ],
-              ),
-            ),
-          ],
-        ),
+                ),
+              ]),
+            ]),
+          ),
+          Positioned(
+            top: -10,
+            right: -10,
+            child: FunCloseButton(onTap: () => Navigator.pop(dialogContext)),
+          ),
+        ]),
       ),
     );
   }
@@ -3131,34 +3204,51 @@ class _KulayScreenState extends State<KulayScreen>
   }
 
   void _confirmDeleteCreation(MyCreation creation) {
+    final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            const Icon(LucideIcons.triangle_alert, color: Colors.red),
-            const SizedBox(width: 8),
-            Expanded(child: Text(AppLocalizations.of(context)!.deleteArtwork)),
-          ],
-        ),
-        content: Text(AppLocalizations.of(context)!.confirmDeleteArtwork),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)!.cancel,
-                style: const TextStyle(color: Colors.grey)),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await _deleteCreation(creation);
-            },
-            child: Text(AppLocalizations.of(context)!.delete,
+      builder: (dialogContext) => FunDialog(
+        child: FunDialogCard(
+          frame: FunFrame.coral,
+          padding: const EdgeInsets.fromLTRB(18, 20, 18, 20),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              const Icon(Icons.warning_rounded,
+                  color: Color(0xFFF26B3A), size: 40),
+              const SizedBox(width: 6),
+              Flexible(child: FunTitle(loc.deleteArtwork, size: 28)),
+            ]),
+            const SizedBox(height: 10),
+            Text(loc.confirmDeleteArtwork,
+                textAlign: TextAlign.center,
                 style: const TextStyle(
-                    color: Colors.red, fontWeight: FontWeight.bold)),
-          ),
-        ],
+                    fontSize: 16,
+                    height: 1.35,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF2B2A5C))),
+            const SizedBox(height: 18),
+            Row(children: [
+              Expanded(
+                child: FunPillButton(
+                  label: loc.cancel,
+                  colors: FunColors.grey,
+                  onTap: () => Navigator.pop(dialogContext),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: FunPillButton(
+                  label: loc.delete,
+                  colors: FunColors.red,
+                  onTap: () async {
+                    Navigator.pop(dialogContext);
+                    await _deleteCreation(creation);
+                  },
+                ),
+              ),
+            ]),
+          ]),
+        ),
       ),
     );
   }
