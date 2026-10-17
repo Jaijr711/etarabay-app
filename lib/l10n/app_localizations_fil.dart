@@ -96,9 +96,6 @@ class AppLocalizationsFil extends AppLocalizations {
   String get settingsTitle => 'Pag-aayos';
 
   @override
-  String get totalProgress => 'Kabuuang Pag-unlad';
-
-  @override
   String get poems => 'Mga Tula';
 
   @override
@@ -154,9 +151,6 @@ class AppLocalizationsFil extends AppLocalizations {
   String get putNumbersInOrder => 'Itugma ang mga numero sa tamang kahon';
 
   @override
-  String get timesUp => 'Tapos na ang oras!';
-
-  @override
   String level(int level) {
     return 'Antas $level';
   }
@@ -177,12 +171,6 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get chooseLeftFirst => 'Pumili muna ng bilang sa kaliwa!';
-
-  @override
-  String get dropHere => 'Ilagay dito!';
-
-  @override
-  String get dragHere => 'Itapat dito';
 
   @override
   String get popAllBalloonsWith => 'Putukin ang lahat ng lobo na may bilang na';
@@ -390,26 +378,10 @@ class AppLocalizationsFil extends AppLocalizations {
   String get lower => 'Maliit na Titik';
 
   @override
-  String letterLabel(String letter) {
-    return 'Titik $letter';
-  }
-
-  @override
-  String numberLabel(String number) {
-    return 'Numero $number';
-  }
-
-  @override
   String get pointsLabel => 'Puntos';
 
   @override
-  String get goodJob => 'Magaling!';
-
-  @override
   String get ulitin => 'Ulitin';
-
-  @override
-  String get traceTitle => 'Kaya mo iyan! Sundan ang linya!';
 
   @override
   String get uppercase => 'Malaking titik';
@@ -561,10 +533,6 @@ class AppLocalizationsFil extends AppLocalizations {
   }
 
   @override
-  String get swipeToDeleteGuide =>
-      'I-swipe pakaliwa upang alisin ang mag-aaral';
-
-  @override
   String get enroll => 'Itala';
 
   @override
@@ -615,22 +583,6 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get tapToEnroll =>
       'I-tap ang \"Magpatala ng Mag-aaral\" para magdagdag.';
-
-  @override
-  String studentProgressTitle(String name) {
-    return 'Progress ni $name';
-  }
-
-  @override
-  String get moduleBreakdown => 'Nilalaman ng Modyul';
-
-  @override
-  String scoreLabel(int score) {
-    return 'Marka: $score';
-  }
-
-  @override
-  String get loginPrompt => 'Mag-log in upang ipagpatuloy ang iyong pag-aaral.';
 
   @override
   String get loginButton => 'Mag-log in';
@@ -715,19 +667,10 @@ class AppLocalizationsFil extends AppLocalizations {
   String get forParents => 'Para sa mga Magulang';
 
   @override
-  String get hello => 'Kumusta!';
-
-  @override
   String get kulaySayaProgress => 'Kulay-Saya Progress';
 
   @override
   String get totalSaved => 'Kabuuang Nai-save';
-
-  @override
-  String get magbasaProgress => 'Magbasa Progress';
-
-  @override
-  String get matematikaProgress => 'Matematika Progress';
 
   @override
   String get noResults => 'Walang resulta';
@@ -737,10 +680,6 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get clearCanvasQuestion => 'Tanggalin ang kinulayan?';
-
-  @override
-  String get eraseColoringWarning =>
-      'Buburahin nito ang lahat ng iyong kinulayan.';
 
   @override
   String get noArtworksYet => 'Wala pang likhang-sining';
@@ -766,13 +705,7 @@ class AppLocalizationsFil extends AppLocalizations {
   String get readingFinishedGood => 'Tapos na! Magaling kang magbasa!';
 
   @override
-  String get readingFinishedHappy => 'Tapos na! Maligayang pagbabasa!';
-
-  @override
   String get doneAlready => 'Tapos na!';
-
-  @override
-  String get checkAnswer => 'Suriin';
 
   @override
   String get noGamesAvailable2 => 'Walang larong magagamit.';
@@ -790,13 +723,7 @@ class AppLocalizationsFil extends AppLocalizations {
   String get whatIsMissingNumber => 'Ano ang nawawalang bilang?';
 
   @override
-  String get straightOrCorrect => 'Tama!';
-
-  @override
   String get iKnowIt => 'Natutuhan ko na';
-
-  @override
-  String get familyTreeTitle => 'Talaan ng Pamilya';
 
   @override
   String get familyTreeTapHint =>
@@ -804,9 +731,6 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get iLearnedFamilyTree => 'Natutunan ko ang Talaan ng Pamilya!';
-
-  @override
-  String get ourHomeTitle => 'Ang Ating Tahanan';
 
   @override
   String get thatIsOurHome => 'Iyan ang ating tahanan!';
@@ -820,9 +744,6 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get error => 'Error';
-
-  @override
-  String get recentActivity => 'Kamakailang Gawain';
 
   @override
   String get recentColor => 'Kamakailang Kulay';
@@ -859,24 +780,6 @@ class AppLocalizationsFil extends AppLocalizations {
       'Pansamantalang hindi available ang aktibidad na ito. Bumalik ka na lang mamaya.';
 
   @override
-  String get overviewTab => 'Buod';
-
-  @override
-  String get magbasaTab => 'Magbasa';
-
-  @override
-  String get matematikaTab => 'Matematika';
-
-  @override
-  String get artworksLabel => 'Mga Obra';
-
-  @override
-  String get pagesLabel => 'pahina';
-
-  @override
-  String get lettersLabel => 'Mga titik';
-
-  @override
   String get diffEasy => 'Madali';
 
   @override
@@ -905,15 +808,6 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get songLabel => 'Kanta';
-
-  @override
-  String get activitiesLabel => 'aktibidad';
-
-  @override
-  String get gamesLabel => 'Mga Laro';
-
-  @override
-  String get savedCountLabel => 'na-save';
 
   @override
   String get uppercaseLettersTitle => 'Malalaking Titik (A–Z)';
@@ -962,29 +856,6 @@ class AppLocalizationsFil extends AppLocalizations {
   }
 
   @override
-  String helloName(String name) {
-    return 'Kumusta, $name!';
-  }
-
-  @override
-  String get letsLearnAndPlay => 'Matuto at maglaro tayo!';
-
-  @override
-  String get myProgressToday => 'Ang Aking Pag-unlad Ngayon';
-
-  @override
-  String get whatDoYouWantToLearn => 'Ano ang gusto mong matutunan?';
-
-  @override
-  String get rewardsCount => 'Gantimpala';
-
-  @override
-  String get activitiesCount => 'Gawain';
-
-  @override
-  String get lessonsCount => 'Mga Aralin';
-
-  @override
   String familyRoleSentence(String member, String roles) {
     return 'Si $member ay $roles.';
   }
@@ -1031,16 +902,6 @@ class AppLocalizationsFil extends AppLocalizations {
   String get readFullPoemBeforeBack => 'Basahin ang buong tula bago bumalik.';
 
   @override
-  String get iReadThePoem => 'Nabasa Ko ang Tula!';
-
-  @override
-  String get readFullStoryBeforeBack =>
-      'Basahin ang buong kwento bago bumalik.';
-
-  @override
-  String get iReadTheStory => 'Nabasa Ko Na Ito!';
-
-  @override
   String get tandaanTitle => 'Tandaan!';
 
   @override
@@ -1063,29 +924,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get traceItSubtitle => 'Matuto ng iyong ABC!';
 
   @override
-  String get checkTracing => 'Suriin';
-
-  @override
-  String get startAtDot => 'Magsimula sa tuldok!';
-
-  @override
-  String get almostThere => 'Malapit na! Subukan muli!';
-
-  @override
-  String progressPages(int done, int total) {
-    return '$done / $total pahina';
-  }
-
-  @override
   String percentComplete(int percent) {
     return '$percent% kumpleto';
   }
-
-  @override
-  String get obraLabel => 'Obra';
-
-  @override
-  String get strokesLabel => 'Mga Pahid';
 
   @override
   String get categoryProgressHeader => 'Pag-unlad sa bawat Kategorya';
@@ -1130,27 +971,6 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get tipStudyTimeBody =>
       'Mag-practice nang 15-20 minuto araw-araw para sa pinakamabuting resulta.';
-
-  @override
-  String progressCompleted(int done, int total) {
-    return '$done / $total natatapos';
-  }
-
-  @override
-  String progressActivities(int done, int total) {
-    return '$done / $total aktibidad';
-  }
-
-  @override
-  String progressGames(int done, int total) {
-    return '$done / $total laro';
-  }
-
-  @override
-  String get pointsStatLabel => 'Puntos';
-
-  @override
-  String get starsStatLabel => 'Bituin';
 
   @override
   String get gameProgressHeader => 'Progreso sa Bawat Laro';
@@ -1363,37 +1183,13 @@ class AppLocalizationsFil extends AppLocalizations {
   String get notSeenRecently => 'Di Naglalaro';
 
   @override
-  String get theClass => 'Ang Klase';
-
-  @override
   String get weakestFirst => 'Pinakakulang sa itaas';
-
-  @override
-  String get recentAchievements => 'Kamakailang Nakamit';
-
-  @override
-  String achievementEarnedBy(String name, String achievement) {
-    return 'Nakuha ni $name ang $achievement';
-  }
 
   @override
   String get searchStudents => 'Hanapin ang Mag-aaral';
 
   @override
   String get noStudentsMatch => 'Walang batang tumugma';
-
-  @override
-  String get everyoneActive => 'Lahat ay naglaro ngayong linggo';
-
-  @override
-  String daysAgo(int days) {
-    return '${days}a nakalipas';
-  }
-
-  @override
-  String hoursAgo(int hours) {
-    return '${hours}h nakalipas';
-  }
 
   @override
   String get sariliProgress => 'Ang Aking Sarili at Aming Pamilya';
@@ -1444,9 +1240,6 @@ class AppLocalizationsFil extends AppLocalizations {
   String get forgotPin => 'Nakalimutan? Gamitin ang Student Number';
 
   @override
-  String get pinSaved => 'Naitala ang code';
-
-  @override
   String get or => 'o';
 
   @override
@@ -1485,15 +1278,8 @@ class AppLocalizationsFil extends AppLocalizations {
   String get newPasswordStudentNumber => 'Bagong password (Student Number)';
 
   @override
-  String get noBiometricOnDevice =>
-      'Walang daliri o mukhang nakatakda sa teleponong ito,';
-
-  @override
   String get noSessionLogInFirst =>
       'Walang bukas na account ng bata. Mag-log in muna.';
-
-  @override
-  String get resetActivity => 'I-reset ang Gawain';
 
   @override
   String get resetSpecificActivity => 'I-reset ang Piling Gawain';
@@ -1520,25 +1306,10 @@ class AppLocalizationsFil extends AppLocalizations {
   }
 
   @override
-  String studentArtworks(int count) {
-    return 'Mga Likha ($count)';
-  }
-
-  @override
   String get noArtworksSaved => 'Wala pang nai-save na likha.';
 
   @override
   String get middleName => 'Gitnang Pangalan';
-
-  @override
-  String get studentIdFormat =>
-      'Pagkakakilanlan ng mag-aaral (Anyo: DC-2026-0001)';
-
-  @override
-  String get autoGenerateId => 'Gumawa ng ID para sa akin';
-
-  @override
-  String get accountPreview => 'Pribyu ng akawnt';
 
   @override
   String get studentInformation => 'Impormasyon ng Mag-aaral';
@@ -1547,27 +1318,15 @@ class AppLocalizationsFil extends AppLocalizations {
   String get parentInformation => 'Impormasyon ng Magulang';
 
   @override
-  String get celebrate => 'Ipagdiwang';
-
-  @override
   String stepOf(int current, int total, String label) {
     return 'Hakbang $current sa $total · $label';
   }
-
-  @override
-  String get autoGenerated => 'Gagawin para sa iyo';
-
-  @override
-  String get enterIdAbove => 'Ilagay ang ID sa itaas';
 
   @override
   String get couldNotLoad => 'Hindi ma-load. Subukan muli.';
 
   @override
   String get teacherSignInPrompt => 'Mag-sign in sa inyong akawnt bilang guro';
-
-  @override
-  String get daycareTeacher => 'Guro sa Daycare';
 
   @override
   String get useBiometric => 'Gamitin ang daliri o mukha';
@@ -1578,9 +1337,6 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get strongest => 'Pinakamalakas';
-
-  @override
-  String get modulesHeader => 'Ang anim na modyul';
 
   @override
   String get credentialsUpdated => 'Na-update ang login.';
@@ -1723,11 +1479,6 @@ class AppLocalizationsFil extends AppLocalizations {
       'Wala nang natitirang student number para sa taong ito.';
 
   @override
-  String moreModules(int count) {
-    return '+$count pa';
-  }
-
-  @override
   String get filterBehindNote =>
       'Nagsimula na, pero malayo ang agwat sa klase.';
 
@@ -1813,9 +1564,6 @@ class AppLocalizationsFil extends AppLocalizations {
       'Kailangan ng hindi bababa sa 4 na karakter ang password.';
 
   @override
-  String get newPasswordLabel => 'Bagong password';
-
-  @override
   String get whatToPractise => 'Ano ang Sanayin';
 
   @override
@@ -1833,13 +1581,7 @@ class AppLocalizationsFil extends AppLocalizations {
       'Hindi pinapayagan ng browser na kopyahin ito ng app. Piliin at kopyahin nang manu-mano.';
 
   @override
-  String get confirmNewPassword => 'Ulitin ang bagong password';
-
-  @override
   String get newParentPin => 'Bagong code';
-
-  @override
-  String get welcome => 'Maligayang pagbabalik!';
 
   @override
   String switchToChild(String name) {
@@ -1857,9 +1599,6 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get switchNeedsConnection =>
       'Kumonekta muna sa internet — may nagawa ang batang ito na nasa teleponong ito lang.';
-
-  @override
-  String get scoreWord => 'Marka';
 
   @override
   String get streakWord => 'Sunod-sunod na tama';

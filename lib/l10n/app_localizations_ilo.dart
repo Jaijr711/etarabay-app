@@ -96,9 +96,6 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get settingsTitle => 'Pannakaisaad';
 
   @override
-  String get totalProgress => 'Sibubukel a Progreso';
-
-  @override
   String get poems => 'Dagiti Daniw';
 
   @override
@@ -153,9 +150,6 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get putNumbersInOrder => 'Guyoden dagiti numero iti kahon';
 
   @override
-  String get timesUp => 'Nalpasen ti oras!';
-
-  @override
   String level(int level) {
     return 'Tukad $level';
   }
@@ -176,12 +170,6 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String get chooseLeftFirst => 'Piliem nga umuna  iti kanigid!';
-
-  @override
-  String get dropHere => 'Itinnag ditoy!';
-
-  @override
-  String get dragHere => 'Guyudem ditoy';
 
   @override
   String get popAllBalloonsWith => 'Bittaken amin a balloon a addaan';
@@ -389,26 +377,10 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get lower => 'Bassit';
 
   @override
-  String letterLabel(String letter) {
-    return 'Letra $letter';
-  }
-
-  @override
-  String numberLabel(String number) {
-    return 'Numero $number';
-  }
-
-  @override
   String get pointsLabel => 'Puntos';
 
   @override
-  String get goodJob => 'Nagsayaat! 🌟';
-
-  @override
   String get ulitin => 'Uliten';
-
-  @override
-  String get traceTitle => 'Surotem, Kayam!';
 
   @override
   String get uppercase => 'Dakkel a letra';
@@ -560,9 +532,6 @@ class AppLocalizationsIlo extends AppLocalizations {
   }
 
   @override
-  String get swipeToDeleteGuide => 'Ipaigid tapno maikkat';
-
-  @override
   String get enroll => 'Ilista';
 
   @override
@@ -613,22 +582,6 @@ class AppLocalizationsIlo extends AppLocalizations {
   @override
   String get tapToEnroll =>
       'Italmeg ti \"Ilista ti Estudiante\" tapno manginayon.';
-
-  @override
-  String studentProgressTitle(String name) {
-    return 'Progreso ni $name';
-  }
-
-  @override
-  String get moduleBreakdown => 'Breakdown ti Module';
-
-  @override
-  String scoreLabel(int score) {
-    return 'Iskor: $score';
-  }
-
-  @override
-  String get loginPrompt => 'Agserrek tapno ituloy ti pinagadal mo';
 
   @override
   String get loginButton => 'Agsrrek';
@@ -712,19 +665,10 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get forParents => 'Para kadagiti Nagannak';
 
   @override
-  String get hello => 'Kablaaw!';
-
-  @override
   String get kulaySayaProgress => 'Progreso ti Kulay-Saya';
 
   @override
   String get totalSaved => 'Amin a Naidulin';
-
-  @override
-  String get magbasaProgress => 'Progreso ti Magbasa';
-
-  @override
-  String get matematikaProgress => 'Progreso ti Matematika';
 
   @override
   String get noResults => 'Awan ti resulta';
@@ -734,9 +678,6 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String get clearCanvasQuestion => 'Dalusan ti Kanbas?';
-
-  @override
-  String get eraseColoringWarning => 'Dalusan amin a namaris mo.';
 
   @override
   String get noArtworksYet => 'Awan ti inubra na pay.';
@@ -761,13 +702,7 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get readingFinishedGood => '✓ Nalpasen! Nagsayaat a panagbasa!';
 
   @override
-  String get readingFinishedHappy => '✓ Nalpasen! Naragsak a panagbasa!';
-
-  @override
   String get doneAlready => 'Nalpasen daytoy!';
-
-  @override
-  String get checkAnswer => 'Kitaen';
 
   @override
   String get noGamesAvailable2 => 'Awan ti ay-ayam';
@@ -785,13 +720,7 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get whatIsMissingNumber => 'Ania ti mapukpukaw a numero?';
 
   @override
-  String get straightOrCorrect => 'Kusto!';
-
-  @override
   String get iKnowIt => 'Ammok dayta!';
-
-  @override
-  String get familyTreeTitle => 'Kayo ti Pamilia';
 
   @override
   String get familyTreeTapHint =>
@@ -799,9 +728,6 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String get iLearnedFamilyTree => 'Naamwek ti Family Tree!';
-
-  @override
-  String get ourHomeTitle => 'Balaymi';
 
   @override
   String get thatIsOurHome => 'Dayta ti balaymi!';
@@ -814,9 +740,6 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String get error => 'Biddut';
-
-  @override
-  String get recentActivity => 'Nabiit pay a naaramid';
 
   @override
   String get recentColor => 'Nabiit pay nga namarisan';
@@ -853,24 +776,6 @@ class AppLocalizationsIlo extends AppLocalizations {
       'Saan pay available daytoy nga aktibidad iti agdama. Pangngaasim ta sublatem iti sumaruno.';
 
   @override
-  String get overviewTab => 'Sumario';
-
-  @override
-  String get magbasaTab => 'Magbasa';
-
-  @override
-  String get matematikaTab => 'Matematika';
-
-  @override
-  String get artworksLabel => 'Dagiti Obra';
-
-  @override
-  String get pagesLabel => 'panid';
-
-  @override
-  String get lettersLabel => 'letra';
-
-  @override
   String get diffEasy => 'Nalaka';
 
   @override
@@ -899,15 +804,6 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String get songLabel => 'Kanta';
-
-  @override
-  String get activitiesLabel => 'aktibidad';
-
-  @override
-  String get gamesLabel => 'ay-ayam';
-
-  @override
-  String get savedCountLabel => 'naidulin';
 
   @override
   String get uppercaseLettersTitle => 'Dakkel a Letra (A–Z)';
@@ -954,29 +850,6 @@ class AppLocalizationsIlo extends AppLocalizations {
   String favoriteChosen(String choice) {
     return 'Ti paboritom ket $choice!';
   }
-
-  @override
-  String helloName(String name) {
-    return 'Kumusta, $name!';
-  }
-
-  @override
-  String get letsLearnAndPlay => 'Agadaltayo ken agay-ayamtayo!';
-
-  @override
-  String get myProgressToday => 'Ti Progresok ita nga Aldaw';
-
-  @override
-  String get whatDoYouWantToLearn => 'Ania ti kayatmo nga adalen?';
-
-  @override
-  String get rewardsCount => 'Gunggona';
-
-  @override
-  String get activitiesCount => 'Aramid';
-
-  @override
-  String get lessonsCount => 'Leksion';
 
   @override
   String familyRoleSentence(String member, String roles) {
@@ -1026,16 +899,6 @@ class AppLocalizationsIlo extends AppLocalizations {
       'Basaen ti buo nga daniw sakbay agsubli.';
 
   @override
-  String get iReadThePoem => 'Nabasak ti daniw! ✓';
-
-  @override
-  String get readFullStoryBeforeBack =>
-      'Basaen ti amin a Sarsarita sakbay nga agsubli.';
-
-  @override
-  String get iReadTheStory => 'Nabasakon! ✓';
-
-  @override
   String get tandaanTitle => 'Lagipem!';
 
   @override
@@ -1058,29 +921,9 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get traceItSubtitle => 'Adalen ti ABC!';
 
   @override
-  String get checkTracing => 'Kitaen';
-
-  @override
-  String get startAtDot => 'Irugi ti tuldok!';
-
-  @override
-  String get almostThere => 'Dandanin! Padasen manen!';
-
-  @override
-  String progressPages(int done, int total) {
-    return '$done / $total panid';
-  }
-
-  @override
   String percentComplete(int percent) {
     return '$percent% kumpleto';
   }
-
-  @override
-  String get obraLabel => 'Obra';
-
-  @override
-  String get strokesLabel => 'Dagiti Pahid';
 
   @override
   String get categoryProgressHeader => 'Progreso iti Tunggal Kategorya';
@@ -1125,27 +968,6 @@ class AppLocalizationsIlo extends AppLocalizations {
   @override
   String get tipStudyTimeBody =>
       'Agensayo iti 15-20 minuto inaldaw-aldaw para iti kasayaatan a resulta.';
-
-  @override
-  String progressCompleted(int done, int total) {
-    return '$done / $total nalpas';
-  }
-
-  @override
-  String progressActivities(int done, int total) {
-    return '$done / $total aktibidad';
-  }
-
-  @override
-  String progressGames(int done, int total) {
-    return '$done / $total ay-ayam';
-  }
-
-  @override
-  String get pointsStatLabel => 'Puntos';
-
-  @override
-  String get starsStatLabel => 'Bituen';
 
   @override
   String get gameProgressHeader => 'Progreso iti Tunggal Ay-ayam';
@@ -1354,37 +1176,13 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get notSeenRecently => 'Di Agay-ayam';
 
   @override
-  String get theClass => 'Ti Klase';
-
-  @override
   String get weakestFirst => 'Ti kakapsutan iti ngato';
-
-  @override
-  String get recentAchievements => 'Kaudian a Nagun-od';
-
-  @override
-  String achievementEarnedBy(String name, String achievement) {
-    return 'Nagun-od ni $name ti $achievement';
-  }
 
   @override
   String get searchStudents => 'Agbirok iti ubing';
 
   @override
   String get noStudentsMatch => 'Awan ti ubing a naanay';
-
-  @override
-  String get everyoneActive => 'Amin ket nagay-ayam iti daytoy a lawas';
-
-  @override
-  String daysAgo(int days) {
-    return '${days}a napalabas';
-  }
-
-  @override
-  String hoursAgo(int hours) {
-    return '${hours}h napalabas';
-  }
 
   @override
   String get sariliProgress => 'Ti Bagik ken ti Pamiliak';
@@ -1435,9 +1233,6 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get forgotPin => 'Nalipatam? Usarem ti Student Number';
 
   @override
-  String get pinSaved => 'Naidulin ti kodigo';
-
-  @override
   String get or => 'wenno';
 
   @override
@@ -1475,15 +1270,8 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get newPasswordStudentNumber => 'Baro a password (Student Number)';
 
   @override
-  String get noBiometricOnDevice =>
-      'Awan ti ramay wenno rupa a naisaad iti daytoy a telepono,';
-
-  @override
   String get noSessionLogInFirst =>
       'Awan ti nakalukat nga account ti ubing. Aglog in nga umuna.';
-
-  @override
-  String get resetActivity => 'I-reset ti Aktibidad';
 
   @override
   String get resetSpecificActivity => 'I-reset ti Napili nga Aktibidad';
@@ -1510,24 +1298,10 @@ class AppLocalizationsIlo extends AppLocalizations {
   }
 
   @override
-  String studentArtworks(int count) {
-    return 'Dagiti Likha ($count)';
-  }
-
-  @override
   String get noArtworksSaved => 'Awan pay ti naidulin a likha.';
 
   @override
   String get middleName => 'Tengnga a Nagan';
-
-  @override
-  String get studentIdFormat => 'Student Number (Porma: DC-2026-0001)';
-
-  @override
-  String get autoGenerateId => 'Mangaramid iti ID para kaniak';
-
-  @override
-  String get accountPreview => 'Sigud a Kita ti Account';
 
   @override
   String get studentInformation => 'Maipapan iti Ubing';
@@ -1536,27 +1310,15 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get parentInformation => 'Maipapan iti Nagannak';
 
   @override
-  String get celebrate => 'Ipagrambak';
-
-  @override
   String stepOf(int current, int total, String label) {
     return 'Addang $current iti $total · $label';
   }
-
-  @override
-  String get autoGenerated => 'Maaramid para kenka';
-
-  @override
-  String get enterIdAbove => 'Ikabil ti ID iti ngato';
 
   @override
   String get couldNotLoad => 'Saan a nailukat. Padasem manen.';
 
   @override
   String get teacherSignInPrompt => 'Sumrek iti teacher account mo';
-
-  @override
-  String get daycareTeacher => 'Maestra iti Daycare';
 
   @override
   String get useBiometric => 'Usarem ti ramay wenno rupa';
@@ -1567,9 +1329,6 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String get strongest => 'Kapipiaan';
-
-  @override
-  String get modulesHeader => 'Dagiti innem a modulo';
 
   @override
   String get credentialsUpdated => 'Napabaro ti login.';
@@ -1713,11 +1472,6 @@ class AppLocalizationsIlo extends AppLocalizations {
       'Awanen ti nabati a student number para iti daytoy a tawen.';
 
   @override
-  String moreModules(int count) {
-    return '+$count pay';
-  }
-
-  @override
   String get filterBehindNote => 'Nangrugin, ngem adayo iti klase.';
 
   @override
@@ -1802,9 +1556,6 @@ class AppLocalizationsIlo extends AppLocalizations {
       'Masapul nga uppat wenno ad-adu a karakter ti password.';
 
   @override
-  String get newPasswordLabel => 'Baro a password';
-
-  @override
   String get whatToPractise => 'Ania ti Masapul a Sanayen';
 
   @override
@@ -1822,13 +1573,7 @@ class AppLocalizationsIlo extends AppLocalizations {
       'Saan nga ipalubos ti browser a kopiaen ti app. Piliem ken kopiaem a mismo.';
 
   @override
-  String get confirmNewPassword => 'Ulitem ti baro a password';
-
-  @override
   String get newParentPin => 'Baro a code';
-
-  @override
-  String get welcome => 'Naimbag ti Isusublim!';
 
   @override
   String switchToChild(String name) {
@@ -1846,9 +1591,6 @@ class AppLocalizationsIlo extends AppLocalizations {
   @override
   String get switchNeedsConnection =>
       'Agkonekta pay iti internet — adda naaramid daytoy nga ubing nga adda laeng iti daytoy a telepono.';
-
-  @override
-  String get scoreWord => 'Iskor';
 
   @override
   String get streakWord => 'Streak';

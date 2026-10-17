@@ -48,7 +48,6 @@
   "alpabetoAtMgaSalita": "Basa ken Kanta!",
   "home": "Balay",
   "settingsTitle": "Pannakaisaad",
-  "totalProgress": "Sibubukel a Progreso",
   "poems": "Dagiti Daniw",
   "stories": "Dagiti Istorya",
   "songs": "Dagiti Kanta",
@@ -67,7 +66,6 @@
   "wrongShort": "Saan nga kusto",
   "replayReplacesStar": "No ulitem, masukatan daytoy a bituen.",
   "putNumbersInOrder": "Guyoden dagiti numero iti kahon",
-  "timesUp": "Nalpasen ti oras!",
   "level": "Tukad {level}",
   "@level": {
     "placeholders": {
@@ -88,8 +86,6 @@
   "congratulations": "Ipagpannakkel Ka!",
   "chooseFirst": "Piliem muna ti sungbat!",
   "chooseLeftFirst": "Piliem nga umuna  iti kanigid!",
-  "dropHere": "Itinnag ditoy!",
-  "dragHere": "Guyudem ditoy",
   "popAllBalloonsWith": "Bittaken amin a balloon a addaan",
   "left": "Kanigid",
   "right": "Kanawan",
@@ -182,19 +178,8 @@
   "clear": "Dalusan",
   "upper": "Dakkel",
   "lower": "Bassit",
-  "letterLabel": "Letra {letter}",
-  "numberLabel": "Numero {number}",
-  "@letterLabel": {
-    "placeholders": {
-      "letter": {
-        "type": "String"
-      }
-    }
-  },
   "pointsLabel": "Puntos",
-  "goodJob": "Nagsayaat! 🌟",
   "ulitin": "Uliten",
-  "traceTitle": "Surotem, Kayam!",
   "uppercase": "Dakkel a letra",
   "lowercase": "Bassit a letra",
   "numbers": "Dagiti Numero",
@@ -263,7 +248,6 @@
       }
     }
   },
-  "swipeToDeleteGuide": "Ipaigid tapno maikkat",
   "enroll": "Ilista",
   "studentEnrolled": "Nailista ti Estudiante!",
   "studentEnrolledSuccessfully": "Nailistan ni {name}.",
@@ -287,24 +271,6 @@
   "copied": "Nakopya!",
   "noStudentsEnrolled": "Awan ti nailista nga estudiante pay.",
   "tapToEnroll": "Italmeg ti \"Ilista ti Estudiante\" tapno manginayon.",
-  "studentProgressTitle": "Progreso ni {name}",
-  "@studentProgressTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "moduleBreakdown": "Breakdown ti Module",
-  "scoreLabel": "Iskor: {score}",
-  "@scoreLabel": {
-    "placeholders": {
-      "score": {
-        "type": "int"
-      }
-    }
-  },
-  "loginPrompt": "Agserrek tapno ituloy ti pinagadal mo",
   "loginButton": "Agsrrek",
   "teacherLoginButton": "Agtuloy a kas mistra",
   "enterUsernamePassword": "Ikabil ti username ken password.",
@@ -336,15 +302,11 @@
   "trackProgressDesc": "Kitaen nu kasano kalaing ti anak babaen ti smart progress tracking.",
   "continueText": "Ituloy",
   "forParents": "Para kadagiti Nagannak",
-  "hello": "Kablaaw!",
   "kulaySayaProgress": "Progreso ti Kulay-Saya",
   "totalSaved": "Amin a Naidulin",
-  "magbasaProgress": "Progreso ti Magbasa",
-  "matematikaProgress": "Progreso ti Matematika",
   "noResults": "Awan ti resulta",
   "imageNotFound": "Saan a makita ti rupa",
   "clearCanvasQuestion": "Dalusan ti Kanbas?",
-  "eraseColoringWarning": "Dalusan amin a namaris mo.",
   "noArtworksYet": "Awan ti inubra na pay.",
   "colorPagePrompt": "Agmaris ti panid ken idulin ti inubra!",
   "startColoring": "Rugyan ti panagmaris",
@@ -352,24 +314,18 @@
   "lessonFinishedPrompt": "Nalpasen daytoy nga adal! Nagsayaat! Agpili ti sabali nga ay-ayam.",
   "okButton": "WEN",
   "readingFinishedGood": "✓ Nalpasen! Nagsayaat a panagbasa!",
-  "readingFinishedHappy": "✓ Nalpasen! Naragsak a panagbasa!",
   "doneAlready": "Nalpasen daytoy!",
-  "checkAnswer": "Kitaen",
   "noGamesAvailable2": "Awan ti ay-ayam",
   "countAndDragCorrectNumber": "Bilangen ken iyakar ti kusto a numero!",
   "countThenDragToBasket": "Bilangen dagiti {items} ket iyakar iti basket",
   "whatIsMissingNumber": "Ania ti mapukpukaw a numero?",
-  "straightOrCorrect": "Kusto!",
   "iKnowIt": "Ammok dayta!",
-  "familyTreeTitle": "Kayo ti Pamilia",
   "familyTreeTapHint": "💡 Pindutem dagiti kameng tapno maamwek ti relasyon!",
   "iLearnedFamilyTree": "Naamwek ti Family Tree!",
-  "ourHomeTitle": "Balaymi",
   "thatIsOurHome": "Dayta ti balaymi!",
   "forParentsSubtitle": "Adtoy ti progreso ti anakyo iti E-Tarabay.",
   "artworks": "dagiti aramid",
   "error": "Biddut",
-  "recentActivity": "Nabiit pay a naaramid",
   "recentColor": "Nabiit pay nga namarisan",
   "unknownStudent": "Saan nga Estudiante",
   "version": "Bersyon",
@@ -380,12 +336,6 @@
   "accountPaused": "Naipauyaw ti panagusar iti daytoy nga app para iti daytoy nga account. Pangngaasim ta kontaken ti suporta para iti ad-adu pay a detalye.",
   "forceLoggedOut": "Pinaruar ka iti daytoy nga app babaen ti developer. Mabalinmon nga agserrek manen ita.",
   "moduleLocked": "Saan pay available daytoy nga aktibidad iti agdama. Pangngaasim ta sublatem iti sumaruno.",
-  "overviewTab": "Sumario",
-  "magbasaTab": "Magbasa",
-  "matematikaTab": "Matematika",
-  "artworksLabel": "Dagiti Obra",
-  "pagesLabel": "panid",
-  "lettersLabel": "letra",
   "diffEasy": "Nalaka",
   "diffMedium": "Katamtaman",
   "diffHard": "Narigat",
@@ -396,9 +346,6 @@
   "poemLabel": "Daniw",
   "storyLabel": "Sarita",
   "songLabel": "Kanta",
-  "activitiesLabel": "aktibidad",
-  "gamesLabel": "ay-ayam",
-  "savedCountLabel": "naidulin",
   "uppercaseLettersTitle": "Dakkel a Letra (A–Z)",
   "lowercaseLettersTitle": "Bassit a Letra (a–z)",
   "numbersTitle": "Dagiti Numero (1–10)",
@@ -427,20 +374,6 @@
       }
     }
   },
-  "helloName": "Kumusta, {name}!",
-  "@helloName": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "letsLearnAndPlay": "Agadaltayo ken agay-ayamtayo!",
-  "myProgressToday": "Ti Progresok ita nga Aldaw",
-  "whatDoYouWantToLearn": "Ania ti kayatmo nga adalen?",
-  "rewardsCount": "Gunggona",
-  "activitiesCount": "Aramid",
-  "lessonsCount": "Leksion",
   "familyRoleSentence": "Ni {member} ket {roles}.",
   "@familyRoleSentence": {
     "placeholders": {
@@ -465,9 +398,6 @@
   "fitPicture": "Isubli",
   "greatSinging": "Nagsayaat nga agkanta!",
   "readFullPoemBeforeBack": "Basaen ti buo nga daniw sakbay agsubli.",
-  "iReadThePoem": "Nabasak ti daniw! ✓",
-  "readFullStoryBeforeBack": "Basaen ti amin a Sarsarita sakbay nga agsubli.",
-  "iReadTheStory": "Nabasakon! ✓",
   "tandaanTitle": "Lagipem!",
   "tandaanSubtitle": "Itugma ti Pares",
   "round": "Nagbukel",
@@ -475,20 +405,6 @@
   "flipCardsToMatch": "Pindutem ti kard tapno ibaliktad. Biroken ti dua a agkaparis!",
   "traceItTitle": "Surotem",
   "traceItSubtitle": "Adalen ti ABC!",
-  "checkTracing": "Kitaen",
-  "startAtDot": "Irugi ti tuldok!",
-  "almostThere": "Dandanin! Padasen manen!",
-  "progressPages": "{done} / {total} panid",
-  "@progressPages": {
-    "placeholders": {
-      "done": {
-        "type": "int"
-      },
-      "total": {
-        "type": "int"
-      }
-    }
-  },
   "percentComplete": "{percent}% kumpleto",
   "@percentComplete": {
     "placeholders": {
@@ -497,8 +413,6 @@
       }
     }
   },
-  "obraLabel": "Obra",
-  "strokesLabel": "Dagiti Pahid",
   "categoryProgressHeader": "Progreso iti Tunggal Kategorya",
   "savedArtworksHeader": "Dagiti Naidulin nga Obra",
   "parentTipsHeader": "Pammalagip para kadagiti Nagannak",
@@ -512,41 +426,6 @@
   "tipMatematikaBody": "Panggepen ti anakyo a malpas ti tunggal laro tapno dumakkel ti kakayahan iti bilang.",
   "tipStudyTimeTitle": "Oras ti Panag-adal",
   "tipStudyTimeBody": "Agensayo iti 15-20 minuto inaldaw-aldaw para iti kasayaatan a resulta.",
-  "progressCompleted": "{done} / {total} nalpas",
-  "@progressCompleted": {
-    "placeholders": {
-      "done": {
-        "type": "int"
-      },
-      "total": {
-        "type": "int"
-      }
-    }
-  },
-  "progressActivities": "{done} / {total} aktibidad",
-  "@progressActivities": {
-    "placeholders": {
-      "done": {
-        "type": "int"
-      },
-      "total": {
-        "type": "int"
-      }
-    }
-  },
-  "progressGames": "{done} / {total} ay-ayam",
-  "@progressGames": {
-    "placeholders": {
-      "done": {
-        "type": "int"
-      },
-      "total": {
-        "type": "int"
-      }
-    }
-  },
-  "pointsStatLabel": "Puntos",
-  "starsStatLabel": "Bituen",
   "gameProgressHeader": "Progreso iti Tunggal Ay-ayam",
   "tipPencilGripTitle": "Umiso a Panagiggem ti Lapis",
   "tipPencilGripBody": "Siguraduem a umiso ti panagiggem ti anakyo iti stylus wenno ima bayat ti panagtrace.",
@@ -620,15 +499,9 @@
   "studentsLabel": "Dagiti Ubbing",
   "needsHelp": "Nabatbati",
   "notSeenRecently": "Di Agay-ayam",
-  "theClass": "Ti Klase",
   "weakestFirst": "Ti kakapsutan iti ngato",
-  "recentAchievements": "Kaudian a Nagun-od",
-  "achievementEarnedBy": "Nagun-od ni {name} ti {achievement}",
   "searchStudents": "Agbirok iti ubing",
   "noStudentsMatch": "Awan ti ubing a naanay",
-  "everyoneActive": "Amin ket nagay-ayam iti daytoy a lawas",
-  "daysAgo": "{days}a napalabas",
-  "hoursAgo": "{hours}h napalabas",
   "sariliProgress": "Ti Bagik ken ti Pamiliak",
   "tandaanProgress": "Lagipem!",
   "starsOfPossible": "{earned} iti {total} a bituen",
@@ -644,7 +517,6 @@
   "pinMismatch": "Agduma dagiti dua a kodigo",
   "wrongPin": "Di umiso a kodigo",
   "forgotPin": "Nalipatam? Usarem ti Student Number",
-  "pinSaved": "Naidulin ti kodigo",
   "or": "wenno",
   "openReport": "Luktan",
   "accountSecurity": "Account ken Seguridad",
@@ -657,34 +529,23 @@
   "confirmYourPassword": "Patalgedam ti passwordmo",
   "blankToKeepPassword": "Ibatim a blanko ti password no ti username laeng ti sukatan.",
   "newPasswordStudentNumber": "Baro a password (Student Number)",
-  "noBiometricOnDevice": "Awan ti ramay wenno rupa a naisaad iti daytoy a telepono,",
   "noSessionLogInFirst": "Awan ti nakalukat nga account ti ubing. Aglog in nga umuna.",
-  "resetActivity": "I-reset ti Aktibidad",
   "resetSpecificActivity": "I-reset ti Napili nga Aktibidad",
   "resetAllActivities": "I-reset ti Amin nga Aktibidad",
   "resetAll": "I-reset Amin",
   "resetCount": "Resetan ({count})",
   "pickActivitiesToReset": "Pilien dagiti aktibidad a kayat a i-reset para ken {name}:",
   "confirmResetAll": "I-reset ti AMIN a progreso ni {name}? Saanton a maisubli.",
-  "studentArtworks": "Dagiti Likha ({count})",
   "noArtworksSaved": "Awan pay ti naidulin a likha.",
   "middleName": "Tengnga a Nagan",
-  "studentIdFormat": "Student Number (Porma: DC-2026-0001)",
-  "autoGenerateId": "Mangaramid iti ID para kaniak",
-  "accountPreview": "Sigud a Kita ti Account",
   "studentInformation": "Maipapan iti Ubing",
   "parentInformation": "Maipapan iti Nagannak",
-  "celebrate": "Ipagrambak",
   "stepOf": "Addang {current} iti {total} · {label}",
-  "autoGenerated": "Maaramid para kenka",
-  "enterIdAbove": "Ikabil ti ID iti ngato",
   "couldNotLoad": "Saan a nailukat. Padasem manen.",
   "teacherSignInPrompt": "Sumrek iti teacher account mo",
-  "daycareTeacher": "Maestra iti Daycare",
   "useBiometric": "Usarem ti ramay wenno rupa",
   "biometricUnavailable": "Awan ti ramay wenno rupa a naisaad iti daytoy a telepono, isu a saan a magamit daytoy.",
   "strongest": "Kapipiaan",
-  "modulesHeader": "Dagiti innem a modulo",
   "credentialsUpdated": "Napabaro ti login.",
   "biometricEnabled": "Nakalukat ti login babaen ti ramay.",
   "biometricDisabled": "Nakarikep ti login babaen ti ramay.",
@@ -728,7 +589,6 @@
   "chooseYourAvatar": "Agpili ti Avatar",
   "manageStudent": "Aywanan daytoy nga estudiante",
   "noStudentNumbersLeft": "Awanen ti nabati a student number para iti daytoy a tawen.",
-  "moreModules": "+{count} pay",
   "filterBehindNote": "Nangrugin, ngem adayo iti klase.",
   "filterQuietNote": "Maysa a lawas wenno nabaybayag a saan a naglukat.",
   "authNothingToUpdate": "Awan ti nabaliwan.",
@@ -752,20 +612,16 @@
   "passwordNotSetYet": "Awan pay.",
   "passwordChangedByParent": "Sinukatan ti nagannak. Saanen a daytoy ti Student Number.",
   "authPasswordTooShort": "Masapul nga uppat wenno ad-adu a karakter ti password.",
-  "newPasswordLabel": "Baro a password",
   "whatToPractise": "Ania ti Masapul a Sanayen",
   "nothingToPractise": "Awan. Husto ti sungsungbatan daytoy nga ubing.",
   "pupilReport": "Ti progreso daytoy nga estudiante iti E-Tarabay.",
   "editStudent": "Baliwan ti detalye",
   "copyByHand": "Saan nga ipalubos ti browser a kopiaen ti app. Piliem ken kopiaem a mismo.",
-  "confirmNewPassword": "Ulitem ti baro a password",
   "newParentPin": "Baro a code",
-  "welcome": "Naimbag ti Isusublim!",
   "switchToChild": "Luktan ti account ni {name}",
   "switchToChildNote": "Agbalinto a kukua ni {name} ti app. Awan ti masapul nga agsublin a sumrek, ken maidulin dagiti naaramidda.",
   "switchAccount": "Agsukat",
   "switchNeedsConnection": "Agkonekta pay iti internet — adda naaramid daytoy nga ubing nga adda laeng iti daytoy a telepono.",
-  "scoreWord": "Iskor",
   "streakWord": "Streak",
   "notifPermissionDenied": "Palubosan nga umuna dagiti pakaamo iti settings ti teleponom.",
   "greetMorning": "Naimbag a Bigat!",

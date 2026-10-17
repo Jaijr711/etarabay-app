@@ -100,7 +100,6 @@ class PamilyaContent {
         'id': 'about_name',
         'question': 'What is your name?',
         'type': 'text_input',
-        'hint': 'Type your name here',
         'icon': '👤',
         'description':
             'Your name is what your family and friends call you. It is important!',
@@ -109,7 +108,6 @@ class PamilyaContent {
         'id': 'about_age',
         'question': 'How old are you?',
         'type': 'age_input',
-        'hint': 'Example: 5, 7, 10',
         'icon': '🎂',
         'description':
             'Your age is the number of years since you were born. Celebrate every year!',
@@ -129,15 +127,12 @@ class PamilyaContent {
         'question': 'When is your birthday?',
         'type': 'info',
         'icon': '🎉',
-        'info': 'Your birthday is the day you were born.',
-        'example': 'Example: January 15, 2018 — Happy Birthday!',
         'description': 'Celebrate your birthday with your family!',
       },
       {
         'id': 'about_home',
         'question': 'Where do you live?',
         'type': 'text_input',
-        'hint': 'Name of city or town',
         'icon': '🏠',
         'description':
             'Home is the place where you live with your family. Home sweet home!',
@@ -148,7 +143,6 @@ class PamilyaContent {
         'id': 'about_name',
         'question': 'Ano ang pangalan mo?',
         'type': 'text_input',
-        'hint': 'I-type ang pangalan mo dito',
         'icon': '👤',
         'description':
             'Ang iyong pangalan ay ang tawag sa iyo ng iyong pamilya at kaibigan. Mahalaga ito.',
@@ -157,7 +151,6 @@ class PamilyaContent {
         'id': 'about_age',
         'question': 'Ilang taon ka na?',
         'type': 'age_input',
-        'hint': 'Halimbawa: 5, 7, 10',
         'icon': '🎂',
         'description':
             'Ang iyong edad ay bilang ng mga taon mula nang ikaw ay ipinanganak. Ipagdiwang ang bawat taon!',
@@ -177,15 +170,12 @@ class PamilyaContent {
         'question': 'Kailan ang iyong kaarawan?',
         'type': 'info',
         'icon': '🎉',
-        'info': 'Ang iyong kaarawan ay ang araw kung kailan ka ipinanganak.',
-        'example': 'Halimbawa: Enero 15, 2018 — Maligayang Kaarawan!',
         'description': 'Ipagdiwang ang iyong kaarawan kasama ang pamilya!',
       },
       {
         'id': 'about_home',
         'question': 'Saan ka nakatira?',
         'type': 'text_input',
-        'hint': 'Pangalan ng lungsod o bayan',
         'icon': '🏠',
         'description':
             'Ang iyong tahanan ay ang lugar kung saan ka nakatira kasama ang iyong pamilya. Kay sarap sa sariling tahanan!',
@@ -196,7 +186,6 @@ class PamilyaContent {
         'id': 'about_name',
         'question': 'Ania ti naganmo?',
         'type': 'text_input',
-        'hint': 'I-type ti naganmo ditoy',
         'icon': '👤',
         'description':
             'Ti naganmo ket ti tawag kenka ti pamilyam ken gagayyemmo. Napateg dayta!',
@@ -205,7 +194,6 @@ class PamilyaContent {
         'id': 'about_age',
         'question': 'Mano ti tawenmo?',
         'type': 'age_input',
-        'hint': 'Kas pagarigan: 5, 7, 10',
         'icon': '🎂',
         'description':
             'Ti tawenmo ket ti bilang dagiti tawen manipud idi nayanakka. Kapadas ti selebrar!',
@@ -225,15 +213,12 @@ class PamilyaContent {
         'question': 'Kaano ti pannakayanakmo?',
         'type': 'info',
         'icon': '🎉',
-        'info': 'Ti pannakayanakmo ket ti aldaw idi nayanakka.',
-        'example': 'Kas pagarigan: Enero 15, 2018 — Aldaw ti Pannakayanak!',
         'description': 'Selebrasyon ti pannakayanakmo kadua ti pamilyam.',
       },
       {
         'id': 'about_home',
         'question': 'Sadino ti pagtaengam?',
         'type': 'text_input',
-        'hint': 'Nagan ti siudad wenno ili',
         'icon': '🏠',
         'description':
             'Ti pagtaengam ket ti lugar a pagyanam a kadua ti pamilyam. Naimbag ti balay!',

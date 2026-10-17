@@ -48,7 +48,6 @@
   "alpabetoAtMgaSalita": "Read & Sing!",
   "home": "Home",
   "settingsTitle": "Settings",
-  "totalProgress": "Total Progress",
   "poems": "Poetry",
   "stories": "Stories",
   "songs": "Songs",
@@ -67,7 +66,6 @@
   "wrongShort": "Wrong",
   "replayReplacesStar": "Playing again replaces this star.",
   "putNumbersInOrder": "Drag the numbers into the boxes",
-  "timesUp": "Time's Up!",
   "level": "Level {level}",
   "@level": {
     "placeholders": {
@@ -88,8 +86,6 @@
   "congratulations": "Congratulations!",
   "chooseFirst": "Choose an answer first!",
   "chooseLeftFirst": "Choose a number on the left first!",
-  "dropHere": "Drop here!",
-  "dragHere": "Drag here",
   "popAllBalloonsWith": "Pop all the balloons with",
   "left": "Left",
   "right": "Right",
@@ -182,26 +178,8 @@
   "clear": "Clear",
   "upper": "Upper",
   "lower": "Lower",
-  "letterLabel": "Letter {letter}",
-  "@letterLabel": {
-    "placeholders": {
-      "letter": {
-        "type": "String"
-      }
-    }
-  },
-  "numberLabel": "Number {number}",
-  "@numberLabel": {
-    "placeholders": {
-      "number": {
-        "type": "String"
-      }
-    }
-  },
   "pointsLabel": "Points",
-  "goodJob": "Good Job! 🌟",
   "ulitin": "Repeat",
-  "traceTitle": "Follow Me, You Can Do It!",
   "uppercase": "Uppercase",
   "lowercase": "Lowercase",
   "numbers": "Numbers",
@@ -270,7 +248,6 @@
       }
     }
   },
-  "swipeToDeleteGuide": "Swipe left on a student to delete",
   "enroll": "Enroll",
   "studentEnrolled": "Student Enrolled!",
   "studentEnrolledSuccessfully": "{name} has been enrolled successfully.",
@@ -294,24 +271,6 @@
   "copied": "Copied!",
   "noStudentsEnrolled": "No students enrolled yet.",
   "tapToEnroll": "Tap \"Enroll Student\" to add one.",
-  "studentProgressTitle": "{name}'s Progress",
-  "@studentProgressTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "moduleBreakdown": "Module Breakdown",
-  "scoreLabel": "Score: {score}",
-  "@scoreLabel": {
-    "placeholders": {
-      "score": {
-        "type": "int"
-      }
-    }
-  },
-  "loginPrompt": "Log in to continue your learning journey",
   "loginButton": "Log In",
   "teacherLoginButton": "Continue as Teacher",
   "enterUsernamePassword": "Please enter both username and password.",
@@ -360,15 +319,11 @@
   "trackProgressDesc": "See how well your child is doing with smart progress tracking.",
   "continueText": "Continue",
   "forParents": "For Parents",
-  "hello": "Hello!",
   "kulaySayaProgress": "Color Fun Progress",
   "totalSaved": "Total Saved",
-  "magbasaProgress": "Stories and Songs Progress",
-  "matematikaProgress": "Numbers Progress",
   "noResults": "No results",
   "imageNotFound": "Image not found",
   "clearCanvasQuestion": "Clear Canvas?",
-  "eraseColoringWarning": "This will erase all your coloring.",
   "noArtworksYet": "No artworks yet.",
   "colorPagePrompt": "Color a page\nand save your artwork!",
   "startColoring": "Start Coloring",
@@ -376,9 +331,7 @@
   "lessonFinishedPrompt": "You finished this lesson! Great job! Choose another game.",
   "okButton": "OK",
   "readingFinishedGood": "✓ Finished! Good reading!",
-  "readingFinishedHappy": "✓ Finished! Happy reading!",
   "doneAlready": "Done already!",
-  "checkAnswer": "Check",
   "noGamesAvailable2": "No games available",
   "countAndDragCorrectNumber": "Count and drag the correct number!",
   "countThenDragToBasket": "Count the {items} then drag them to the basket",
@@ -390,17 +343,13 @@
     }
   },
   "whatIsMissingNumber": "What number is missing?",
-  "straightOrCorrect": "Correct!",
   "iKnowIt": "I learned it!",
-  "familyTreeTitle": "Family Tree",
   "familyTreeTapHint": "💡 Tap the members to know their relationship!",
   "iLearnedFamilyTree": "I learned the Family Tree!",
-  "ourHomeTitle": "Our Home",
   "thatIsOurHome": "That is our home!",
   "forParentsSubtitle": "Here is your child's progress on E-Tarabay.",
   "artworks": "artworks",
   "error": "Error",
-  "recentActivity": "Recent Activity",
   "recentColor": "Recent Color",
   "unknownStudent": "Unknown Student",
   "version": "Version",
@@ -411,12 +360,6 @@
   "accountPaused": "Access to this app has been paused for this account. Please contact support for more details.",
   "forceLoggedOut": "You were signed out by the developer. You can log in again right away.",
   "moduleLocked": "This activity is temporarily unavailable. Please check back later.",
-  "overviewTab": "Overview",
-  "magbasaTab": "Stories & Songs",
-  "matematikaTab": "Numbers",
-  "artworksLabel": "Artworks",
-  "pagesLabel": "pages",
-  "lettersLabel": "letters",
   "diffEasy": "Easy",
   "diffMedium": "Medium",
   "diffHard": "Hard",
@@ -427,9 +370,6 @@
   "poemLabel": "Poem",
   "storyLabel": "Story",
   "songLabel": "Song",
-  "activitiesLabel": "activities",
-  "gamesLabel": "games",
-  "savedCountLabel": "saved",
   "uppercaseLettersTitle": "Uppercase Letters (A–Z)",
   "lowercaseLettersTitle": "Lowercase Letters (a–z)",
   "numbersTitle": "Numbers (1–10)",
@@ -458,20 +398,6 @@
       }
     }
   },
-  "helloName": "Hello, {name}!",
-  "@helloName": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "letsLearnAndPlay": "Let's learn and play!",
-  "myProgressToday": "My Progress Today",
-  "whatDoYouWantToLearn": "What do you want to learn?",
-  "rewardsCount": "Reward",
-  "activitiesCount": "Activities",
-  "lessonsCount": "Lessons",
   "familyRoleSentence": "{member} is {roles}.",
   "@familyRoleSentence": {
     "placeholders": {
@@ -496,9 +422,6 @@
   "fitPicture": "Fit",
   "greatSinging": "Great singing!",
   "readFullPoemBeforeBack": "Read the entire poem before going back.",
-  "iReadThePoem": "I Read the Poem! ✓",
-  "readFullStoryBeforeBack": "Read the entire story before going back.",
-  "iReadTheStory": "I Have Read It! ✓",
   "tandaanTitle": "Remember It!",
   "tandaanSubtitle": "Match the Pairs",
   "round": "Round",
@@ -506,20 +429,6 @@
   "flipCardsToMatch": "Tap a card to flip it. Find two that match!",
   "traceItTitle": "Trace It",
   "traceItSubtitle": "Learn Your ABC!",
-  "checkTracing": "Check",
-  "startAtDot": "Start at the dot!",
-  "almostThere": "Almost there! Try again!",
-  "progressPages": "{done} / {total} pages",
-  "@progressPages": {
-    "placeholders": {
-      "done": {
-        "type": "int"
-      },
-      "total": {
-        "type": "int"
-      }
-    }
-  },
   "percentComplete": "{percent}% complete",
   "@percentComplete": {
     "placeholders": {
@@ -528,8 +437,6 @@
       }
     }
   },
-  "obraLabel": "Artworks",
-  "strokesLabel": "Strokes",
   "categoryProgressHeader": "Progress Per Category",
   "savedArtworksHeader": "Saved Artworks",
   "parentTipsHeader": "Tips for Parents",
@@ -543,41 +450,6 @@
   "tipMatematikaBody": "Encourage your child to complete every game to build stronger number skills.",
   "tipStudyTimeTitle": "Study Time",
   "tipStudyTimeBody": "Set aside 15-20 minutes each day for learning and practice. Regular practice can help your child build confidence and improve their skills.",
-  "progressCompleted": "{done} / {total} completed",
-  "@progressCompleted": {
-    "placeholders": {
-      "done": {
-        "type": "int"
-      },
-      "total": {
-        "type": "int"
-      }
-    }
-  },
-  "progressActivities": "{done} / {total} activities",
-  "@progressActivities": {
-    "placeholders": {
-      "done": {
-        "type": "int"
-      },
-      "total": {
-        "type": "int"
-      }
-    }
-  },
-  "progressGames": "{done} / {total} games",
-  "@progressGames": {
-    "placeholders": {
-      "done": {
-        "type": "int"
-      },
-      "total": {
-        "type": "int"
-      }
-    }
-  },
-  "pointsStatLabel": "Points",
-  "starsStatLabel": "Stars",
   "gameProgressHeader": "Progress Per Game",
   "tipPencilGripTitle": "Proper Pencil Grip",
   "tipPencilGripBody": "Make sure your child holds the stylus or uses their fingers correctly when tracing each letter.",
@@ -715,29 +587,9 @@
   "@notSeenRecently": {
     "description": "Children with no activity in the last seven days"
   },
-  "theClass": "The class",
-  "@theClass": {
-    "description": "Heading for the class-wide module breakdown"
-  },
   "weakestFirst": "Weakest module first",
   "@weakestFirst": {
     "description": "Note under the class breakdown explaining the order"
-  },
-  "recentAchievements": "Recent Achievements",
-  "@recentAchievements": {
-    "description": "Heading for the class-wide feed of recently earned badges and certificates"
-  },
-  "achievementEarnedBy": "{name} earned {achievement}",
-  "@achievementEarnedBy": {
-    "description": "One row of the recent-achievements feed, e.g. \"Jay earned Alphabet Star\"",
-    "placeholders": {
-      "name": {
-        "type": "String"
-      },
-      "achievement": {
-        "type": "String"
-      }
-    }
   },
   "searchStudents": "Search students",
   "@searchStudents": {
@@ -746,28 +598,6 @@
   "noStudentsMatch": "No student found",
   "@noStudentsMatch": {
     "description": "Shown when a search matches nobody"
-  },
-  "everyoneActive": "Everyone has played this week",
-  "@everyoneActive": {
-    "description": "Shown when no child is inactive"
-  },
-  "daysAgo": "{days}d ago",
-  "@daysAgo": {
-    "description": "How long since a child last played, e.g. 12d ago",
-    "placeholders": {
-      "days": {
-        "type": "int"
-      }
-    }
-  },
-  "hoursAgo": "{hours}h ago",
-  "@hoursAgo": {
-    "description": "How long since something happened, in hours, e.g. 3h ago",
-    "placeholders": {
-      "hours": {
-        "type": "int"
-      }
-    }
   },
   "sariliProgress": "About me and my family",
   "@sariliProgress": {
@@ -837,10 +667,6 @@
   "@forgotPin": {
     "description": "Link back to the LRN as a recovery route"
   },
-  "pinSaved": "Code saved",
-  "@pinSaved": {
-    "description": "Confirmation that a new code was stored"
-  },
   "or": "or",
   "@or": {
     "description": "Divider between two ways of signing in"
@@ -889,16 +715,8 @@
   "@newPasswordStudentNumber": {
     "description": "Adult screen wording"
   },
-  "noBiometricOnDevice": "No fingerprint or face is set up on this phone,",
-  "@noBiometricOnDevice": {
-    "description": "Adult screen wording"
-  },
   "noSessionLogInFirst": "No student session found. Please log in first.",
   "@noSessionLogInFirst": {
-    "description": "Adult screen wording"
-  },
-  "resetActivity": "Reset Activity",
-  "@resetActivity": {
     "description": "Adult screen wording"
   },
   "resetSpecificActivity": "Reset Specific Activity",
@@ -940,15 +758,6 @@
       }
     }
   },
-  "studentArtworks": "Artworks ({count})",
-  "@studentArtworks": {
-    "description": "Header over a child’s saved drawings",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "noArtworksSaved": "No artwork saved yet.",
   "@noArtworksSaved": {
     "description": "Adult screen wording"
@@ -957,28 +766,12 @@
   "@middleName": {
     "description": "Adult screen wording"
   },
-  "studentIdFormat": "Student Number (Format: DC-2026-0001)",
-  "@studentIdFormat": {
-    "description": "Adult screen wording"
-  },
-  "autoGenerateId": "Make an ID for me",
-  "@autoGenerateId": {
-    "description": "Adult screen wording"
-  },
-  "accountPreview": "Account Preview",
-  "@accountPreview": {
-    "description": "Adult screen wording"
-  },
   "studentInformation": "Student Information",
   "@studentInformation": {
     "description": "Adult screen wording"
   },
   "parentInformation": "Parent Information",
   "@parentInformation": {
-    "description": "Adult screen wording"
-  },
-  "celebrate": "Celebrate",
-  "@celebrate": {
     "description": "Adult screen wording"
   },
   "stepOf": "Step {current} of {total} · {label}",
@@ -996,24 +789,12 @@
       }
     }
   },
-  "autoGenerated": "Made for you",
-  "@autoGenerated": {
-    "description": "Adult screen wording"
-  },
-  "enterIdAbove": "Enter the ID above",
-  "@enterIdAbove": {
-    "description": "Adult screen wording"
-  },
   "couldNotLoad": "Could not load. Please try again.",
   "@couldNotLoad": {
     "description": "Adult screen wording"
   },
   "teacherSignInPrompt": "Sign in to your teacher account",
   "@teacherSignInPrompt": {
-    "description": "Adult screen wording"
-  },
-  "daycareTeacher": "Daycare Teacher",
-  "@daycareTeacher": {
     "description": "Adult screen wording"
   },
   "useBiometric": "Use fingerprint / face",
@@ -1026,10 +807,6 @@
   },
   "strongest": "Going best",
   "@strongest": {
-    "description": "Parents summary wording"
-  },
-  "modulesHeader": "All six modules",
-  "@modulesHeader": {
     "description": "Parents summary wording"
   },
   "credentialsUpdated": "Login updated.",
@@ -1213,15 +990,6 @@
   "@noStudentNumbersLeft": {
     "description": "Shown when enrolment cannot mint a free number"
   },
-  "moreModules": "+{count} more",
-  "@moreModules": {
-    "description": "Collapsed class card: how many modules are hidden",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "filterBehindNote": "Started, but is progressing more slowly than the class.",
   "@filterBehindNote": {
     "description": "Explains an active class filter"
@@ -1319,10 +1087,6 @@
   "@authPasswordTooShort": {
     "description": "Student password, shown to the teacher"
   },
-  "newPasswordLabel": "New password",
-  "@newPasswordLabel": {
-    "description": "Parent's field for the child's new password"
-  },
   "whatToPractise": "What to practise",
   "@whatToPractise": {
     "description": "Teacher's per-child practice list"
@@ -1343,17 +1107,9 @@
   "@copyByHand": {
     "description": "Shown when the browser refuses the clipboard"
   },
-  "confirmNewPassword": "Confirm new password",
-  "@confirmNewPassword": {
-    "description": "Second box when a parent changes the password"
-  },
   "newParentPin": "New code",
   "@newParentPin": {
     "description": "First box when a parent is creating their code"
-  },
-  "welcome": "Welcome Back!",
-  "@welcome": {
-    "description": "Sign-in screen greeting"
   },
   "switchToChild": "Open {name}'s account",
   "@switchToChild": {
@@ -1381,7 +1137,6 @@
   "@switchNeedsConnection": {
     "description": "Parent switches to their other child"
   },
-  "scoreWord": "Score",
   "streakWord": "Streak",
   "notifPermissionDenied": "Allow notifications in your phone settings first.",
   "greetMorning": "Good Morning!",
@@ -1391,7 +1146,9 @@
   "updateAvailableBody": "Version {version} is ready to download.",
   "@updateAvailableBody": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "updateDownloadNow": "Download Now",

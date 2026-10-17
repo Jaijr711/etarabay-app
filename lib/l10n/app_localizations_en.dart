@@ -96,9 +96,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTitle => 'Settings';
 
   @override
-  String get totalProgress => 'Total Progress';
-
-  @override
   String get poems => 'Poetry';
 
   @override
@@ -153,9 +150,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get putNumbersInOrder => 'Drag the numbers into the boxes';
 
   @override
-  String get timesUp => 'Time\'s Up!';
-
-  @override
   String level(int level) {
     return 'Level $level';
   }
@@ -176,12 +170,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chooseLeftFirst => 'Choose a number on the left first!';
-
-  @override
-  String get dropHere => 'Drop here!';
-
-  @override
-  String get dragHere => 'Drag here';
 
   @override
   String get popAllBalloonsWith => 'Pop all the balloons with';
@@ -387,26 +375,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lower => 'Lower';
 
   @override
-  String letterLabel(String letter) {
-    return 'Letter $letter';
-  }
-
-  @override
-  String numberLabel(String number) {
-    return 'Number $number';
-  }
-
-  @override
   String get pointsLabel => 'Points';
 
   @override
-  String get goodJob => 'Good Job! 🌟';
-
-  @override
   String get ulitin => 'Repeat';
-
-  @override
-  String get traceTitle => 'Follow Me, You Can Do It!';
 
   @override
   String get uppercase => 'Uppercase';
@@ -557,9 +529,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get swipeToDeleteGuide => 'Swipe left on a student to delete';
-
-  @override
   String get enroll => 'Enroll';
 
   @override
@@ -609,22 +578,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tapToEnroll => 'Tap \"Enroll Student\" to add one.';
-
-  @override
-  String studentProgressTitle(String name) {
-    return '$name\'s Progress';
-  }
-
-  @override
-  String get moduleBreakdown => 'Module Breakdown';
-
-  @override
-  String scoreLabel(int score) {
-    return 'Score: $score';
-  }
-
-  @override
-  String get loginPrompt => 'Log in to continue your learning journey';
 
   @override
   String get loginButton => 'Log In';
@@ -709,19 +662,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forParents => 'For Parents';
 
   @override
-  String get hello => 'Hello!';
-
-  @override
   String get kulaySayaProgress => 'Color Fun Progress';
 
   @override
   String get totalSaved => 'Total Saved';
-
-  @override
-  String get magbasaProgress => 'Stories and Songs Progress';
-
-  @override
-  String get matematikaProgress => 'Numbers Progress';
 
   @override
   String get noResults => 'No results';
@@ -731,9 +675,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get clearCanvasQuestion => 'Clear Canvas?';
-
-  @override
-  String get eraseColoringWarning => 'This will erase all your coloring.';
 
   @override
   String get noArtworksYet => 'No artworks yet.';
@@ -758,13 +699,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readingFinishedGood => '✓ Finished! Good reading!';
 
   @override
-  String get readingFinishedHappy => '✓ Finished! Happy reading!';
-
-  @override
   String get doneAlready => 'Done already!';
-
-  @override
-  String get checkAnswer => 'Check';
 
   @override
   String get noGamesAvailable2 => 'No games available';
@@ -781,13 +716,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get whatIsMissingNumber => 'What number is missing?';
 
   @override
-  String get straightOrCorrect => 'Correct!';
-
-  @override
   String get iKnowIt => 'I learned it!';
-
-  @override
-  String get familyTreeTitle => 'Family Tree';
 
   @override
   String get familyTreeTapHint =>
@@ -795,9 +724,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get iLearnedFamilyTree => 'I learned the Family Tree!';
-
-  @override
-  String get ourHomeTitle => 'Our Home';
 
   @override
   String get thatIsOurHome => 'That is our home!';
@@ -811,9 +737,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get error => 'Error';
-
-  @override
-  String get recentActivity => 'Recent Activity';
 
   @override
   String get recentColor => 'Recent Color';
@@ -850,24 +773,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'This activity is temporarily unavailable. Please check back later.';
 
   @override
-  String get overviewTab => 'Overview';
-
-  @override
-  String get magbasaTab => 'Stories & Songs';
-
-  @override
-  String get matematikaTab => 'Numbers';
-
-  @override
-  String get artworksLabel => 'Artworks';
-
-  @override
-  String get pagesLabel => 'pages';
-
-  @override
-  String get lettersLabel => 'letters';
-
-  @override
   String get diffEasy => 'Easy';
 
   @override
@@ -896,15 +801,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get songLabel => 'Song';
-
-  @override
-  String get activitiesLabel => 'activities';
-
-  @override
-  String get gamesLabel => 'games';
-
-  @override
-  String get savedCountLabel => 'saved';
 
   @override
   String get uppercaseLettersTitle => 'Uppercase Letters (A–Z)';
@@ -951,29 +847,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String favoriteChosen(String choice) {
     return 'Your Favorite is $choice!';
   }
-
-  @override
-  String helloName(String name) {
-    return 'Hello, $name!';
-  }
-
-  @override
-  String get letsLearnAndPlay => 'Let\'s learn and play!';
-
-  @override
-  String get myProgressToday => 'My Progress Today';
-
-  @override
-  String get whatDoYouWantToLearn => 'What do you want to learn?';
-
-  @override
-  String get rewardsCount => 'Reward';
-
-  @override
-  String get activitiesCount => 'Activities';
-
-  @override
-  String get lessonsCount => 'Lessons';
 
   @override
   String familyRoleSentence(String member, String roles) {
@@ -1023,16 +896,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Read the entire poem before going back.';
 
   @override
-  String get iReadThePoem => 'I Read the Poem! ✓';
-
-  @override
-  String get readFullStoryBeforeBack =>
-      'Read the entire story before going back.';
-
-  @override
-  String get iReadTheStory => 'I Have Read It! ✓';
-
-  @override
   String get tandaanTitle => 'Remember It!';
 
   @override
@@ -1054,29 +917,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get traceItSubtitle => 'Learn Your ABC!';
 
   @override
-  String get checkTracing => 'Check';
-
-  @override
-  String get startAtDot => 'Start at the dot!';
-
-  @override
-  String get almostThere => 'Almost there! Try again!';
-
-  @override
-  String progressPages(int done, int total) {
-    return '$done / $total pages';
-  }
-
-  @override
   String percentComplete(int percent) {
     return '$percent% complete';
   }
-
-  @override
-  String get obraLabel => 'Artworks';
-
-  @override
-  String get strokesLabel => 'Strokes';
 
   @override
   String get categoryProgressHeader => 'Progress Per Category';
@@ -1121,27 +964,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tipStudyTimeBody =>
       'Set aside 15-20 minutes each day for learning and practice. Regular practice can help your child build confidence and improve their skills.';
-
-  @override
-  String progressCompleted(int done, int total) {
-    return '$done / $total completed';
-  }
-
-  @override
-  String progressActivities(int done, int total) {
-    return '$done / $total activities';
-  }
-
-  @override
-  String progressGames(int done, int total) {
-    return '$done / $total games';
-  }
-
-  @override
-  String get pointsStatLabel => 'Points';
-
-  @override
-  String get starsStatLabel => 'Stars';
 
   @override
   String get gameProgressHeader => 'Progress Per Game';
@@ -1347,37 +1169,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notSeenRecently => 'Not playing';
 
   @override
-  String get theClass => 'The class';
-
-  @override
   String get weakestFirst => 'Weakest module first';
-
-  @override
-  String get recentAchievements => 'Recent Achievements';
-
-  @override
-  String achievementEarnedBy(String name, String achievement) {
-    return '$name earned $achievement';
-  }
 
   @override
   String get searchStudents => 'Search students';
 
   @override
   String get noStudentsMatch => 'No student found';
-
-  @override
-  String get everyoneActive => 'Everyone has played this week';
-
-  @override
-  String daysAgo(int days) {
-    return '${days}d ago';
-  }
-
-  @override
-  String hoursAgo(int hours) {
-    return '${hours}h ago';
-  }
 
   @override
   String get sariliProgress => 'About me and my family';
@@ -1428,9 +1226,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forgotPin => 'Forgot code? Use the Student Number';
 
   @override
-  String get pinSaved => 'Code saved';
-
-  @override
   String get or => 'or';
 
   @override
@@ -1468,15 +1263,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newPasswordStudentNumber => 'New password (Student Number)';
 
   @override
-  String get noBiometricOnDevice =>
-      'No fingerprint or face is set up on this phone,';
-
-  @override
   String get noSessionLogInFirst =>
       'No student session found. Please log in first.';
-
-  @override
-  String get resetActivity => 'Reset Activity';
 
   @override
   String get resetSpecificActivity => 'Reset Specific Activity';
@@ -1503,24 +1291,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String studentArtworks(int count) {
-    return 'Artworks ($count)';
-  }
-
-  @override
   String get noArtworksSaved => 'No artwork saved yet.';
 
   @override
   String get middleName => 'Middle Name';
-
-  @override
-  String get studentIdFormat => 'Student Number (Format: DC-2026-0001)';
-
-  @override
-  String get autoGenerateId => 'Make an ID for me';
-
-  @override
-  String get accountPreview => 'Account Preview';
 
   @override
   String get studentInformation => 'Student Information';
@@ -1529,27 +1303,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get parentInformation => 'Parent Information';
 
   @override
-  String get celebrate => 'Celebrate';
-
-  @override
   String stepOf(int current, int total, String label) {
     return 'Step $current of $total · $label';
   }
-
-  @override
-  String get autoGenerated => 'Made for you';
-
-  @override
-  String get enterIdAbove => 'Enter the ID above';
 
   @override
   String get couldNotLoad => 'Could not load. Please try again.';
 
   @override
   String get teacherSignInPrompt => 'Sign in to your teacher account';
-
-  @override
-  String get daycareTeacher => 'Daycare Teacher';
 
   @override
   String get useBiometric => 'Use fingerprint / face';
@@ -1560,9 +1322,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get strongest => 'Going best';
-
-  @override
-  String get modulesHeader => 'All six modules';
 
   @override
   String get credentialsUpdated => 'Login updated.';
@@ -1702,11 +1461,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'No student numbers are left for this year.';
 
   @override
-  String moreModules(int count) {
-    return '+$count more';
-  }
-
-  @override
   String get filterBehindNote =>
       'Started, but is progressing more slowly than the class.';
 
@@ -1793,9 +1547,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'The password needs at least 4 characters.';
 
   @override
-  String get newPasswordLabel => 'New password';
-
-  @override
   String get whatToPractise => 'What to practise';
 
   @override
@@ -1813,13 +1564,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'This browser will not let the app copy. Select it and copy by hand.';
 
   @override
-  String get confirmNewPassword => 'Confirm new password';
-
-  @override
   String get newParentPin => 'New code';
-
-  @override
-  String get welcome => 'Welcome Back!';
 
   @override
   String switchToChild(String name) {
@@ -1837,9 +1582,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get switchNeedsConnection =>
       'Connect to the internet first — this child has work that is only on this phone.';
-
-  @override
-  String get scoreWord => 'Score';
 
   @override
   String get streakWord => 'Streak';

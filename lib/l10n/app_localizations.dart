@@ -262,12 +262,6 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settingsTitle;
 
-  /// No description provided for @totalProgress.
-  ///
-  /// In en, this message translates to:
-  /// **'Total Progress'**
-  String get totalProgress;
-
   /// No description provided for @poems.
   ///
   /// In en, this message translates to:
@@ -376,12 +370,6 @@ abstract class AppLocalizations {
   /// **'Drag the numbers into the boxes'**
   String get putNumbersInOrder;
 
-  /// No description provided for @timesUp.
-  ///
-  /// In en, this message translates to:
-  /// **'Time\'s Up!'**
-  String get timesUp;
-
   /// No description provided for @level.
   ///
   /// In en, this message translates to:
@@ -417,18 +405,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose a number on the left first!'**
   String get chooseLeftFirst;
-
-  /// No description provided for @dropHere.
-  ///
-  /// In en, this message translates to:
-  /// **'Drop here!'**
-  String get dropHere;
-
-  /// No description provided for @dragHere.
-  ///
-  /// In en, this message translates to:
-  /// **'Drag here'**
-  String get dragHere;
 
   /// No description provided for @popAllBalloonsWith.
   ///
@@ -814,41 +790,17 @@ abstract class AppLocalizations {
   /// **'Lower'**
   String get lower;
 
-  /// No description provided for @letterLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Letter {letter}'**
-  String letterLabel(String letter);
-
-  /// No description provided for @numberLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Number {number}'**
-  String numberLabel(String number);
-
   /// No description provided for @pointsLabel.
   ///
   /// In en, this message translates to:
   /// **'Points'**
   String get pointsLabel;
 
-  /// No description provided for @goodJob.
-  ///
-  /// In en, this message translates to:
-  /// **'Good Job! 🌟'**
-  String get goodJob;
-
   /// No description provided for @ulitin.
   ///
   /// In en, this message translates to:
   /// **'Repeat'**
   String get ulitin;
-
-  /// No description provided for @traceTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Follow Me, You Can Do It!'**
-  String get traceTitle;
 
   /// No description provided for @uppercase.
   ///
@@ -1132,12 +1084,6 @@ abstract class AppLocalizations {
   /// **'Happy Birthday, {name}!'**
   String birthdayGreeting(String name);
 
-  /// No description provided for @swipeToDeleteGuide.
-  ///
-  /// In en, this message translates to:
-  /// **'Swipe left on a student to delete'**
-  String get swipeToDeleteGuide;
-
   /// No description provided for @enroll.
   ///
   /// In en, this message translates to:
@@ -1233,30 +1179,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap \"Enroll Student\" to add one.'**
   String get tapToEnroll;
-
-  /// No description provided for @studentProgressTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'{name}\'s Progress'**
-  String studentProgressTitle(String name);
-
-  /// No description provided for @moduleBreakdown.
-  ///
-  /// In en, this message translates to:
-  /// **'Module Breakdown'**
-  String get moduleBreakdown;
-
-  /// No description provided for @scoreLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Score: {score}'**
-  String scoreLabel(int score);
-
-  /// No description provided for @loginPrompt.
-  ///
-  /// In en, this message translates to:
-  /// **'Log in to continue your learning journey'**
-  String get loginPrompt;
 
   /// No description provided for @loginButton.
   ///
@@ -1403,12 +1325,6 @@ abstract class AppLocalizations {
   /// **'For Parents'**
   String get forParents;
 
-  /// No description provided for @hello.
-  ///
-  /// In en, this message translates to:
-  /// **'Hello!'**
-  String get hello;
-
   /// No description provided for @kulaySayaProgress.
   ///
   /// In en, this message translates to:
@@ -1420,18 +1336,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Total Saved'**
   String get totalSaved;
-
-  /// No description provided for @magbasaProgress.
-  ///
-  /// In en, this message translates to:
-  /// **'Stories and Songs Progress'**
-  String get magbasaProgress;
-
-  /// No description provided for @matematikaProgress.
-  ///
-  /// In en, this message translates to:
-  /// **'Numbers Progress'**
-  String get matematikaProgress;
 
   /// No description provided for @noResults.
   ///
@@ -1450,12 +1354,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear Canvas?'**
   String get clearCanvasQuestion;
-
-  /// No description provided for @eraseColoringWarning.
-  ///
-  /// In en, this message translates to:
-  /// **'This will erase all your coloring.'**
-  String get eraseColoringWarning;
 
   /// No description provided for @noArtworksYet.
   ///
@@ -1499,23 +1397,11 @@ abstract class AppLocalizations {
   /// **'✓ Finished! Good reading!'**
   String get readingFinishedGood;
 
-  /// No description provided for @readingFinishedHappy.
-  ///
-  /// In en, this message translates to:
-  /// **'✓ Finished! Happy reading!'**
-  String get readingFinishedHappy;
-
   /// No description provided for @doneAlready.
   ///
   /// In en, this message translates to:
   /// **'Done already!'**
   String get doneAlready;
-
-  /// No description provided for @checkAnswer.
-  ///
-  /// In en, this message translates to:
-  /// **'Check'**
-  String get checkAnswer;
 
   /// No description provided for @noGamesAvailable2.
   ///
@@ -1541,23 +1427,11 @@ abstract class AppLocalizations {
   /// **'What number is missing?'**
   String get whatIsMissingNumber;
 
-  /// No description provided for @straightOrCorrect.
-  ///
-  /// In en, this message translates to:
-  /// **'Correct!'**
-  String get straightOrCorrect;
-
   /// No description provided for @iKnowIt.
   ///
   /// In en, this message translates to:
   /// **'I learned it!'**
   String get iKnowIt;
-
-  /// No description provided for @familyTreeTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Family Tree'**
-  String get familyTreeTitle;
 
   /// No description provided for @familyTreeTapHint.
   ///
@@ -1570,12 +1444,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'I learned the Family Tree!'**
   String get iLearnedFamilyTree;
-
-  /// No description provided for @ourHomeTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Our Home'**
-  String get ourHomeTitle;
 
   /// No description provided for @thatIsOurHome.
   ///
@@ -1600,12 +1468,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error'**
   String get error;
-
-  /// No description provided for @recentActivity.
-  ///
-  /// In en, this message translates to:
-  /// **'Recent Activity'**
-  String get recentActivity;
 
   /// No description provided for @recentColor.
   ///
@@ -1667,42 +1529,6 @@ abstract class AppLocalizations {
   /// **'This activity is temporarily unavailable. Please check back later.'**
   String get moduleLocked;
 
-  /// No description provided for @overviewTab.
-  ///
-  /// In en, this message translates to:
-  /// **'Overview'**
-  String get overviewTab;
-
-  /// No description provided for @magbasaTab.
-  ///
-  /// In en, this message translates to:
-  /// **'Stories & Songs'**
-  String get magbasaTab;
-
-  /// No description provided for @matematikaTab.
-  ///
-  /// In en, this message translates to:
-  /// **'Numbers'**
-  String get matematikaTab;
-
-  /// No description provided for @artworksLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Artworks'**
-  String get artworksLabel;
-
-  /// No description provided for @pagesLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'pages'**
-  String get pagesLabel;
-
-  /// No description provided for @lettersLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'letters'**
-  String get lettersLabel;
-
   /// No description provided for @diffEasy.
   ///
   /// In en, this message translates to:
@@ -1762,24 +1588,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Song'**
   String get songLabel;
-
-  /// No description provided for @activitiesLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'activities'**
-  String get activitiesLabel;
-
-  /// No description provided for @gamesLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'games'**
-  String get gamesLabel;
-
-  /// No description provided for @savedCountLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'saved'**
-  String get savedCountLabel;
 
   /// No description provided for @uppercaseLettersTitle.
   ///
@@ -1865,48 +1673,6 @@ abstract class AppLocalizations {
   /// **'Your Favorite is {choice}!'**
   String favoriteChosen(String choice);
 
-  /// No description provided for @helloName.
-  ///
-  /// In en, this message translates to:
-  /// **'Hello, {name}!'**
-  String helloName(String name);
-
-  /// No description provided for @letsLearnAndPlay.
-  ///
-  /// In en, this message translates to:
-  /// **'Let\'s learn and play!'**
-  String get letsLearnAndPlay;
-
-  /// No description provided for @myProgressToday.
-  ///
-  /// In en, this message translates to:
-  /// **'My Progress Today'**
-  String get myProgressToday;
-
-  /// No description provided for @whatDoYouWantToLearn.
-  ///
-  /// In en, this message translates to:
-  /// **'What do you want to learn?'**
-  String get whatDoYouWantToLearn;
-
-  /// No description provided for @rewardsCount.
-  ///
-  /// In en, this message translates to:
-  /// **'Reward'**
-  String get rewardsCount;
-
-  /// No description provided for @activitiesCount.
-  ///
-  /// In en, this message translates to:
-  /// **'Activities'**
-  String get activitiesCount;
-
-  /// No description provided for @lessonsCount.
-  ///
-  /// In en, this message translates to:
-  /// **'Lessons'**
-  String get lessonsCount;
-
   /// No description provided for @familyRoleSentence.
   ///
   /// In en, this message translates to:
@@ -1991,24 +1757,6 @@ abstract class AppLocalizations {
   /// **'Read the entire poem before going back.'**
   String get readFullPoemBeforeBack;
 
-  /// No description provided for @iReadThePoem.
-  ///
-  /// In en, this message translates to:
-  /// **'I Read the Poem! ✓'**
-  String get iReadThePoem;
-
-  /// No description provided for @readFullStoryBeforeBack.
-  ///
-  /// In en, this message translates to:
-  /// **'Read the entire story before going back.'**
-  String get readFullStoryBeforeBack;
-
-  /// No description provided for @iReadTheStory.
-  ///
-  /// In en, this message translates to:
-  /// **'I Have Read It! ✓'**
-  String get iReadTheStory;
-
   /// No description provided for @tandaanTitle.
   ///
   /// In en, this message translates to:
@@ -2051,47 +1799,11 @@ abstract class AppLocalizations {
   /// **'Learn Your ABC!'**
   String get traceItSubtitle;
 
-  /// No description provided for @checkTracing.
-  ///
-  /// In en, this message translates to:
-  /// **'Check'**
-  String get checkTracing;
-
-  /// No description provided for @startAtDot.
-  ///
-  /// In en, this message translates to:
-  /// **'Start at the dot!'**
-  String get startAtDot;
-
-  /// No description provided for @almostThere.
-  ///
-  /// In en, this message translates to:
-  /// **'Almost there! Try again!'**
-  String get almostThere;
-
-  /// No description provided for @progressPages.
-  ///
-  /// In en, this message translates to:
-  /// **'{done} / {total} pages'**
-  String progressPages(int done, int total);
-
   /// No description provided for @percentComplete.
   ///
   /// In en, this message translates to:
   /// **'{percent}% complete'**
   String percentComplete(int percent);
-
-  /// No description provided for @obraLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Artworks'**
-  String get obraLabel;
-
-  /// No description provided for @strokesLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Strokes'**
-  String get strokesLabel;
 
   /// No description provided for @categoryProgressHeader.
   ///
@@ -2170,36 +1882,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Set aside 15-20 minutes each day for learning and practice. Regular practice can help your child build confidence and improve their skills.'**
   String get tipStudyTimeBody;
-
-  /// No description provided for @progressCompleted.
-  ///
-  /// In en, this message translates to:
-  /// **'{done} / {total} completed'**
-  String progressCompleted(int done, int total);
-
-  /// No description provided for @progressActivities.
-  ///
-  /// In en, this message translates to:
-  /// **'{done} / {total} activities'**
-  String progressActivities(int done, int total);
-
-  /// No description provided for @progressGames.
-  ///
-  /// In en, this message translates to:
-  /// **'{done} / {total} games'**
-  String progressGames(int done, int total);
-
-  /// No description provided for @pointsStatLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Points'**
-  String get pointsStatLabel;
-
-  /// No description provided for @starsStatLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Stars'**
-  String get starsStatLabel;
 
   /// No description provided for @gameProgressHeader.
   ///
@@ -2579,29 +2261,11 @@ abstract class AppLocalizations {
   /// **'Not playing'**
   String get notSeenRecently;
 
-  /// Heading for the class-wide module breakdown
-  ///
-  /// In en, this message translates to:
-  /// **'The class'**
-  String get theClass;
-
   /// Note under the class breakdown explaining the order
   ///
   /// In en, this message translates to:
   /// **'Weakest module first'**
   String get weakestFirst;
-
-  /// Heading for the class-wide feed of recently earned badges and certificates
-  ///
-  /// In en, this message translates to:
-  /// **'Recent Achievements'**
-  String get recentAchievements;
-
-  /// One row of the recent-achievements feed, e.g. "Jay earned Alphabet Star"
-  ///
-  /// In en, this message translates to:
-  /// **'{name} earned {achievement}'**
-  String achievementEarnedBy(String name, String achievement);
 
   /// Placeholder in the teacher search field
   ///
@@ -2614,24 +2278,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No student found'**
   String get noStudentsMatch;
-
-  /// Shown when no child is inactive
-  ///
-  /// In en, this message translates to:
-  /// **'Everyone has played this week'**
-  String get everyoneActive;
-
-  /// How long since a child last played, e.g. 12d ago
-  ///
-  /// In en, this message translates to:
-  /// **'{days}d ago'**
-  String daysAgo(int days);
-
-  /// How long since something happened, in hours, e.g. 3h ago
-  ///
-  /// In en, this message translates to:
-  /// **'{hours}h ago'**
-  String hoursAgo(int hours);
 
   /// Heading of the About Me parent report
   ///
@@ -2723,12 +2369,6 @@ abstract class AppLocalizations {
   /// **'Forgot code? Use the Student Number'**
   String get forgotPin;
 
-  /// Confirmation that a new code was stored
-  ///
-  /// In en, this message translates to:
-  /// **'Code saved'**
-  String get pinSaved;
-
   /// Divider between two ways of signing in
   ///
   /// In en, this message translates to:
@@ -2804,20 +2444,8 @@ abstract class AppLocalizations {
   /// Adult screen wording
   ///
   /// In en, this message translates to:
-  /// **'No fingerprint or face is set up on this phone,'**
-  String get noBiometricOnDevice;
-
-  /// Adult screen wording
-  ///
-  /// In en, this message translates to:
   /// **'No student session found. Please log in first.'**
   String get noSessionLogInFirst;
-
-  /// Adult screen wording
-  ///
-  /// In en, this message translates to:
-  /// **'Reset Activity'**
-  String get resetActivity;
 
   /// Adult screen wording
   ///
@@ -2855,12 +2483,6 @@ abstract class AppLocalizations {
   /// **'Reset all of {name}’s progress? This cannot be undone.'**
   String confirmResetAll(String name);
 
-  /// Header over a child’s saved drawings
-  ///
-  /// In en, this message translates to:
-  /// **'Artworks ({count})'**
-  String studentArtworks(int count);
-
   /// Adult screen wording
   ///
   /// In en, this message translates to:
@@ -2876,24 +2498,6 @@ abstract class AppLocalizations {
   /// Adult screen wording
   ///
   /// In en, this message translates to:
-  /// **'Student Number (Format: DC-2026-0001)'**
-  String get studentIdFormat;
-
-  /// Adult screen wording
-  ///
-  /// In en, this message translates to:
-  /// **'Make an ID for me'**
-  String get autoGenerateId;
-
-  /// Adult screen wording
-  ///
-  /// In en, this message translates to:
-  /// **'Account Preview'**
-  String get accountPreview;
-
-  /// Adult screen wording
-  ///
-  /// In en, this message translates to:
   /// **'Student Information'**
   String get studentInformation;
 
@@ -2903,29 +2507,11 @@ abstract class AppLocalizations {
   /// **'Parent Information'**
   String get parentInformation;
 
-  /// Adult screen wording
-  ///
-  /// In en, this message translates to:
-  /// **'Celebrate'**
-  String get celebrate;
-
   /// Progress through the enrolment wizard
   ///
   /// In en, this message translates to:
   /// **'Step {current} of {total} · {label}'**
   String stepOf(int current, int total, String label);
-
-  /// Adult screen wording
-  ///
-  /// In en, this message translates to:
-  /// **'Made for you'**
-  String get autoGenerated;
-
-  /// Adult screen wording
-  ///
-  /// In en, this message translates to:
-  /// **'Enter the ID above'**
-  String get enterIdAbove;
 
   /// Adult screen wording
   ///
@@ -2938,12 +2524,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign in to your teacher account'**
   String get teacherSignInPrompt;
-
-  /// Adult screen wording
-  ///
-  /// In en, this message translates to:
-  /// **'Daycare Teacher'**
-  String get daycareTeacher;
 
   /// Adult screen wording
   ///
@@ -2962,12 +2542,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Going best'**
   String get strongest;
-
-  /// Parents summary wording
-  ///
-  /// In en, this message translates to:
-  /// **'All six modules'**
-  String get modulesHeader;
 
   /// Message shown to a teacher or parent
   ///
@@ -3227,12 +2801,6 @@ abstract class AppLocalizations {
   /// **'No student numbers are left for this year.'**
   String get noStudentNumbersLeft;
 
-  /// Collapsed class card: how many modules are hidden
-  ///
-  /// In en, this message translates to:
-  /// **'+{count} more'**
-  String moreModules(int count);
-
   /// Explains an active class filter
   ///
   /// In en, this message translates to:
@@ -3371,12 +2939,6 @@ abstract class AppLocalizations {
   /// **'The password needs at least 4 characters.'**
   String get authPasswordTooShort;
 
-  /// Parent's field for the child's new password
-  ///
-  /// In en, this message translates to:
-  /// **'New password'**
-  String get newPasswordLabel;
-
   /// Teacher's per-child practice list
   ///
   /// In en, this message translates to:
@@ -3407,23 +2969,11 @@ abstract class AppLocalizations {
   /// **'This browser will not let the app copy. Select it and copy by hand.'**
   String get copyByHand;
 
-  /// Second box when a parent changes the password
-  ///
-  /// In en, this message translates to:
-  /// **'Confirm new password'**
-  String get confirmNewPassword;
-
   /// First box when a parent is creating their code
   ///
   /// In en, this message translates to:
   /// **'New code'**
   String get newParentPin;
-
-  /// Sign-in screen greeting
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome Back!'**
-  String get welcome;
 
   /// Parent switches to their other child
   ///
@@ -3448,12 +2998,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Connect to the internet first — this child has work that is only on this phone.'**
   String get switchNeedsConnection;
-
-  /// No description provided for @scoreWord.
-  ///
-  /// In en, this message translates to:
-  /// **'Score'**
-  String get scoreWord;
 
   /// No description provided for @streakWord.
   ///
