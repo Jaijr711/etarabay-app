@@ -34,12 +34,12 @@ class PamilyaContent {
     ],
     'ilo': [
       {
-        'title': 'Ti Bagik',
+        'title': 'Maipapan iti Bagik',
         'icon': LucideIcons.user,
         'color': Color(0xFFFF6B6B)
       },
       {
-        'title': 'Ti Pamilyak',
+        'title': 'Ti Pamilak',
         'icon': LucideIcons.users,
         'color': Color(0xFF4ECDC4)
       },
@@ -78,13 +78,18 @@ class PamilyaContent {
       ],
     ],
     'ilo': [
-      ['Maipanggep Kaniak', 'Dagiti Riknak', 'Inaldaw nga Aramid', 'Paboritok'],
+      [
+        'Maipanggep Kaniak',
+        'Toy kaririknak',
+        'Inaldaw nga Ar-aramiden',
+        'Dagiti Kaykayatko'
+      ],
       [
         'Dagiti Miyembro ti Pamilya',
-        'Trabaho iti Pamilya',
-        'Aramid ti Pamilya',
-        'Punuan ti Pamilya',
-        'Ti Balaymi'
+        'Dagiti akem iti pamilia',
+        'Aramid ti Pamilia',
+        'Puon ti Pamilya',
+        'Ti Pagtaengan tayo'
       ],
     ],
   };
@@ -188,7 +193,7 @@ class PamilyaContent {
         'type': 'text_input',
         'icon': '👤',
         'description':
-            'Ti naganmo ket ti tawag kenka ti pamilyam ken gagayyemmo. Napateg dayta!',
+            'Ti naganmo ket ti tawag kenka ti pamiliam ken gagayyemmo. Napateg dayta!',
       },
       {
         'id': 'about_age',
@@ -196,7 +201,7 @@ class PamilyaContent {
         'type': 'age_input',
         'icon': '🎂',
         'description':
-            'Ti tawenmo ket ti bilang dagiti tawen manipud idi nayanakka. Kapadas ti selebrar!',
+            'Ti tawenmo ket ti bilang dagiti tawen manipud idi nayanakka. Rambakan ti tunggal tawen!',
       },
       {
         'id': 'about_gender',
@@ -213,7 +218,7 @@ class PamilyaContent {
         'question': 'Kaano ti pannakayanakmo?',
         'type': 'info',
         'icon': '🎉',
-        'description': 'Selebrasyon ti pannakayanakmo kadua ti pamilyam.',
+        'description': 'Rambakan ti pannakayanakmo kadua ti pamiliam.',
       },
       {
         'id': 'about_home',
@@ -396,80 +401,83 @@ class PamilyaContent {
     'ilo': [
       {
         'id': 'emotion_happy',
-        'question': 'Kaano ka NARAG-O?',
+        'question': 'Kaano ka a makarikna ti Ragsak?',
         'choices': [
-          '🎁 No adda regalo wenno sorpresa',
-          '😢 No mananatangken',
-          '😴 No matuturog'
+          '🎁 No adda sagut wenno pagsiddaaw.',
+          '😢 No adda tao manatangken',
+          '😴 No matmaturog'
         ],
         'correct': 0,
         'explanation':
-            'Nalinteg! Narag-o tayo no adda nasayaat a mapasamak kas ti regalo wenno pesta.',
-        'tip': 'Ngumingiti ka ken ibagam ti ragsak mo iti pamilyam!',
+            'Kusto! Naragsak tayo no adda mapasamak a nasayaat a banag kas iti pannakaawat iti regalo wenno panag rambak.',
+        'tip': 'Agisem ka ket ibingaymo ti ragsakmo ti pamiliam.',
       },
       {
         'id': 'emotion_sad',
-        'question': 'Kaano ka NALUNLUNGOT?',
+        'question': 'Kaano ka a makarikna ti Ladingit?',
         'choices': [
-          '🎂 No adda kasangay',
-          '🧸 No mawanen ti paboritom a laruan',
-          '🍦 No kumkumanen ti ice cream'
+          '🎂 No adda padaya iti panagkasangay',
+          '🧸 No mapukaw ti kayatam nga ay-ayam',
+          '🍦 No mangan ka iti sorbetes'
         ],
         'correct': 1,
         'explanation':
-            'Nalinteg! Normal ti maglunglungot no adda mawanen wenno no adda di nasayaat a napasamak.',
-        'tip': 'No nalunglungot ka, yakap ti nanangmo wenno amam.',
+            'Kusto! Kadaywan a maladingitan tayo no adda mapukawtayo wenno no adda dakes a mapasamak.',
+        'tip': 'No maladingitan ka, arakupem ni nanangmo wenno tatangmo.',
       },
       {
         'id': 'emotion_angry',
-        'question': 'Kaano ka NAALIGUTGET?',
+        'question': 'Kaano ka a makarikna ti Unget?',
         'choices': [
-          '🎮 No nanalo iti laro',
-          '🧸 No adda baro a laruan',
-          '👊 No inala ti laruanmo nga awan pannakaisuro'
+          '🎮 No mangabak ka iti ay-ayam',
+          '🧸 No maaddaanka iti baro nga ay-ayam',
+          '👊 No adda nangala iti ay-ayam mo nga awan to pakada na'
         ],
         'correct': 2,
         'explanation':
-            'Nalinteg! Naaligutgettayo no adda di umiso wenno di nalinteg a napasamak.',
-        'tip': 'No naaligutget ka, sumrek ti angin ken bilangen iti lima.',
+            'Kusto! Agpungtot tayo no adda saan a nainkalintegan wenno di umno a mapasamak.',
+        'tip':
+            'No agpungtot ka, aganges iti nauneg ken bilangen agingga ti lima.',
       },
       {
         'id': 'emotion_surprised',
-        'question': 'Kaano ka NASDAAW?',
+        'question': 'Kaano ka a makarikna ti Nasdaaw?',
         'choices': [
-          '🎁 No adda di inayan a sorpresa',
-          '🍚 No mangan',
-          '😴 No matulog'
+          '🎁 No adda saan a namnamaen a sorpresa',
+          '🍚 No mangmangan',
+          '😴 No matmaturog'
         ],
         'correct': 0,
-        'explanation': 'Nalinteg! Nasdaaw tayo no adda di inayan a napasamak.',
-        'tip': 'Mabalin a mangsdaaw — simmuroten ti pannakaadal!',
+        'explanation':
+            'Kusto! Masdaaw tayo no adda saan a namnamaen a mapasamak.',
+        'tip':
+            'Nasayaat laeng ti masdaaw - ti panagadal ket maysa nga adbentura!',
       },
       {
         'id': 'emotion_sleepy',
-        'question': 'Kaano ka MAUYONG?',
+        'question': 'Kaano ka a makaturog?',
         'choices': [
-          '🌅 No bigbigat kalpasan ti panagtilmon',
-          '🌙 No rabii na',
-          '☀️ No agalagad'
+          '🌅 No ti bigbigat kalpasan ti panagriing',
+          '🌙 No rabiin',
+          '☀️ No agay-ayam iti ruar'
         ],
         'correct': 1,
         'explanation':
-            'Nalinteg! Mauyong tayo no rabii na ta oras na ti matulog.',
-        'tip': 'Agtugaw nang nasapa tapno lumaki nang naruay!',
+            'Kusto! Marikna tayo ti makaturog iti rabii gapu ta orasen ti panagturog.',
+        'tip': 'Agidda ka a nasapa tapno dumakkel ka a napigsa!',
       },
       {
         'id': 'emotion_scared',
-        'question': 'Kaano ka NATAKOT?',
+        'question': 'Kaano ka a makarikna ti Buteng?',
         'choices': [
-          '🌈 No adda balangaw',
-          '⚡ No adda kimat ken kulog',
-          '☀️ No init ti aldaw'
+          '🌈 No adda bullalayaw',
+          '⚡ No adda kimat ken gurruud',
+          '☀️ Iti aldaw a makasilaw ti init'
         ],
         'correct': 1,
         'explanation':
-            'Nalinteg! Natakot tayo iti nalaing a sirak kas ti kulog.',
-        'tip': 'No natakot ka, yakap ti nanangmo wenno amam.',
+            'Kusto! Mabutengtayo kadagiti napigsa nga uni a kas ti gur-ruod.',
+        'tip': 'No mabuteng ka, arakupem ni nanangmo wenno tatangmo.',
       },
     ],
   };
@@ -591,53 +599,57 @@ class PamilyaContent {
       {
         'id': 'routine_morning',
         'question':
-            'Ania ti umuna nga aramidenmo no BIGBIGAT kalpasan ti panagtilmon?',
+            'Ania ti umuna nga aramidem no BIGBIGAT kalpasan ti panagtilmon?',
         'choices': [
-          '🛏️ Agtilmon ken agbangon',
-          '🍳 Kumanen ti agahon',
-          '📺 Ag-TV'
+          '🛏️ Bumangon ken pumanaw iti katre',
+          '🍳 Mangan iti pammigat',
+          '📺 Agbuya ti TV'
         ],
         'correct': 0,
         'explanation':
             'Nalinteg! Umuna nga agtilmon ken agbangon sakbay ti sabali nga gapuanan.',
-        'tip': 'Agbangon nang nasapa tapno naandam iti intero nga aldaw!',
+        'tip':
+            'Ti nasayaat a ar-aramiden iti agsapa ket makatulong tapno nasayaat ti aldawmo.',
       },
       {
         'id': 'routine_afternoon',
-        'question': 'Ania ti kaslakami nga aramidenmo iti MALEM?',
+        'question': 'Ania ti aramidem iti malem',
         'choices': [
-          '📚 Agadal wenno aglaro',
-          '🍚 Kumanen ti pangaldaw',
-          '😴 Matulog ti intero nga malem'
+          '📚 Agadal wenno agay-ayam',
+          '🍚 Mangan ti pangaldaw',
+          '😴 Maturog iti intero a malem'
         ],
         'correct': 0,
-        'explanation': 'Nalinteg! Iti malem, agadal tayo wenno aglaro.',
-        'tip': 'Pagtalinaeden ti oras para iti panagadal ken panaglaro!',
+        'explanation': 'Kusto! Iti malem, agadal tayo wenno agay-ayam.',
+        'tip':
+            'Ti nasayaat nga aldaw ket addaan iti panawen para iti panagadal ken panagragragsak',
       },
       {
         'id': 'routine_evening',
-        'question': 'Ania ti mabalin nga aramidenmo sakbay ti PANAGTUROG?',
+        'question': 'Ania ti ar-aramidem sakbay ti PANAGTUROG?',
         'choices': [
-          '🪥 Agsuplit',
-          '🍪 Kumanen ti merienda',
-          '📱 Aglaro iti cellphone'
+          '🪥 Agsepilio iti ngipen',
+          '🍪 Mangan ti merienda',
+          '📱 Agay-ayam iti cellphone'
         ],
         'correct': 0,
         'explanation':
-            'Nalinteg! Napateg ti panagsuplit sakbay ti panagturog tapno maprotektaran ti ngipen.',
-        'tip': 'Ti nasuyat nga ngipen ket iwas sakit!',
+            'Kusto! Napateg ti panagsepilio sakbay ti panagturog tapno maprotektaran ti ngipen.',
+        'tip': 'Ti nadalus a ngipen kayatna a sawen awan ti ut-ot ti ngipen.',
       },
       {
         'id': 'routine_hygiene',
-        'question': 'Kasano ti maprotektaranmo ti bagim iti sakit?',
+        'question':
+            'Kasano a mataginayonmo ti salun-atmo ken maliklikan ti panagsakit?',
         'choices': [
-          '🧼 Aghugas iti ima',
-          '🪥 Agsuplit laeng',
+          '🧼 Ugasam dagiti imam',
+          '🪥 Agsepilio laeng iti ngipen',
           '💧 Uminom iti danum'
         ],
         'correct': 0,
         'explanation': 'Nalinteg! Ti panaghugas iti ima ket iwas sakit.',
-        'tip': 'Aghugas iti ima sakbay ti panangan ken kalpasan ti banio!',
+        'tip':
+            'Ugasam dagiti imam sakbay a mangan ken kalpasan nga agusar iti banio!',
       },
     ],
   };
@@ -716,41 +728,36 @@ class PamilyaContent {
     'ilo': [
       {
         'id': 'preference_food',
-        'question': 'Ania ti paboritom nga MAKAN?',
-        'options': [
-          '🍚 Sinanglaw',
-          '🐟 Pinakbet',
-          '🍛 Dinengdeng',
-          '🍖 Bagnet'
-        ],
+        'question': 'Ania ti makan a kayat mo unay?',
+        'options': ['🍚 Innapoy', '🐟 Ikan', '🍛 Nilaga', '🍖 Karne'],
         'emojis': ['🍚', '🐟', '🍛', '🍖'],
-        'description': 'Dagiti nailian nga makan ti Ilocos! Umili ka!',
+        'description': 'Pilien ti kayatam a Taraon!',
       },
       {
         'id': 'preference_color',
-        'question': 'Ania ti paboritom nga KULOR?',
-        'options': [
-          '🔴 Nalabbaga',
-          '🔵 Natimgas',
-          '🟢 Nalabbag-o',
-          '🟡 Nadarang'
-        ],
+        'question': 'Ania ti kayatam nga MARIS?',
+        'options': ['🔴 Nalabbaga', '🔵 Asul', '🟢 Berde', '🟡 Duyaw'],
         'emojis': ['🔴', '🔵', '🟢', '🟡'],
-        'description': 'Pumili ka iti paboritom nga kulor!',
+        'description': 'Pumili ka iti kayatam nga maris!',
       },
       {
         'id': 'preference_game',
-        'question': 'Ania ti paboritom nga LARO?',
-        'options': ['🪀 Piko', '🏃 Taguan', '🧩 Puzzle', '🎯 Tumbang Preso'],
+        'question': 'Ania ti ay-ayam a kayat mo unay?',
+        'options': [
+          '🪀 Piko',
+          '🏃 Habulan',
+          '🧩 Palaisipan',
+          '🎯 Panag-ay-ayyam iti darts'
+        ],
         'emojis': ['🪀', '🏃', '🧩', '🎯'],
-        'description': 'Dagiti nailian nga laro! Maymaysa a naraig!',
+        'description': 'Naragsak nga ay-ayam a maay-ayam kadagiti gagayyemmo!',
       },
       {
         'id': 'preference_animal',
-        'question': 'Ania ti paboritom nga HAYOP?',
+        'question': 'Ania ti kayatam nga ayup?',
         'options': ['🐶 Aso', '🐱 Pusa', '🐓 Manok', '🐃 Nuang'],
         'emojis': ['🐶', '🐱', '🐓', '🐃'],
-        'description': 'Pumili iti paboritom nga ayup!',
+        'description': 'Pumili iti kayatam nga ayup!',
       },
     ],
   };
@@ -993,90 +1000,134 @@ class PamilyaContent {
     'ilo': [
       {
         'id': 'family_nanay',
-        'question': 'Sino ti ag-alagad kenka no aggagar ken nagluto iti makan?',
-        'choices': ['👩 Nanang', '👨 Amang', '👧 Manang', '🧑 Manong'],
+        'question':
+            'Siasino ti mangay-aywan kenka ken mangiparikna kenka nga ayat-ayatendaka?',
+        'choices': [
+          '👩 Nanang',
+          '👨 Tatang',
+          '👧 Kabsat a babai',
+          '🧑 Kabsat a lalaki'
+        ],
         'correct': 0,
         'member': 'Nanang',
         'emoji': '👩',
-        'roles': 'nagluluto, ag-alagad, naglalambing',
+        'roles': 'agluto, panangaywan, panagayat',
         'description':
-            'Si Nanang ti ag-alagad kadatayo ken nagluto iti nasayaat nga makan.',
-        'note': 'Iti Ilocos, awagentayo ti ina iti "Nanang" wenno "Inang".',
+            'Aywanannakami ni Nanang ken agluto iti naimas a taraon.',
+        'note': 'Iti Filipino, awagantayo ti nanang iti "Nanay" wenno "Ina".',
+        'popup':
+            'Ti nanang ket mangtaripato kenka, tumulong kenka, ken ay-ayatenna ka iti tunggal aldaw. Iti Filipino, awagantayo isuna iti “Nanay” wenno “Ina.”',
         'audioPath': 'audio/family/ni_nanang.mp3'
       },
       {
         'id': 'family_amang',
-        'question': 'Sino ti nagtatrabaho para iti pamilya ken naimus aglaro?',
-        'choices': ['👩 Nanang', '👨 Amang', '👧 Manang', '🧑 Manong'],
+        'question':
+            'Siasino ti agtartrabaho a tumulong iti pamiliam ken pagay-ayatna ti makiay-ayam kenka',
+        'choices': [
+          '👩 Nanang',
+          '👨 Tatang',
+          '👧 Kabsat a babai',
+          '🧑 Kabsat a lalaki'
+        ],
         'correct': 1,
-        'member': 'Amang',
+        'member': 'Tatang',
         'emoji': '👨',
-        'roles': 'nagtatrabaho, naglalaro, nagpoprotekta',
+        'roles': 'agtrabaho, agpaspasnek, agtalinaed',
         'description':
-            'Si Amang ti nagtatrabaho para iti pamilya ken naimus aglaro.',
-        'note': 'Iti Ilocos, awagentayo ti ama iti "Amang" wenno "Tatang".',
+            'Agtartrabaho ni Tatang para iti pamilia ken makaparagsak nga kaay-ayam.',
+        'note': 'Iti Filipino, awagantayo ti tatang iti “Tatay” wenno “Ama.”',
+        'popup':
+            'Agtrabaho ti tatang, aywananna ti pamiliana, pagtalinaedennaka a natalged ken pagay-ayatna ti mangbusbos iti singgalut kenka. Iti Filipino, awagantayo isuna iti "Tatay" wenno "Ama".',
         'audioPath': 'audio/family/si_amang.mp3'
       },
       {
         'id': 'family_manong',
-        'question': 'Sino ti nataengan nga kabsatmo a lalaki?',
-        'choices': ['👩 Nanang', '👨 Amang', '👧 Manang', '🧑 Manong'],
+        'question': 'Sinno ti inauna nga kabsatmo a lalaki?',
+        'choices': [
+          '👩 Nanang',
+          '👨 Tatang',
+          '👧 Kabsat a babai',
+          '🧑 Kabsat a lalaki'
+        ],
         'correct': 3,
         'member': 'Manong',
         'emoji': '🧑',
-        'roles': 'nataengan nga kabsat, mangikuyog, kalaro',
-        'description': 'Si Manong ti nataengan nga kabsatmo a lalaki.',
-        'note': 'Iti Ilocos, awagentayo iti napateg nga kabsat iti "Manong".',
+        'roles': 'inauna nga kabsat, mangikuyog, kaduak nga agay-ayam',
+        'description':
+            'Ti inauna a kabsatmo a lalaki ket isu ti kabsatmo a lalaki a nataengan ngem sika.',
+        'note':
+            'Iti Filipino, awagantayo iti inauna a kabsat a lalaki iti “Kuya.”',
+        'popup':
+            'Ti inauna a kabsat a lalaki ket makiay-ayam kenka, tulongannaka, ken aywanannaka. Iti Filipino, awagantayo isuna iti "kuya".',
         'audioPath': 'audio/family/ni_manong.mp3'
       },
       {
         'id': 'family_manang',
-        'question': 'Sino ti nataengan nga kabsatmo a babai?',
-        'choices': ['👩 Nanang', '👨 Amang', '👧 Manang', '🧑 Manong'],
+        'question': 'Sinno ti inauna nga kabsatmo a babai?',
+        'choices': [
+          '👩 Nanang',
+          '👨 Tatang',
+          '👧 Kabsat a babai',
+          '🧑 Kabsat a lalaki'
+        ],
         'correct': 2,
         'member': 'Manang',
         'emoji': '👧',
-        'roles': 'nataengan nga kabsat, tumulong iti balay, kaobraobra',
-        'description': 'Si Manang ti nataengan nga kabsatmo a babai.',
+        'roles':
+            'inauna a kabsat, tumulong iti balay, ken kaduam nga agay-ayam.',
+        'description': 'Ni Manang ti inauna nga kabsatmo a babai.',
         'note':
-            'Iti Ilocos, awagentayo iti napateg nga kabsat a babai iti "Manang".',
+            'Iti Filipino, awagantayo iti inauna a kabsat a babai iti “Ate.”',
+        'popup':
+            'Ti inauna a kabsat a babai ket tumulong iti pagtaengan, makiay-ayam kenka, ken mangaywan kenka. Iti Filipino, awagantayo isuna iti “Ate.”',
         'audioPath': 'audio/family/ni_manang.mp3'
       },
       {
         'id': 'family_bunso',
-        'question': 'Sino ti kaungpus nga miyembro ti pamilya?',
-        'choices': ['👶 Kaungpus', '🧑 Manong', '👧 Manang', '👴 Lelong'],
+        'question': 'Sinno ti kaudian nga anak iti pamilia?',
+        'choices': [
+          '👶 Inaudi',
+          '🧑 Kabsat a lalaki',
+          '👧 Kabsat a babai',
+          '👴 Lilong'
+        ],
         'correct': 0,
-        'member': 'Kaungpus',
+        'member': 'Inaudi',
         'emoji': '👶',
-        'roles': 'kaungpus nga kabsat, inaalagaan',
-        'description': 'Ti kaungpus ti kaungpus nga miyembro ti pamilya.',
+        'roles': 'Ti kaudian a kabsat, aywanan.',
+        'description': 'Ti inaudi ti kaubingan a kameng ti pamilia.',
         'note':
-            'Iti Ilocos, awagentayo iti kaungpus nga kabsat iti "Kaungpus" wenno "Bunsoy".',
+            'Iti Filipino, awagantayo isuna ti inaudi a kabsat iti "Bunso".',
+        'popup':
+            'Ti inaudi a kabsat ket ay-ayaten ken ay-aywanan ti pamilia. Iti Filipino, awagantayo ida iti "Bunso".',
         'audioPath': 'audio/family/ni_bunsoy.mp3'
       },
       {
         'id': 'family_lelong',
-        'question': 'Sino ti ama ni nanang wenno amang?',
-        'choices': ['👴 Lelong', '👵 Leling', '👨 Amang', '👩 Nanang'],
+        'question': 'Sinno ti tatang ni nanangmo wenno tatangmo?',
+        'choices': ['👴 Lilong', '👵 Lilang', '👨 Tatang', '👩 Nanang'],
         'correct': 0,
-        'member': 'Lelong',
+        'member': 'Lilong',
         'emoji': '👴',
-        'roles': 'Lelong dagiti annaknak, nagkukuwento iti tao',
-        'description': 'Si Lelong ti ama ti nanang wenno amang tayo.',
-        'note': 'Iti Ilocos, awagentayo ti apo a lalaki iti "Lelong".',
+        'roles': 'agsarsarita ken mangted iti balakad',
+        'description': 'Ti lilong ket tatang ti nanangmo wenno tatangmo.',
+        'note': 'Iti Filipino, awagantayo iti lilong a “Lolo.”',
+        'popup':
+            'Ti Lilong ket agsarsarita, mangted iti balakad, ken ay-ayatenna ti makipaglaok kadagiti kameng ti pamiliana. Iti Filipino, awagantayo isuna iti “Lolo.”',
         'audioPath': 'audio/family/ni_lelong.mp3'
       },
       {
         'id': 'family_leling',
-        'question': 'Sino ti ina ni nanang wenno amang?',
-        'choices': ['👴 Lelong', '👵 Leling', '👨 Amang', '👩 Nanang'],
+        'question': 'Sinno ti nanang ni nanangmo wenno tatangmo?',
+        'choices': ['👴 Lilong', '👵 Lilang', '👨 Tatang', '👩 Nanang'],
         'correct': 1,
-        'member': 'Leling',
+        'member': 'Lilang',
         'emoji': '👵',
-        'roles': 'Leling dagiti annaknak, nagluluto iti naimas',
-        'description': 'Si Leling ti ina ti nanang wenno amang tayo.',
-        'note': 'Iti Ilocos, awagentayo ti apo a babai iti "Leling".',
+        'roles': 'Agluto iti naimas a taraon ken agsarsarita.',
+        'description': 'Ni Lilang ti Ina ni nanang wenno tatang tayo,',
+        'note': 'Iti Filipino, awagantayo ni lilang iti "Lola".',
+        'popup':
+            'Ti Lilang ket agluto iti naimas a taraon, mangibaga kadagiti sarsarita. Iti Filipino, awagantayo isuna iti "Lola"',
         'audioPath': 'audio/family/ni_leling.mp3'
       },
     ],
@@ -1193,49 +1244,50 @@ class PamilyaContent {
     'ilo': [
       {
         'id': 'role_cook',
-        'question': 'Sino ti kaslakami nga nagluluto iti balaymi?',
+        'question': 'Sinno ti kanayon nga agluto iti balay?',
         'choices': [
           'Nanang laeng',
-          'Amang laeng',
-          'Leling laeng',
-          'Mabalin ti aniaman'
+          'Tatang laeng',
+          'Lilang laeng',
+          'Manang/Manong'
         ],
         'correct': 3,
-        'explanation': 'Nalinteg! Mabalin ti aniaman iti pamilya ti magluto.'
+        'explanation': 'Kusto! Siasinoman iti pamilia ket mabalin nga agluto'
       },
       {
         'id': 'role_work',
-        'question': 'Sino ti nagtatrabaho para iti pamilya?',
+        'question':
+            'Siasino ti agtartrabaho a tumulong a mangsuporta iti pamilia?',
         'choices': [
-          'Amang laeng',
+          'Tatang laeng',
           'Nanang laeng',
-          'Lelong laeng',
-          'Mabalin ti adu'
+          'Lilong laeng',
+          'Adu ti mabalin'
         ],
         'correct': 3,
-        'explanation': 'Nalinteg! Mabalin ti adu iti pamilya ti nagtatrabaho.'
+        'explanation':
+            'Kusto! Adu a kameng ti Pamilia ti mabalin nga agtrabaho.'
       },
       {
         'id': 'role_story',
-        'question': 'Sino ti nalablabes a nagkukuwento iti daan?',
-        'choices': ['Manong', 'Manang', 'Lelong ken Leling', 'Amang'],
+        'question': 'Sinno ti kanayon nga agisal salaysay?',
+        'choices': ['Manong', 'Manang', 'Lilong ken Lilang', 'Tatang'],
         'correct': 2,
-        'explanation':
-            'Nalinteg! Dagiti Lelong ken Leling ti kaslakami nga nagkukuwento.'
+        'explanation': 'Kusto! Dagiti apong ti kasasayaatan a mangisalsalaysay.'
       },
       {
         'id': 'role_care',
-        'question': 'Sino ti ag-alagad kenka no aggagarika?',
-        'choices': ['Nanang', 'Amang', 'Leling', 'Amin da'],
+        'question': 'Sinno ti mangaywan kenka no masakit ka?',
+        'choices': ['Nanang', 'Tatang', 'Lilang', 'Amin kadakuada'],
         'correct': 3,
-        'explanation': 'Nalinteg! Amin nga miyembro ti pamilya ag-alagad.'
+        'explanation': 'Kusto! Amin a kameng ti pamilia ket ag iin-naywanda.'
       },
       {
         'id': 'role_play',
-        'question': 'Sino ti kalarom iti balay?',
-        'choices': ['Manong', 'Manang', 'Kaungpus', 'Amin dagiti kabsat'],
+        'question': 'Sinno ti kaay-ayammo iti balay?',
+        'choices': ['Manong', 'Manang', 'Inaudi', 'Aniaman a kabsat'],
         'correct': 3,
-        'explanation': 'Nalinteg! Mabalin ka aglaro kadagiti aniaman.'
+        'explanation': 'Kusto! Mabalinmo nga kaay-ayam ti siasinoman'
       },
     ],
   };
@@ -1352,55 +1404,55 @@ class PamilyaContent {
       {
         'id': 'activity_dinner',
         'question':
-            'Ania ti nasayaat nga aramidem a sangsangkamaysa iti panagannak?',
+            'Ania ti mabalinyo nga aramiden a sangsangkamaysa bayat ti pannangan?',
         'choices': [
-          'Kumanen ken agkukuwentuan',
-          'Mangar-ay iti TV',
-          'Matulog',
-          'Ag-cellphone'
+          'Mangan ken ag sarita a ag kakadwa',
+          'Agbuya ti TV',
+          'Maturog',
+          'Agusar ti cellphone'
         ],
         'correct': 0,
-        'explanation':
-            'Nalinteg! Naraig ti kumanen a sangsangkamaysa ken magkukuwentuan.'
+        'explanation': 'Kusto! Nasayaat ti mangan ken ag sarita a ag kakadwa'
       },
       {
         'id': 'activity_weekend',
-        'question': 'Ania ti mabalin nga aramiden ti pamilya iti weekend?',
+        'question':
+            'Ania ti mabalin nga aramiden ti pamilia kadagiti Sabado ken Domingo?',
         'choices': [
-          'Agmanmano iti parke',
-          'Agbilibilang iti grocery',
-          'Aglinlinis a sangsangkamaysa',
-          'Amin dagiti naibaga'
+          'Aginana iti parke',
+          'Aggatang idiay tiendaan',
+          'Agdalus a agkakadua',
+          'Amin kadagitoy'
         ],
         'correct': 3,
         'explanation':
-            'Nalinteg! Amin nga aramiden a sangsangkamaysa ket naraig.'
+            'Kusto! Nagsayaat amin nga ar-aramiden a maaramid a ag kakadua'
       },
       {
         'id': 'activity_celebration',
-        'question': 'Ania ti aramidem ti pamilya no adda kasangay?',
+        'question': 'Ania ti ar-aramiden ti pamilia kadagiti panagkasangay?',
         'choices': [
-          'Kumanen ti kek',
-          'Mangited iti regalo',
-          'Selebrasyon a sangsangkamaysa',
-          'Amin dagiti naibaga'
+          'Mangan ti kek',
+          'Mangted iti regalo',
+          'Agrambak a agkakadua',
+          'Amin kadagitoy'
         ],
         'correct': 3,
         'explanation':
-            'Nalinteg! Ti kasangay ket selebrasyon a sangsangkamaysa!'
+            'Kusto! Dagiti panagkasangay ket rambak para iti intero a pamilia!'
       },
       {
         'id': 'activity_help',
-        'question': 'Kasano ka makatutulongen iti pamilyam?',
+        'question': 'Kasano a matulongam ti pamiliam?',
         'choices': [
-          'Agurnos iti laruan',
-          'Agwaswas',
-          'Agurnos iti pinggan',
-          'Amin dagiti naibaga'
+          'Urnosen dagiti ay-ayam',
+          'Agpunas iti datar',
+          'Ugasan dagiti pinggan',
+          'Amin kadagitoy'
         ],
         'correct': 3,
         'explanation':
-            'Nalinteg! Ti pangtulongen iti balay ket pannakaayat iti pamilya.'
+            'Kusto! Ti panangtulong iti pagtaengan ket mangipakita iti ayatmo para iti pamiliam.'
       },
     ],
   };
@@ -1476,30 +1528,30 @@ class PamilyaContent {
     'ilo': {
       'generations': [
         {
-          'title': 'Dagiti Apo (Lelong ken Leling)',
+          'title': 'Dagiti Apo (Lilong ken Lilang)',
           'color': Color(0xFF9B59B6),
           'members': [
-            {'relation': 'Lelong (ama ni Amang)', 'emoji': '👴'},
-            {'relation': 'Leling (ina ni Amang)', 'emoji': '👵'},
-            {'relation': 'Lelong (ama ni Nanang)', 'emoji': '👴'},
-            {'relation': 'Leling (ina ni Nanang)', 'emoji': '👵'},
+            {'relation': 'Lilong (tatang ni tatang)', 'emoji': '👴'},
+            {'relation': 'Lilang (nanang ni tatang)', 'emoji': '👵'},
+            {'relation': 'Lilong (tatang ni nanang)', 'emoji': '👴'},
+            {'relation': 'Lilang (nanang ni nanang)', 'emoji': '👵'},
           ]
         },
         {
           'title': 'Dagiti Nagannak',
           'color': Color(0xFF2980B9),
           'members': [
-            {'relation': 'Amang', 'emoji': '👨'},
+            {'relation': 'Tatang', 'emoji': '👨'},
             {'relation': 'Nanang', 'emoji': '👩'},
           ]
         },
         {
-          'title': 'Dagiti Kabsat',
+          'title': 'Kakabsat',
           'color': Color(0xFF27AE60),
           'members': [
             {'relation': 'Manong (panganay)', 'emoji': '🧑'},
             {'relation': 'Manang (maikadua)', 'emoji': '👧'},
-            {'relation': 'Kaungpus', 'emoji': '👶'},
+            {'relation': 'Inaudi', 'emoji': '👶'},
           ]
         },
       ]
@@ -1584,7 +1636,7 @@ class PamilyaContent {
     ],
     'ilo': [
       {
-        'name': 'Sala',
+        'name': 'Salas',
         'emoji': '🛋️',
         'activity': 'agmanmano ken mangar-ay iti TV ti pamilya',
         'color': Color(0xFFE74C3C)
@@ -1592,25 +1644,25 @@ class PamilyaContent {
       {
         'name': 'Kusina',
         'emoji': '🍳',
-        'activity': 'nagluto ken kumanen ti pamilya',
+        'activity': 'Ti pamilia ket agluto ken mangan a agkakadua',
         'color': Color(0xFFE67E22)
       },
       {
         'name': 'Kuarto',
         'emoji': '🛏️',
-        'activity': 'nagatiddog ken nagsarsarita ti pamilya',
+        'activity': 'Ti pamilia ket aginana ken agsasarita nga agkakadua',
         'color': Color(0xFF3498DB)
       },
       {
         'name': 'Banio',
         'emoji': '🚿',
-        'activity': 'naligo ken naglinabas ti pamilya',
+        'activity': 'Ti pamilia ket agdigos ken agbuggo',
         'color': Color(0xFF1ABC9C)
       },
       {
-        'name': 'Bakir',
+        'name': 'Paraangan',
         'emoji': '🌿',
-        'activity': 'naglalaruan ken nagannak iti pamilya',
+        'activity': 'Pagay-ayaman ken pagliliwaan ti oras ti pamilia.',
         'color': Color(0xFF2ECC71)
       },
     ],
@@ -1782,78 +1834,81 @@ class PamilyaContent {
     'ilo': [
       {
         'id': 'tree_1',
-        'question': 'Sino dagiti nagannak ni Amang wenno Nanang?',
+        'question': 'Sinno dagiti nagannak ni Tatang wenno ni Nanang mo?',
         'choices': [
-          'Lelong ken Leling',
-          'Tito ken Tita',
-          'Dagiti Kabsat',
-          'Dagiti Pinsan'
+          'Lilong ken Lilang',
+          'Uliteg ken Ikit',
+          'Kakabsat',
+          'Kasinsin'
         ],
         'correct': 0,
         'explanation':
-            'Nalinteg! Ni Lelong ken Leling dagiti nagannak ti nagannaktayo.'
+            'Kusto! Dagiti apong ket dagiti nagannak dagiti nagannaktayo.'
       },
       {
         'id': 'tree_2',
-        'question': 'Sino ti kaungpusan a kabsat iti pamilya?',
-        'choices': ['Manong', 'Manang', 'Kaungpus / Bunso', 'Leling'],
+        'question': 'Sinno ti kaudian a kabsat iti pamilia?',
+        'choices': ['Manong', 'Manang', 'Ubing / Inudian', 'Lilang'],
         'correct': 2,
         'explanation':
-            'Nalinteg! Ti kaungpus ket isu ti ubbing iti magkakabsat.'
+            'Kusto! Ti maladaga wenno kaubingan a kameng kadagiti kakabsat.'
       },
       {
         'id': 'tree_3',
-        'question': 'Ania ti awag iti lakay a kabsat nga kabaatan?',
-        'choices': ['Manang', 'Manong', 'Kaungpus', 'Lelong'],
+        'question':
+            'Ania ti awagmo iti in-inauna a kabsat a lalaki iti Tagalog/Filipino?',
+        'choices': ['Manang', 'Manong', 'Inaudi', 'Lilong'],
         'correct': 1,
-        'explanation': 'Nalinteg! Manong ti awag iti lakay nga kabsat.'
+        'explanation': 'Kusto! Kuya ket ti termino para ti manong'
       },
       {
         'id': 'tree_4',
-        'question': 'Ania ti awag iti babai a kabsat nga kabaatan?',
-        'choices': ['Manong', 'Manang', 'Kaungpus', 'Leling'],
+        'question':
+            'Ania ti awagmo iti in-inauna a kabsat a babai iti Tagalog/Filipino?',
+        'choices': ['Manong', 'Manang', 'Inaudi', 'Lilang'],
         'correct': 1,
-        'explanation': 'Nalinteg! Manang ti awag iti babai nga kabsat.'
+        'explanation': 'Kusto! Ate ket ti termino para ti manang'
       },
       {
         'id': 'tree_5',
         'question':
-            'Sino ti mag-alagad ken mag-ayat kadagiti ubbing iti balay?',
+            'Sinno ti mangiturong ken mangaywan kadagiti annak iti balay?',
         'choices': [
-          'Amang ken Nanang',
-          'Dagiti kabsat ti balay',
-          'Dagiti ganggannaet',
-          'Awan'
+          'Tatang ken Nanang',
+          'Karruba',
+          'Ganggannaet',
+          'Ay-ayup laeng'
         ],
         'correct': 0,
         'explanation':
-            'Nalinteg! Ni Amang ken Nanang ti mag-ayat ken mag-alagad.'
+            'Inaldaw nga iwanwan ken aywanannaka dagiti nagannak. Ipakitam ti ayatmo babaen ti panagdengngeg, panangtulong ken panangibaga iti "Agyamanak!"'
       },
       {
         'id': 'tree_6',
-        'question': 'Ania ti tsart a mag-pakita ti ugnayan ti pamilya?',
+        'question':
+            'Ania ti tsart ti mangipakita iti relasion iti sumaganad a henerasion?',
         'choices': [
-          'Punuan ti Pamilya',
-          'Lista ti laklako',
-          'Kalendaryo',
-          'Orasan'
+          'Puon ti Pamilya',
+          'Listaan ti batangan',
+          'Kalendario',
+          'Tsart ti Panawen'
         ],
         'correct': 0,
         'explanation':
-            'Nalinteg! Ti Punuan ti Pamilya ket isu ti tsart ti salinlahi.'
+            'Kusto! Ipakita ti Puon ti Pamilia dagiti henerasion ti maysa a pamilia'
       },
       {
         'id': 'tree_7',
-        'question': 'Kasano ti pangtrato kadagiti miyembro ti pamilya?',
+        'question': 'Kasano koma ti panagtitinnulong dagiti kameng ti pamilia?',
         'choices': [
-          'Ag-ayatan ken ag-respeto',
-          'Ag-apa inaldaw',
-          'Madi nga agsao',
-          'Ag-pawayway'
+          'Ti ayat ken respeto',
+          'Aga-apa',
+          'Babaen ti saan a panag pipinnansin',
+          'Agpukkaw'
         ],
         'correct': 0,
         'explanation':
-            'Nalinteg! Ti ag-ayatan ken ag-respeto ti mangpainget iti pamilya.'
+            'Kusto! Ti panagayat ken panagraem iti tunggal maysa ket mangaramid iti naragsak a pamilia.'
       },
     ],
   };
@@ -2005,64 +2060,79 @@ class PamilyaContent {
     'ilo': [
       {
         'id': 'home_1',
-        'question': 'Sadino ti paglutoan ken pag-sagana iti kanen?',
-        'choices': ['Kusina', 'Kuarto', 'Banio', 'Garahi'],
+        'question':
+            'Iti ania paset ti balay ti paglutwan ken pangisaganaan iti taraon',
+        'choices': ['Kusina', 'Kuarto', 'Banio', 'Garahe'],
         'correct': 0,
-        'explanation': 'Nalinteg! Iti kusina ti pagsagana iti kanen.'
+        'explanation':
+            'Kusto! Ti kusina ti pangisaganaan kadagiti naimas a taraon.'
       },
       {
         'id': 'home_2',
-        'question': 'Sadino ti pag-atiddog ken pag-turog?',
-        'choices': ['Kuarto', 'Kusina', 'Bakir', 'Pagan-kanan'],
+        'question':
+            'Iti ania a paset ti balay ti pagturogan ken paginanaan tayo?',
+        'choices': ['Kuarto', 'Kusina', 'Paraangan', 'Panganan'],
         'correct': 0,
-        'explanation': 'Nalinteg! Iti kuarto ti pagturog ken pagpahingaan.'
+        'explanation':
+            'Kusto! Ti kwarto ket mangmangted iti inana ken natalna a panag-turog'
       },
       {
         'id': 'home_3',
         'question':
-            'Sadino ti pagtipunan ti pamilya nga agkukuwentuan ken mangar-ay iti TV?',
-        'choices': ['Sala', 'Banio', 'Bodega', 'Kusina'],
+            'Sadino ti pag-uumongnan ti pamilia tapno agsasarita ken agbuya iti TV?',
+        'choices': ['Salas', 'Banio', 'Bodega', 'Kusina'],
         'correct': 0,
-        'explanation': 'Nalinteg! Iti sala ti pagtipunan a sangsangkamaysa.'
+        'explanation':
+            'Salas: Aginana ken agbuya iti TV a agkakadua ti pamilia.'
       },
       {
         'id': 'home_4',
-        'question': 'Sadino ti pag-ligoan ken pag-linabas ti bagyo?',
-        'choices': ['Banio', 'Sala', 'Halamanan', 'Kuarto'],
+        'question': 'Sadinno ti pag-digosantayo ken pagbuggaon tayo?',
+        'choices': ['Banio', 'Salas', 'Hardin', 'Kuarto'],
         'correct': 0,
-        'explanation': 'Nalinteg! Iti banio ti pagligoan tapno nadalus.'
+        'explanation':
+            'Kusto! Iti Banio ti panagsalimet-mettayo iti kinadalus ti bagi.'
       },
       {
         'id': 'home_5',
-        'question': 'Sadino ti mabalin nga pag-laruan a natalged iti balay?',
-        'choices': ['Bakir', 'Dalan ti sasakyan', 'Dapogan', 'Bubong'],
+        'question':
+            'Sadinno a natalged a pagay-ayaman dagiti ubbing iti ruar nga asideg iti balay?',
+        'choices': [
+          'Paraangan',
+          'Kalsada nga ado lumablabas',
+          'Kalan ti kusina',
+          'Atep'
+        ],
         'correct': 0,
-        'explanation': 'Nalinteg! Iti bakir ti natalged a paglaruan.'
+        'explanation':
+            'Kusto! Ti paraangan wenno minuyongan ket natalged a pagay-ayaman iti ruar.'
       },
       {
         'id': 'home_6',
-        'question': 'Apay nga napateg ti balaymi?',
+        'question': 'Apay a napateg unay kadatayo ti balay tayo?',
         'choices': [
-          'Mangprotekta ken mangted iti ayat iti pamilya',
-          'Tiendaan laeng',
-          'Naringgor',
-          'Awan serserbi'
+          'Sal-salaknibanna ken lin-linongan ti pamilia tayo babaen iti ayat.',
+          'Maysa laeng a tiendaan',
+          'Naariwawa daytoy',
+          'Awan gapuna'
         ],
         'correct': 0,
-        'explanation': 'Nalinteg! Ti balay ket dalan ti proteksyon ken ayat.'
+        'explanation':
+            'Kusto! Ti balay ket natalged a paglin-linongan a napno ti ayat ti pamilia.'
       },
       {
         'id': 'home_7',
-        'question': 'Kasano ti pangalagad tapno nadalus ti balaymi?',
+        'question':
+            'Kasano tayo a makatulong tapno nadalus ken nasayaat ti pagtaengantayo?',
         'choices': [
-          'Ag-tulong nga agwalis ken ag-urnos',
-          'Ag-kalat iti dalan',
-          'Mangringgor iti gamit',
+          'Tumulong nga agsagad ken mangurnos kadagiti ay-ayam.',
+          'Ibelleng ti basura iti sadinoman',
+          'Buraken dagiti bambanag',
           'Baybay-an ti laruan'
         ],
         'correct': 0,
         'explanation':
-            'Nalinteg! Ti agtulong nga aglinis ti mangpabaro iti balay.'
+            'Kusto! Ti panagtulong iti panagdalus ket mangpatalged ti balay tayo para kadagiti amin.'
       },
     ],
   };

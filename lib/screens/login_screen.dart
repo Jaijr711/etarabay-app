@@ -81,10 +81,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _biometricLogin() async {
+    final prompt = AppLocalizations.of(context)!.biometricPrompt;
     final creds =
         await BiometricService.getCredentials(BiometricService.studentKey);
     if (creds == null) return;
-    final ok = await BiometricService.authenticate('Log in to continue');
+    final ok = await BiometricService.authenticate(prompt);
     if (!ok || !mounted) return;
     _usernameController.text = creds['username'] ?? '';
     _passwordController.text = creds['password'] ?? '';
@@ -497,8 +498,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               label: Text(
                                 _biometricName.isNotEmpty
-                                    ? 'Sign in as $_biometricName'
-                                    : 'Use fingerprint / face',
+                                    ? AppLocalizations.of(context)!
+                                        .signInAs(_biometricName)
+                                    : AppLocalizations.of(context)!
+                                        .useBiometric,
                                 style: const TextStyle(
                                   color: AppColors.primary,
                                   fontWeight: FontWeight.w600,

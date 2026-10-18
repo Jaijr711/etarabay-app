@@ -188,10 +188,10 @@ class _CertificatesScreenState extends State<CertificatesScreen>
               backgroundColor: Colors.white.withOpacity(0.2),
             ),
             const SizedBox(width: 16),
-            const Expanded(
+            Expanded(
               child: Text(
-                'My Certificate',
-                style: TextStyle(
+                AppLocalizations.of(context)!.myCertificate,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -597,6 +597,8 @@ class _CertificateDetailScreenState extends State<CertificateDetailScreen>
   }
 
   Future<void> _shareCertificate() async {
+    // Read before the awaits below, while the context is certainly mounted.
+    final shareText = AppLocalizations.of(context)!.shareCertificateText;
     try {
       setState(() => _isCapturing = true);
       await Future.delayed(const Duration(milliseconds: 50));
@@ -611,7 +613,7 @@ class _CertificateDetailScreenState extends State<CertificateDetailScreen>
 
       await Share.shareXFiles(
         [XFile.fromData(bytes, name: 'certificate.png', mimeType: 'image/png')],
-        text: 'I just earned a new certificate on E-Tarabay!',
+        text: shareText,
       );
     } catch (e) {
       debugPrint('Error sharing: $e');

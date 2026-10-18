@@ -1477,10 +1477,25 @@ class _KulayScreenState extends State<KulayScreen>
     }
   }
 
-  bool _isCurrentPageSaved() {
-    if (_selectedPage == null) return false;
-    if (_editingCreation != null) return true;
-    return _myCreations.any(_selectedPage!.owns);
+  /// The newest creation colored on [page]'s current picture, if any. One
+  /// colored on a picture the page has since replaced does not count: its
+  /// colors belong to a drawing that is no longer there.
+  MyCreation? _latestCreationOn(ColoringPage page) {
+    MyCreation? latest;
+    for (final c in _myCreations) {
+      if (!page.owns(c)) continue;
+      if (c.sourcePagePath.isNotEmpty && c.sourcePagePath != page.imagePath) {
+        continue;
+      }
+      if (latest == null || c.date.isAfter(latest.date)) latest = c;
+    }
+    return latest;
+  }
+
+  /// Whether [pageName] has coloring in progress that was not saved yet.
+  Future<bool> _hasAutoSave(String pageName) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.containsKey('${_autoSaveKey(pageName)}_strokes');
   }
 
   /// A creation's title in the language the child is using now. The name
@@ -2052,9 +2067,18 @@ class _KulayScreenState extends State<KulayScreen>
             userProvider.isKulayPageCompleted(cat.name, pageIndex));
 
     return GestureDetector(
-      onTap: () {
-        // A finished page stays open: children colour the same picture over
-        // and over, and that repetition is the point of the activity.
+      onTap: () async {
+        // A page the child has saved opens with their saved colors, and Save
+        // updates that creation. It used to open blank — the in-progress
+        // copy is cleared on save — with Save turned into "View", so the
+        // saved coloring looked lost and coloring it again was never kept.
+        final saved = _latestCreationOn(page);
+        if (saved != null && !await _hasAutoSave(page.name)) {
+          if (!mounted) return;
+          _editCreation(page, saved);
+          return;
+        }
+        if (!mounted) return;
         _clearZoom();
         final oldBaked = _bakedStrokes;
         setState(() {
@@ -2070,6 +2094,8 @@ class _KulayScreenState extends State<KulayScreen>
           _coloringStartTime = DateTime.now();
           _bakedStrokes = null;
           _bakedCount = 0;
+          // Unsaved changes to a saved creation: Save updates that creation.
+          _editingCreation = saved;
         });
         oldBaked?.dispose();
         _maskCache.clear();
@@ -2576,25 +2602,16 @@ class _KulayScreenState extends State<KulayScreen>
             onTap: _confirmClearAll,
           ),
           _tBtn(
-              icon: _editingCreation != null
-                  ? LucideIcons.save
-                  : (_isCurrentPageSaved()
-                      ? LucideIcons.eye
-                      : LucideIcons.save),
+              // Always saves. On a page already saved it was "View", which
+              // only showed the old creation — coloring the page again was
+              // never kept.
+              icon: LucideIcons.save,
               label: _editingCreation != null
                   ? AppLocalizations.of(context)!.update
-                  // Was the bare English word "View" — the one label on this
-                  // screen that stayed English in every language.
-                  : (_isCurrentPageSaved()
-                      ? AppLocalizations.of(context)!.viewArtwork
-                      : AppLocalizations.of(context)!.save),
+                  : AppLocalizations.of(context)!.save,
               tint: const Color(0xFF3F9BC9),
               active: false,
-              onTap: _editingCreation != null
-                  ? _saveCreation
-                  : (_isCurrentPageSaved()
-                      ? () => setState(() => _selectedTab = 1)
-                      : _saveCreation)),
+              onTap: _saveCreation),
         ]),
       ]),
     );
@@ -2822,14 +2839,13 @@ class _KulayScreenState extends State<KulayScreen>
       Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
         child: Row(children: [
-          Text(
-              '${_myCreations.length} artwork${_myCreations.length == 1 ? '' : 's'}',
+          Text(AppLocalizations.of(context)!.artworkCount(_myCreations.length),
               style: TextStyle(
                   color: Colors.grey.shade500,
                   fontSize: 12,
                   fontWeight: FontWeight.w500)),
           const Spacer(),
-          _sc(0, 'Recent'),
+          _sc(0, AppLocalizations.of(context)!.sortRecent),
           const SizedBox(width: 6),
           _sc(1, 'A–Z'),
         ]),
@@ -3160,7 +3176,13 @@ class _KulayScreenState extends State<KulayScreen>
     final samePicture = creation.sourcePagePath.isEmpty ||
         creation.sourcePagePath == page.imagePath;
     final hasFill = creation.fillImage.isNotEmpty;
-    final useStrokes = samePicture && (hasFill || creation.base64Image.isEmpty);
+    // Saved with its canvas size: strokes and fills are kept apart, and one
+    // with no fill simply had none. It was taken for an old creation, so a
+    // brush-only drawing reopened as its small blurred copy with its strokes
+    // gone, and every edit was made on top of that copy.
+    final keepsParts = hasFill || creation.canvasSide > 0;
+    final useStrokes =
+        samePicture && (keepsParts || creation.base64Image.isEmpty);
     _clearZoom();
     final oldBaked = _bakedStrokes;
     setState(() {
@@ -3190,7 +3212,9 @@ class _KulayScreenState extends State<KulayScreen>
         return;
       }
       final base = _baseImage;
-      final source = hasFill ? creation.fillImage : creation.base64Image;
+      final source = hasFill
+          ? creation.fillImage
+          : (keepsParts ? '' : creation.base64Image);
       if (base != null && source.isNotEmpty) {
         try {
           var picture = img.decodeImage(base64Decode(source));

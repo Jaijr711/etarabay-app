@@ -781,13 +781,13 @@ abstract class AppLocalizations {
   /// No description provided for @upper.
   ///
   /// In en, this message translates to:
-  /// **'Upper'**
+  /// **'Capital Letter'**
   String get upper;
 
   /// No description provided for @lower.
   ///
   /// In en, this message translates to:
-  /// **'Lower'**
+  /// **'Small Letter'**
   String get lower;
 
   /// No description provided for @pointsLabel.
@@ -805,13 +805,13 @@ abstract class AppLocalizations {
   /// No description provided for @uppercase.
   ///
   /// In en, this message translates to:
-  /// **'Uppercase'**
+  /// **'Capital Letter'**
   String get uppercase;
 
   /// No description provided for @lowercase.
   ///
   /// In en, this message translates to:
-  /// **'Lowercase'**
+  /// **'Small Letter'**
   String get lowercase;
 
   /// No description provided for @numbers.
@@ -1592,7 +1592,7 @@ abstract class AppLocalizations {
   /// No description provided for @uppercaseLettersTitle.
   ///
   /// In en, this message translates to:
-  /// **'Uppercase Letters (A–Z)'**
+  /// **'Capital Letters (A–Z)'**
   String get uppercaseLettersTitle;
 
   /// No description provided for @lowercaseLettersTitle.
@@ -2188,12 +2188,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{earned} earned, {remaining} waiting to be claimed!'**
   String awardsWaiting(int earned, int remaining);
-
-  /// Button that opens an already-saved drawing
-  ///
-  /// In en, this message translates to:
-  /// **'View'**
-  String get viewArtwork;
 
   /// Smallest of the three brush sizes
   ///
@@ -3106,6 +3100,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Number'**
   String get numberWord;
+
+  /// Title of the certificate screen
+  ///
+  /// In en, this message translates to:
+  /// **'My Certificate'**
+  String get myCertificate;
+
+  /// Text sent along with a shared certificate
+  ///
+  /// In en, this message translates to:
+  /// **'I just earned a new certificate on E-Tarabay!'**
+  String get shareCertificateText;
+
+  /// Under the score in the lesson result
+  ///
+  /// In en, this message translates to:
+  /// **'Score'**
+  String get scoreLabel;
+
+  /// Result pill for three stars; the part before • is the count
+  ///
+  /// In en, this message translates to:
+  /// **'3/3 Stars • Perfect Score! Outstanding!'**
+  String get starSummary3;
+
+  /// Result pill for two stars
+  ///
+  /// In en, this message translates to:
+  /// **'2/3 Stars • 1 empty star remaining.'**
+  String get starSummary2;
+
+  /// Result pill for one star
+  ///
+  /// In en, this message translates to:
+  /// **'1/3 Star • 2 empty stars remaining.'**
+  String get starSummary1;
+
+  /// Result pill for no stars
+  ///
+  /// In en, this message translates to:
+  /// **'0/3 Stars'**
+  String get starSummary0;
+
+  /// A star and what earns it, in the star breakdown
+  ///
+  /// In en, this message translates to:
+  /// **'Star {starNumber}: {title}'**
+  String starNumberTitle(String starNumber, String title);
+
+  /// Tag on a star that was earned
+  ///
+  /// In en, this message translates to:
+  /// **'Earned'**
+  String get starEarned;
+
+  /// Tag on a star not earned yet
+  ///
+  /// In en, this message translates to:
+  /// **'Empty'**
+  String get starEmpty;
+
+  /// How many artworks the child has saved
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 artwork} other{{count} artworks}}'**
+  String artworkCount(int count);
+
+  /// Sort the saved artworks newest first
+  ///
+  /// In en, this message translates to:
+  /// **'Recent'**
+  String get sortRecent;
+
+  /// Overall grade, 90% and up
+  ///
+  /// In en, this message translates to:
+  /// **'Outstanding'**
+  String get gradeOutstanding;
+
+  /// Overall grade, 80% and up
+  ///
+  /// In en, this message translates to:
+  /// **'Very Satisfactory'**
+  String get gradeVerySatisfactory;
+
+  /// Overall grade, 75% and up
+  ///
+  /// In en, this message translates to:
+  /// **'Satisfactory'**
+  String get gradeSatisfactory;
+
+  /// Overall grade, under 75%
+  ///
+  /// In en, this message translates to:
+  /// **'Developing'**
+  String get gradeDeveloping;
+
+  /// Shown by the phone while it reads the fingerprint
+  ///
+  /// In en, this message translates to:
+  /// **'Log in to continue'**
+  String get biometricPrompt;
+
+  /// Fingerprint button with the saved child's name
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in as {name}'**
+  String signInAs(String name);
+
+  /// Field label
+  ///
+  /// In en, this message translates to:
+  /// **'Current password'**
+  String get currentPassword;
+
+  /// Field label
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get newPassword;
+
+  /// Field label
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm new password'**
+  String get confirmNewPassword;
+
+  /// Error
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your current password.'**
+  String get enterCurrentPassword;
+
+  /// Error
+  ///
+  /// In en, this message translates to:
+  /// **'New passwords do not match.'**
+  String get newPasswordsDoNotMatch;
+
+  /// Error
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to change.'**
+  String get nothingToChange;
+
+  /// Error
+  ///
+  /// In en, this message translates to:
+  /// **'Current password is incorrect.'**
+  String get currentPasswordIncorrect;
+
+  /// Teacher settings section
+  ///
+  /// In en, this message translates to:
+  /// **'Audio'**
+  String get sectionAudio;
+
+  /// Teacher settings section
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get sectionAccount;
+
+  /// Teacher settings section
+  ///
+  /// In en, this message translates to:
+  /// **'Classroom'**
+  String get sectionClassroom;
+
+  /// Under the fingerprint switch in teacher settings
+  ///
+  /// In en, this message translates to:
+  /// **'Skip typing your password next time'**
+  String get skipPasswordNextTime;
+
+  /// Teacher login error
+  ///
+  /// In en, this message translates to:
+  /// **'Your password changed. Please sign in with your password once.'**
+  String get teacherPasswordChanged;
+
+  /// Teacher login error
+  ///
+  /// In en, this message translates to:
+  /// **'Teacher account not set up yet. Please connect to the internet once to finish setup.'**
+  String get teacherNotSetUp;
+
+  /// Teacher login error
+  ///
+  /// In en, this message translates to:
+  /// **'Could not verify credentials. If this is your first login, please connect to the internet once.'**
+  String get teacherCannotVerify;
+
+  /// Teacher dashboard banner
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Birthday today!} other{{count} birthdays today!}}'**
+  String birthdayToday(int count);
+
+  /// Quote on the welcome screen
+  ///
+  /// In en, this message translates to:
+  /// **'“Live as if you were to die tomorrow. Learn as if you were to live forever.”\n― Mahatma Gandhi'**
+  String get onboardingQuote;
+
+  /// The tune of a song that is a recording, not a known melody
+  ///
+  /// In en, this message translates to:
+  /// **'Audio Recording'**
+  String get audioRecordingTune;
 }
 
 class _AppLocalizationsDelegate

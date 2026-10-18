@@ -231,7 +231,7 @@ class _TandaanScreenState extends State<TandaanScreen>
     {
       'title_en': 'Shapes',
       'title_tl': 'Hugis',
-      'title_il': 'Hugis',
+      'title_il': 'Suksukog',
       'color': AppColors.shapes,
       'pairs': [
         {
@@ -243,19 +243,19 @@ class _TandaanScreenState extends State<TandaanScreen>
           'emoji': '⚪',
           'label_en': 'Circle',
           'label_tl': 'Bilog',
-          'label_il': 'Bilog'
+          'label_il': 'Sirkulo'
         },
         {
           'emoji': '🟦',
           'label_en': 'Square',
           'label_tl': 'Parisukat',
-          'label_il': 'Parisukat'
+          'label_il': 'Kudrado'
         },
         {
           'emoji': '🔺',
           'label_en': 'Triangle',
           'label_tl': 'Tatsulok',
-          'label_il': 'Tatsulok'
+          'label_il': 'Trianggulo'
         },
         {
           'emoji': '⭐',

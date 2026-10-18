@@ -2187,13 +2187,34 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
     );
   }
 
+  /// The grade in the reader's language. Progress keeps it as the English
+  /// word — a sibling's comes from the cloud that way too — so it is turned
+  /// into words here, where it is shown.
+  String _gradeLabel(String grade) {
+    final loc = AppLocalizations.of(context)!;
+    switch (grade) {
+      case 'Outstanding':
+        return loc.gradeOutstanding;
+      case 'Very Satisfactory':
+        return loc.gradeVerySatisfactory;
+      case 'Satisfactory':
+        return loc.gradeSatisfactory;
+      case 'Developing':
+        return loc.gradeDeveloping;
+      case 'Not Started':
+        return loc.notStartedYet;
+      default:
+        return grade;
+    }
+  }
+
   /// Stars, badges and the overall grade, at the top of the report.
   Widget _parentSummary() {
     final userProvider = Provider.of<UserProvider>(context);
 
     // Everything here follows whoever is selected above.
     final progress = _shownProgress;
-    final grade = (progress['grade'] ?? '').toString();
+    final grade = _gradeLabel((progress['grade'] ?? '').toString());
     final percent = (progress['percentage'] as num?)?.toDouble() ?? 0;
     final stars = _siblingId != null
         ? ((progress['totalStars'] as num?)?.toInt() ?? 0)

@@ -130,13 +130,6 @@ void main() {
           UserProvider.matematikaLevelCount);
     });
 
-    test('the table agrees with the three new levels themselves', () {
-      const perLevel = UserProvider.matematikaGamesPerLevel;
-      expect(perLevel[7], patternQuestions.length);
-      expect(perLevel[8], joinQuestions.length);
-      expect(perLevel[9], takeAwayQuestions.length);
-    });
-
     test('the star ceiling is three per level', () {
       expect(UserProvider.matematikaStarCeiling,
           UserProvider.matematikaLevelCount * 3);

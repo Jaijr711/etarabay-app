@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
+import '../services/auth_messages.dart';
 import '../services/auth_service.dart';
 import '../services/biometric_service.dart';
 import '../utils/constants.dart';
@@ -102,16 +103,18 @@ class _ParentAccountScreenState extends State<ParentAccountScreen> {
     final confirm = _confirmCtrl.text.trim();
 
     if (username.isEmpty) {
-      _snack(AppLocalizations.of(context)!.usernameEmpty, LucideIcons.circle_alert, Colors.red);
+      _snack(AppLocalizations.of(context)!.usernameEmpty,
+          LucideIcons.circle_alert, Colors.red);
       return;
     }
     if (newPass.isNotEmpty && newPass != confirm) {
-      _snack(AppLocalizations.of(context)!.passwordsDoNotMatch, LucideIcons.circle_alert, Colors.red);
+      _snack(AppLocalizations.of(context)!.passwordsDoNotMatch,
+          LucideIcons.circle_alert, Colors.red);
       return;
     }
     if (newPass.isNotEmpty && newPass.length < 4) {
-      _snack(AppLocalizations.of(context)!.authPasswordTooShort, LucideIcons.circle_alert,
-          Colors.red);
+      _snack(AppLocalizations.of(context)!.authPasswordTooShort,
+          LucideIcons.circle_alert, Colors.red);
       return;
     }
 
@@ -126,8 +129,14 @@ class _ParentAccountScreenState extends State<ParentAccountScreen> {
     setState(() => _saving = false);
 
     if (result['status'] != 'Success') {
-      _snack(result['message']?.toString() ?? 'Could not save changes.',
-          LucideIcons.circle_alert, Colors.red);
+      // In the reader's language; the service's own sentence is English.
+      final message = authMessage(context, result);
+      _snack(
+          message.isNotEmpty
+              ? message
+              : AppLocalizations.of(context)!.authSaveFailed,
+          LucideIcons.circle_alert,
+          Colors.red);
       return;
     }
 
@@ -141,18 +150,20 @@ class _ParentAccountScreenState extends State<ParentAccountScreen> {
             : ((await BiometricService.getCredentials(
                     BiometricService.studentKey))?['password'] ??
                 ''),
-        extra: {'name': Provider.of<UserProvider>(context, listen: false)
-                .userProfile
-                ?.name ??
-            ''},
+        extra: {
+          'name': Provider.of<UserProvider>(context, listen: false)
+                  .userProfile
+                  ?.name ??
+              ''
+        },
       );
     }
 
     _newPassCtrl.clear();
     _confirmCtrl.clear();
-    _snack(AppLocalizations.of(context)!.credentialsUpdated, LucideIcons.circle_check, AppColors.success);
+    _snack(AppLocalizations.of(context)!.credentialsUpdated,
+        LucideIcons.circle_check, AppColors.success);
   }
-
 
   /// Changing the code that opens this report.
   ///
@@ -251,8 +262,7 @@ class _ParentAccountScreenState extends State<ParentAccountScreen> {
       slot: BiometricService.studentKey,
       passwordLabel: loc.confirmChildStudentNumber,
       numericPassword: true,
-      verify: (password) =>
-          _authService.verifyStudentPassword(id, password),
+      verify: (password) => _authService.verifyStudentPassword(id, password),
       wrongPasswordMessage: loc.studentNumberIncorrect,
       credentials: (_) async => {
         'username': _usernameCtrl.text.trim(),
@@ -319,13 +329,13 @@ class _ParentAccountScreenState extends State<ParentAccountScreen> {
                           child: OutlinedButton.icon(
                             onPressed: _changeParentCode,
                             icon: const Icon(LucideIcons.key_round, size: 18),
-                            label: Text(AppLocalizations.of(context)!.changeCode),
+                            label:
+                                Text(AppLocalizations.of(context)!.changeCode),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppColors.primary,
                               side: BorderSide(
                                   color: AppColors.primary.withOpacity(0.4)),
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 13),
+                              padding: const EdgeInsets.symmetric(vertical: 13),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14)),
                             ),
@@ -340,7 +350,9 @@ class _ParentAccountScreenState extends State<ParentAccountScreen> {
                       children: [
                         TextField(
                           controller: _usernameCtrl,
-                          decoration: _deco('Username', LucideIcons.user),
+                          decoration: _deco(
+                              AppLocalizations.of(context)!.username,
+                              LucideIcons.user),
                         ),
                         const SizedBox(height: 12),
                         TextField(
@@ -348,7 +360,8 @@ class _ParentAccountScreenState extends State<ParentAccountScreen> {
                           obscureText: _obscure,
                           keyboardType: TextInputType.number,
                           decoration: _deco(
-                            AppLocalizations.of(context)!.newPasswordStudentNumber,
+                            AppLocalizations.of(context)!
+                                .newPasswordStudentNumber,
                             LucideIcons.lock,
                             suffix: IconButton(
                               icon: Icon(
@@ -367,7 +380,8 @@ class _ParentAccountScreenState extends State<ParentAccountScreen> {
                           obscureText: _obscure,
                           keyboardType: TextInputType.number,
                           decoration: _deco(
-                              'Confirm new password', LucideIcons.lock),
+                              AppLocalizations.of(context)!.confirmNewPassword,
+                              LucideIcons.lock),
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -394,9 +408,10 @@ class _ParentAccountScreenState extends State<ParentAccountScreen> {
                                     height: 20,
                                     child: CircularProgressIndicator(
                                         strokeWidth: 2, color: Colors.white))
-                                : Text(AppLocalizations.of(context)!.saveChanges,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600)),
+                                : Text(
+                                    AppLocalizations.of(context)!.saveChanges,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w600)),
                           ),
                         ),
                       ],
@@ -419,8 +434,10 @@ class _ParentAccountScreenState extends State<ParentAccountScreen> {
                               child: const Icon(LucideIcons.fingerprint_pattern,
                                   color: AppColors.primary, size: 20),
                             ),
-                            title: Text(AppLocalizations.of(context)!.biometricLogin),
-                            subtitle: Text(AppLocalizations.of(context)!.childLoginNote),
+                            title: Text(
+                                AppLocalizations.of(context)!.biometricLogin),
+                            subtitle: Text(
+                                AppLocalizations.of(context)!.childLoginNote),
                             value: _biometricEnabled,
                             onChanged: _toggleBiometric,
                           ),

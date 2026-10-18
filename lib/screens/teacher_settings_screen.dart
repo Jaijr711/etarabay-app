@@ -176,15 +176,18 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
               final confirm = confirmCtrl.text.trim();
 
               if (current.isEmpty) {
-                setDialogState(() => error = 'Enter your current password.');
+                setDialogState(() =>
+                    error = AppLocalizations.of(context)!.enterCurrentPassword);
                 return;
               }
               if (newPass.isNotEmpty && newPass != confirm) {
-                setDialogState(() => error = 'New passwords do not match.');
+                setDialogState(() => error =
+                    AppLocalizations.of(context)!.newPasswordsDoNotMatch);
                 return;
               }
               if (newUser.isEmpty && newPass.isEmpty) {
-                setDialogState(() => error = 'Nothing to change.');
+                setDialogState(() =>
+                    error = AppLocalizations.of(context)!.nothingToChange);
                 return;
               }
 
@@ -197,7 +200,8 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
               if (!ok) {
                 setDialogState(() {
                   busy = false;
-                  error = 'Current password is incorrect.';
+                  error =
+                      AppLocalizations.of(context)!.currentPasswordIncorrect;
                 });
                 return;
               }
@@ -254,7 +258,9 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
                   TextField(
                     controller: currentCtrl,
                     obscureText: true,
-                    decoration: deco('Current password', LucideIcons.lock),
+                    decoration: deco(
+                        AppLocalizations.of(context)!.currentPassword,
+                        LucideIcons.lock),
                   ),
                   const SizedBox(height: 12),
                   TextField(
@@ -265,7 +271,8 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
                   TextField(
                     controller: newPassCtrl,
                     obscureText: obscure,
-                    decoration: deco('New password', LucideIcons.lock_keyhole,
+                    decoration: deco(AppLocalizations.of(context)!.newPassword,
+                        LucideIcons.lock_keyhole,
                         suffix: IconButton(
                           icon: Icon(
                               obscure ? LucideIcons.eye_off : LucideIcons.eye,
@@ -278,8 +285,9 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
                   TextField(
                     controller: confirmCtrl,
                     obscureText: obscure,
-                    decoration:
-                        deco('Confirm new password', LucideIcons.lock_keyhole),
+                    decoration: deco(
+                        AppLocalizations.of(context)!.confirmNewPassword,
+                        LucideIcons.lock_keyhole),
                   ),
                   if (error != null) ...[
                     const SizedBox(height: 12),
@@ -503,7 +511,7 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _sectionHeader('Audio'),
+                    _sectionHeader(AppLocalizations.of(context)!.sectionAudio),
                     Card.filled(
                       clipBehavior: Clip.antiAlias,
                       child: Column(
@@ -566,7 +574,8 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _sectionHeader('Account'),
+                    _sectionHeader(
+                        AppLocalizations.of(context)!.sectionAccount),
                     Card.filled(
                       clipBehavior: Clip.antiAlias,
                       child: Column(
@@ -589,8 +598,8 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
                                   icon: LucideIcons.fingerprint_pattern),
                               title: Text(
                                   AppLocalizations.of(context)!.biometricLogin),
-                              subtitle: const Text(
-                                  'Skip typing your password next time'),
+                              subtitle: Text(AppLocalizations.of(context)!
+                                  .skipPasswordNextTime),
                               value: _biometricEnabled,
                               onChanged: _toggleBiometric,
                             ),
@@ -607,7 +616,8 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _sectionHeader('Classroom'),
+                    _sectionHeader(
+                        AppLocalizations.of(context)!.sectionClassroom),
                     Card.filled(
                       clipBehavior: Clip.antiAlias,
                       child: Column(
@@ -646,7 +656,7 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _sectionHeader('About'),
+                    _sectionHeader(AppLocalizations.of(context)!.about),
                     Card.filled(
                       clipBehavior: Clip.antiAlias,
                       child: ListTile(

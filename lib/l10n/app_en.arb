@@ -176,12 +176,12 @@
   "undo": "Undo",
   "redo": "Redo",
   "clear": "Clear",
-  "upper": "Upper",
-  "lower": "Lower",
+  "upper": "Capital Letter",
+  "lower": "Small Letter",
   "pointsLabel": "Points",
   "ulitin": "Repeat",
-  "uppercase": "Uppercase",
-  "lowercase": "Lowercase",
+  "uppercase": "Capital Letter",
+  "lowercase": "Small Letter",
   "numbers": "Numbers",
   "letter": "Letter {letter}",
   "@letter": {
@@ -370,7 +370,7 @@
   "poemLabel": "Poem",
   "storyLabel": "Story",
   "songLabel": "Song",
-  "uppercaseLettersTitle": "Uppercase Letters (A–Z)",
+  "uppercaseLettersTitle": "Capital Letters (A–Z)",
   "lowercaseLettersTitle": "Lowercase Letters (a–z)",
   "numbersTitle": "Numbers (1–10)",
   "levelComplete": "Level {level} Complete!",
@@ -517,10 +517,6 @@
         "type": "int"
       }
     }
-  },
-  "viewArtwork": "View",
-  "@viewArtwork": {
-    "description": "Button that opens an already-saved drawing"
   },
   "brushSmall": "Small",
   "@brushSmall": {
@@ -1167,5 +1163,168 @@
   "resetActivitiesDone": "The selected activities were reset.",
   "resetActivitiesFailed": "The activities could not be reset. Please try again.",
   "letterWord": "Letter",
-  "numberWord": "Number"
+  "numberWord": "Number",
+  "myCertificate": "My Certificate",
+  "@myCertificate": {
+    "description": "Title of the certificate screen"
+  },
+  "shareCertificateText": "I just earned a new certificate on E-Tarabay!",
+  "@shareCertificateText": {
+    "description": "Text sent along with a shared certificate"
+  },
+  "scoreLabel": "Score",
+  "@scoreLabel": {
+    "description": "Under the score in the lesson result"
+  },
+  "starSummary3": "3/3 Stars • Perfect Score! Outstanding!",
+  "@starSummary3": {
+    "description": "Result pill for three stars; the part before • is the count"
+  },
+  "starSummary2": "2/3 Stars • 1 empty star remaining.",
+  "@starSummary2": {
+    "description": "Result pill for two stars"
+  },
+  "starSummary1": "1/3 Star • 2 empty stars remaining.",
+  "@starSummary1": {
+    "description": "Result pill for one star"
+  },
+  "starSummary0": "0/3 Stars",
+  "@starSummary0": {
+    "description": "Result pill for no stars"
+  },
+  "starNumberTitle": "Star {starNumber}: {title}",
+  "@starNumberTitle": {
+    "description": "A star and what earns it, in the star breakdown",
+    "placeholders": {
+      "starNumber": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "starEarned": "Earned",
+  "@starEarned": {
+    "description": "Tag on a star that was earned"
+  },
+  "starEmpty": "Empty",
+  "@starEmpty": {
+    "description": "Tag on a star not earned yet"
+  },
+  "artworkCount": "{count, plural, =1{1 artwork} other{{count} artworks}}",
+  "@artworkCount": {
+    "description": "How many artworks the child has saved",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sortRecent": "Recent",
+  "@sortRecent": {
+    "description": "Sort the saved artworks newest first"
+  },
+  "gradeOutstanding": "Outstanding",
+  "@gradeOutstanding": {
+    "description": "Overall grade, 90% and up"
+  },
+  "gradeVerySatisfactory": "Very Satisfactory",
+  "@gradeVerySatisfactory": {
+    "description": "Overall grade, 80% and up"
+  },
+  "gradeSatisfactory": "Satisfactory",
+  "@gradeSatisfactory": {
+    "description": "Overall grade, 75% and up"
+  },
+  "gradeDeveloping": "Developing",
+  "@gradeDeveloping": {
+    "description": "Overall grade, under 75%"
+  },
+  "biometricPrompt": "Log in to continue",
+  "@biometricPrompt": {
+    "description": "Shown by the phone while it reads the fingerprint"
+  },
+  "signInAs": "Sign in as {name}",
+  "@signInAs": {
+    "description": "Fingerprint button with the saved child's name",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "currentPassword": "Current password",
+  "@currentPassword": {
+    "description": "Field label"
+  },
+  "newPassword": "New password",
+  "@newPassword": {
+    "description": "Field label"
+  },
+  "confirmNewPassword": "Confirm new password",
+  "@confirmNewPassword": {
+    "description": "Field label"
+  },
+  "enterCurrentPassword": "Enter your current password.",
+  "@enterCurrentPassword": {
+    "description": "Error"
+  },
+  "newPasswordsDoNotMatch": "New passwords do not match.",
+  "@newPasswordsDoNotMatch": {
+    "description": "Error"
+  },
+  "nothingToChange": "Nothing to change.",
+  "@nothingToChange": {
+    "description": "Error"
+  },
+  "currentPasswordIncorrect": "Current password is incorrect.",
+  "@currentPasswordIncorrect": {
+    "description": "Error"
+  },
+  "sectionAudio": "Audio",
+  "@sectionAudio": {
+    "description": "Teacher settings section"
+  },
+  "sectionAccount": "Account",
+  "@sectionAccount": {
+    "description": "Teacher settings section"
+  },
+  "sectionClassroom": "Classroom",
+  "@sectionClassroom": {
+    "description": "Teacher settings section"
+  },
+  "skipPasswordNextTime": "Skip typing your password next time",
+  "@skipPasswordNextTime": {
+    "description": "Under the fingerprint switch in teacher settings"
+  },
+  "teacherPasswordChanged": "Your password changed. Please sign in with your password once.",
+  "@teacherPasswordChanged": {
+    "description": "Teacher login error"
+  },
+  "teacherNotSetUp": "Teacher account not set up yet. Please connect to the internet once to finish setup.",
+  "@teacherNotSetUp": {
+    "description": "Teacher login error"
+  },
+  "teacherCannotVerify": "Could not verify credentials. If this is your first login, please connect to the internet once.",
+  "@teacherCannotVerify": {
+    "description": "Teacher login error"
+  },
+  "birthdayToday": "{count, plural, =1{Birthday today!} other{{count} birthdays today!}}",
+  "@birthdayToday": {
+    "description": "Teacher dashboard banner",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingQuote": "“Live as if you were to die tomorrow. Learn as if you were to live forever.”\n― Mahatma Gandhi",
+  "@onboardingQuote": {
+    "description": "Quote on the welcome screen"
+  },
+  "audioRecordingTune": "Audio Recording",
+  "@audioRecordingTune": {
+    "description": "The tune of a song that is a recording, not a known melody"
+  }
 }

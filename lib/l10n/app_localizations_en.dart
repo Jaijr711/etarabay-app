@@ -369,10 +369,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clear => 'Clear';
 
   @override
-  String get upper => 'Upper';
+  String get upper => 'Capital Letter';
 
   @override
-  String get lower => 'Lower';
+  String get lower => 'Small Letter';
 
   @override
   String get pointsLabel => 'Points';
@@ -381,10 +381,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ulitin => 'Repeat';
 
   @override
-  String get uppercase => 'Uppercase';
+  String get uppercase => 'Capital Letter';
 
   @override
-  String get lowercase => 'Lowercase';
+  String get lowercase => 'Small Letter';
 
   @override
   String get numbers => 'Numbers';
@@ -803,7 +803,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get songLabel => 'Song';
 
   @override
-  String get uppercaseLettersTitle => 'Uppercase Letters (A–Z)';
+  String get uppercaseLettersTitle => 'Capital Letters (A–Z)';
 
   @override
   String get lowercaseLettersTitle => 'Lowercase Letters (a–z)';
@@ -1131,9 +1131,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String awardsWaiting(int earned, int remaining) {
     return '$earned earned, $remaining waiting to be claimed!';
   }
-
-  @override
-  String get viewArtwork => 'View';
 
   @override
   String get brushSmall => 'Small';
@@ -1641,4 +1638,134 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get numberWord => 'Number';
+
+  @override
+  String get myCertificate => 'My Certificate';
+
+  @override
+  String get shareCertificateText =>
+      'I just earned a new certificate on E-Tarabay!';
+
+  @override
+  String get scoreLabel => 'Score';
+
+  @override
+  String get starSummary3 => '3/3 Stars • Perfect Score! Outstanding!';
+
+  @override
+  String get starSummary2 => '2/3 Stars • 1 empty star remaining.';
+
+  @override
+  String get starSummary1 => '1/3 Star • 2 empty stars remaining.';
+
+  @override
+  String get starSummary0 => '0/3 Stars';
+
+  @override
+  String starNumberTitle(String starNumber, String title) {
+    return 'Star $starNumber: $title';
+  }
+
+  @override
+  String get starEarned => 'Earned';
+
+  @override
+  String get starEmpty => 'Empty';
+
+  @override
+  String artworkCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count artworks',
+      one: '1 artwork',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sortRecent => 'Recent';
+
+  @override
+  String get gradeOutstanding => 'Outstanding';
+
+  @override
+  String get gradeVerySatisfactory => 'Very Satisfactory';
+
+  @override
+  String get gradeSatisfactory => 'Satisfactory';
+
+  @override
+  String get gradeDeveloping => 'Developing';
+
+  @override
+  String get biometricPrompt => 'Log in to continue';
+
+  @override
+  String signInAs(String name) {
+    return 'Sign in as $name';
+  }
+
+  @override
+  String get currentPassword => 'Current password';
+
+  @override
+  String get newPassword => 'New password';
+
+  @override
+  String get confirmNewPassword => 'Confirm new password';
+
+  @override
+  String get enterCurrentPassword => 'Enter your current password.';
+
+  @override
+  String get newPasswordsDoNotMatch => 'New passwords do not match.';
+
+  @override
+  String get nothingToChange => 'Nothing to change.';
+
+  @override
+  String get currentPasswordIncorrect => 'Current password is incorrect.';
+
+  @override
+  String get sectionAudio => 'Audio';
+
+  @override
+  String get sectionAccount => 'Account';
+
+  @override
+  String get sectionClassroom => 'Classroom';
+
+  @override
+  String get skipPasswordNextTime => 'Skip typing your password next time';
+
+  @override
+  String get teacherPasswordChanged =>
+      'Your password changed. Please sign in with your password once.';
+
+  @override
+  String get teacherNotSetUp =>
+      'Teacher account not set up yet. Please connect to the internet once to finish setup.';
+
+  @override
+  String get teacherCannotVerify =>
+      'Could not verify credentials. If this is your first login, please connect to the internet once.';
+
+  @override
+  String birthdayToday(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count birthdays today!',
+      one: 'Birthday today!',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onboardingQuote =>
+      '“Live as if you were to die tomorrow. Learn as if you were to live forever.”\n― Mahatma Gandhi';
+
+  @override
+  String get audioRecordingTune => 'Audio Recording';
 }

@@ -248,8 +248,8 @@ class TeacherTools extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(success
-                ? 'Activity progress reset successfully.'
-                : 'Failed to reset progress.'),
+                ? AppLocalizations.of(context)!.resetActivitiesDone
+                : AppLocalizations.of(context)!.resetActivitiesFailed),
             backgroundColor: success ? Colors.green : Colors.red,
           ),
         );

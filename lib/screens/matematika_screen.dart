@@ -201,6 +201,8 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   final List<Map<String, dynamic>> _game1Levels = const [
     {
       'question_en': 'How many apples can you count?',
+      'question_tl': 'Ilan ang mansanas?',
+      'question_il': 'Mano dagiti mansanas, mabalin kadi nga bilangem?',
       'item_name_en': 'apples',
       'item_name_il': 'mansanas',
       'item_name_tl': 'mansanas',
@@ -210,6 +212,8 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     },
     {
       'question_en': 'How many bananas can you count?',
+      'question_tl': 'Ilang saging ang nabilang mo?',
+      'question_il': 'Mano dagiti saba, mabalin kadi nga bilangem?',
       'item_name_en': 'bananas',
       'item_name_il': 'saging',
       'item_name_tl': 'saging',
@@ -219,6 +223,8 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     },
     {
       'question_en': 'How many dogs can you count?',
+      'question_tl': 'Ilang aso ang nabilang mo?',
+      'question_il': 'Mano iti aso, mabalin kadi nga bilangem?',
       'item_name_en': 'dogs',
       'item_name_il': 'aso',
       'item_name_tl': 'aso',
@@ -228,6 +234,8 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     },
     {
       'question_en': 'How many fish do you count?',
+      'question_tl': 'Ilang isda ang nabilang mo?',
+      'question_il': 'Mano dagiti ikan, mabalin kadi nga bilangem?',
       'item_name_en': 'fish',
       'item_name_il': 'isda',
       'item_name_tl': 'isda',
@@ -237,6 +245,8 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     },
     {
       'question_en': 'How many birds you count?',
+      'question_tl': 'Ilang ibon ang nabilang mo?',
+      'question_il': 'Mano dagiti billit, mabalin kadi nga bilangem?',
       'item_name_en': 'birds',
       'item_name_il': 'billit',
       'item_name_tl': 'ibon',
@@ -905,8 +915,9 @@ class _MatematikaScreenState extends State<MatematikaScreen>
         : (lang.currentLanguage == 'fil' ? 'item_name_tl' : 'item_name_en');
     // The validated English question, written out per board. It sat in the
     // data unused while the screen showed the generic "How many {item}?".
-    final english = game['question_en'] as String?;
-    if (key == 'item_name_en' && english != null) return english;
+    // And the validated Filipino and Ilokano ones beside it.
+    final written = game[key.replaceFirst('item_name', 'question')] as String?;
+    if (written != null) return written;
     return AppLocalizations.of(context)!.howMany(game[key] ?? 'items');
   }
 

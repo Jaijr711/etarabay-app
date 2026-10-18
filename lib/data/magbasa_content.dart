@@ -500,7 +500,7 @@ class MagbasaContent {
       'action': {
         'en': 'Wave hands and dance',
         'fil': 'Ikaway ang mga kamay at sumayaw',
-        'ilo': 'Iwagayway dagiti imam ket agsala',
+        'ilo': 'Iwagayway dagiti imam ken agsala',
       },
     },
     'uppat_a_pato': {
@@ -568,7 +568,7 @@ class MagbasaContent {
       'action': {
         'en': 'Show your hands and clap',
         'fil': 'Ipakita ang mga kamay at pumalakpak',
-        'ilo': 'Ipakitam dagiti imam ket agpalakpak',
+        'ilo': 'Ipakitam dagiti imam ken agpalakpak',
       },
     },
     'bassit_a_lawwalawwa': {
@@ -592,7 +592,7 @@ class MagbasaContent {
       'action': {
         'en': 'Spider hand movements climbing up',
         'fil': 'Gayahin ang gagambang umaakyat gamit ang mga kamay',
-        'ilo': 'Tuladem ti lawwalawwa nga umuli babaen dagiti imam',
+        'ilo': 'Dagiti tignay ti ima ti lawalawa a pumangato.',
       },
     },
     'maysa_dua_baduya': {
@@ -659,7 +659,7 @@ class MagbasaContent {
       'action': {
         'en': 'Hug yourself and sway',
         'fil': 'Yakapin ang sarili at umindayog',
-        'ilo': 'Arakupem ta bagim ket agindayon',
+        'ilo': 'Arakupem ti bagim ket agkiling-kiling.',
       },
     },
     'da_tarong': {
@@ -724,7 +724,7 @@ class MagbasaContent {
       'action': {
         'en': 'Planting motion',
         'fil': 'Gayahin ang pagtatanim',
-        'ilo': 'Tuladem ti panagmula',
+        'ilo': 'Tignay ti panagmula',
       },
     },
     'lima_a_tinapay': {
@@ -744,7 +744,7 @@ class MagbasaContent {
       'action': {
         'en': 'Show five fingers then two fingers',
         'fil': 'Magpakita ng limang daliri, tapos dalawa',
-        'ilo': 'Mangipakita iti lima a ramay, kalpasanna dua',
+        'ilo': 'Ipakitam dagiti lima a ramay, kalpasanna dagiti dua a ramay.',
       },
     },
   };

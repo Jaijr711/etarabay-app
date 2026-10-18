@@ -2395,37 +2395,39 @@ class _PamilyaScreenState extends State<PamilyaScreen>
           'itemEmoji': '📺',
           'itemName': _currentLang == 'en'
               ? 'Television'
-              : (_currentLang == 'fil' ? 'Telebisyon' : 'TV / Buya'),
+              : (_currentLang == 'fil' ? 'Telebisyon' : 'Telebision'),
           'roomIndex': 0, // Living Room / Sala
           'question': _currentLang == 'en'
               ? 'Where do we watch TV together as a family?'
               : (_currentLang == 'fil'
                   ? 'Saang bahagi ng bahay sama-samang nanonood ng telebisyon ang pamilya?'
-                  : 'Adino ti pagbuyaantayo iti TV a sangsangkamaysa?'),
+                  : 'Sadino ti pagbuyaan iti TV a kakaduam ti pamilia?'),
         },
         {
           'itemEmoji': '🍳',
           'itemName': _currentLang == 'en'
               ? 'Frying Pan & Stove'
-              : (_currentLang == 'fil' ? 'Kawali at Kalan' : 'Paglutuan'),
+              : (_currentLang == 'fil'
+                  ? 'Kawali at Kalan'
+                  : 'Pagpritoan ken kalan'),
           'roomIndex': 1, // Kitchen / Kusina
           'question': _currentLang == 'en'
               ? 'Where does Nanang cook delicious meals?'
               : (_currentLang == 'fil'
                   ? 'Saan nagluluto si Nanay ng masarap na pagkain?'
-                  : 'Adino ti paglutlutoan ni Nanang iti naimbag a taraon?'),
+                  : 'Sadinno ti paglutoan ni nanang kadagiti naimas a taraon?'),
         },
         {
           'itemEmoji': '🛏️',
           'itemName': _currentLang == 'en'
               ? 'Bed and Pillow'
-              : (_currentLang == 'fil' ? 'Kama at Unan' : 'Kama ken Pango'),
+              : (_currentLang == 'fil' ? 'Kama at Unan' : 'Katre ken Pungan'),
           'roomIndex': 2, // Bedroom / Kwarto
           'question': _currentLang == 'en'
               ? 'Where do we rest and sleep at night?'
               : (_currentLang == 'fil'
                   ? 'Saan tayo nagpapahinga at natutulog sa gabi?'
-                  : 'Adino ti pagturturogantayo no rabii?'),
+                  : 'Sadinno ti paginanaan ken pagturogan iti rabii?'),
         },
         {
           'itemEmoji': '🧼',
@@ -2433,13 +2435,13 @@ class _PamilyaScreenState extends State<PamilyaScreen>
               ? 'Soap and Shampoo'
               : (_currentLang == 'fil'
                   ? 'Sabon at Shampoo'
-                  : 'Sabon ken Digos'),
+                  : 'Sabon ken shampoo'),
           'roomIndex': 3, // Bathroom / Banyo
           'question': _currentLang == 'en'
               ? 'Where do we take a bath and wash ourselves?'
               : (_currentLang == 'fil'
                   ? 'Saan tayo naliligo at naghuhugas ng katawan?'
-                  : 'Adino ti pagdigosantayo ken pagbugguantayo?'),
+                  : 'Sadino ti pagdigusan ken pagbugguan ti bagitayo?'),
         },
         {
           'itemEmoji': '🌷',
@@ -2447,13 +2449,13 @@ class _PamilyaScreenState extends State<PamilyaScreen>
               ? 'Garden & Plants'
               : (_currentLang == 'fil'
                   ? 'Hardin at mga Halaman'
-                  : 'Mulmula ken Ay-ayam'),
+                  : 'Minuyongan ken Muka'),
           'roomIndex': 4, // Yard / Bakuran
           'question': _currentLang == 'en'
               ? 'Where do we play outdoors and water the plants?'
               : (_currentLang == 'fil'
                   ? 'Saan tayo naglalaro sa labas at nagdidilig ng mga halaman?'
-                  : 'Adino ti pagay-ayamantayo ken pagsibugantayo iti mulmula?'),
+                  : 'Sadinno ti pagay-ayamantayo iti ruar ken pagsibugantayo kadagiti mula?'),
         },
       ];
 

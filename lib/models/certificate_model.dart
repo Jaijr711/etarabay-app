@@ -39,10 +39,11 @@ final Map<String, CertificateInfo> allCertificates = {
     id: 'e_tarabay_graduate',
     title: 'Certificate of Completion',
     titleFil: 'Sertipiko ng Pagtatapos',
-    titleIlo: 'Sertipiko ti Panagtungpal',
+    titleIlo: 'Sertipiko ti Pannakalpas',
     description: 'You completed EVERYTHING in E-Tarabay! You are a true star!',
     descriptionFil: 'Natapos mo ang LAHAT sa E-Tarabay. Napakagaling mo!',
-    descriptionIlo: 'Nakumpletom amin iti E-Tarabay! Pudno a sikat ka!',
+    descriptionIlo:
+        'Nalpasamon ti amin iti E-Tarabay! Sika ket pudno a nalaing!',
     emoji: '🎓',
     icon: LucideIcons.graduation_cap,
     primaryColor: Color(0xFF2D3436),

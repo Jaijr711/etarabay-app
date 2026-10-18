@@ -415,7 +415,8 @@ class _SuccessModalState extends State<SuccessModal> {
         Image.asset(_trophy, width: 92, height: 92),
         Transform.translate(
           offset: const Offset(-10, 0),
-          child: _scoreBubble('Score', widget.score.toString(), 96),
+          child: _scoreBubble(AppLocalizations.of(context)!.scoreLabel,
+              widget.score.toString(), 96),
         ),
         // Room for the mascot, who stands over the card's right edge.
         const SizedBox(width: 44),
@@ -568,15 +569,16 @@ class _SuccessModalState extends State<SuccessModal> {
   /// were dropped — a three-year-old cannot act on them, and the parent can
   /// tap the stars for the full rules.
   String _getStarDetailSummary(int stars) {
+    final loc = AppLocalizations.of(context)!;
     switch (stars) {
       case 3:
-        return '3/3 Stars • Perfect Score! Outstanding!';
+        return loc.starSummary3;
       case 2:
-        return '2/3 Stars • 1 empty star remaining.';
+        return loc.starSummary2;
       case 1:
-        return '1/3 Star • 2 empty stars remaining.';
+        return loc.starSummary1;
       default:
-        return '0/3 Stars';
+        return loc.starSummary0;
     }
   }
 
@@ -688,7 +690,8 @@ class _SuccessModalState extends State<SuccessModal> {
                   // them all right on your first try").
                   Flexible(
                     child: Text(
-                      'Star $starNumber: $title',
+                      AppLocalizations.of(context)!
+                          .starNumberTitle('$starNumber', title),
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -709,7 +712,9 @@ class _SuccessModalState extends State<SuccessModal> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      isEarned ? 'Earned' : 'Empty',
+                      isEarned
+                          ? AppLocalizations.of(context)!.starEarned
+                          : AppLocalizations.of(context)!.starEmpty,
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,

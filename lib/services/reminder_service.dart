@@ -77,7 +77,7 @@ class ReminderService {
       minute: 0,
       ilo: (
         'Naimbag a Bigat!',
-        'Kitaentayo no ania ti masursuroam ita nga aldaw iti E-Tarabay!'
+        'Kitaen tayo no ania ti masursuroam ita nga aldaw iti E-Tarabay!'
       ),
       fil: (
         'Magandang Umaga!',
@@ -89,7 +89,7 @@ class ReminderService {
       id: 1001,
       hour: 8,
       minute: 0,
-      ilo: ('Oras ti Panagadal!', 'Ading, umayka agay-ayam iti E-Tarabay!'),
+      ilo: ('Oras ti Panagadal!', 'Agsubli ka ken agay-ayam iti E-Tarabay!'),
       fil: ('Oras na para Mag-aral!', 'Halika, maglaro tayo sa E-Tarabay!'),
       en: ("It's Learning Time!", 'Come back and play in E-Tarabay!'),
     ),
@@ -98,8 +98,8 @@ class ReminderService {
       hour: 19,
       minute: 0,
       ilo: (
-        'Nangan ka a?',
-        'Kalpasan ti pananganmo, agay-ayamtayo iti E-Tarabay!'
+        'Oras ti Pannangan!',
+        'Kalpasan ti pangrabii, agay-ayamtayo iti E-Tarabay!'
       ),
       fil: (
         'Kumain ka na ba?',
@@ -115,8 +115,8 @@ class ReminderService {
       hour: 20,
       minute: 0,
       ilo: (
-        'Oras ti Panagturog!',
-        'Ading, matorogka a nasapa tapno nabileg ken nasalun-at ka!'
+        'Oras ti Pannaturog!',
+        'Maturog a nasapa tapno agbalin a napigsa ken nasalun-at!'
       ),
       fil: (
         'Oras na para Matulog!',
@@ -342,8 +342,8 @@ class ReminderService {
           ? ('Paalala', 'Araw-araw na paalala mula sa E-Tarabay')
           : ('Kaarawan', 'Bati sa kaarawan mula sa E-Tarabay'),
       'ilo' => daily
-          ? ('Pakaammo', 'Inaldaw a pakaammo manipud iti E-Tarabay')
-          : ('Kasangay', 'Pakablaaw iti kasangay manipud iti E-Tarabay'),
+          ? ('Palagip', 'Inaldaw a palagip manipud E-Tarabay')
+          : ('Kasangay', 'Pakablaaw iti kasangay aggapo iti E-Tarabay'),
       _ => daily
           ? ('Reminders', 'Daily reminders from E-Tarabay')
           : ('Birthday', 'Birthday greetings from E-Tarabay'),

@@ -1788,9 +1788,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  names.length == 1
-                      ? 'Birthday today!'
-                      : '${names.length} birthdays today!',
+                  AppLocalizations.of(context)!.birthdayToday(names.length),
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,

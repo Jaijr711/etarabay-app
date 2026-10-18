@@ -313,9 +313,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            '“Live as if you were to die tomorrow. Learn as if you were to live forever.”\n― Mahatma Gandhi',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.onboardingQuote,
+            style: const TextStyle(
               fontSize: 16,
               color: AppColors.textLight,
               fontStyle: FontStyle.italic,

@@ -413,10 +413,26 @@ void main() async {
     // Cache all Firestore data locally so the app works fully offline:
     // reads are served from cache when there's no network, writes are
     // queued locally and automatically synced once the network returns.
-    FirebaseFirestore.instance.settings = const Settings(
-      persistenceEnabled: true,
-      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
-    );
+    if (kIsWeb) {
+      // In a browser the cache is shared by every tab of the app. The
+      // single-tab cache the settings below turn on belongs to the first tab
+      // only: a second one (an old tab left open beside a fresh one) was
+      // refused it — "Failed to obtain exclusive access to the persistence
+      // layer" — and fell back to memory, losing offline work on close.
+      try {
+        // ignore: deprecated_member_use
+        await FirebaseFirestore.instance.enablePersistence(
+            const PersistenceSettings(synchronizeTabs: true));
+      } catch (e) {
+        // A browser without IndexedDB (a private window) keeps to memory.
+        debugPrint('Firestore web cache unavailable: $e');
+      }
+    } else {
+      FirebaseFirestore.instance.settings = const Settings(
+        persistenceEnabled: true,
+        cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+      );
+    }
 
     // Give every app instance a stable Firebase identity (anonymous).
     // This is additive — students are still identified by their Firestore

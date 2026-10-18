@@ -1147,9 +1147,6 @@ class AppLocalizationsFil extends AppLocalizations {
   }
 
   @override
-  String get viewArtwork => 'Tingnan';
-
-  @override
   String get brushSmall => 'Maliit';
 
   @override
@@ -1659,4 +1656,130 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get numberWord => 'Numero';
+
+  @override
+  String get myCertificate => 'Ang Aking Sertipiko';
+
+  @override
+  String get shareCertificateText =>
+      'Nakakuha ako ng bagong sertipiko sa E-Tarabay!';
+
+  @override
+  String get scoreLabel => 'Marka';
+
+  @override
+  String get starSummary3 => '3/3 Bituin • Perpektong Marka! Mahusay!';
+
+  @override
+  String get starSummary2 => '2/3 Bituin • 1 bituin pa ang kulang.';
+
+  @override
+  String get starSummary1 => '1/3 Bituin • 2 bituin pa ang kulang.';
+
+  @override
+  String get starSummary0 => '0/3 Bituin';
+
+  @override
+  String starNumberTitle(String starNumber, String title) {
+    return 'Bituin $starNumber: $title';
+  }
+
+  @override
+  String get starEarned => 'Nakuha';
+
+  @override
+  String get starEmpty => 'Wala pa';
+
+  @override
+  String artworkCount(int count) {
+    return '$count likha';
+  }
+
+  @override
+  String get sortRecent => 'Pinakabago';
+
+  @override
+  String get gradeOutstanding => 'Napakahusay';
+
+  @override
+  String get gradeVerySatisfactory => 'Lubhang Kasiya-siya';
+
+  @override
+  String get gradeSatisfactory => 'Kasiya-siya';
+
+  @override
+  String get gradeDeveloping => 'Umuunlad';
+
+  @override
+  String get biometricPrompt => 'Mag-log in para magpatuloy';
+
+  @override
+  String signInAs(String name) {
+    return 'Mag-sign in bilang $name';
+  }
+
+  @override
+  String get currentPassword => 'Kasalukuyang password';
+
+  @override
+  String get newPassword => 'Bagong password';
+
+  @override
+  String get confirmNewPassword => 'Kumpirmahin ang bagong password';
+
+  @override
+  String get enterCurrentPassword => 'Ilagay ang kasalukuyang password.';
+
+  @override
+  String get newPasswordsDoNotMatch =>
+      'Hindi magkatugma ang mga bagong password.';
+
+  @override
+  String get nothingToChange => 'Walang babaguhin.';
+
+  @override
+  String get currentPasswordIncorrect => 'Mali ang kasalukuyang password.';
+
+  @override
+  String get sectionAudio => 'Mga Tunog';
+
+  @override
+  String get sectionAccount => 'Akawnt';
+
+  @override
+  String get sectionClassroom => 'Silid-aralan';
+
+  @override
+  String get skipPasswordNextTime =>
+      'Lagtawan ang pagta-type ng iyong password sa susunod';
+
+  @override
+  String get teacherPasswordChanged =>
+      'Nagbago ang iyong password. Mag-sign in muna gamit ang iyong password.';
+
+  @override
+  String get teacherNotSetUp =>
+      'Hindi pa handa ang account ng guro. Kumonekta muna sa internet para matapos ito.';
+
+  @override
+  String get teacherCannotVerify =>
+      'Hindi ma-verify ang login. Kung ito ang unang pag-login mo, kumonekta muna sa internet.';
+
+  @override
+  String birthdayToday(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ang may kaarawan ngayon!',
+      one: 'May kaarawan ngayon!',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get onboardingQuote =>
+      '“Mabuhay ka na parang mamamatay ka bukas. Mag-aral ka na parang mabubuhay ka magpakailanman.”\n― Mahatma Gandhi';
+
+  @override
+  String get audioRecordingTune => 'Rekording ng Boses';
 }

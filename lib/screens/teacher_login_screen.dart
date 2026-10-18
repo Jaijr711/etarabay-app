@@ -68,8 +68,8 @@ class _TeacherLoginScreenState extends State<TeacherLoginScreen> {
   }
 
   Future<void> _biometricLogin() async {
-    final ok =
-        await BiometricService.authenticate('Log in to your teacher account');
+    final ok = await BiometricService.authenticate(
+        AppLocalizations.of(context)!.teacherSignInPrompt);
     if (!ok || !mounted) return;
 
     final creds =
@@ -91,8 +91,7 @@ class _TeacherLoginScreenState extends State<TeacherLoginScreen> {
         _isLoading = false;
         _biometricEnabled = false;
       });
-      _showErrorDialog(
-          'Your password changed. Please sign in with your password once.');
+      _showErrorDialog(AppLocalizations.of(context)!.teacherPasswordChanged);
     }
   }
 
@@ -123,8 +122,7 @@ class _TeacherLoginScreenState extends State<TeacherLoginScreen> {
       final data = snap.data();
       if (data == null) {
         setState(() => _isLoading = false);
-        _showErrorDialog(
-            'Teacher account not set up yet. Please connect to the internet once to finish setup.');
+        _showErrorDialog(AppLocalizations.of(context)!.teacherNotSetUp);
         return;
       }
 
@@ -147,8 +145,7 @@ class _TeacherLoginScreenState extends State<TeacherLoginScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
-      _showErrorDialog(
-          'Could not verify credentials. If this is your first login, please connect to the internet once.');
+      _showErrorDialog(AppLocalizations.of(context)!.teacherCannotVerify);
     }
   }
 

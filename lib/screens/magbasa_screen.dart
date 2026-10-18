@@ -2436,7 +2436,12 @@ class _SongScreenState extends State<SongScreen>
   @override
   Widget build(BuildContext context) {
     final lyrics = _lyrics;
-    final tune = widget.songData['tune'] as String;
+    // A recording has no melody to name; the label says what it is in the
+    // reader's language. A named tune is a title and stays as written.
+    final rawTune = widget.songData['tune'] as String;
+    final tune = rawTune == 'Audio Recording'
+        ? AppLocalizations.of(context)!.audioRecordingTune
+        : rawTune;
     final loc = AppLocalizations.of(context)!;
     // The action is an instruction to the child — "clap", "sway" — not part
     // of the song, so unlike the lyrics it follows the app's language.
