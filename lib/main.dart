@@ -1,6 +1,7 @@
 import 'services/audio_source.dart';
 import 'services/reminder_service.dart';
 import 'widgets/account_watcher.dart';
+import 'widgets/system_bars_guard.dart';
 import 'widgets/tablet_scale.dart';
 import 'dart:async';
 
@@ -555,9 +556,12 @@ class ETarabayApp extends StatelessWidget {
       // TabletScale outermost: on an iPad or tablet the phone layout is drawn
       // enlarged instead of stretched — see tablet_scale.dart.
       builder: (context, child) => TabletScale(
-        child: AccountWatcher(
-          navigatorKey: appNavigatorKey,
-          child: child ?? const SizedBox.shrink(),
+        // Inside TabletScale, so on a tablet it reads the scaled-down bar.
+        child: SystemBarsGuard(
+          child: AccountWatcher(
+            navigatorKey: appNavigatorKey,
+            child: child ?? const SizedBox.shrink(),
+          ),
         ),
       ),
       locale:

@@ -1852,7 +1852,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
 
   // ─── Reusable widgets ────────────────────────────────────────────────────────
 
-  Widget _mcqTile(int answer, {required int correct}) {
+  Widget _mcqTile(int answer, {required int correct, double size = 92}) {
     final selected = _selectedAnswer == answer;
     // White until tapped, then green or red — the About Me answer buttons.
     final verdict = selected ? answer == correct : null;
@@ -1866,7 +1866,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
         });
       },
       // Large tap target: small fingers need room to hit it reliably.
-      child: _chunkyNumber(answer, 92, 44, verdict: verdict),
+      child: _chunkyNumber(answer, size, size * 0.48, verdict: verdict),
     );
   }
 
@@ -1993,7 +1993,11 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   /// from the rest. The cloud is as tall as a share of its width (less when
   /// it is given less), and the words inside shrink to fit it.
   Widget _questionText(String text) => LayoutBuilder(builder: (_, box) {
-        final byWidth = box.maxWidth * 0.50;
+        // Half the width, but never more than a fifth of the screen's
+        // height: on a short phone half the width was most of the board,
+        // and the things to count were squeezed to nothing under it.
+        final byWidth =
+            min(box.maxWidth * 0.50, MediaQuery.sizeOf(context).height * 0.2);
         final h =
             box.maxHeight.isFinite ? min(box.maxHeight, byWidth) : byWidth;
         return SizedBox(
@@ -2002,6 +2006,27 @@ class _MatematikaScreenState extends State<MatematikaScreen>
           child: QuestionCloud(text),
         );
       });
+
+  /// The answer buttons in one row, each as big as the row's width allows
+  /// up to 92 — three fixed 92s with their gaps were wider than a 360dp
+  /// phone, and the third ran off the screen.
+  Widget _answerRow(List<dynamic> answers, int correct) {
+    return LayoutBuilder(builder: (_, box) {
+      const gap = 16.0;
+      final n = answers.isEmpty ? 1 : answers.length;
+      final size = ((box.maxWidth - gap * n) / n).clamp(56.0, 92.0);
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          for (final a in answers)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: gap / 2),
+              child: _mcqTile(a as int, correct: correct, size: size),
+            ),
+        ],
+      );
+    });
+  }
 
   /// A number on a white 3D button, as the About Me answers are drawn —
   /// turning green or red once [verdict] is known. [width] is the face; the
@@ -2158,35 +2183,30 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     // Two halves, named: what is being counted, and what the child answers
     // with.
     final card = _gameCard(
-      child: Column(
-        children: [
-          // Capped at a third of the card, so a long question can
-          // never squeeze the things being counted into a sliver.
-          // Measured against the card rather than fixed at 120: on a
-          // small phone the whole card is barely twice that, and a
-          // flat number meant the cap did nothing where it was needed
-          // most.
-          LayoutBuilder(
-            builder: (_, box) => ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: box.maxHeight * 0.32),
-              child: _questionText(_getHowManyFromMap(game)),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Expanded(child: _countableObjects(objects)),
-        ],
-      ),
+      // The card measured from outside: a LayoutBuilder inside the Column
+      // was handed unbounded height, so the cap below never applied, and on
+      // a short phone the question pushed the apples out of the card.
+      child: LayoutBuilder(
+          builder: (_, box) => Column(
+                children: [
+                  // Capped at a third of the card, so a long question can
+                  // never squeeze the things being counted into a sliver.
+                  // Measured against the card rather than fixed at 120: on a
+                  // small phone the whole card is barely twice that, and a
+                  // flat number meant the cap did nothing where it was needed
+                  // most.
+                  ConstrainedBox(
+                    constraints:
+                        BoxConstraints(maxHeight: box.maxHeight * 0.45),
+                    child: _questionText(_getHowManyFromMap(game)),
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(child: _countableObjects(objects)),
+                ],
+              )),
     );
 
-    final answerRow = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: answers
-          .map((a) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: _mcqTile(a as int, correct: game['correct'] as int),
-              ))
-          .toList(),
-    );
+    final answerRow = _answerRow(answers, game['correct'] as int);
 
     final prompt = Text(
       AppLocalizations.of(context)!.selectCorrectAnswer,
@@ -2222,30 +2242,32 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     // The three pieces of this board, named: the objects to count, the
     // basket to drop into, and the numbers to drag.
     final card = _gameCard(
-      child: Column(
-        children: [
-          // The instruction gets at most a third of the card.
-          //
-          // It had no ceiling before, and it is three lines long, so
-          // it was taking well over half — the objects were left
-          // roughly 85 logical pixels for two rows and came out at
-          // the minimum size the layout allows. Capping it hands that
-          // height straight to the things being counted, and the
-          // question shrinks to fit rather than being cut off,
-          // because _questionText scales down inside whatever room
-          // it is given.
-          LayoutBuilder(
-            builder: (_, box) => ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: box.maxHeight * 0.36),
-              child: _questionText(_getDragFromMap(game)),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-            child: _countableObjects(List.generate(correct, (_) => emoji)),
-          ),
-        ],
-      ),
+      // Measured from outside, as in Count the Objects.
+      child: LayoutBuilder(
+          builder: (_, box) => Column(
+                children: [
+                  // The instruction gets at most a third of the card.
+                  //
+                  // It had no ceiling before, and it is three lines long, so
+                  // it was taking well over half — the objects were left
+                  // roughly 85 logical pixels for two rows and came out at
+                  // the minimum size the layout allows. Capping it hands that
+                  // height straight to the things being counted, and the
+                  // question shrinks to fit rather than being cut off,
+                  // because _questionText scales down inside whatever room
+                  // it is given.
+                  ConstrainedBox(
+                    constraints:
+                        BoxConstraints(maxHeight: box.maxHeight * 0.55),
+                    child: _questionText(_getDragFromMap(game)),
+                  ),
+                  const SizedBox(height: 10),
+                  Expanded(
+                    child:
+                        _countableObjects(List.generate(correct, (_) => emoji)),
+                  ),
+                ],
+              )),
     );
 
     // The basket. Landing the right number in it is the whole move, so it
@@ -2270,7 +2292,12 @@ class _MatematikaScreenState extends State<MatematikaScreen>
           clipBehavior: Clip.none,
           children: [
             BasketPicture(
-              size: 120,
+              // Smaller on a short screen, so the question and the flowers
+              // keep their room.
+              size: MediaQuery.sizeOf(context).height < 720
+                  ? 76
+                  : (MediaQuery.sizeOf(context).height * 0.16)
+                      .clamp(84.0, 120.0),
               highlighted: candidate.isNotEmpty,
               holding: _dropCorrect ? correct : null,
             ),
@@ -2343,7 +2370,11 @@ class _MatematikaScreenState extends State<MatematikaScreen>
                 : const Alignment(-0.75, 0),
             child: basket,
           ),
-          const SizedBox(height: 40),
+          SizedBox(
+              height: MediaQuery.sizeOf(context).height < 720
+                  ? 10
+                  : (MediaQuery.sizeOf(context).height * 0.045)
+                      .clamp(12.0, 40.0)),
           numbers,
         ],
       ),
@@ -2472,7 +2503,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
                 // half its height spare — too small to count three apples in.
                 LayoutBuilder(builder: (_, box) {
                   final nodeH =
-                      ((box.maxHeight / count) - 18).clamp(66.0, 150.0);
+                      ((box.maxHeight / count) - 18).clamp(44.0, 150.0);
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6),
                     child: Row(
@@ -3191,15 +3222,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
                   fontSize: 13,
                   color: Colors.grey)),
           const SizedBox(height: 14),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: answers
-                .map((a) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: _mcqTile(a as int, correct: correct),
-                    ))
-                .toList(),
-          ),
+          _answerRow(answers, correct),
         ],
       ),
     );
