@@ -1,7 +1,6 @@
 import 'package:e_tarabay/l10n/app_localizations.dart';
 import 'dart:async';
 import 'dart:math' as math;
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
@@ -32,6 +31,7 @@ import 'certificates_screen.dart';
 import 'settings_screen.dart';
 import 'parents_lock_screen.dart';
 import 'profile_screen.dart';
+import '../widgets/soft_backdrop.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -59,9 +59,17 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   /// so a sideloaded install has to ask. Silent on any failure: a child
   /// mid-lesson should never see a network error over something that
   /// isn't blocking anything they are doing.
+  ///
+  /// Home is built again on every tap of its tab (the tabs replace each
+  /// other), so "once per app open" has to be kept here rather than by the
+  /// screen: the card used to come back each time the child went Home.
+  static bool _updateOfferedThisRun = false;
+
   Future<void> _checkForUpdate() async {
+    if (_updateOfferedThisRun) return;
     final update = await UpdateChecker.instance.checkForUpdate();
-    if (update != null && mounted) {
+    if (update != null && mounted && !_updateOfferedThisRun) {
+      _updateOfferedThisRun = true;
       showUpdateAvailableDialog(context, update);
     }
   }
@@ -245,7 +253,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   String _formatDisplayName(String fullName, String middleName) {
     final trimmedFull = fullName.trim();
     final trimmedMid = middleName.trim();
-    if (trimmedFull.isEmpty) return 'Student';
+    if (trimmedFull.isEmpty) {
+      return AppLocalizations.of(context)!.studentFallback;
+    }
 
     if (trimmedMid.isNotEmpty) {
       final initial = '${trimmedMid[0].toUpperCase()}.';
@@ -300,11 +310,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       body: Stack(
         children: [
           const Positioned.fill(child: _PlayfulBackground()),
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-              child: Container(color: Colors.white.withOpacity(0.08)),
-            ),
+          const Positioned.fill(
+            child: SoftBackdrop(),
           ),
           SafeArea(
             child: Column(
@@ -816,6 +823,11 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                             .tandaanTitle,
                                         subtitle: AppLocalizations.of(context)!
                                             .tandaanSubtitle,
+                                        // A 3D picture like the other five:
+                                        // the module's own cards, Tarabay
+                                        // on a back and a pair just found.
+                                        imagePath:
+                                            'assets/images/tandaan/home.webp',
                                         color: AppColors.shapes,
                                         badgeStars: tandaanBadge,
                                         onTap: () {
@@ -826,7 +838,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                             const TandaanScreen(),
                                           );
                                         },
-                                        child: _buildTandaanThumbnail(),
                                       ),
                                     ),
                                   ),
@@ -1010,156 +1021,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
         }),
       ),
     );
-  }
-
-  Widget _buildTandaanThumbnail() {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        // Soft mint gradient background
-        Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFFE0F7FA), Color(0xFFB2DFDB)],
-            ),
-          ),
-        ),
-        // Decorative soft circles
-        Positioned(
-          top: -20,
-          left: -20,
-          child: Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.shapes.withOpacity(0.12),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: -10,
-          right: -10,
-          child: Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.animals.withOpacity(0.12),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 30,
-          right: 20,
-          child: Container(
-            width: 30,
-            height: 30,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.colors.withOpacity(0.15),
-            ),
-          ),
-        ),
-        // Floating memory cards
-        Center(
-          child: Transform.rotate(
-            angle: -0.15,
-            child: _thumbCard(
-              color: AppColors.shapes,
-              child: const Icon(LucideIcons.circle_question_mark,
-                  color: Colors.white, size: 20),
-            ),
-          ),
-        ),
-        Positioned(
-          left: 38,
-          top: 42,
-          child: Transform.rotate(
-            angle: 0.12,
-            child: _thumbCard(
-              color: AppColors.animals,
-              child: const Text('🐶', style: TextStyle(fontSize: 18)),
-            ),
-          ),
-        ),
-        Positioned(
-          right: 36,
-          top: 38,
-          child: Transform.rotate(
-            angle: -0.08,
-            child: _thumbCard(
-              color: AppColors.colors,
-              child: const Text('🍎', style: TextStyle(fontSize: 18)),
-            ),
-          ),
-        ),
-        Positioned(
-          left: 52,
-          bottom: 44,
-          child: Transform.rotate(
-            angle: 0.18,
-            child: _thumbCard(
-              color: AppColors.alphabet,
-              child: const Text('Aa',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  )),
-            ),
-          ),
-        ),
-        Positioned(
-          right: 48,
-          bottom: 40,
-          child: Transform.rotate(
-            angle: -0.1,
-            child: _thumbCard(
-              color: AppColors.primary.withOpacity(0.7),
-              child: const Icon(LucideIcons.circle_question_mark,
-                  color: Colors.white, size: 18),
-            ),
-          ),
-        ),
-        // Sparkles
-        Positioned(
-          top: 50,
-          left: 28,
-          child: _sparkle(Colors.amber),
-        ),
-        Positioned(
-          bottom: 55,
-          right: 22,
-          child: _sparkle(AppColors.shapes),
-        ),
-      ],
-    );
-  }
-
-  Widget _thumbCard({required Color color, required Widget child}) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.35),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Center(child: child),
-    );
-  }
-
-  Widget _sparkle(Color color) {
-    return Icon(LucideIcons.sparkles, color: color.withOpacity(0.5), size: 14);
   }
 
   /// Up to three stars on a module card.

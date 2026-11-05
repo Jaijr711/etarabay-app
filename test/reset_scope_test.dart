@@ -41,6 +41,36 @@ void main() {
     });
   });
 
+  // A new phone had applied no marker at all, so it restored the child's
+  // progress and then carried out every reset ever made on them.
+  group('a reset is carried out once, and never an old one on a new phone',
+      () {
+    const apply = UserProvider.shouldApplyMarker;
+
+    test('a reset this phone has not seen is carried out', () {
+      expect(apply(marker: 'r2', applied: 'r1', freshDevice: false), isTrue);
+    });
+
+    test('one already carried out is not carried out again', () {
+      expect(apply(marker: 'r1', applied: 'r1', freshDevice: false), isFalse);
+    });
+
+    test('an old reset found on a phone holding none of the child is not',
+        () {
+      expect(apply(marker: 'r1', applied: null, freshDevice: true), isFalse);
+    });
+
+    test('a phone the child has always used still carries out a first reset',
+        () {
+      expect(apply(marker: 'r1', applied: null, freshDevice: false), isTrue);
+    });
+
+    test('the fresh-phone flag is kept per child', () {
+      expect(UserProvider.freshDeviceKeyFor('child-a'),
+          isNot(UserProvider.freshDeviceKeyFor('child-b')));
+    });
+  });
+
   group('every resettable module knows where its progress lives', () {
     // The six the teacher is offered in the reset dialog. A module added to
     // that list without an entry here would clear nothing at all, silently:

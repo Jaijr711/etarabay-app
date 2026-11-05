@@ -12,7 +12,7 @@ class AppColors {
 
   static const Color textDark = Color(0xFF1E293B);
   static const Color textLight = Color(0xFF64748B);
-  
+
   // The bottom bar. One colour per destination, the same on every screen,
   // because a child learns "the orange one is my prizes" by its paint and
   // that only works if the paint never changes.
@@ -28,19 +28,6 @@ class AppColors {
   static const Color animals = Color(0xFFA8E6CF);
   static const Color family = Color(0xFFFF99C8);
   static const Color body = Color(0xFFA0D6B4);
-}
-
-class AppStyles {
-  static const TextStyle instructionText = TextStyle(
-    fontSize: 22,
-    fontWeight: FontWeight.bold,
-    color: AppColors.textDark,
-  );
-  static const TextStyle instructionHeader = TextStyle(
-    fontSize: 26,
-    fontWeight: FontWeight.w900,
-    color: AppColors.textDark,
-  );
 }
 
 /// The twelve animal avatars a child can choose for themselves (see

@@ -12,7 +12,8 @@ void main() {
   group('three steps', () {
     test('nothing until a third of the way', () {
       expect(const BadgeProgress(0, 26).tier, 0);
-      expect(const BadgeProgress(8, 26).tier, 0, reason: '8/26 is under a third');
+      expect(const BadgeProgress(8, 26).tier, 0,
+          reason: '8/26 is under a third');
     });
 
     test('bronze at a third', () {

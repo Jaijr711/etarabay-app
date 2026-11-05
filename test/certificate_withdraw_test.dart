@@ -22,8 +22,17 @@ Set<String> settleCertificates({
   required Set<String> held,
 }) {
   const badgeIds = [
-    'firstSteps', 'alphabet', 'numbers', 'colors', 'shapes', 'animals',
-    'bookworm', 'starStudent', 'mathWhiz', 'familyHero', 'writingStar',
+    'firstSteps',
+    'alphabet',
+    'numbers',
+    'colors',
+    'shapes',
+    'animals',
+    'bookworm',
+    'starStudent',
+    'mathWhiz',
+    'familyHero',
+    'writingStar',
     'songbird',
   ];
   final allBadges = badgeIds.every(claimedBadges.contains);
@@ -49,8 +58,17 @@ const _modules = [
 ];
 
 Set<String> _allClaimed() => {
-      'firstSteps', 'alphabet', 'numbers', 'colors', 'shapes', 'animals',
-      'bookworm', 'starStudent', 'mathWhiz', 'familyHero', 'writingStar',
+      'firstSteps',
+      'alphabet',
+      'numbers',
+      'colors',
+      'shapes',
+      'animals',
+      'bookworm',
+      'starStudent',
+      'mathWhiz',
+      'familyHero',
+      'writingStar',
       'songbird',
     };
 

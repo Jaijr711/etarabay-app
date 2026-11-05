@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -11,9 +12,11 @@ import '../providers/user_provider.dart';
 import '../utils/constants.dart';
 import '../utils/path_smoothing.dart';
 import '../widgets/custom_back_button.dart';
+import '../widgets/module_cards.dart';
 import '../widgets/question_cloud.dart' show DoodleBackground;
 import '../widgets/success_modal.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
+import '../widgets/design_scale.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  HIDDEN-GUIDE TRACING PAINTER
@@ -93,11 +96,19 @@ class _StrokeFillPainter extends CustomPainter {
     required this.starPulse,
     required this.collect,
     this.guideProgress,
+    this.guide,
   }) :
-        // Both animations drive the canvas directly. Driving them through
+        // The animations drive the canvas directly. Driving them through
         // `setState` instead would rebuild the whole screen sixty times a
-        // second to move one star.
-        super(repaint: Listenable.merge([starPulse, collect]));
+        // second to move one star — which the start dot's pulse still did,
+        // the whole time a letter sat waiting to be traced.
+        super(
+            repaint: Listenable.merge(
+                [starPulse, collect, if (guide != null) guide]));
+
+  /// The start dot's pulse, read as it paints; [guideProgress] says only
+  /// whether it is on (0 or more) or off (-1).
+  final Animation<double>? guide;
 
   Offset _toScreen(Offset d) =>
       Offset(d.dx * scale + offset.dx, d.dy * scale + offset.dy);
@@ -268,7 +279,7 @@ class _StrokeFillPainter extends CustomPainter {
     // needs to read as "tap here" on its own, so the swing is bigger than
     // the guide-demo pulse used to need.
     final beat = guideProgress != null && guideProgress! >= 0
-        ? math.sin(guideProgress! * math.pi * 2)
+        ? math.sin((guide?.value ?? guideProgress!) * math.pi * 2)
         : 0.0;
     final pulse = 1.0 + 0.35 * beat;
     final haloOpacity = 0.22 + 0.2 * (beat * 0.5 + 0.5);
@@ -356,6 +367,20 @@ class _TraceItScreenState extends State<TraceItScreen>
   late AnimationController _warningController;
   late Animation<double> _warningAnimation;
   late PageController _pageController;
+
+  /// True while the child is choosing a letter on the wall, false while
+  /// they are tracing one. The module opens on the wall: every letter in
+  /// view, the finished ones green, the next one shining, the rest locked.
+  bool _showWall = true;
+
+  /// The locked tile the child just pressed, and a count that restarts its
+  /// shake each time.
+  int? _shakeIndex;
+  int _shakeTick = 0;
+
+  /// "Write D first." under the wall, for a moment after a locked tile.
+  String? _wallHint;
+  Timer? _wallHintTimer;
 
   // Guide dot animation
   late AnimationController _guideController;
@@ -549,9 +574,6 @@ class _TraceItScreenState extends State<TraceItScreen>
       duration: const Duration(milliseconds: 2500),
       vsync: this,
     );
-    _guideController.addListener(() {
-      if (mounted) setState(() => _guideProgress = _guideController.value);
-    });
 
     _starController = AnimationController(
       duration: const Duration(milliseconds: 1600),
@@ -657,10 +679,24 @@ class _TraceItScreenState extends State<TraceItScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // The waiting star's twinkle runs for as long as the screen is open;
+    // with animations off (the phone's setting, or a phone too weak for
+    // them) it holds still instead.
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _starController.stop();
+    } else if (!_starController.isAnimating) {
+      _starController.repeat();
+    }
+  }
+
+  @override
   void dispose() {
     _successController.dispose();
     _warningController.dispose();
     _pageController.dispose();
+    _wallHintTimer?.cancel();
     _guideController.dispose();
     _rewindController.dispose();
     _starController.dispose();
@@ -940,8 +976,13 @@ class _TraceItScreenState extends State<TraceItScreen>
     _guideController.stop();
     _successController.forward(from: 0);
 
+    // Only on the board this letter was finished on. Checking that the
+    // screen was still there let it run after back to the wall — the
+    // "I know it!" card came up over the letters — or move a board the
+    // child had just opened on another letter.
+    final session = _boardSession;
     Future.delayed(const Duration(milliseconds: 1200), () {
-      if (!mounted) return;
+      if (!mounted || session != _boardSession || _showWall) return;
       if (_selectedIndex + 1 < _currentLetters.length) {
         _pageController.animateToPage(
           _selectedIndex + 1,
@@ -1044,7 +1085,7 @@ class _TraceItScreenState extends State<TraceItScreen>
         secondaryLabel: AppLocalizations.of(context)!.back,
         onSecondaryTap: () {
           Navigator.pop(context);
-          Navigator.pop(context);
+          _backToWall();
         },
         mainColor: AppColors.primary,
       ),
@@ -1089,6 +1130,16 @@ class _TraceItScreenState extends State<TraceItScreen>
     // mode pills, the character in a glossy bubble between two round arrows,
     // a glossy progress bar ending in a smiling star, and the tracing card in
     // a thick green frame.
+    return PopScope(
+      canPop: _showWall,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _backToWall();
+      },
+      child: _scaffold(context, size, loc),
+    );
+  }
+
+  Widget _scaffold(BuildContext context, Size size, AppLocalizations loc) {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FC),
       // The app bar is the plain one the app always had — kept at the team's
@@ -1100,7 +1151,7 @@ class _TraceItScreenState extends State<TraceItScreen>
         leading: Center(
           child: CustomBackButton(
             iconColor: AppColors.textDark,
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => _showWall ? Navigator.pop(context) : _backToWall(),
           ),
         ),
         title: FittedBox(
@@ -1143,200 +1194,432 @@ class _TraceItScreenState extends State<TraceItScreen>
         SafeArea(
           child: Column(children: [
             _buildModeTabs(),
-            _letterHeader(loc),
+            if (_showWall) Expanded(child: DesignScale(child: _buildWall(loc))),
+            if (!_showWall) ...[
+              _letterHeader(loc),
 
-            // Canvas
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                onPageChanged: _onPageChanged,
-                itemCount: _currentLetters.length,
-                // Navigation is arrow-only so students can't swipe to letters they
-                // haven't reached yet.
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  final letter = _currentLetters[index];
-                  // Selected page reuses the already-magnified live strokes;
-                  // other pages magnify on the fly for their preview. Every
-                  // character in every mode has strokes, so the empty list is
-                  // unreachable and only keeps a future character from crashing.
-                  final rawStrokes =
-                      strokesForMode(_selectedMode, letter.letter) ?? const [];
-                  final letterStrokes =
-                      _selectedIndex == index ? _strokes : _magnify(rawStrokes);
-                  return Center(
-                    child: AnimatedBuilder(
-                      animation: _warningAnimation,
-                      builder: (_, child) {
-                        final done = _currentCompletedSet.contains(index) ||
-                            (_isCompleted && _selectedIndex == index);
-                        // A thick green frame round the canvas, as drawn.
-                        return Container(
-                          width: size.width,
-                          height: size.height * 0.98,
-                          margin: const EdgeInsets.fromLTRB(12, 6, 12, 8),
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFBFE6C4),
-                            borderRadius: BorderRadius.circular(34),
-                            border: Border.all(
-                                color: const Color(0xFF9ED3A6), width: 3),
-                            boxShadow: [
-                              BoxShadow(
-                                color:
-                                    const Color(0xFF6DBB7A).withOpacity(0.35),
-                                blurRadius: 18,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          foregroundDecoration: const _FrameSpeckles(),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 350),
-                            curve: Curves.easeOut,
+              // Canvas
+              Expanded(
+                child: PageView.builder(
+                  controller: _pageController,
+                  onPageChanged: _onPageChanged,
+                  itemCount: _currentLetters.length,
+                  // Navigation is arrow-only so students can't swipe to letters they
+                  // haven't reached yet.
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    final letter = _currentLetters[index];
+                    // Selected page reuses the already-magnified live strokes;
+                    // other pages magnify on the fly for their preview. Every
+                    // character in every mode has strokes, so the empty list is
+                    // unreachable and only keeps a future character from crashing.
+                    final rawStrokes =
+                        strokesForMode(_selectedMode, letter.letter) ??
+                            const [];
+                    final letterStrokes = _selectedIndex == index
+                        ? _strokes
+                        : _magnify(rawStrokes);
+                    return Center(
+                      child: AnimatedBuilder(
+                        animation: _warningAnimation,
+                        builder: (_, child) {
+                          final done = _currentCompletedSet.contains(index) ||
+                              (_isCompleted && _selectedIndex == index);
+                          // A thick green frame round the canvas, as drawn.
+                          return Container(
+                            width: size.width,
+                            height: size.height * 0.98,
+                            margin: const EdgeInsets.fromLTRB(12, 6, 12, 8),
+                            padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              // A finished letter turns the whole canvas green. It
-                              // says "done" without a banner popping up over the
-                              // letter the child just traced.
-                              color: done
-                                  ? const Color(0xFFE3F6E6)
-                                  : const Color(0xFFF2FBF3),
-                              borderRadius: BorderRadius.circular(24),
-                              border: _outOfBounds && _selectedIndex == index
-                                  ? Border.all(
-                                      color: Colors.orange.withOpacity(
-                                          0.6 + _warningAnimation.value * 0.4),
-                                      width: 3)
-                                  : Border.all(
-                                      color: done
-                                          ? const Color(0xFF34C759)
-                                          : const Color(0xFFA8D9AF),
-                                      width: done ? 3 : 2),
-                              // A glow only once the character is done; the
-                              // green frame round it already lifts it off the
-                              // page, and a shadow in the letter's colour left
-                              // a muddy band along the frame's bottom.
+                              color: const Color(0xFFBFE6C4),
+                              borderRadius: BorderRadius.circular(34),
+                              border: Border.all(
+                                  color: const Color(0xFF9ED3A6), width: 3),
                               boxShadow: [
-                                if (done)
-                                  BoxShadow(
-                                    color: const Color(0xFF34C759)
-                                        .withOpacity(0.35),
-                                    blurRadius: 18,
-                                    spreadRadius: 1,
-                                  ),
+                                BoxShadow(
+                                  color:
+                                      const Color(0xFF6DBB7A).withOpacity(0.35),
+                                  blurRadius: 18,
+                                  offset: const Offset(0, 8),
+                                ),
                               ],
                             ),
-                            child: LayoutBuilder(builder: (_, constraints) {
-                              final cs = Size(
-                                  constraints.maxWidth, constraints.maxHeight);
-                              _computeTransform(cs);
-                              return GestureDetector(
-                                onPanStart: _onPanStart,
-                                onPanUpdate: _onPanUpdate,
-                                onPanEnd: _onPanEnd,
-                                child: Stack(fit: StackFit.expand, children: [
-                                  CustomPaint(
-                                    painter: _StrokeFillPainter(
-                                      strokes: letterStrokes,
-                                      strokeProgress: _selectedIndex == index
-                                          ? _strokeProgress
-                                          : List<double>.filled(
-                                              letterStrokes.length,
-                                              _currentCompletedSet
-                                                      .contains(index)
-                                                  ? 1.0
-                                                  : 0.0),
-                                      activeStroke: _selectedIndex == index
-                                          ? _activeStroke
-                                          : (_currentCompletedSet
-                                                  .contains(index)
-                                              ? letterStrokes.length
-                                              : 0),
-                                      color: letter.color,
-                                      isCompleted:
-                                          _currentCompletedSet.contains(index),
-                                      scale: _canvasScale,
-                                      offset: _canvasOffset,
-                                      guideProgress: _selectedIndex == index
-                                          ? _guideProgress
-                                          : null,
-                                      starPulse: _starController,
-                                      // Only the character on screen collects a
-                                      // star; the pages either side must not
-                                      // borrow this one's moment.
-                                      collect: _selectedIndex == index
-                                          ? _successController
-                                          : kAlwaysDismissedAnimation,
+                            foregroundDecoration: const _FrameSpeckles(),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 350),
+                              curve: Curves.easeOut,
+                              decoration: BoxDecoration(
+                                // A finished letter turns the whole canvas green. It
+                                // says "done" without a banner popping up over the
+                                // letter the child just traced.
+                                color: done
+                                    ? const Color(0xFFE3F6E6)
+                                    : const Color(0xFFF2FBF3),
+                                borderRadius: BorderRadius.circular(24),
+                                border: _outOfBounds && _selectedIndex == index
+                                    ? Border.all(
+                                        color: Colors.orange.withOpacity(0.6 +
+                                            _warningAnimation.value * 0.4),
+                                        width: 3)
+                                    : Border.all(
+                                        color: done
+                                            ? const Color(0xFF34C759)
+                                            : const Color(0xFFA8D9AF),
+                                        width: done ? 3 : 2),
+                                // A glow only once the character is done; the
+                                // green frame round it already lifts it off the
+                                // page, and a shadow in the letter's colour left
+                                // a muddy band along the frame's bottom.
+                                boxShadow: [
+                                  if (done)
+                                    BoxShadow(
+                                      color: const Color(0xFF34C759)
+                                          .withOpacity(0.35),
+                                      blurRadius: 18,
+                                      spreadRadius: 1,
                                     ),
-                                  ),
-                                  // Completion mark, tucked into the corner.
-                                  //
-                                  // This used to be a wide "Good Job!" banner across
-                                  // the bottom of the canvas — it covered the letter
-                                  // the child had just traced, and repeated word for
-                                  // word the message already shown below the canvas.
-                                  if (_isCompleted && _selectedIndex == index)
-                                    Positioned(
-                                      top: 14,
-                                      right: 14,
-                                      child: ScaleTransition(
-                                        scale: _scaleAnimation,
-                                        child: Container(
-                                          padding: const EdgeInsets.all(9),
-                                          decoration: BoxDecoration(
-                                            color: Colors.green,
-                                            shape: BoxShape.circle,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                  color: Colors.green
-                                                      .withOpacity(0.45),
-                                                  blurRadius: 14,
-                                                  offset: const Offset(0, 4))
-                                            ],
-                                          ),
-                                          child: const Icon(LucideIcons.check,
-                                              color: Colors.white, size: 26),
-                                        ),
+                                ],
+                              ),
+                              child: LayoutBuilder(builder: (_, constraints) {
+                                final cs = Size(constraints.maxWidth,
+                                    constraints.maxHeight);
+                                _computeTransform(cs);
+                                return GestureDetector(
+                                  onPanStart: _onPanStart,
+                                  onPanUpdate: _onPanUpdate,
+                                  onPanEnd: _onPanEnd,
+                                  child: Stack(fit: StackFit.expand, children: [
+                                    CustomPaint(
+                                      painter: _StrokeFillPainter(
+                                        strokes: letterStrokes,
+                                        strokeProgress: _selectedIndex == index
+                                            ? _strokeProgress
+                                            : List<double>.filled(
+                                                letterStrokes.length,
+                                                _currentCompletedSet
+                                                        .contains(index)
+                                                    ? 1.0
+                                                    : 0.0),
+                                        activeStroke: _selectedIndex == index
+                                            ? _activeStroke
+                                            : (_currentCompletedSet
+                                                    .contains(index)
+                                                ? letterStrokes.length
+                                                : 0),
+                                        color: letter.color,
+                                        isCompleted: _currentCompletedSet
+                                            .contains(index),
+                                        scale: _canvasScale,
+                                        offset: _canvasOffset,
+                                        guideProgress: _selectedIndex == index
+                                            ? _guideProgress
+                                            : null,
+                                        guide: _selectedIndex == index
+                                            ? _guideController
+                                            : null,
+                                        starPulse: _starController,
+                                        // Only the character on screen collects a
+                                        // star; the pages either side must not
+                                        // borrow this one's moment.
+                                        collect: _selectedIndex == index
+                                            ? _successController
+                                            : kAlwaysDismissedAnimation,
                                       ),
                                     ),
-                                ]),
-                              );
-                            }),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            // Start this character again.
-            //
-            // The only other control here was a "Suriin" button guarded by
-            // `if (!_useDragFill)`. Every character in all three alphabets has
-            // drag-fill strokes, so that guard has never once been true and the
-            // button has never been drawn — leaving a lone grey outline in the
-            // smallest type on the screen as the child's only way back.
-            //
-            // Shown only while the character is still being traced: once it is
-            // finished there is nothing to clear, and the button only invited
-            // a child to wipe out work they had just completed.
-            if (!_isCompleted)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
-                child: _ChunkyPill(
-                  label: loc.clear,
-                  icon: LucideIcons.rotate_ccw,
-                  top: const Color(0xFF45DCCB),
-                  bottom: const Color(0xFF18A8B6),
-                  edge: const Color(0xFF0F7A85),
-                  onTap: _resetTracing,
+                                    // Completion mark, tucked into the corner.
+                                    //
+                                    // This used to be a wide "Good Job!" banner across
+                                    // the bottom of the canvas — it covered the letter
+                                    // the child had just traced, and repeated word for
+                                    // word the message already shown below the canvas.
+                                    if (_isCompleted && _selectedIndex == index)
+                                      Positioned(
+                                        top: 14,
+                                        right: 14,
+                                        child: ScaleTransition(
+                                          scale: _scaleAnimation,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(9),
+                                            decoration: BoxDecoration(
+                                              color: Colors.green,
+                                              shape: BoxShape.circle,
+                                              boxShadow: [
+                                                BoxShadow(
+                                                    color: Colors.green
+                                                        .withOpacity(0.45),
+                                                    blurRadius: 14,
+                                                    offset: const Offset(0, 4))
+                                              ],
+                                            ),
+                                            child: const Icon(LucideIcons.check,
+                                                color: Colors.white, size: 26),
+                                          ),
+                                        ),
+                                      ),
+                                  ]),
+                                );
+                              }),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
                 ),
               ),
+
+              // Start this character again.
+              //
+              // The only other control here was a "Suriin" button guarded by
+              // `if (!_useDragFill)`. Every character in all three alphabets has
+              // drag-fill strokes, so that guard has never once been true and the
+              // button has never been drawn — leaving a lone grey outline in the
+              // smallest type on the screen as the child's only way back.
+              //
+              // Shown only while the character is still being traced: once it is
+              // finished there is nothing to clear, and the button only invited
+              // a child to wipe out work they had just completed.
+              if (!_isCompleted)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
+                  child: _ChunkyPill(
+                    label: loc.clear,
+                    icon: LucideIcons.rotate_ccw,
+                    top: const Color(0xFF45DCCB),
+                    bottom: const Color(0xFF18A8B6),
+                    edge: const Color(0xFF0F7A85),
+                    onTap: _resetTracing,
+                  ),
+                ),
+            ],
           ]),
         ),
       ]),
+    );
+  }
+
+  /// From the wall into one letter.
+  ///
+  /// The board's page view is not built while the wall is up, so its
+  /// controller has nothing attached and can simply be replaced by one that
+  /// starts on the chosen letter.
+  /// Goes up each time the board is opened from the wall or left for it.
+  int _boardSession = 0;
+
+  void _openFromWall(int index) {
+    final old = _pageController;
+    setState(() {
+      _boardSession++;
+      _selectedIndex = index;
+      _resetTracing();
+      _pageController = PageController(initialPage: index);
+      _showWall = false;
+    });
+    old.dispose();
+  }
+
+  void _backToWall() {
+    if (_showWall) return;
+    setState(() {
+      _boardSession++;
+      _showWall = true;
+      _resetTracing();
+    });
+  }
+
+  /// A locked letter shakes, and the wall says which one comes first.
+  void _refuseLocked(int index, AppLocalizations loc) {
+    HapticFeedback.lightImpact();
+    _wallHintTimer?.cancel();
+    setState(() {
+      _shakeIndex = index;
+      _shakeTick++;
+      _wallHint =
+          loc.traceLockedHint(_currentLetters[_maxReachableIndex].letter);
+    });
+    _wallHintTimer = Timer(const Duration(milliseconds: 2200), () {
+      if (mounted) setState(() => _wallHint = null);
+    });
+  }
+
+  /// Every character of the chosen alphabet as a tile: finished ones green
+  /// with a star, the next one orange and glowing, the rest grey and locked —
+  /// the same rule as the arrows, which never let a child skip ahead.
+  Widget _buildWall(AppLocalizations loc) {
+    final letters = _currentLetters;
+    final done = _currentCompletedSet.length;
+    final numbers = _selectedMode == 2;
+    final reach = _maxReachableIndex;
+
+    return ListView(
+      padding: const EdgeInsets.only(bottom: 16),
+      children: [
+        ModuleTally(
+          picture: 'assets/images/star_gold.webp',
+          done: done,
+          total: letters.length,
+          label: (n) => numbers
+              ? loc.tallyNumbers(n, letters.length)
+              : loc.tallyLetters(n, letters.length),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 2),
+          child: Text(
+            numbers ? loc.pickNumber : loc.pickLetter,
+            style: const TextStyle(
+              fontFamily: 'Fredoka',
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF4B4F63),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
+          child: GridView.count(
+            crossAxisCount: 6,
+            mainAxisSpacing: 7,
+            crossAxisSpacing: 7,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              for (int i = 0; i < letters.length; i++)
+                _wallTile(
+                  letters[i].letter,
+                  finished: _currentCompletedSet.contains(i),
+                  next: !_currentCompletedSet.contains(i) && i == reach,
+                  onTap: _currentCompletedSet.contains(i) || i <= reach
+                      ? () => _openFromWall(i)
+                      : () => _refuseLocked(i, loc),
+                  shake: _shakeIndex == i,
+                ),
+            ],
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Row(children: [
+            Image.asset('assets/images/mascot_wave.webp',
+                width: 44, height: 44, excludeFromSemantics: true),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                _wallHint ?? loc.traceNextHint,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF4B4F63),
+                ),
+              ),
+            ),
+          ]),
+        ),
+      ],
+    );
+  }
+
+  Widget _wallTile(String char,
+      {required bool finished,
+      required bool next,
+      required VoidCallback onTap,
+      required bool shake}) {
+    final locked = !finished && !next;
+    final Color fill, border, ink;
+    if (finished) {
+      fill = const Color(0xFFE3F6E8);
+      border = const Color(0xFF9AD9AE);
+      ink = const Color(0xFF2E9B4E);
+    } else if (next) {
+      fill = const Color(0xFFFF9800);
+      border = const Color(0xFFFF9800);
+      ink = Colors.white;
+    } else {
+      fill = const Color(0xFFEEF0F5);
+      border = const Color(0xFFE3E6EE);
+      ink = const Color(0xFFC3C8D4);
+    }
+
+    Widget tile = Container(
+      decoration: BoxDecoration(
+        color: fill,
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: border, width: 2),
+      ),
+      alignment: Alignment.center,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          char,
+          style: TextStyle(
+            fontFamily: 'Fredoka',
+            fontSize: 21,
+            fontWeight: FontWeight.w600,
+            color: ink,
+          ),
+        ),
+      ),
+    );
+
+    // The next letter breathes, so the eye finds it among twenty-six.
+    if (next) {
+      tile = AnimatedBuilder(
+        animation: _starController,
+        builder: (_, child) {
+          final t = math.sin(_starController.value * math.pi);
+          return DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(13),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFFFE0B2),
+                  spreadRadius: 3 + 3 * t,
+                ),
+              ],
+            ),
+            child: child,
+          );
+        },
+        child: tile,
+      );
+    }
+
+    return GestureDetector(
+      onTap: onTap,
+      child: TweenAnimationBuilder<double>(
+        key: ValueKey('shake-$char-${shake ? _shakeTick : 0}'),
+        tween: Tween(begin: shake ? 1 : 0, end: 0),
+        duration: const Duration(milliseconds: 420),
+        builder: (_, v, child) => Transform.translate(
+          offset: Offset(math.sin(v * math.pi * 6) * 5 * v, 0),
+          child: child,
+        ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned.fill(child: tile),
+            if (finished)
+              const Positioned(
+                right: -4,
+                top: -5,
+                child: Icon(Icons.star_rounded,
+                    size: 17, color: Color(0xFFFFB800)),
+              ),
+            if (locked)
+              const Positioned(
+                right: 3,
+                bottom: 2,
+                child: Icon(Icons.lock_rounded,
+                    size: 12, color: Color(0xFFB9BFCC)),
+              ),
+          ],
+        ),
+      ),
     );
   }
 

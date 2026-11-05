@@ -34,7 +34,8 @@ void main() {
       // These are illustrations, not shapes — drawing them here would replace
       // real artwork with a coloured blob.
       for (final e in ['🍎', '🐶', '👧', '🏠', '🎈', '⭐', '🔴']) {
-        expect(ShapeGlyph.handles(e), isFalse, reason: '$e should not be drawn');
+        expect(ShapeGlyph.handles(e), isFalse,
+            reason: '$e should not be drawn');
       }
     });
   });

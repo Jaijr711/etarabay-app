@@ -9,14 +9,12 @@ class PremiumPageRoute<T> extends PageRouteBuilder<T> {
 
   PremiumPageRoute({
     required this.child,
-    RouteSettings? settings,
+    super.settings,
   }) : super(
-          settings: settings,
           transitionDuration: const Duration(milliseconds: 240),
           reverseTransitionDuration: const Duration(milliseconds: 200),
           pageBuilder: (context, animation, secondaryAnimation) => child,
-          transitionsBuilder:
-              (context, animation, secondaryAnimation, child) {
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
             // A simple, fast, smooth slide + fade — one lightweight transition
             // with no scale/dim layers, so navigation feels snappy and never
             // janks, even on lower-end devices.
@@ -48,14 +46,12 @@ class FadeThroughPageRoute<T> extends PageRouteBuilder<T> {
 
   FadeThroughPageRoute({
     required this.child,
-    RouteSettings? settings,
+    super.settings,
   }) : super(
-          settings: settings,
           transitionDuration: const Duration(milliseconds: 220),
           reverseTransitionDuration: const Duration(milliseconds: 180),
           pageBuilder: (context, animation, secondaryAnimation) => child,
-          transitionsBuilder:
-              (context, animation, secondaryAnimation, child) {
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
             // Simple, fast cross-fade — cheap to composite and smooth for
             // switching between unrelated destinations (e.g. bottom-nav tabs).
             final fadeIn = CurvedAnimation(

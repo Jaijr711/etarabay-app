@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:e_tarabay/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../widgets/replay_dialog.dart';
@@ -13,7 +15,7 @@ import 'kulay_screen.dart';
 import 'trace_it_screen.dart';
 import 'magbasa_screen.dart';
 import 'tandaan_screen.dart';
-import '../widgets/custom_header_app_bar.dart';
+import '../widgets/kid_page_header.dart';
 import '../widgets/floating_bottom_nav_bar.dart';
 import '../widgets/locked_module_dialog.dart';
 import '../widgets/staggered_entrance.dart';
@@ -21,6 +23,8 @@ import '../utils/page_transitions.dart';
 import 'awards_screen.dart';
 import 'settings_screen.dart';
 import 'home_screen.dart';
+import '../widgets/design_scale.dart';
+import '../services/device_performance.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  SharedPreferences key helpers — must match each feature screen exactly
@@ -291,10 +295,13 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
     return Scaffold(
       backgroundColor: Colors.white,
       extendBody: true,
-      appBar: CustomHeaderAppBar(
+      appBar: KidPageHeader(
         title: AppLocalizations.of(context)!.lessons,
-        baseColor: AppColors.primary,
-        showBackButton: false,
+        // The same count as the five stars under the ring.
+        subtitle: AppLocalizations.of(context)!
+            .kidSubLessons((_overallProgress * 5).ceil().clamp(0, 5)),
+        bubble: AppLocalizations.of(context)!.kidBubbleLessons,
+        color: AppColors.navLessons,
       ),
       bottomNavigationBar: FloatingBottomNavBar(
         selectedIndex: 1,
@@ -339,109 +346,69 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
           ),
         ],
       ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/bg_lesson.jpg',
-              fit: BoxFit.cover,
+      body: DesignScale(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.asset(
+                'assets/images/bg_lesson.jpg',
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          // A static translucent overlay instead of a live BackdropFilter
-          // blur. The real-time blur re-rendered every frame caused noticeable
-          // lag (especially during page transitions); this keeps a soft,
-          // readable backdrop at a fraction of the cost.
-          Positioned.fill(
-            child: Container(color: Colors.white.withOpacity(0.55)),
-          ),
-          SingleChildScrollView(
-            // Extra bottom padding so the last card isn't hidden behind the
-            // floating bottom navigation bar (body uses extendBody: true).
-            padding: EdgeInsets.fromLTRB(
-                16, 16, 16, 120 + MediaQuery.of(context).padding.bottom),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                StaggeredEntrance(
-                  index: 0,
-                  child: _buildHeader(context),
-                ),
-                const SizedBox(height: 20),
-                StaggeredEntrance(
-                  index: 1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionTitle(
-                          context, AppLocalizations.of(context)!.matematika),
-                      _buildMatematikaCard(context),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                StaggeredEntrance(
-                  index: 2,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionTitle(context,
-                          AppLocalizations.of(context)!.angAkingSariliTitle),
-                      _buildPamilyaCard(context),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                StaggeredEntrance(
-                  index: 3,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionTitle(
-                          context, AppLocalizations.of(context)!.kulaySaya),
-                      _buildKulayCard(context),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                StaggeredEntrance(
-                  index: 4,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionTitle(
-                          context, AppLocalizations.of(context)!.traceItTitle),
-                      _buildTraceItCard(context),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                StaggeredEntrance(
-                  index: 5,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionTitle(
-                          context, AppLocalizations.of(context)!.magbasaTitle),
-                      _buildMagbasaCard(context),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                StaggeredEntrance(
-                  index: 6,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionTitle(
-                          context, AppLocalizations.of(context)!.tandaanTitle),
-                      _buildTandaanCard(context),
-                    ],
-                  ),
-                ),
-              ],
+            // A static translucent overlay instead of a live BackdropFilter
+            // blur. The real-time blur re-rendered every frame caused noticeable
+            // lag (especially during page transitions); this keeps a soft,
+            // readable backdrop at a fraction of the cost.
+            Positioned.fill(
+              child: Container(color: Colors.white.withOpacity(0.55)),
             ),
-          ),
-        ],
+            SingleChildScrollView(
+              // Extra bottom padding so the last card isn't hidden behind the
+              // floating bottom navigation bar (body uses extendBody: true).
+              padding: EdgeInsets.fromLTRB(
+                  16, 16, 16, 120 + MediaQuery.of(context).padding.bottom),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  StaggeredEntrance(
+                    index: 0,
+                    child: _buildHeader(context),
+                  ),
+                  const SizedBox(height: 18),
+                  StaggeredEntrance(
+                    index: 1,
+                    child: _buildMatematikaCard(context),
+                  ),
+                  const SizedBox(height: 18),
+                  StaggeredEntrance(
+                    index: 2,
+                    child: _buildPamilyaCard(context),
+                  ),
+                  const SizedBox(height: 18),
+                  StaggeredEntrance(
+                    index: 3,
+                    child: _buildKulayCard(context),
+                  ),
+                  const SizedBox(height: 18),
+                  StaggeredEntrance(
+                    index: 4,
+                    child: _buildTraceItCard(context),
+                  ),
+                  const SizedBox(height: 18),
+                  StaggeredEntrance(
+                    index: 5,
+                    child: _buildMagbasaCard(context),
+                  ),
+                  const SizedBox(height: 18),
+                  StaggeredEntrance(
+                    index: 6,
+                    child: _buildTandaanCard(context),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -451,104 +418,92 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
   // ─────────────────────────────────────────────────────────────────────────
 
   Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+    final done = _overallProgress >= 1.0;
+    final value = _overallProgress.clamp(0.0, 1.0);
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 10, 14, 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF14503A).withOpacity(0.12),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Row(
         children: [
-          // Circular progress indicator
-          SizedBox(
-            width: 64,
-            height: 64,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  width: 64,
-                  height: 64,
-                  child: CircularProgressIndicator(
-                    value: _overallProgress.clamp(0.0, 1.0),
-                    strokeWidth: 7,
-                    backgroundColor: Colors.grey.shade200,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      _overallProgress >= 1.0
-                          ? const Color(0xFF34C759)
-                          : AppColors.primary,
-                    ),
-                    strokeCap: StrokeCap.round,
-                  ),
-                ),
-                // The number inside the ring used to read "56%". The ring
-                // already says it, in a form a child can see rather than
-                // read, so what sits in the middle is a star instead — the
-                // thing they are actually collecting.
-                Icon(
-                  Icons.star_rounded,
-                  size: 26,
-                  color: _overallProgress >= 1.0
-                      ? const Color(0xFF34C759)
-                      : const Color(0xFFFFB800),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 16),
-          // Text info
+          Image.asset('assets/images/badges/trophy.webp',
+              width: 40, height: 40, excludeFromSemantics: true),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  AppLocalizations.of(context)!.overallProgress,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textDark,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    AppLocalizations.of(context)!.overallProgress,
+                    style: const TextStyle(
+                      fontFamily: 'Fredoka',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textDark,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 6),
-                // "23/150 completed" became five stars.
-                //
-                // Five is at the top of what this age counts, so a full row
-                // is a finish line they can see coming. The fraction was two
-                // numbers, one of them 150 — a figure with no meaning to a
-                // three-year-old beyond "a lot".
                 Row(
-                  children: List.generate(5, (i) {
-                    final got = _overallProgress * 5 > i;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 3),
-                      child: Icon(
-                        got ? Icons.star_rounded : Icons.star_outline_rounded,
-                        size: 24,
-                        color: got
-                            ? const Color(0xFFFFB800)
-                            : Colors.grey.shade300,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE6EEE9),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        alignment: Alignment.centerLeft,
+                        child: FractionallySizedBox(
+                          widthFactor: value,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              gradient: LinearGradient(
+                                colors: done
+                                    ? const [
+                                        Color(0xFF34C759),
+                                        Color(0xFF6EDC8C)
+                                      ]
+                                    : const [
+                                        Color(0xFF2E9E5B),
+                                        Color(0xFF5CCB8A)
+                                      ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    );
-                  }),
+                    ),
+                    const SizedBox(width: 8),
+                    // Five stars, the most this age counts: a full row is a
+                    // finish line they can see coming.
+                    for (var i = 0; i < 5; i++)
+                      Icon(
+                        Icons.star_rounded,
+                        size: 18,
+                        color: _overallProgress * 5 > i
+                            ? const Color(0xFFFFB800)
+                            : const Color(0xFFDDE1E7),
+                      ),
+                  ],
                 ),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  //  Section title
-  // ─────────────────────────────────────────────────────────────────────────
-
-  Widget _buildSectionTitle(BuildContext context, String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8, bottom: 8),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: AppColors.textDark,
-        ),
       ),
     );
   }
@@ -570,15 +525,34 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
     showLockedModuleDialog(context);
   }
 
+  /// The first lesson, in the order shown, that has been started and not
+  /// finished: its card is ringed, so a child coming back sees where they
+  /// left off.
+  String? get _currentModuleKey {
+    for (final (key, done, total) in [
+      ('matematika', _matDone, _matTotal),
+      ('pamilya', _pamilyaDone, _pamilyaTotal),
+      ('kulay', _kulayDone, _kulayTotal),
+      ('traceit', _traceItDone, _traceItTotal),
+      ('magbasa', _magbasaDone, _magbasaTotal),
+      ('tandaan', _tandaanDone, _tandaanTotal),
+    ]) {
+      if (done > 0 && done < total && !_isLocked(key)) return key;
+    }
+    return null;
+  }
+
   Widget _buildMatematikaCard(BuildContext context) {
     return _buildLessonCard(
       context: context,
       title: AppLocalizations.of(context)!.matematika,
       subtitle:
-          '$_matDone/$_matTotal ${AppLocalizations.of(context)!.activities}',
+          AppLocalizations.of(context)!.lessonActivities(_matDone, _matTotal),
       imagePath: 'assets/images/card1.webp',
       color: AppColors.numbers,
       progress: _matTotal > 0 ? _matDone / _matTotal : 0.0,
+      highlight: _currentModuleKey == 'matematika',
+      locked: _isLocked('matematika'),
       onTap: () async {
         if (_isLocked('matematika')) return _showLockedMessage();
         await context.pushPremium(const MatematikaScreen());
@@ -592,11 +566,13 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
     return _buildLessonCard(
       context: context,
       title: AppLocalizations.of(context)!.angAkingSariliTitle,
-      subtitle:
-          '$_pamilyaDone/$_pamilyaTotal ${AppLocalizations.of(context)!.levels}',
+      subtitle: AppLocalizations.of(context)!
+          .lessonLevels(_pamilyaDone, _pamilyaTotal),
       imagePath: 'assets/images/card2.webp',
       color: AppColors.family,
       progress: _pamilyaTotal > 0 ? _pamilyaDone / _pamilyaTotal : 0.0,
+      highlight: _currentModuleKey == 'pamilya',
+      locked: _isLocked('pamilya'),
       onTap: () async {
         if (_isLocked('pamilya')) return _showLockedMessage();
         await context.pushPremium(const PamilyaScreen());
@@ -609,11 +585,13 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
     return _buildLessonCard(
       context: context,
       title: AppLocalizations.of(context)!.kulaySaya,
-      subtitle:
-          '$_kulayDone/$_kulayTotal ${AppLocalizations.of(context)!.activities}',
+      subtitle: AppLocalizations.of(context)!
+          .lessonActivities(_kulayDone, _kulayTotal),
       imagePath: 'assets/images/card3.webp',
       color: AppColors.colors,
       progress: _kulayTotal > 0 ? _kulayDone / _kulayTotal : 0.0,
+      highlight: _currentModuleKey == 'kulay',
+      locked: _isLocked('kulay'),
       onTap: () async {
         if (_isLocked('kulay')) return _showLockedMessage();
         await context.pushPremium(const KulayScreen());
@@ -626,11 +604,13 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
     return _buildLessonCard(
       context: context,
       title: AppLocalizations.of(context)!.traceItTitle,
-      subtitle:
-          '$_traceItDone/$_traceItTotal ${AppLocalizations.of(context)!.activities}',
+      subtitle: AppLocalizations.of(context)!
+          .lessonActivities(_traceItDone, _traceItTotal),
       imagePath: 'assets/images/card4.webp',
       color: AppColors.success,
       progress: _traceItTotal > 0 ? _traceItDone / _traceItTotal : 0.0,
+      highlight: _currentModuleKey == 'traceit',
+      locked: _isLocked('traceit'),
       onTap: () async {
         if (_isLocked('traceit')) return _showLockedMessage();
         await context.pushPremium(const TraceItScreen());
@@ -643,11 +623,13 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
     return _buildLessonCard(
       context: context,
       title: AppLocalizations.of(context)!.magbasaTitle,
-      subtitle:
-          '$_magbasaDone/$_magbasaTotal ${AppLocalizations.of(context)!.activities}',
+      subtitle: AppLocalizations.of(context)!
+          .lessonActivities(_magbasaDone, _magbasaTotal),
       imagePath: 'assets/images/card5.webp',
       color: AppColors.alphabet,
       progress: _magbasaTotal > 0 ? _magbasaDone / _magbasaTotal : 0.0,
+      highlight: _currentModuleKey == 'magbasa',
+      locked: _isLocked('magbasa'),
       onTap: () async {
         if (_isLocked('magbasa')) return _showLockedMessage();
         await context.pushPremium(const MagbasaScreen());
@@ -660,11 +642,13 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
     return _buildLessonCard(
       context: context,
       title: AppLocalizations.of(context)!.tandaanTitle,
-      subtitle:
-          '$_tandaanDone/$_tandaanTotal ${AppLocalizations.of(context)!.activities}',
-      imagePath: 'assets/images/intro4.webp',
+      subtitle: AppLocalizations.of(context)!
+          .lessonActivities(_tandaanDone, _tandaanTotal),
+      imagePath: 'assets/images/tandaan/home.webp',
       color: AppColors.shapes,
       progress: _tandaanTotal > 0 ? _tandaanDone / _tandaanTotal : 0.0,
+      highlight: _currentModuleKey == 'tandaan',
+      locked: _isLocked('tandaan'),
       onTap: () async {
         if (_isLocked('tandaan')) return _showLockedMessage();
         await context.pushPremium(const TandaanScreen());
@@ -693,121 +677,212 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
     required Color color,
     required double progress,
     required VoidCallback onTap,
+    bool locked = false,
+    bool highlight = false,
   }) {
+    final loc = AppLocalizations.of(context)!;
     final bool isCompleted = progress >= 0.999; // Using float margin
+    final tintTop = Color.lerp(color, Colors.white, 0.84)!;
+    final tintBottom = Color.lerp(color, Colors.white, 0.70)!;
+    final edge = Color.lerp(color, Colors.white, 0.55)!;
 
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-      child: InkWell(
-        onTap: isCompleted ? () => _showCompletedDialog(title, onTap) : onTap,
-        borderRadius: BorderRadius.circular(22),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  // Big friendly picture instead of a small line icon —
-                  // daycare kids recognize the game by its picture.
-                  Container(
-                    width: 88,
-                    height: 88,
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: (isCompleted ? Colors.green : color)
-                          .withOpacity(0.10),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: (isCompleted ? Colors.green : color)
-                            .withOpacity(0.25),
-                        width: 1.5,
-                      ),
+    // What pressing it will do, said on a button the child can see is one:
+    // start, carry on, finished, or not open yet.
+    final String action;
+    final Color actionBg;
+    final Color actionFg;
+    final IconData actionIcon;
+    if (locked) {
+      action = loc.lessonLocked;
+      actionBg = const Color(0xFFE5E7EB);
+      actionFg = const Color(0xFF6B7280);
+      actionIcon = Icons.lock_rounded;
+    } else if (isCompleted) {
+      action = loc.lessonDone;
+      actionBg = const Color(0xFFFFC531);
+      actionFg = const Color(0xFF7A4A00);
+      actionIcon = Icons.star_rounded;
+    } else {
+      action = progress > 0 ? loc.lessonContinue : loc.lessonStart;
+      actionBg = Color.lerp(color, Colors.black, 0.12)!;
+      actionFg = Colors.white;
+      actionIcon = Icons.play_arrow_rounded;
+    }
+
+    return GestureDetector(
+      onTap: isCompleted ? () => _showCompletedDialog(title, onTap) : onTap,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            constraints: const BoxConstraints(minHeight: 112),
+            padding: const EdgeInsets.fromLTRB(14, 12, 118, 12),
+            decoration: BoxDecoration(
+              gradient: locked
+                  ? null
+                  : LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [tintTop, tintBottom],
                     ),
-                    child: Image.asset(
-                      imagePath,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) =>
-                          Icon(LucideIcons.sparkles, color: color, size: 34),
-                    ),
+              color: locked ? const Color(0xFFF3F4F6) : null,
+              borderRadius: BorderRadius.circular(22),
+              border: highlight ? Border.all(color: color, width: 3) : null,
+              boxShadow: [
+                BoxShadow(
+                  color: locked
+                      ? const Color(0xFFE5E7EB)
+                      : highlight
+                          ? Color.lerp(color, Colors.black, 0.25)!
+                          : edge,
+                  offset: const Offset(0, 3),
+                ),
+                BoxShadow(
+                  color: const Color(0xFF143C28).withOpacity(0.10),
+                  blurRadius: 14,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: 'Fredoka',
+                    fontSize: 16,
+                    height: 1.12,
+                    fontWeight: FontWeight.w600,
+                    color:
+                        locked ? const Color(0xFF8A93A3) : AppColors.textDark,
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF475569),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(5),
+                  child: LinearProgressIndicator(
+                    value: progress.clamp(0.0, 1.0),
+                    minHeight: 9,
+                    backgroundColor: Colors.white.withOpacity(0.85),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        isCompleted ? const Color(0xFF2ECC71) : color),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: actionBg,
+                    borderRadius: BorderRadius.circular(999),
+                    boxShadow: locked
+                        ? null
+                        : [
+                            BoxShadow(
+                              color: Color.lerp(actionBg, Colors.black, 0.3)!,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(actionIcon, size: 16, color: actionFg),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          action,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: 19,
-                            fontWeight: FontWeight.bold,
-                            color: isCompleted
-                                ? Colors.green.shade700
-                                : AppColors.textDark,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w900,
+                            color: actionFg,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          // Was the Tagalog "TAPOS NA!" typed into the
-                          // code, so it stayed Tagalog in English and in
-                          // Ilokano. The app already has this sentence.
-                          isCompleted
-                              ? AppLocalizations.of(context)!.finishedAlready
-                              : subtitle,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: isCompleted
-                                ? Colors.green
-                                : Colors.grey.shade600,
-                            fontWeight: isCompleted
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  if (isCompleted)
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFFFFBEB),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.star_rounded,
-                        color: Color(0xFFFFB800),
-                        size: 26,
-                      ),
-                    )
-                  else
-                    Icon(
-                      LucideIcons.chevron_right,
-                      color: Colors.grey.shade400,
-                      size: 20,
-                    ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: LinearProgressIndicator(
-                  value: progress.clamp(0.0, 1.0),
-                  backgroundColor: isCompleted
-                      ? Colors.green.withOpacity(0.1)
-                      : Colors.grey.shade100,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                      isCompleted ? Colors.green : color),
-                  // Thick enough to read across the room. This bar is the
-                  // only thing on the card that says how far along they are.
-                  minHeight: 14,
+                ),
+              ],
+            ),
+          ),
+          // The picture: the same box for every lesson, on the right,
+          // centred and inside the card, so they all sit alike.
+          Positioned(
+            right: 10,
+            top: 0,
+            bottom: 0,
+            child: Center(
+              child: SizedBox(
+                width: 100,
+                height: 100,
+                child: Opacity(
+                  opacity: locked ? 0.45 : 1,
+                  child: _lessonPicture(imagePath, color, grey: locked),
                 ),
               ),
-            ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// A lesson's picture with a soft shadow under it, grey when locked.
+  Widget _lessonPicture(String path, Color color, {required bool grey}) {
+    Widget image(ColorFilter? filter) {
+      final img = Image.asset(
+        path,
+        width: 100,
+        height: 100,
+        // Decoded at the size it is shown, not the file's.
+        cacheWidth: (100 * MediaQuery.devicePixelRatioOf(context) * 1.3).ceil(),
+        fit: BoxFit.contain,
+        excludeFromSemantics: true,
+        errorBuilder: (_, __, ___) =>
+            Icon(LucideIcons.sparkles, color: color, size: 40),
+      );
+      return filter == null
+          ? img
+          : ColorFiltered(colorFilter: filter, child: img);
+    }
+
+    const greyscale = ColorFilter.matrix(<double>[
+      0.33, 0.33, 0.33, 0, 0, //
+      0.33, 0.33, 0.33, 0, 0,
+      0.33, 0.33, 0.33, 0, 0,
+      0, 0, 0, 1, 0,
+    ]);
+    // No blurred shadow on a phone that cannot draw it smoothly.
+    if (DevicePerformance.lite.value) return image(grey ? greyscale : null);
+    return Stack(
+      children: [
+        Transform.translate(
+          offset: const Offset(0, 5),
+          child: ImageFiltered(
+            imageFilter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+            child: image(
+                const ColorFilter.mode(Color(0x33000000), BlendMode.srcIn)),
           ),
         ),
-      ),
+        image(grey ? greyscale : null),
+      ],
     );
   }
 }

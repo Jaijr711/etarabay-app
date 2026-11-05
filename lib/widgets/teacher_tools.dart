@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:e_tarabay/l10n/app_localizations.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/user_provider.dart';
-import '../services/auth_service.dart';
 import '../utils/constants.dart';
+import 'report_widgets.dart';
+import 'reset_progress_sheet.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 
 /// What a teacher can do about a child that a parent cannot.
@@ -17,312 +17,152 @@ class TeacherTools extends StatelessWidget {
   final String studentName;
   final Map<String, dynamic> studentData;
 
+  /// Opens the child's info, from the dashboard that owns it.
+  final VoidCallback? onEditInfo;
+
+  /// Opens the child's login card.
+  final VoidCallback? onShowLogin;
+
   const TeacherTools({
     super.key,
     required this.studentName,
     required this.studentData,
+    this.onEditInfo,
+    this.onShowLogin,
   });
 
-  Future<void> _showResetSpecificActivityDialog(BuildContext context) async {
-    final targetStudentId = (studentData['id'] ??
-            studentData['studentId'] ??
-            studentData['docId'] ??
-            '')
-        .toString();
+  String get _studentId => (studentData['id'] ??
+          studentData['studentId'] ??
+          studentData['docId'] ??
+          '')
+      .toString();
 
-    // Named the way the rest of the app names each module, in the
-    // teacher's own language — these were Tagalog whatever was chosen.
-    final l10n = AppLocalizations.of(context)!;
-    final activities = [
-      {
-        'key': 'matematika',
-        'label': l10n.matematika,
-        'icon': LucideIcons.calculator,
-        'color': Colors.blue
-      },
-      {
-        'key': 'pamilya',
-        'label': l10n.sariliProgress,
-        'icon': LucideIcons.users,
-        'color': Colors.purple
-      },
-      {
-        'key': 'traceit',
-        'label': l10n.traceItTitle,
-        'icon': LucideIcons.pencil,
-        'color': Colors.teal
-      },
-      {
-        'key': 'magbasa',
-        'label': l10n.magbasaTitle,
-        'icon': LucideIcons.book_open,
-        'color': Colors.indigo
-      },
-      {
-        'key': 'tandaan',
-        'label': l10n.tandaanTitle,
-        'icon': LucideIcons.brain,
-        'color': Colors.amber.shade800
-      },
-      {
-        'key': 'kulay',
-        'label': l10n.kulaySaya,
-        'icon': LucideIcons.palette,
-        'color': Colors.pink
-      },
-    ];
-
-    final selected = <String>{};
-
-    await showDialog(
-      context: context,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              title: Row(
-                children: [
-                  const Icon(LucideIcons.list_restart,
-                      color: Colors.orange, size: 24),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                        AppLocalizations.of(context)!.resetSpecificActivity,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18)),
-                  ),
-                ],
-              ),
-              content: SizedBox(
-                width: double.maxFinite,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!
-                          .pickActivitiesToReset(studentName),
-                      style:
-                          TextStyle(color: Colors.grey.shade700, fontSize: 14),
-                    ),
-                    const SizedBox(height: 12),
-                    Flexible(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: activities.map((act) {
-                            final key = act['key'] as String;
-                            final isChecked = selected.contains(key);
-                            final color = act['color'] as Color;
-                            return CheckboxListTile(
-                              value: isChecked,
-                              activeColor: color,
-                              contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 4),
-                              secondary:
-                                  Icon(act['icon'] as IconData, color: color),
-                              title: Text(
-                                act['label'] as String,
-                                style: const TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.w600),
-                              ),
-                              onChanged: (val) {
-                                setDialogState(() {
-                                  if (val == true) {
-                                    selected.add(key);
-                                  } else {
-                                    selected.remove(key);
-                                  }
-                                });
-                              },
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: Text(AppLocalizations.of(context)!.cancel,
-                      style: const TextStyle(color: Colors.grey)),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: selected.isEmpty
-                      ? null
-                      : () async {
-                          Navigator.pop(ctx);
-                          final auth = AuthService();
-                          final success =
-                              await auth.resetStudentSpecificActivities(
-                                  targetStudentId, selected.toList());
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(success
-                                    ? l10n.resetActivitiesDone
-                                    : l10n.resetActivitiesFailed),
-                                backgroundColor:
-                                    success ? Colors.green : Colors.red,
-                              ),
-                            );
-                            if (success) {
-                              try {
-                                final userProvider = Provider.of<UserProvider>(
-                                    context,
-                                    listen: false);
-                                if (userProvider.currentStudentId ==
-                                    targetStudentId) {
-                                  await userProvider.resetAllProgressLocally();
-                                }
-                              } catch (_) {}
-                            }
-                          }
-                        },
-                  child: Text(AppLocalizations.of(context)!
-                      .resetCount(selected.length)),
-                ),
-              ],
-            );
-          },
-        );
-      },
+  Future<void> _reset(BuildContext context) async {
+    final done = await showResetProgressSheet(
+      context,
+      studentId: _studentId,
+      studentName: studentName,
     );
-  }
-
-  Future<void> _confirmResetActivity(BuildContext context) async {
-    final targetStudentId = (studentData['id'] ??
-            studentData['studentId'] ??
-            studentData['docId'] ??
-            '')
-        .toString();
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            const Icon(LucideIcons.rotate_ccw, color: Colors.red),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(AppLocalizations.of(context)!.resetAllActivities,
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ),
-        content: Text(
-          AppLocalizations.of(context)!.confirmResetAll(studentName),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(AppLocalizations.of(context)!.cancel,
-                style: const TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(AppLocalizations.of(context)!.resetAll),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm == true && context.mounted) {
-      final auth = AuthService();
-      final success = await auth.resetStudentActivityProgress(targetStudentId);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(success
-                ? AppLocalizations.of(context)!.resetActivitiesDone
-                : AppLocalizations.of(context)!.resetActivitiesFailed),
-            backgroundColor: success ? Colors.green : Colors.red,
-          ),
-        );
-        if (success) {
-          try {
-            final userProvider =
-                Provider.of<UserProvider>(context, listen: false);
-            if (userProvider.currentStudentId == targetStudentId) {
-              await userProvider.resetAllProgressLocally();
-            }
-          } catch (_) {}
-          if (!context.mounted) return;
-          Navigator.pop(context);
-        }
-      }
-    }
+    // Back to the class, where the child's card shows the fresh figures;
+    // this page was drawn from the record before the reset.
+    if (done && context.mounted) Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
-    final List creations = studentData['creations'] is List
+    final loc = AppLocalizations.of(context)!;
+    final List oldCreations = studentData['creations'] is List
         ? studentData['creations'] as List
         : [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildArtworksGallery(context, creations),
-        const SizedBox(height: 32),
-
-        // Reset Activity Buttons
-        SizedBox(
-          width: double.infinity,
-          height: 50,
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange.shade700,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              elevation: 2,
-            ),
-            icon: const Icon(LucideIcons.list_restart, size: 20),
-            label: Text(
-              AppLocalizations.of(context)!.resetSpecificActivity,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
-            onPressed: () => _showResetSpecificActivityDialog(context),
-          ),
+        // Fetched when the teacher opens this child, not carried in the
+        // live class list, where every child's drawings came down again
+        // with every answer they gave.
+        FutureBuilder<List>(
+          future: _cloudCreations(_studentId, oldCreations),
+          builder: (context, snap) =>
+              _buildArtworksGallery(context, snap.data ?? oldCreations),
         ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.red.shade700,
-              side: BorderSide(color: Colors.red.shade300, width: 1.5),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-            icon: const Icon(LucideIcons.rotate_ccw, size: 18),
-            label: Text(
-              AppLocalizations.of(context)!.resetAllActivities,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-            ),
-            onPressed: () => _confirmResetActivity(context),
-          ),
+        const SizedBox(height: 22),
+        ReportSectionHeader(
+          title: loc.teacherToolsHeader,
+          icon: LucideIcons.wrench,
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 10),
+        if (onEditInfo != null)
+          _tool(
+            icon: LucideIcons.square_pen,
+            title: loc.toolEditInfo,
+            note: loc.toolEditInfoNote,
+            onTap: onEditInfo!,
+          ),
+        if (onShowLogin != null)
+          _tool(
+            icon: LucideIcons.id_card,
+            title: loc.toolLogin,
+            note: loc.toolLoginNote,
+            onTap: onShowLogin!,
+          ),
+        _tool(
+          icon: LucideIcons.rotate_ccw,
+          title: loc.toolReset,
+          note: loc.toolResetNote,
+          danger: true,
+          onTap: () => _reset(context),
+        ),
+        const SizedBox(height: 16),
       ],
+    );
+  }
+
+  Widget _tool({
+    required IconData icon,
+    required String title,
+    required String note,
+    required VoidCallback onTap,
+    bool danger = false,
+  }) {
+    const red = Color(0xFFC2334D);
+    final colour = danger ? red : AppColors.primary;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: Color(0xFFE6E8EF)),
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 10, 12),
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: danger
+                        ? const Color(0xFFFDE8EC)
+                        : const Color(0xFFEEEDFD),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, size: 19, color: colour),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: danger ? red : AppColors.textDark,
+                        ),
+                      ),
+                      Text(
+                        note,
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          color: AppColors.textLight,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(LucideIcons.chevron_right,
+                    size: 18, color: Color(0xFFB8BECB)),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -343,125 +183,133 @@ class TeacherTools extends StatelessWidget {
       'assets/images/paint6.png': l10n.pageMansanas,
       'assets/images/paint7.png': l10n.pageSaging,
       'assets/images/paint8.png': l10n.pageTeddyBear,
-      'assets/images/paint9.png': l10n.pageSodaPop,
+      'assets/images/paint_racecar.png': l10n.pageRaceCar,
     };
     return byPage[page] ?? '${creation['name'] ?? 'Artwork'}';
   }
 
+  Future<List> _cloudCreations(String studentId, List fallback) async {
+    if (studentId.isEmpty) return fallback;
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('students')
+          .doc(studentId)
+          .collection('extra')
+          .doc('creations')
+          .get();
+      final list = doc.data()?['list'];
+      return list is List ? list : fallback;
+    } catch (_) {
+      return fallback;
+    }
+  }
+
   Widget _buildArtworksGallery(BuildContext context, List creations) {
+    final loc = AppLocalizations.of(context)!;
+    final header = ReportSectionHeader(
+      title: loc.childWorksHeader,
+      icon: LucideIcons.image,
+      count: creations.isEmpty ? null : creations.length,
+    );
+
     if (creations.isEmpty) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
-        ),
-        child: Column(
-          children: [
-            Icon(LucideIcons.image_off, color: Colors.grey.shade400, size: 36),
-            const SizedBox(height: 8),
-            Text(
-              AppLocalizations.of(context)!.noArtworksSaved,
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          header,
+          const SizedBox(height: 10),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+            decoration: reportCardDecoration(radius: 16),
+            child: Row(
+              children: [
+                Icon(LucideIcons.image_off,
+                    color: Colors.grey.shade400, size: 22),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    loc.noArtworksSaved,
+                    style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       );
     }
 
-    return SizedBox(
-      height: 170,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: creations.length,
-        itemBuilder: (context, index) {
-          final creation =
-              creations[index] is Map ? creations[index] as Map : {};
-          final name = _artworkName(context, creation);
-          final base64Img = creation['base64Image'] as String? ?? '';
-          final stars = creation['stars'] as int?;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        header,
+        const SizedBox(height: 10),
+        SizedBox(
+          height: 112,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: creations.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              final creation =
+                  creations[index] is Map ? creations[index] as Map : {};
+              final name = _artworkName(context, creation);
+              final base64Img = creation['base64Image'] as String? ?? '';
+              final stars = (creation['stars'] as num?)?.toInt() ?? 0;
 
-          Widget imageWidget;
-          if (base64Img.isNotEmpty) {
-            try {
-              final bytes = base64Decode(base64Img);
-              imageWidget = Image.memory(bytes, fit: BoxFit.cover);
-            } catch (_) {
-              imageWidget = Container(
-                color: Colors.grey.shade200,
-                child: const Icon(LucideIcons.image, color: Colors.grey),
-              );
-            }
-          } else {
-            imageWidget = Container(
-              color: Colors.grey.shade200,
-              child: const Icon(LucideIcons.palette, color: AppColors.colors),
-            );
-          }
+              Widget image;
+              try {
+                image = base64Img.isEmpty
+                    ? const ColoredBox(
+                        color: Color(0xFFF1F2F7),
+                        child:
+                            Icon(LucideIcons.palette, color: AppColors.colors),
+                      )
+                    : Image.memory(base64Decode(base64Img), fit: BoxFit.cover);
+              } catch (_) {
+                image = const ColoredBox(
+                  color: Color(0xFFF1F2F7),
+                  child: Icon(LucideIcons.image, color: Colors.grey),
+                );
+              }
 
-          return Container(
-            width: 140,
-            margin: const EdgeInsets.only(right: 12),
-            child: GestureDetector(
-              onTap: () => _showArtworkPreview(context, name, base64Img, stars),
-              child: Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(14),
-                        ),
-                        child: imageWidget,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          if (stars != null && stars > 0)
-                            Row(
-                              children: [
-                                const Icon(Icons.star_rounded,
-                                    color: Color(0xFFFFB800), size: 14),
-                                const SizedBox(width: 2),
-                                Text(
-                                  '$stars Stars',
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+              return Tooltip(
+                message: name,
+                child: GestureDetector(
+                  onTap: () =>
+                      _showArtworkPreview(context, name, base64Img, stars),
+                  child: Container(
+                    width: 84,
+                    clipBehavior: Clip.antiAlias,
+                    decoration: reportCardDecoration(radius: 14),
+                    child: Column(
+                      children: [
+                        SizedBox(width: 84, height: 84, child: image),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              for (var i = 0; i < 3; i++)
+                                Icon(
+                                  Icons.star_rounded,
+                                  size: 14,
+                                  color: i < stars
+                                      ? const Color(0xFFF5A623)
+                                      : const Color(0xFFD9DCE4),
                                 ),
-                              ],
-                            ),
-                        ],
-                      ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -556,93 +404,130 @@ class PracticeList extends StatelessWidget {
     final loc = AppLocalizations.of(context)!;
     final raw = progress['practiceMisses'];
 
-    final rows = <({String label, int weight})>[];
+    final rows = <({_Skill skill, int weight})>[];
     if (raw is Map) {
       for (final module in raw.entries) {
         final items = module.value;
         if (items is! Map) continue;
         for (final item in items.entries) {
-          final label =
+          final skill =
               _skillName(context, module.key.toString(), item.key.toString());
-          if (label == null) continue;
+          if (skill == null) continue;
           rows.add((
-            label: label,
+            skill: skill,
             weight: (item.value as num?)?.toInt() ?? 0,
           ));
         }
       }
     }
     rows.sort((a, b) => b.weight.compareTo(a.weight));
+    final shown = rows.take(6).toList();
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 24),
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 12,
-              offset: const Offset(0, 4)),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ReportSectionHeader(
+            title: loc.whatToPractise,
+            icon: LucideIcons.target,
+            count: shown.isEmpty ? null : shown.length,
+          ),
+          const SizedBox(height: 10),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            decoration: reportCardDecoration(),
+            child: shown.isEmpty
+                // Nothing on the list is the good outcome, so it is said
+                // rather than left as a gap the teacher has to interpret.
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Text(loc.nothingToPractise,
+                        style: TextStyle(
+                            fontSize: 13,
+                            height: 1.35,
+                            color: Colors.grey.shade600)),
+                  )
+                : Column(
+                    children: [
+                      for (var i = 0; i < shown.length; i++)
+                        _row(loc, shown[i].skill, shown[i].weight,
+                            first: i == 0),
+                    ],
+                  ),
+          ),
         ],
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Icon(LucideIcons.life_buoy, size: 16, color: Colors.grey.shade500),
-          const SizedBox(width: 8),
-          Text(loc.whatToPractise,
-              style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textDark)),
-        ]),
-        const SizedBox(height: 12),
-        // Nothing on the list is the good outcome, so it is said rather than
-        // left as a gap the teacher has to interpret.
-        if (rows.isEmpty)
-          Text(loc.nothingToPractise,
-              style: TextStyle(
-                  fontSize: 13, height: 1.35, color: Colors.grey.shade600))
-        else
-          for (final row in rows.take(6)) ...[
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(children: [
-                Expanded(
-                  child: Text(row.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          fontSize: 13.5, fontWeight: FontWeight.w600)),
-                ),
-                const SizedBox(width: 10),
-                // Five dots, filled as far as the child is from settling it.
-                for (var i = 0; i < 5; i++)
-                  Container(
-                    width: 7,
-                    height: 7,
-                    margin: const EdgeInsets.only(left: 3),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: i < row.weight
-                          ? const Color(0xFFC2334D)
-                          : Colors.grey.shade200,
-                    ),
-                  ),
-              ]),
-            ),
-          ],
-      ]),
     );
   }
 
-  /// Turns a stored `module` + `levelN` into the name the child saw.
+  Widget _row(AppLocalizations loc, _Skill skill, int weight,
+      {required bool first}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        border: first
+            ? null
+            : const Border(top: BorderSide(color: Color(0xFFF0F1F5))),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 9,
+            height: 9,
+            decoration:
+                BoxDecoration(color: skill.colour, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(skill.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark)),
+                Text(skill.module,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 12, color: AppColors.textLight)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          // How many more times it went wrong than right, lately.
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFDE8EC),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(
+              loc.practiceMisses(weight),
+              style: const TextStyle(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFFC2334D),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Turns a stored `module` + `levelN` into the name the child saw, the
+  /// module it is in, and that module's colour.
   ///
   /// Returns null for anything unrecognised — a level removed from a module
   /// later should quietly disappear from the teacher's list, not show up as
   /// a raw key.
-  String? _skillName(BuildContext context, String module, String item) {
+  _Skill? _skillName(BuildContext context, String module, String item) {
     final loc = AppLocalizations.of(context)!;
     final index = int.tryParse(item.replaceFirst('level', ''));
     if (index == null) return null;
@@ -676,9 +561,14 @@ class PracticeList extends StatelessWidget {
 
     final moduleName = switch (module) {
       'matematika' => loc.matematika,
-      'sarili' => loc.angAkingSarili,
+      'sarili' => loc.angAkingSarili.replaceAll('\n', ' '),
       _ => loc.atAkingPamilya,
     };
-    return '${names[index]} · $moduleName';
+    final colour = module == 'matematika'
+        ? const Color(0xFF2C7BE5)
+        : const Color(0xFF2E9E5B);
+    return (name: names[index], module: moduleName, colour: colour);
   }
 }
+
+typedef _Skill = ({String name, String module, Color colour});

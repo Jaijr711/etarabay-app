@@ -83,8 +83,7 @@ void main() {
     // b and p into true circles that close, and redrawing 8 as a single
     // figure eight — top, round the left, through the waist, back up the
     // right — brought it back, because that path ends where it started.
-    test('shares a point with the handle on exactly the closed characters',
-        () {
+    test('shares a point with the handle on exactly the closed characters', () {
       final closed = <String>[];
       for (final (mode, name, list) in [
         (0, 'uppercase', uppercaseLetters),

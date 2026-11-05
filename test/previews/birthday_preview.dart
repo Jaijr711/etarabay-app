@@ -29,12 +29,10 @@ void main() {
     // finished. Answering the channel here, the same way the framework's
     // own test bindings answer plugin channels, heads it off before it ever
     // throws.
-    TestDefaultBinaryMessengerBinding
-        .instance.defaultBinaryMessenger
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
             const MethodChannel('xyz.luan/audioplayers'), (_) async => null);
-    TestDefaultBinaryMessengerBinding
-        .instance.defaultBinaryMessenger
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
             const MethodChannel('xyz.luan/audioplayers.global'),
             (_) async => null);

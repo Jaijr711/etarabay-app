@@ -10,6 +10,7 @@ import '../main.dart'; // Import AudioManager
 import 'login_screen.dart';
 import '../providers/user_provider.dart';
 import 'home_screen.dart';
+import 'setup_resume_screen.dart';
 import 'teacher_dashboard_screen.dart';
 import 'onboarding_screen.dart';
 import '../utils/page_transitions.dart';
@@ -88,6 +89,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
   VideoPlayerController? _video;
   bool _videoFailed = false;
+
+  /// Known once the session is read: false until then, so nothing — not
+  /// even the logo — shows before it is known whether this is a teacher.
+  bool _decided = false;
+
+  /// A teacher coming back: no train, no logo. Their PIN is already on top
+  /// of this screen, and the dashboard should be under it the moment it
+  /// opens.
+  bool _skipIntro = false;
   bool _leaving = false;
   bool _musicStarted = false;
 
@@ -99,6 +109,22 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     // Started now, so it is settled long before the video is over.
     unawaited(_destination);
+    _begin();
+  }
+
+  /// The opening for a child, or none for a teacher.
+  Future<void> _begin() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    if (prefs.getString('session_role') == 'teacher') {
+      setState(() {
+        _decided = true;
+        _skipIntro = true;
+      });
+      _leave();
+      return;
+    }
+    setState(() => _decided = true);
     _startVideo();
   }
 
@@ -194,7 +220,12 @@ class _SplashScreenState extends State<SplashScreen> {
     }
 
     if (!hasSeenOnboarding) return const OnboardingScreen();
-    if (role == 'student' && studentId != null) return const HomeScreen();
+    if (role == 'student' && studentId != null) {
+      if (prefs.getBool(setupPendingKeyFor(studentId)) == true) {
+        return SetupResumeScreen(studentId: studentId);
+      }
+      return const HomeScreen();
+    }
     if (role == 'teacher') return const TeacherDashboardScreen();
     return const LoginScreen();
   }
@@ -213,43 +244,45 @@ class _SplashScreenState extends State<SplashScreen> {
           // Ten seconds is a long wait on the fifth open of the day.
           onTap: playing ? _leave : null,
           child: SizedBox.expand(
-            child: playing
-                ? Center(
-                    child: AspectRatio(
-                      aspectRatio: v.value.aspectRatio,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          VideoPlayer(v),
-                          // On a screen taller or wider than the video, its
-                          // edge falls inside the screen: a block dropping in
-                          // from the top appeared out of nothing along a
-                          // straight line, and some Android decoders draw a
-                          // thin stripe at the frame's edge. A short fade to
-                          // the page's white on all four sides hides both.
-                          const IgnorePointer(child: _EdgeFade()),
-                        ],
+            child: !_decided || _skipIntro
+                ? const SizedBox.shrink()
+                : playing
+                    ? Center(
+                        child: AspectRatio(
+                          aspectRatio: v.value.aspectRatio,
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              VideoPlayer(v),
+                              // On a screen taller or wider than the video, its
+                              // edge falls inside the screen: a block dropping in
+                              // from the top appeared out of nothing along a
+                              // straight line, and some Android decoders draw a
+                              // thin stripe at the frame's edge. A short fade to
+                              // the page's white on all four sides hides both.
+                              const IgnorePointer(child: _EdgeFade()),
+                            ],
+                          ),
+                        ),
+                      )
+                    : Center(
+                        // Shown while the video starts, and instead of it when
+                        // it cannot play here.
+                        child: Image.asset(
+                          'assets/images/app_logo-transparent.png',
+                          width: 240,
+                          height: 240,
+                          fit: BoxFit.contain,
+                        )
+                            .animate(
+                                onPlay: (controller) =>
+                                    controller.repeat(reverse: true))
+                            .scaleXY(
+                                begin: 1.0,
+                                end: 1.05,
+                                duration: 1500.ms,
+                                curve: Curves.easeInOut),
                       ),
-                    ),
-                  )
-                : Center(
-                    // Shown while the video starts, and instead of it when
-                    // it cannot play here.
-                    child: Image.asset(
-                      'assets/images/app_logo-transparent.png',
-                      width: 240,
-                      height: 240,
-                      fit: BoxFit.contain,
-                    )
-                        .animate(
-                            onPlay: (controller) =>
-                                controller.repeat(reverse: true))
-                        .scaleXY(
-                            begin: 1.0,
-                            end: 1.05,
-                            duration: 1500.ms,
-                            curve: Curves.easeInOut),
-                  ),
           ),
         ),
       ),

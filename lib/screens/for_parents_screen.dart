@@ -1,3 +1,5 @@
+import '../widgets/report_widgets.dart';
+import '../widgets/reset_progress_sheet.dart';
 import '../widgets/teacher_tools.dart';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -44,6 +46,8 @@ class ForParentsScreen extends StatefulWidget {
     this.viewStudentId,
     this.viewStudentName,
     this.viewStudentData,
+    this.onEditInfo,
+    this.onShowLogin,
   });
 
   /// Opens the report for a child who is not signed in on this device.
@@ -57,6 +61,11 @@ class ForParentsScreen extends StatefulWidget {
   /// tools panel — a parent visiting has no record to hand and no business
   /// resetting anything.
   final Map<String, dynamic>? viewStudentData;
+
+  /// The teacher's way into this child's info and login card, from the
+  /// dashboard that owns them.
+  final VoidCallback? onEditInfo;
+  final VoidCallback? onShowLogin;
 
   /// Whether this is somebody looking in, rather than the parent at home.
   bool get isVisiting => viewStudentId != null;
@@ -176,7 +185,7 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
     ],
     'Toys': [
       {'name': 'Teddy Bear', 'difficulty': 'Medium'},
-      {'name': 'Soda', 'difficulty': 'Easy'},
+      {'name': 'Race Car', 'difficulty': 'Medium'},
     ],
   };
   static const Map<String, Color> _kulayColors = {
@@ -741,7 +750,7 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
         return {for (final c in part['done'] as List) c.toString()};
       }
     }
-    return _siblingProgress == null ? local : const {};
+    return !_viewingOther ? local : const {};
   }
 
   /// Which Matematika games in [lvl] are done, from whichever child's
@@ -761,7 +770,7 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
         }
       }
     }
-    return _siblingProgress == null ? _matDone[lvl] : const {};
+    return !_viewingOther ? _matDone[lvl] : const {};
   }
 
   /// Which Kulay-Saya pages in [cat] are coloured, from whichever child's
@@ -777,7 +786,7 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
         }
       }
     }
-    return _siblingProgress == null ? (_kulayDone[cat] ?? const {}) : const {};
+    return !_viewingOther ? (_kulayDone[cat] ?? const {}) : const {};
   }
 
   /// Which poems/stories/songs in [cat] ('tula', 'kwento' or 'kanta') are
@@ -794,9 +803,7 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
         }
       }
     }
-    return _siblingProgress == null
-        ? (_magbasaDone[cat] ?? const {})
-        : const {};
+    return !_viewingOther ? (_magbasaDone[cat] ?? const {}) : const {};
   }
 
   /// Finished drawings, from whichever child's record is being shown.
@@ -805,7 +812,7 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
     if (kulay is Map && kulay['totalCreations'] != null) {
       return (kulay['totalCreations'] as num).toInt();
     }
-    return _siblingProgress == null ? _kulayTotalCreations : 0;
+    return !_viewingOther ? _kulayTotalCreations : 0;
   }
 
   Widget _buildTraceItTab() {
@@ -1073,43 +1080,42 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
         }),
         const SizedBox(height: 16),
 
+        _doneChip(
+            [
+              for (int l = 0; l < _matLevelGameCounts.length; l++)
+                if (_matDoneFor(l).length >= _matLevelGameCounts[l]) l
+            ].length,
+            _matLevelGameCounts.length,
+            const Color(0xFF2C7BE5)),
+        const SizedBox(height: 16),
         _sectionHeader(AppLocalizations.of(context)!.gameProgressHeader,
             LucideIcons.grid_3x3),
         const SizedBox(height: 12),
 
         ...List.generate(_matLevelTitles(context).length, (lvl) {
-          final done = _matDoneFor(lvl).length;
+          final doneSet = _matDoneFor(lvl);
+          final done = doneSet.length;
           final total = _matLevelGameCounts[lvl];
           final progress = total > 0 ? done / total : 0.0;
-          const color = Colors.teal;
+          const color = Color(0xFF2C7BE5);
 
           return Container(
-            margin: const EdgeInsets.only(bottom: 14),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: color.withOpacity(0.2)),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3))
-              ],
-            ),
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.all(14),
+            decoration: reportCardDecoration(radius: 18),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Container(
-                    width: 44,
-                    height: 44,
+                    width: 34,
+                    height: 34,
                     decoration: BoxDecoration(
-                        color: color.withOpacity(0.15), shape: BoxShape.circle),
+                        color: color.withOpacity(0.12), shape: BoxShape.circle),
                     child: Center(
                         child: Text('${lvl + 1}',
                             style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
                                 color: color)))),
                 const SizedBox(width: 12),
                 Expanded(
@@ -1118,62 +1124,70 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
                         children: [
                       Text(_matLevelTitles(context)[lvl],
                           style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: color)),
-                      const SizedBox(height: 4),
-                      Row(children: [
-                        Expanded(
-                            child: ClipRRect(
-                                borderRadius: BorderRadius.circular(6),
-                                child: LinearProgressIndicator(
-                                    value: progress,
-                                    backgroundColor: Colors.grey.shade200,
-                                    valueColor:
-                                        const AlwaysStoppedAnimation<Color>(
-                                            color),
-                                    minHeight: 7))),
-                        const SizedBox(width: 10),
-                        Text('$done/$total',
-                            style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: color)),
-                      ]),
+                              fontSize: 14.5,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textDark)),
+                      const SizedBox(height: 6),
+                      ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                              value: progress,
+                              backgroundColor: const Color(0xFFEEF0F5),
+                              valueColor:
+                                  const AlwaysStoppedAnimation<Color>(color),
+                              minHeight: 7)),
                     ])),
+                const SizedBox(width: 10),
+                Text('$done/$total',
+                    style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: color)),
               ]),
               const SizedBox(height: 10),
+              // Each round of the game: green with a tick once done.
               Wrap(
                 spacing: 6,
                 runSpacing: 6,
                 children: List.generate(total, (g) {
-                  final isDone = _matDoneFor(lvl).contains(g);
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: 34,
-                    height: 34,
+                  final isDone = doneSet.contains(g);
+                  return Container(
+                    padding: const EdgeInsets.fromLTRB(5, 3, 9, 3),
                     decoration: BoxDecoration(
                       color: isDone
-                          ? color.withOpacity(0.15)
-                          : Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                          color: isDone ? color : Colors.grey.shade300,
-                          width: isDone ? 1.5 : 1),
+                          ? const Color(0xFFE9F7EF)
+                          : const Color(0xFFF1F2F7),
+                      borderRadius: BorderRadius.circular(999),
                     ),
-                    child: Center(
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                          Text('${g + 1}',
-                              style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: color)),
-                          if (isDone)
-                            const Icon(LucideIcons.check,
-                                size: 8, color: color),
-                        ])),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Container(
+                        width: 16,
+                        height: 16,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isDone
+                              ? const Color(0xFF2E9E5B)
+                              : Colors.transparent,
+                          border: Border.all(
+                              color: isDone
+                                  ? const Color(0xFF2E9E5B)
+                                  : const Color(0xFFC9CDD8),
+                              width: 1.5),
+                        ),
+                        child: isDone
+                            ? const Icon(LucideIcons.check,
+                                size: 10, color: Colors.white)
+                            : null,
+                      ),
+                      const SizedBox(width: 4),
+                      Text('${g + 1}',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              color: isDone
+                                  ? const Color(0xFF1F7A45)
+                                  : AppColors.textLight)),
+                    ]),
                   );
                 }),
               ),
@@ -1417,9 +1431,20 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
     });
   }
 
+  /// Whether the report is about a child other than the one signed in on
+  /// this device: a sibling, or the child a teacher opened.
+  ///
+  /// Then nothing on this device is theirs. While their record loads, or if
+  /// it cannot be fetched, the report shows nothing rather than this
+  /// phone's own child's stars under their name.
+  bool get _viewingOther => widget.isVisiting || _siblingId != null;
+
   /// The progress being shown — the sibling's if one is selected.
   Map<String, dynamic> get _shownProgress =>
-      _siblingProgress ?? Provider.of<UserProvider>(context).getAllProgress();
+      _siblingProgress ??
+      (_viewingOther
+          ? const <String, dynamic>{}
+          : Provider.of<UserProvider>(context).getAllProgress());
 
   /// Stars earned and stars available for one module.
   ///
@@ -1428,9 +1453,25 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
   /// the same number.
   (int, int) _moduleStars(String key) {
     final m = _shownProgress[key];
-    if (m is! Map) return (0, 0);
+    if (m is! Map) return (0, _possibleStars(key, null));
     final earned = ((m['stars'] ?? m['earnedStars'] ?? 0) as num).toInt();
-    return (earned, (m['possibleStars'] as int?) ?? 0);
+    return (earned, _possibleStars(key, m));
+  }
+
+  /// What each module's stars top out at, for a record that does not carry
+  /// its own total: one synced before the totals travelled with it, or not
+  /// loaded yet. Without it another child's report read "0 of 0 stars" with
+  /// an empty bar. Pamilya and Tandaan fall back the same way where read.
+  static const Map<String, int> _starCeilings = {
+    'matematika': UserProvider.matematikaStarCeiling,
+    'magbasa': UserProvider.magbasaStarCeiling,
+    'kulay': UserProvider.kulayStarCeiling,
+    'traceit': UserProvider.traceitStarCeiling,
+  };
+
+  static int _possibleStars(String key, Map? m) {
+    final carried = (m?['possibleStars'] as num?)?.toInt() ?? 0;
+    return carried > 0 ? carried : (_starCeilings[key] ?? 0);
   }
 
   /// One level of a graded module: its name, its stars, and how it went.
@@ -1438,52 +1479,88 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
   /// Three filled stars is a clean run; fewer means the child got there but
   /// needed more than one go. Empty means not opened — said in words, because
   /// three grey stars and "never tried" look the same to someone skimming.
-  Widget _levelStarRow(String title, int stars, Color color) {
+  Widget _levelStarRow(String title, int stars, Color color,
+      {int? number, IconData? icon}) {
     final loc = AppLocalizations.of(context)!;
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.18)),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 3))
-        ],
-      ),
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+      decoration: reportCardDecoration(radius: 16),
       child: Row(children: [
+        Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(icon != null ? 12 : 19),
+          ),
+          child: Center(
+            child: icon != null
+                ? Icon(icon, size: 19, color: color)
+                : Text('${number ?? ''}',
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: color)),
+          ),
+        ),
+        const SizedBox(width: 12),
         Expanded(
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(title,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style:
-                    const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-            if (stars == 0) ...[
-              const SizedBox(height: 2),
-              Text(loc.notStartedYet,
-                  style:
-                      TextStyle(fontSize: 11.5, color: Colors.grey.shade500)),
-            ],
+                style: const TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark)),
+            const SizedBox(height: 1),
+            Text(
+                stars == 0
+                    ? loc.notStartedYet
+                    : loc.levelStarsEarned(stars.clamp(0, 3)),
+                style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: stars == 0 ? AppColors.textLight : color)),
           ]),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 8),
         Row(mainAxisSize: MainAxisSize.min, children: [
           for (int i = 0; i < 3; i++)
-            Icon(i < stars ? Icons.star_rounded : Icons.star_outline_rounded,
+            Icon(Icons.star_rounded,
                 size: 20,
-                color:
-                    i < stars ? const Color(0xFFFFB800) : Colors.grey.shade300),
+                color: i < stars
+                    ? const Color(0xFFF5A623)
+                    : const Color(0xFFD9DCE4)),
         ]),
       ]),
     );
   }
 
-  /// Header shared by the two graded reports: stars earned out of available.
+  /// "3 of 9 done", under a module's header: the one figure the stars do
+  /// not say on their own.
+  Widget _doneChip(int done, int total, Color color) {
+    final loc = AppLocalizations.of(context)!;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.10),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(LucideIcons.circle_check, size: 14, color: color),
+        const SizedBox(width: 5),
+        Text(loc.levelsDone(done, total),
+            style: TextStyle(
+                fontSize: 12.5, fontWeight: FontWeight.w800, color: color)),
+      ]),
+    );
+  }
+
+  /// Header shared by the module reports: the module's colour and sign, how
+  /// far through it the child is, and the stars on the right.
   Widget _gradedHeader({
     required IconData icon,
     required String title,
@@ -1493,50 +1570,99 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
     required List<Color> gradient,
   }) {
     final loc = AppLocalizations.of(context)!;
-    return _gradientCard(
-      gradient: gradient,
+    final percent = possible > 0 ? (earned * 100 / possible).round() : 0;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [gradient.first, gradient.first.withOpacity(0.72)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+              color: gradient.first.withOpacity(0.28),
+              blurRadius: 14,
+              offset: const Offset(0, 5)),
+        ],
+      ),
+      // The title gets the whole width: beside the stars, a long module name
+      // in Ilocano broke on a small phone and left "!" on a line of its own.
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Icon(icon, color: Colors.white, size: 28),
-          const SizedBox(width: 10),
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.22),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Icon(icon, color: Colors.white, size: 24),
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
+                    fontFamily: 'Fredoka',
                     color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold)),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    height: 1.15)),
           ),
         ]),
-        const SizedBox(height: 4),
-        Text(subtitle,
-            style: TextStyle(
-                color: Colors.white.withOpacity(0.9), fontSize: 12.5)),
         const SizedBox(height: 14),
-        Text(loc.starsOfPossible(earned, possible),
-            style: const TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold)),
-        const SizedBox(height: 6),
         ClipRRect(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(6),
           child: LinearProgressIndicator(
-            value: possible > 0 ? earned / possible : 0,
-            backgroundColor: Colors.white.withOpacity(0.3),
+            value: possible > 0 ? (earned / possible).clamp(0.0, 1.0) : 0,
+            minHeight: 8,
+            backgroundColor: Colors.white.withOpacity(0.28),
             valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-            minHeight: 10,
           ),
         ),
+        const SizedBox(height: 8),
+        Row(children: [
+          Expanded(
+            child: Text(
+                earned == 0 ? loc.notStartedYet : loc.percentDone(percent),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                    color: Colors.white.withOpacity(0.95),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700)),
+          ),
+          const Icon(Icons.star_rounded, color: Color(0xFFFFD54F), size: 20),
+          const SizedBox(width: 3),
+          Text('$earned',
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800)),
+          const SizedBox(width: 4),
+          Text(loc.ofStars(possible),
+              style: TextStyle(
+                  color: Colors.white.withOpacity(0.9), fontSize: 12)),
+        ]),
       ]),
     );
   }
 
   Widget _buildSariliTab() {
     final loc = AppLocalizations.of(context)!;
-    final p = Provider.of<UserProvider>(context).getPamilyaProgress();
-    final levels = (p['levelStars'] as List?)?.cast<int>() ?? const <int>[];
-    final earned = (p['earnedStars'] as int?) ?? 0;
-    final possible = (p['possibleStars'] as int?) ?? 0;
+    final p = (_shownProgress['pamilya'] as Map?) ?? const {};
+    final levels = [
+      for (final v in (p['levelStars'] as List?) ?? const []) (v as num).toInt()
+    ];
+    final earned = ((p['earnedStars'] ?? 0) as num).toInt();
+    final possible = ((p['possibleStars'] ??
+                UserProvider.sariliStarCeiling + UserProvider.familyStarCeiling)
+            as num)
+        .toInt();
 
     // Levels 0-3 are "About Myself"; 4-8 are "And My Family". The report
     // keeps them apart because a parent reads them as two different subjects.
@@ -1554,29 +1680,38 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
           possible: possible,
           gradient: const [sariliColor, familyColor],
         ),
+        const SizedBox(height: 12),
+        _doneChip(levels.where((v) => v > 0).length, 9, familyColor),
         const SizedBox(height: 16),
         _sectionHeader(
             loc.angAkingSarili.replaceAll('\n', ' '), LucideIcons.smile),
         const SizedBox(height: 12),
         for (int i = 0; i < 4; i++)
           _levelStarRow(
-              loc.level(i + 1), i < levels.length ? levels[i] : 0, sariliColor),
+              loc.level(i + 1), i < levels.length ? levels[i] : 0, sariliColor,
+              number: i + 1),
         const SizedBox(height: 8),
-        _sectionHeader(loc.atAkingPamilya, LucideIcons.users),
+        _sectionHeader(loc.familySectionHeader, LucideIcons.users),
         const SizedBox(height: 12),
         for (int i = 4; i < 9; i++)
           _levelStarRow(
-              loc.level(i - 3), i < levels.length ? levels[i] : 0, familyColor),
+              loc.level(i - 3), i < levels.length ? levels[i] : 0, familyColor,
+              number: i - 3),
       ]),
     );
   }
 
   Widget _buildTandaanTab() {
     final loc = AppLocalizations.of(context)!;
-    final p = Provider.of<UserProvider>(context).getTandaanProgress();
-    final cats = (p['categoryStars'] as List?)?.cast<int>() ?? const <int>[];
-    final earned = (p['stars'] as int?) ?? 0;
-    final possible = (p['possibleStars'] as int?) ?? 0;
+    final p = (_shownProgress['tandaan'] as Map?) ?? const {};
+    final cats = [
+      for (final v in (p['categoryStars'] as List?) ?? const [])
+        (v as num).toInt()
+    ];
+    final earned = ((p['stars'] ?? 0) as num).toInt();
+    final possible =
+        ((p['possibleStars'] ?? UserProvider.tandaanStarCeiling) as num)
+            .toInt();
 
     const color = Color(0xFF1E88C7);
     final names = [
@@ -1597,11 +1732,19 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
           possible: possible,
           gradient: const [color, Color(0xFF4ECDC4)],
         ),
+        const SizedBox(height: 12),
+        _doneChip(cats.where((v) => v > 0).length, names.length, color),
         const SizedBox(height: 16),
         _sectionHeader(loc.categoryProgressHeader, LucideIcons.layers),
         const SizedBox(height: 12),
         for (int i = 0; i < names.length; i++)
-          _levelStarRow(names[i], i < cats.length ? cats[i] : 0, color),
+          _levelStarRow(names[i], i < cats.length ? cats[i] : 0, color,
+              icon: const [
+                LucideIcons.paw_print,
+                LucideIcons.apple,
+                LucideIcons.shapes,
+                LucideIcons.type,
+              ][i]),
       ]),
     );
   }
@@ -1661,7 +1804,7 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
   double _moduleFraction(Map<String, dynamic> all, String key) {
     final m = all[key];
     if (m is! Map) return 0;
-    final possible = (m['possibleStars'] as int?) ?? 0;
+    final possible = _possibleStars(key, m);
     if (possible <= 0) return 0;
     final earned = ((m['stars'] ?? m['earnedStars'] ?? 0) as num).toDouble();
     return (earned / possible).clamp(0.0, 1.0);
@@ -1676,6 +1819,7 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
     final ordered = [
       for (final m in mods) (m: m, f: _moduleFraction(all, m.module))
     ]..sort((a, b) => a.f.compareTo(b.f));
+    final signs = {for (final r in reportModules(loc)) r.key: r.icon};
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -1735,12 +1879,15 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
             _moduleRow(
               entry.m.name,
               entry.m.colour,
+              signs[entry.m.module] ?? LucideIcons.layers,
               entry.f,
+              _moduleEarned(all, entry.m.module),
               // Open for anyone now. These used to read this device's own
               // files — its traced letters, its artwork tally — so a sibling's
               // name would have sat over the signed-in child's work; both now
               // come from the record being shown.
-              () => _openReport(entry.m.name, entry.m.report),
+              () => _openReport(
+                  entry.m.name, entry.m.report, entry.m.module, entry.m.colour),
             ),
         ],
 
@@ -1753,6 +1900,8 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
           TeacherTools(
             studentName: widget.viewStudentName ?? '',
             studentData: widget.viewStudentData!,
+            onEditInfo: widget.onEditInfo,
+            onShowLogin: widget.onShowLogin,
           ),
         ],
 
@@ -2064,59 +2213,98 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
   }
 
   /// One module, with the way into its own report.
-  Widget _moduleRow(
-      String name, Color colour, double fraction, VoidCallback? onTap) {
+  /// Stars collected in one module, from the same ledger as its fraction.
+  int _moduleEarned(Map<String, dynamic> all, String key) {
+    final m = all[key];
+    if (m is! Map) return 0;
+    return ((m['stars'] ?? m['earnedStars'] ?? 0) as num).toInt();
+  }
+
+  Widget _moduleRow(String name, Color colour, IconData icon, double fraction,
+      int stars, VoidCallback? onTap) {
+    final loc = AppLocalizations.of(context)!;
+    final notStarted = fraction <= 0;
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colour.withOpacity(0.18)),
-      ),
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: reportCardDecoration(radius: 16),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 13, 10, 13),
+            padding: const EdgeInsets.fromLTRB(12, 12, 8, 12),
             child: Row(children: [
+              ReportModuleIcon(icon: icon, colour: colour, size: 40),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: 14.5, fontWeight: FontWeight.w600)),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 3,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text(name,
+                              style: const TextStyle(
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.textDark)),
+                          if (notStarted)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 7, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF1F2F7),
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Text(loc.notStartedYet,
+                                  style: const TextStyle(
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.textLight)),
+                            ),
+                        ],
+                      ),
                       const SizedBox(height: 7),
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(5),
+                        borderRadius: BorderRadius.circular(4),
                         child: LinearProgressIndicator(
                           value: fraction,
-                          minHeight: 8,
-                          backgroundColor: Colors.grey.shade200,
+                          minHeight: 7,
+                          backgroundColor: const Color(0xFFEEF0F5),
                           valueColor: AlwaysStoppedAnimation<Color>(colour),
                         ),
                       ),
                     ]),
               ),
-              const SizedBox(width: 12),
-              SizedBox(
-                width: 38,
-                child: Text('${(fraction * 100).round()}%',
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.grey.shade600)),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text('${(fraction * 100).round()}%',
+                      style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textDark)),
+                  Row(mainAxisSize: MainAxisSize.min, children: [
+                    const Icon(Icons.star_rounded,
+                        size: 14, color: Color(0xFFF5A623)),
+                    const SizedBox(width: 2),
+                    Text('$stars',
+                        style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textLight)),
+                  ]),
+                ],
               ),
               // No arrow when there is nowhere to go — an arrow that does
               // nothing is worse than none.
               if (onTap != null)
-                Icon(LucideIcons.chevron_right,
-                    size: 18, color: Colors.grey.shade400)
+                const Icon(LucideIcons.chevron_right,
+                    size: 18, color: Color(0xFFB8BECB))
               else
                 const SizedBox(width: 18),
             ]),
@@ -2143,69 +2331,61 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
     _rebuildOpenReport?.call(() {});
   }
 
-  void _openReport(String title, Widget Function() body) {
+  void _openReport(
+      String title, Widget Function() body, String module, Color colour) {
+    final loc = AppLocalizations.of(context)!;
+    final studentId = widget.viewStudentId;
     Navigator.of(context)
         .push(MaterialPageRoute(
-          builder: (_) => Scaffold(
-            backgroundColor: const Color(0xFFF7F9FC),
-            appBar: AppBar(
-              title: Text(title,
-                  style: const TextStyle(
-                      fontSize: 17, fontWeight: FontWeight.bold)),
-              backgroundColor: Colors.white,
-              elevation: 0.5,
-            ),
-            // Its own rebuild, so what the parent taps is what redraws.
-            body: StatefulBuilder(builder: (_, rebuild) {
-              _rebuildOpenReport = rebuild;
-              return body();
-            }),
-          ),
+          builder: (pageContext) => Scaffold(
+              backgroundColor: const Color(0xFFF7F9FC),
+              appBar: AppBar(
+                title: Text(title,
+                    style: const TextStyle(
+                        fontSize: 17, fontWeight: FontWeight.bold)),
+                backgroundColor: Colors.white,
+                elevation: 0.5,
+              ),
+              // Its own rebuild, so what the parent taps is what redraws.
+              body: StatefulBuilder(builder: (_, rebuild) {
+                _rebuildOpenReport = rebuild;
+                return body();
+              }),
+              // A teacher resets this one module from where they are looking
+              // at it, rather than from a list at the foot of another page.
+              bottomNavigationBar: widget.viewStudentData == null ||
+                      studentId == null
+                  ? null
+                  : DecoratedBox(
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          border: Border(
+                              top: BorderSide(color: Color(0xFFEEF0F5)))),
+                      child: SafeArea(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+                          child: _DashedButton(
+                            label: loc.resetModule(title),
+                            onTap: () async {
+                              final done = await showResetProgressSheet(
+                                pageContext,
+                                studentId: studentId,
+                                studentName: widget.viewStudentName ?? '',
+                                preselect: {module},
+                              );
+                              if (!done || !pageContext.mounted) return;
+                              // Back to the class, where the fresh figures are.
+                              Navigator.of(pageContext)
+                                ..pop()
+                                ..pop();
+                            },
+                          ),
+                        ),
+                      ),
+                    )),
         ))
         // The page is gone; a later toggle must not reach for it.
         .then((_) => _rebuildOpenReport = null);
-  }
-
-  Widget _gradientCard({required List<Color> gradient, required Widget child}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-            colors: gradient,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-              color: gradient[0].withOpacity(0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4))
-        ],
-      ),
-      child: child,
-    );
-  }
-
-  /// The grade in the reader's language. Progress keeps it as the English
-  /// word — a sibling's comes from the cloud that way too — so it is turned
-  /// into words here, where it is shown.
-  String _gradeLabel(String grade) {
-    final loc = AppLocalizations.of(context)!;
-    switch (grade) {
-      case 'Outstanding':
-        return loc.gradeOutstanding;
-      case 'Very Satisfactory':
-        return loc.gradeVerySatisfactory;
-      case 'Satisfactory':
-        return loc.gradeSatisfactory;
-      case 'Developing':
-        return loc.gradeDeveloping;
-      case 'Not Started':
-        return loc.notStartedYet;
-      default:
-        return grade;
-    }
   }
 
   /// Stars, badges and the overall grade, at the top of the report.
@@ -2214,7 +2394,6 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
 
     // Everything here follows whoever is selected above.
     final progress = _shownProgress;
-    final grade = _gradeLabel((progress['grade'] ?? '').toString());
     final percent = (progress['percentage'] as num?)?.toDouble() ?? 0;
     final stars = _siblingId != null
         ? ((progress['totalStars'] as num?)?.toInt() ?? 0)
@@ -2222,183 +2401,250 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
     final whose = _siblingId != null
         ? _siblingName
         : (userProvider.userProfile?.name ?? '');
-    final avatar = _siblingId != null
-        ? (_household.firstWhere((c) => c['id'] == _siblingId,
-                orElse: () => const {})['avatar'] ??
-            '')
-        : (userProvider.userProfile?.avatar ?? '');
+    final visited = widget.viewStudentData;
+    final avatar = visited != null
+        ? (visited['avatar'] ?? (visited['profile'] as Map?)?['avatar'] ?? '')
+            .toString()
+        : _siblingId != null
+            ? (_household.firstWhere((c) => c['id'] == _siblingId,
+                    orElse: () => const {})['avatar'] ??
+                '')
+            : (userProvider.userProfile?.avatar ?? '');
     final streak = (progress['dayStreak'] as num?)?.toInt() ?? 0;
     final lastPlayed = (progress['lastPlayed'] ?? '').toString();
 
-    return _gradientCard(
-      gradient: [const Color(0xFF11998E), const Color(0xFF38EF7D)],
+    final loc = AppLocalizations.of(context)!;
+    final fraction = (percent / 100).clamp(0.0, 1.0);
+
+    // Whose report this is, how far they are, and when they last played,
+    // on one white card: the face in a ring that is the whole-app figure.
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFFE6E8EF)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x147C4DFF),
+            blurRadius: 18,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Whose report this is, with their face. On a device with two
-          // children the face is the one line a parent reads at a glance;
-          // everything else on the card is a number.
-          if (whose.isNotEmpty) ...[
-            Row(children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.25),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                      color: Colors.white.withOpacity(0.6), width: 2),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: Image.asset(
-                  avatarAssetForPreset(avatar),
-                  fit: BoxFit.cover,
-                  alignment: Alignment.topCenter,
-                  errorBuilder: (_, __, ___) => const Icon(LucideIcons.user,
-                      size: 22, color: Colors.white),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(whose,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800)),
-                      const SizedBox(height: 2),
-                      // The first question a parent asks, and the only line
-                      // here they can act on tonight.
-                      Text(_whenLastPlayed(lastPlayed, streak),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              color: Colors.white.withOpacity(0.92),
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w600)),
-                    ]),
-              ),
-            ]),
-            const SizedBox(height: 14),
-          ],
-          Row(
-            children: [
-              Expanded(
-                child: _summaryFigure(
-                  icon: Icons.star_rounded,
-                  value: '$stars',
-                  of: '${UserProvider.totalPossibleStars}',
-                  label: AppLocalizations.of(context)!.stars,
-                ),
-              ),
-              // A sibling's badges are not in the synced record, and a zero
-              // would read as "none earned" rather than "not known".
-              if (_siblingId == null) ...[
-                Container(
-                    width: 1,
-                    height: 44,
-                    color: Colors.white.withOpacity(0.35)),
-                Expanded(
-                  child: _summaryFigure(
-                    icon: Icons.workspace_premium_rounded,
-                    value: '${userProvider.collectedBadgeIds.length}',
-                    of: null,
-                    label: AppLocalizations.of(context)!.awards,
-                  ),
-                ),
-              ],
-            ],
-          ),
-          if (grade.isNotEmpty) ...[
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                Text(
-                  grade,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: LinearProgressIndicator(
-                      value: (percent / 100).clamp(0.0, 1.0),
-                      minHeight: 8,
-                      backgroundColor: Colors.white.withOpacity(0.28),
-                      valueColor:
-                          const AlwaysStoppedAnimation<Color>(Colors.white),
+          Row(children: [
+            SizedBox(
+              width: 74,
+              height: 78,
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.topCenter,
+                children: [
+                  SizedBox(
+                    width: 74,
+                    height: 74,
+                    child: CircularProgressIndicator(
+                      value: fraction,
+                      strokeWidth: 6,
+                      backgroundColor: const Color(0xFFE9EBF2),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                          AppColors.primary),
                     ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  '${percent.toStringAsFixed(0)}%',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
+                  Positioned(
+                    top: 7,
+                    child: Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: avatarTintForPreset(avatar),
+                        shape: BoxShape.circle,
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: Image.asset(
+                        avatarAssetForPreset(avatar),
+                        fit: BoxFit.cover,
+                        alignment: Alignment.topCenter,
+                        errorBuilder: (_, __, ___) => const Icon(
+                            LucideIcons.user,
+                            size: 26,
+                            color: AppColors.textLight),
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                  Positioned(
+                    bottom: -2,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 7, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                      child: Text('${percent.round()}%',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800)),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ],
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (whose.isNotEmpty)
+                      Text(whose,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontFamily: 'Fredoka',
+                              color: AppColors.textDark,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              height: 1.15)),
+                    const SizedBox(height: 6),
+                    // The first question a parent asks, and the only line
+                    // here they can act on tonight.
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 9, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: lastPlayed.isEmpty
+                            ? const Color(0xFFF1F2F7)
+                            : const Color(0xFFE9F7EF),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(LucideIcons.flame,
+                            size: 13,
+                            color: lastPlayed.isEmpty
+                                ? AppColors.textLight
+                                : const Color(0xFF1F7A45)),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(_whenLastPlayed(lastPlayed, streak),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  color: lastPlayed.isEmpty
+                                      ? AppColors.textLight
+                                      : const Color(0xFF1F7A45))),
+                        ),
+                      ]),
+                    ),
+                  ]),
+            ),
+          ]),
+          const SizedBox(height: 14),
+          Row(children: [
+            Expanded(
+              child: _summaryTile(
+                value: '$stars',
+                of: '/${UserProvider.totalPossibleStars}',
+                label: loc.reportStarsTile,
+                star: true,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _summaryTile(
+                value: '${percent.round()}',
+                of: '%',
+                label: loc.reportDoneTile,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _summaryTile(
+                value: _lastPlayedShort(lastPlayed),
+                label: loc.reportLastPlayedTile,
+              ),
+            ),
+          ]),
         ],
       ),
     );
   }
 
-  Widget _summaryFigure({
-    required IconData icon,
+  /// When the child last played, in a word: "Today", "Yesterday", "3 days".
+  String _lastPlayedShort(String iso) {
+    final loc = AppLocalizations.of(context)!;
+    final last = DateTime.tryParse(iso);
+    if (last == null) return '—';
+    final now = DateTime.now();
+    final days = DateTime(now.year, now.month, now.day)
+        .difference(DateTime(last.year, last.month, last.day))
+        .inDays;
+    if (days <= 0) return loc.lastPlayedToday;
+    if (days == 1) return loc.lastPlayedYesterday;
+    return loc.lastPlayedDays(days);
+  }
+
+  Widget _summaryTile({
     required String value,
-    required String? of,
     required String label,
+    String? of,
+    bool star = false,
   }) {
-    return Column(
-      children: [
-        Icon(icon, color: Colors.white, size: 26),
-        const SizedBox(height: 4),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            Text(
-              value,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 26,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            if (of != null)
-              Text(
-                ' / $of',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.85),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 9),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF6F5FF),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(children: [
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              if (star)
+                const Padding(
+                  padding: EdgeInsets.only(right: 2),
+                  child: Icon(Icons.star_rounded,
+                      size: 17, color: Color(0xFFF5A623)),
                 ),
-              ),
-          ],
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.9),
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
+              Text(value,
+                  style: const TextStyle(
+                      fontSize: 19,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textDark)),
+              if (of != null)
+                Text(of,
+                    style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textLight)),
+            ],
           ),
         ),
-      ],
+        const SizedBox(height: 1),
+        // Shrinks rather than cuts: "Naudi a ay-ayam" ran out of room on
+        // a small phone.
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(label,
+              maxLines: 1,
+              style: const TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textLight)),
+        ),
+      ]),
     );
   }
 
@@ -2449,8 +2695,8 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
         return loc.pageSaging;
       case 'Teddy Bear':
         return loc.pageTeddyBear;
-      case 'Soda':
-        return loc.pageSodaPop;
+      case 'Race Car':
+        return loc.pageRaceCar;
       default:
         return name;
     }
@@ -2512,14 +2758,8 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
     );
   }
 
-  Widget _sectionHeader(String title, IconData icon) {
-    return Row(children: [
-      Icon(icon, color: AppColors.primary, size: 18),
-      const SizedBox(width: 8),
-      Text(title,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-    ]);
-  }
+  Widget _sectionHeader(String title, IconData icon) =>
+      ReportSectionHeader(title: title, icon: icon);
 
   Widget _tipCard(IconData icon, String title, String body) {
     return Container(
@@ -2557,4 +2797,72 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
       ]),
     );
   }
+}
+
+/// A quiet red outline with dashes: an action that undoes work, offered
+/// without shouting.
+class _DashedButton extends StatelessWidget {
+  const _DashedButton({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    const red = Color(0xFFC2334D);
+    return CustomPaint(
+      foregroundPainter: const _DashedOutline(color: Color(0xFFF2B8C3)),
+      child: Material(
+        color: const Color(0xFFFFF7F9),
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 13),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(LucideIcons.rotate_ccw, size: 17, color: red),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(label,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: red)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DashedOutline extends CustomPainter {
+  const _DashedOutline({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+    final path = Path()
+      ..addRRect(RRect.fromRectAndRadius(
+          Offset.zero & size, const Radius.circular(14)));
+    for (final metric in path.computeMetrics()) {
+      for (double d = 0; d < metric.length; d += 9) {
+        canvas.drawPath(metric.extractPath(d, d + 5), paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashedOutline old) => old.color != color;
 }

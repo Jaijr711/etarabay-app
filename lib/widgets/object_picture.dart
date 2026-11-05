@@ -91,6 +91,9 @@ class ObjectPicture extends StatelessWidget {
     '🧑': 'kuya',
     '👶': 'sanggol',
     '👤': 'tao',
+    // The whole family, as on the Family Members lesson card — it was the
+    // one answer in About Me still drawn as a flat emoji.
+    '👨‍👩‍👧': 'magulang',
 
     // Food
     '🍚': 'kanin',

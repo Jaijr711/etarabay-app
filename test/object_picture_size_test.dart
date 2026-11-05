@@ -47,10 +47,8 @@ void main() {
   });
 
   test('a known object resolves to a path, an unknown one does not', () {
-    expect(ObjectPicture.assetFor('🍎'),
-        'assets/images/apple.webp');
-    expect(ObjectPicture.assetFor('🍌'),
-        'assets/images/banana.webp');
+    expect(ObjectPicture.assetFor('🍎'), 'assets/images/apple.webp');
+    expect(ObjectPicture.assetFor('🍌'), 'assets/images/banana.webp');
     expect(ObjectPicture.assetFor('🐟'), 'assets/images/fish.webp');
     expect(ObjectPicture.assetFor('🦕'), isNull);
   });
@@ -59,20 +57,16 @@ void main() {
     // The game data writes the sofa as U+1F6CB followed by U+FE0F. It looks
     // the same and is a different string; before this it silently resolved to
     // no picture at all.
-    expect(ObjectPicture.assetFor('🛋️'),
-        'assets/images/sopa.webp');
-    expect(ObjectPicture.assetFor('🛏️'),
-        'assets/images/kama.webp');
+    expect(ObjectPicture.assetFor('🛋️'), 'assets/images/sopa.webp');
+    expect(ObjectPicture.assetFor('🛏️'), 'assets/images/kama.webp');
   });
 
   test('a variation selector does not hide the picture', () {
     // The game data writes the sofa as U+1F6CB followed by U+FE0F. It looks
     // the same and is a different string; before this it silently resolved to
     // no picture at all.
-    expect(ObjectPicture.assetFor('🛋️'),
-        'assets/images/sopa.webp');
-    expect(ObjectPicture.assetFor('🛏️'),
-        'assets/images/kama.webp');
+    expect(ObjectPicture.assetFor('🛋️'), 'assets/images/sopa.webp');
+    expect(ObjectPicture.assetFor('🛏️'), 'assets/images/kama.webp');
   });
 
   // ── The fault that hid three pictures ─────────────────────────────────────

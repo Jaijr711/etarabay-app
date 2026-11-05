@@ -1,20 +1,24 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import '../widgets/fun_dialog.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 
 import '../data/badge_catalog.dart';
 import '../widgets/badge_emblem.dart';
-import 'dart:ui';
 import 'package:provider/provider.dart';
 import 'package:e_tarabay/l10n/app_localizations.dart';
 import '../providers/user_provider.dart';
 import '../utils/constants.dart';
+import '../widgets/kid_page_header.dart';
 import '../widgets/floating_bottom_nav_bar.dart';
 import '../widgets/staggered_entrance.dart';
 import '../utils/page_transitions.dart';
 import 'lessons_screen.dart';
 import 'settings_screen.dart';
 import 'home_screen.dart';
+import '../widgets/design_scale.dart';
+import '../widgets/soft_backdrop.dart';
 
 class AwardsScreen extends StatelessWidget {
   const AwardsScreen({super.key});
@@ -33,6 +37,14 @@ class AwardsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FF),
       extendBody: true,
+      // Held at the top like Lessons and Settings, not scrolled away with the
+      // medals or played in with them.
+      appBar: KidPageHeader(
+        title: loc.awards,
+        subtitle: loc.kidSubAwards(claimed.length),
+        bubble: loc.kidBubbleAwards,
+        color: AppColors.navAwards,
+      ),
       bottomNavigationBar: FloatingBottomNavBar(
         selectedIndex: 2,
         onTap: (index) {
@@ -72,77 +84,57 @@ class AwardsScreen extends StatelessWidget {
               assetPath: 'assets/images/setting.webp'),
         ],
       ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/bg_awards.jpg',
-              fit: BoxFit.cover,
-            ),
-          ),
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-              child: Container(color: Colors.white.withOpacity(0.08)),
-            ),
-          ),
-          CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: StaggeredEntrance(
-                  index: 0,
-                  child: _buildHeader(
-                      context, achievements.length, claimed.length),
-                ),
+      body: DesignScale(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.asset(
+                'assets/images/bg_awards.jpg',
+                fit: BoxFit.cover,
               ),
-              SliverPadding(
-                padding: const EdgeInsets.all(16),
-                sliver: SliverGrid(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.9,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                  ),
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final badge = _allBadges[index];
-                      // 1, 2 or 3 stars on the ring — the same int the
-                      // award check writes.
-                      final tier = achievements[badge['id']] ?? 0;
-                      final isEarned = tier >= 1;
-                      final isClaimed = claimed.contains(badge['id']);
-                      return StaggeredEntrance(
-                        index: index + 1,
-                        child: _buildBadgeCard(
-                          context,
-                          badge: badge,
-                          isEarned: isEarned,
-                          tier: tier,
-                          isClaimed: isClaimed,
-                          progress: badgeProgress[badge['id']],
-                          userProvider: userProvider,
-                        ),
-                      );
-                    },
-                    childCount: _allBadges.length,
+            ),
+            const Positioned.fill(
+              child: SoftBackdrop(),
+            ),
+            CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: StaggeredEntrance(
+                    index: 0,
+                    child: _buildProgress(
+                        context, achievements.length, claimed.length),
                   ),
                 ),
-              ),
-              // Room for the floating bar to sit over nothing.
-              //
-              // The bar is drawn above the content, not beside it, so the
-              // list has to stop short of it. At 40 the last row of medals
-              // was half under the pill — and the last row is where the
-              // newest, most interesting badge tends to be.
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 110 + MediaQuery.of(context).padding.bottom,
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    child: StaggeredEntrance(
+                      index: 1,
+                      child: _buildCabinet(
+                        context,
+                        achievements: achievements,
+                        claimed: claimed,
+                        badgeProgress: badgeProgress,
+                        userProvider: userProvider,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+                // Room for the floating bar to sit over nothing.
+                //
+                // The bar is drawn above the content, not beside it, so the
+                // list has to stop short of it. At 40 the last row of medals
+                // was half under the pill — and the last row is where the
+                // newest, most interesting badge tends to be.
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 110 + MediaQuery.of(context).padding.bottom,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -156,6 +148,7 @@ class AwardsScreen extends StatelessWidget {
         'id': def.id,
         'icon': def.icon,
         'color': def.color,
+        'image': def.image,
       },
   ];
 
@@ -227,50 +220,10 @@ class AwardsScreen extends StatelessWidget {
     }
   }
 
-  Widget _buildHeader(BuildContext context, int earned, int claimed) {
+  /// The medal count and bar, and the medal waiting to be taken: the top of
+  /// the scrolling list, under the fixed header.
+  Widget _buildProgress(BuildContext context, int earned, int claimed) {
     final loc = AppLocalizations.of(context)!;
-    final headerContent = Container(
-      // Was 50 above the title, on top of whatever the SafeArea already
-      // reserved for the notch — a band of empty green taller than the title
-      // it was making room for.
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.success, AppColors.success.withOpacity(0.85)],
-        ),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.success.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                loc.awards,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-
     final progressSection = Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: Row(
@@ -293,10 +246,12 @@ class AwardsScreen extends StatelessWidget {
               children: [
                 // A trophy here, above a wall of medals. The medal is what
                 // this screen is about, so the count wears one.
-                const BadgeEmblem(
-                  icon: Icons.emoji_events_rounded,
-                  color: Color(0xFFFFC542),
-                  size: 34,
+                // The same 3D family as the medals below it.
+                Image.asset(
+                  'assets/images/badges/trophy.webp',
+                  width: 36,
+                  height: 36,
+                  excludeFromSemantics: true,
                 ),
                 const SizedBox(width: 10),
                 // Just how many they have. The "/ 13" is gone: the bar beside
@@ -333,7 +288,6 @@ class AwardsScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        headerContent,
         progressSection,
         // A medal is waiting to be taken.
         //
@@ -390,313 +344,205 @@ class AwardsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBadgeCard(
+  /// How wide a medal is on the shelf: three to a shelf inside the
+  /// cabinet's wooden frame, as big as that allows.
+  static double _shelfMedalSize(double screenWidth) {
+    // Page gutters 32, the frame 12, the cabinet's own padding 20.
+    final perItem = (screenWidth - 32 - 12 - 20) / 3;
+    return math.min(perItem - 14, 88);
+  }
+
+  /// The awards as a trophy cabinet: three medals to a wooden shelf, the
+  /// twelve the certificate counts first, and the five-day streak on a shelf
+  /// of its own, since it rewards showing up rather than finishing anything.
+  Widget _buildCabinet(
+    BuildContext context, {
+    required Map<String, int> achievements,
+    required List<String> claimed,
+    required Map<String, BadgeProgress> badgeProgress,
+    required UserProvider userProvider,
+  }) {
+    final loc = AppLocalizations.of(context)!;
+    // Measured outside the scaled page, so taken back to the width the
+    // shelves are laid out at.
+    final medal = _shelfMedalSize(
+        DesignScale.layoutWidth(MediaQuery.sizeOf(context).width));
+
+    Widget itemFor(Map<String, dynamic> badge) {
+      final id = badge['id'] as String;
+      return _buildShelfItem(
+        context,
+        badge: badge,
+        tier: achievements[id] ?? 0,
+        isClaimed: claimed.contains(id),
+        progress: badgeProgress[id],
+        userProvider: userProvider,
+        medal: medal,
+      );
+    }
+
+    final course = [
+      for (final b in _allBadges)
+        if (UserProvider.graduateBadgeIds.contains(b['id'])) b
+    ];
+    final special = [
+      for (final b in _allBadges)
+        if (!UserProvider.graduateBadgeIds.contains(b['id'])) b
+    ];
+
+    final shelves = <Widget>[
+      for (var i = 0; i < course.length; i += 3)
+        _buildShelf([
+          for (final b in course.skip(i).take(3)) itemFor(b),
+        ]),
+      if (special.isNotEmpty)
+        _buildShelf(
+          [for (final b in special) itemFor(b)],
+          label: loc.badgeSpecialShelf,
+        ),
+    ];
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(10, 12, 10, 14),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFFFBEBD5), Color(0xFFF4DDBD)],
+        ),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFFB87A43), width: 6),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF50280A).withOpacity(0.25),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          for (var i = 0; i < shelves.length; i++) ...[
+            if (i > 0) const SizedBox(height: 14),
+            shelves[i],
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// One wooden shelf with its medals standing on it.
+  Widget _buildShelf(List<Widget> items, {String? label}) {
+    return Column(
+      children: [
+        if (label != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontFamily: 'Fredoka',
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF7A4A00),
+              ),
+            ),
+          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: items,
+        ),
+        const SizedBox(height: 2),
+        Container(
+          height: 14,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4),
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFFC98B4E), Color(0xFF9A6232)],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF50280A).withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// A medal on the shelf. Pressing it does what the card used to: take a
+  /// won medal, look at a taken one, or hear how to win one not yet won.
+  Widget _buildShelfItem(
     BuildContext context, {
     required Map<String, dynamic> badge,
-    required bool isEarned,
     required int tier,
     required bool isClaimed,
     required BadgeProgress? progress,
     required UserProvider userProvider,
+    required double medal,
   }) {
-    final color = Color(badge['color'] as int);
     final loc = AppLocalizations.of(context)!;
-
-    if (!isEarned) {
-      // A locked badge still shows how close the child is. Started work is
-      // visible progress, not a blank lock.
-      final started = progress != null && progress.current > 0;
-      return GestureDetector(
-        // The card had no answer to "how do I get this one?". The sentence
-        // that answers it existed all along — every badge has a translated
-        // hint — but it was only drawn for badges with no progress rule to
-        // show, which is none of them. It could not simply be added to the
-        // card either: at two columns the tile holds the emblem, a title that
-        // wraps to two lines in Tagalog, a bar and three stars with about
-        // thirty pixels to spare. So the card asks, and the tap answers.
-        onTap: () => _showHowToEarnDialog(context, badge, progress),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(24),
-            border: started
-                ? Border.all(color: color.withOpacity(0.35), width: 2)
-                : null,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // The mark that says the card will answer if you press it.
-              //
-              // It sits on the emblem rather than under the title because
-              // there is no room under the title: the tile is already holding
-              // a name that wraps to two lines, a bar and three stars. A
-              // tappable card with nothing to say it is tappable is a feature
-              // nobody finds.
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: started
-                          ? color.withOpacity(0.12)
-                          : Colors.grey.shade300,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: started
-                          ? BadgeEmblem(
-                              icon: badge['icon'] as IconData,
-                              color: color,
-                              size: 54,
-                              locked: true,
-                            )
-                          : const Icon(LucideIcons.lock,
-                              color: Colors.grey, size: 28),
-                    ),
-                  ),
-                  Positioned(
-                    right: -4,
-                    top: -2,
-                    child: Container(
-                      width: 22,
-                      height: 22,
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '?',
-                          style: TextStyle(
-                            fontSize: 13,
-                            height: 1.0,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Text(
-                _badgeTitle(context, badge['id'] as String),
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: started ? AppColors.textDark : Colors.grey.shade500,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              if (progress != null) ...[
-                const SizedBox(height: 8),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: LinearProgressIndicator(
-                    value: progress.fraction,
-                    minHeight: 8,
-                    backgroundColor: Colors.grey.shade300,
-                    valueColor: AlwaysStoppedAnimation<Color>(color),
-                  ),
-                ),
-                const SizedBox(height: 5),
-                // Marked with a star, because that is exactly what the number
-                // is: the stars this badge needs, in the same currency the
-                // dashboard counts. Without the star it read as "12 of 21
-                // somethings", and the child had no way to know what to go and
-                // do about it.
-                // Was "9 / 21". The bar above already shows the proportion,
-                // so the digits were saying it a second time in a form this age
-                // cannot read. Three stars say the same thing countably.
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(3, (i) {
-                    final got = progress.fraction * 3 > i;
-                    return Icon(
-                      got ? Icons.star_rounded : Icons.star_outline_rounded,
-                      size: 17,
-                      color:
-                          got ? const Color(0xFFFFB800) : Colors.grey.shade300,
-                    );
-                  }),
-                ),
-              ] else
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: Text(
-                    _badgeHint(context, badge['id'] as String),
-                    style: TextStyle(fontSize: 10, color: Colors.grey.shade400),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    if (isEarned && !isClaimed) {
-      return GestureDetector(
-        onTap: () => _showClaimDialog(context, badge, userProvider, tier),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: color.withOpacity(0.3), width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: color.withOpacity(0.15),
-                blurRadius: 12,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Stack(
-                children: [
-                  BadgeEmblem(
-                    icon: badge['icon'] as IconData,
-                    color: color,
-                    size: 62,
-                    tier: tier,
-                  ),
-                  Positioned(
-                    right: -2,
-                    top: -2,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Colors.amber,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.star_rounded,
-                          color: Colors.white, size: 16),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                _badgeTitle(context, badge['id'] as String),
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade700,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              // A real button, not a hint.
-              //
-              // This used to be an 11px pill reading "tap to claim" — the
-              // smallest text on the card, on a card that looks finished
-              // already. A child who has just earned a badge should not have
-              // to work out that the card is a button; the button should be
-              // the loudest thing on it.
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () =>
-                        _showClaimDialog(context, badge, userProvider, tier),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: color,
-                      foregroundColor: Colors.white,
-                      elevation: 3,
-                      shadowColor: color.withOpacity(0.5),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
-                    ),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        loc.claimBadgeButton,
-                        style: const TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w900),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+    final color = Color(badge['color'] as int);
+    final isEarned = tier >= 1;
+    final ready = isEarned && !isClaimed;
 
     return GestureDetector(
-      onTap: () => _showViewBadgeModal(context, badge),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [color, color.withOpacity(0.85)],
-          ),
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.4),
-              blurRadius: 15,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Stack(
+      behavior: HitTestBehavior.opaque,
+      onTap: ready
+          ? () => _showClaimDialog(context, badge, userProvider, tier)
+          : isEarned
+              ? () => _showViewBadgeModal(context, badge)
+              : () => _showHowToEarnDialog(context, badge, progress),
+      child: SizedBox(
+        width: medal + 12,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Positioned(
-              right: -20,
-              top: -20,
-              child: Container(
-                width: 80,
-                height: 80,
+            BadgeEmblem(
+              icon: badge['icon'] as IconData,
+              image: badge['image'] as String,
+              color: color,
+              size: medal,
+              locked: !isEarned,
+              tier: tier,
+              sparkle: ready,
+            ),
+            if (ready)
+              Container(
+                margin: const EdgeInsets.only(top: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.1),
+                  color: const Color(0xFFFFD23F),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  loc.claimShort,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFF7A4A00),
+                  ),
                 ),
               ),
-            ),
-            Positioned.fill(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  BadgeEmblem(
-                    icon: badge['icon'] as IconData,
-                    color: const Color(0xFFFFC542),
-                    size: 62,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    _badgeTitle(context, badge['id'] as String),
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                ],
+            const SizedBox(height: 3),
+            Text(
+              _badgeTitle(context, badge['id'] as String),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11,
+                height: 1.1,
+                fontWeight: FontWeight.w800,
+                color: isEarned
+                    ? const Color(0xFF5A3A12)
+                    : const Color(0xFF8D7B66),
               ),
             ),
           ],
@@ -716,6 +562,7 @@ class AwardsScreen extends StatelessWidget {
         child: FunMessage(
           picture: BadgeEmblem(
             icon: badge['icon'] as IconData,
+            image: badge['image'] as String,
             color: color,
             size: 96,
             tier: tier,
@@ -761,6 +608,7 @@ class AwardsScreen extends StatelessWidget {
         child: FunMessage(
           picture: BadgeEmblem(
             icon: badge['icon'] as IconData,
+            image: badge['image'] as String,
             color: color,
             size: 92,
             locked: true,
@@ -806,6 +654,11 @@ class AwardsScreen extends StatelessWidget {
 
   void _showViewBadgeModal(BuildContext context, Map<String, dynamic> badge) {
     final color = Color(badge['color'] as int);
+    // How many stars it has reached, for the ribbon under the picture.
+    final tier = Provider.of<UserProvider>(context, listen: false)
+            .userProfile
+            ?.achievements[badge['id']] ??
+        0;
     final loc = AppLocalizations.of(context)!;
     // A deeper relative of the badge's colour. A light badge (the amber
     // About Me one) left white words, an amber pill and a gold medal all on
@@ -885,8 +738,12 @@ class AwardsScreen extends StatelessWidget {
                   ),
                   child: BadgeEmblem(
                     icon: badge['icon'] as IconData,
-                    color: const Color(0xFFFFC542),
+                    image: badge['image'] as String,
+                    // The award's own colour on the coin's face; the rim is
+                    // already gold.
+                    color: Color(badge['color'] as int),
                     size: 118,
+                    tier: tier,
                   ),
                 ),
                 const SizedBox(height: 20),

@@ -1,7 +1,7 @@
 name: e_tarabay
 description: "Ang Kabataan ay Pagasa ng Bayan"
 publish_to: 'none'
-version: 1.2.52+64
+version: 1.2.55+67
 
 environment:
   sdk: ^3.5.4
@@ -14,8 +14,6 @@ dependencies:
   intl: ^0.20.2  
 
   # UI and Icons
-  google_fonts: ^6.3.2
-  animated_text_kit: ^4.3.0
   flutter_animate: ^4.5.2
   
   # State Management
@@ -80,6 +78,15 @@ flutter:
     # listing each file by hand meant a forgotten line showed up as a
     # missing image at runtime and nowhere else.
     - assets/images/
+    # The medals' 3D pictures (Microsoft Fluent Emoji 3D, MIT — the licence
+    # is registered in main.dart). A sub-folder needs its own line.
+    - assets/images/badges/
+    # Settings' 3D icons, from the same Fluent Emoji set.
+    - assets/images/settings/
+    # One picture per Numbers level, showing what the level asks for.
+    - assets/images/bilang/
+    # Remember It: 3D shapes (Fluent Emoji 3D, MIT), letter blocks, its pictures.
+    - assets/images/tandaan/
     # The whole folder too, for the same reason. Naming one file by hand is
     # why the seven family recordings could be dropped in and still not ship:
     # nothing would have said they were missing.
@@ -104,6 +111,19 @@ flutter:
     - family: Fredoka
       fonts:
         - asset: assets/fonts/Fredoka.ttf
+    # Roboto (Apache 2.0, see assets/fonts/Roboto-LICENSE.txt), the face the
+    # whole app is set in. Android has it built in, but the web version
+    # downloaded it from Google Fonts at every start, so with no connection
+    # the words came out blank. Bundled, the web finds it here instead.
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-regular.ttf
+        - asset: assets/fonts/Roboto-medium.ttf
+          weight: 500
+        - asset: assets/fonts/Roboto-bold.ttf
+          weight: 700
+        - asset: assets/fonts/Roboto-black.ttf
+          weight: 900
 flutter_launcher_icons:
   android: true
   # Android only — the iOS project was removed (2026-10-13).

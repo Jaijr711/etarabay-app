@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 import '../widgets/custom_back_button.dart';
 import '../widgets/fun_dialog.dart';
@@ -8,7 +10,7 @@ import 'package:e_tarabay/l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import '../main.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, visibleForTesting;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
@@ -21,6 +23,10 @@ import '../utils/constants.dart';
 import '../widgets/crayon_swatch.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import '../utils/word_fit.dart';
+import '../widgets/design_scale.dart';
+import '../widgets/module_cards.dart';
+import '../services/sfx.dart';
+import 'package:confetti/confetti.dart';
 
 class ColoringCategory {
   final String name;
@@ -180,12 +186,6 @@ class MyCreation {
     if (m > 0) return '${m}m ${s}s';
     return '${s}s';
   }
-
-  String getTimeAgoLocalized(BuildContext context) {
-    final diff = DateTime.now().difference(date);
-    if (diff.inMinutes < 1) return AppLocalizations.of(context)!.justNow;
-    return AppLocalizations.of(context)!.timeAgo(diff.inMinutes);
-  }
 }
 
 class StrokePainter extends CustomPainter {
@@ -213,7 +213,21 @@ class StrokePainter extends CustomPainter {
     this.activeStrokePath,
     this.bakedImage,
     this.bakedCount = 0,
+    super.repaint,
   });
+
+  /// Where an image of the page sits on the canvas: [BoxFit.contain],
+  /// as the line art is shown.
+  static Rect containRect(ui.Image image, Size size) {
+    final ratio = image.width / image.height;
+    final side = size.shortestSide;
+    if (ratio > 1) {
+      final h = side / ratio;
+      return Rect.fromLTWH(0, (side - h) / 2, side, h);
+    }
+    final w = side * ratio;
+    return Rect.fromLTWH((side - w) / 2, 0, w, side);
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -222,7 +236,7 @@ class StrokePainter extends CustomPainter {
     // touched — it only removes the child's own coloring.
     canvas.saveLayer(Offset.zero & size, Paint());
     final baked = bakedImage;
-    if (baked != null) canvas.drawImage(baked, Offset.zero, Paint());
+    if (baked != null) drawBaked(canvas, baked, size);
     // Only the strokes the cached image does not already cover — most
     // repaints while the child is actively dragging touch nothing here but
     // the one active stroke below, regardless of how much they have already
@@ -235,6 +249,17 @@ class StrokePainter extends CustomPainter {
       drawStroke(canvas, activeStroke!, activeStrokePath, size);
     }
     canvas.restore();
+  }
+
+  /// The baked strokes, rendered at the screen's own resolution (or finer),
+  /// fitted back onto the canvas — see [_KulayScreenState._rebakeStrokes].
+  static void drawBaked(Canvas canvas, ui.Image baked, Size size) {
+    canvas.drawImageRect(
+      baked,
+      Rect.fromLTWH(0, 0, baked.width.toDouble(), baked.height.toDouble()),
+      Offset.zero & Size(size.shortestSide, size.shortestSide),
+      Paint(),
+    );
   }
 
   /// Shared with [_KulayScreenState._rebakeStrokes] so the live painter and
@@ -283,25 +308,13 @@ class StrokePainter extends CustomPainter {
 
     if (mask != null) {
       // Map the image-space mask onto the canvas with the same BoxFit.contain
-      // geometry used to display the line art.
-      final imgW = mask.width.toDouble();
-      final imgH = mask.height.toDouble();
-      final ratio = imgW / imgH;
-      final side = size.shortestSide;
-      double drawW, drawH, offX = 0, offY = 0;
-      if (ratio > 1) {
-        drawW = side;
-        drawH = side / ratio;
-        offY = (side - drawH) / 2;
-      } else {
-        drawH = side;
-        drawW = side * ratio;
-        offX = (side - drawW) / 2;
-      }
+      // geometry used to display the line art. Its pixel steps fall under
+      // the outlines drawn over the coloring (see _drawingSurface), so the
+      // cheapest sampling does — smoothing it cost every frame of a stroke.
       canvas.drawImageRect(
         mask,
-        Rect.fromLTWH(0, 0, imgW, imgH),
-        Rect.fromLTWH(offX, offY, drawW, drawH),
+        Rect.fromLTWH(0, 0, mask.width.toDouble(), mask.height.toDouble()),
+        containRect(mask, size),
         Paint()..blendMode = BlendMode.dstIn,
       );
       canvas.restore();
@@ -312,9 +325,56 @@ class StrokePainter extends CustomPainter {
   bool shouldRepaint(StrokePainter old) => true;
 }
 
+/// Whether the unsaved draft under [key] has anything on it: a stroke, or a
+/// fill with its picture. A card picture alone does not count — that is how
+/// a page came to say "in progress" with colours on its card and open empty.
+@visibleForTesting
+bool kulayDraftHasContent(SharedPreferences prefs, String key) {
+  final strokes = prefs.getString('${key}_strokes');
+  final hasStrokes = strokes != null && strokes.isNotEmpty && strokes != '[]';
+  final hasFill = (prefs.getInt('${key}_filledPixels') ?? 0) > 0 &&
+      (prefs.containsKey('${key}_imageData') ||
+          prefs.containsKey('${key}_imagePath'));
+  return hasStrokes || hasFill;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 //  SCREEN
 // ─────────────────────────────────────────────────────────────────────────────
+/// How many strokes, or points across them, a picture keeps as strokes
+/// before the oldest are folded into its fill picture; and how many of the
+/// newest always stay strokes, for Undo. Variables only so a test can lower
+/// them.
+@visibleForTesting
+int kulayBakeMaxStrokes = 300;
+@visibleForTesting
+int kulayBakeMaxPoints = 12000;
+@visibleForTesting
+int kulayBakeKeep = 50;
+
+/// Whether a picture's strokes have grown past what it keeps as strokes.
+@visibleForTesting
+bool kulayNeedsBake(List<ColoringStroke> strokes) {
+  if (strokes.length > kulayBakeMaxStrokes) return true;
+  int points = 0;
+  for (final s in strokes) {
+    points += s.points.length;
+    if (points > kulayBakeMaxPoints) return true;
+  }
+  return false;
+}
+
+/// The first page after [current] in the book's order — across categories,
+/// wrapping round — that is not finished, or null when every page is.
+@visibleForTesting
+int? kulayNextUnfinished(List<bool> finished, int current) {
+  for (int k = 1; k <= finished.length; k++) {
+    final i = (current + k) % finished.length;
+    if (!finished[i]) return i;
+  }
+  return null;
+}
+
 class KulayScreen extends StatefulWidget {
   const KulayScreen({super.key});
 
@@ -327,7 +387,16 @@ class _KulayScreenState extends State<KulayScreen>
   // ── Navigation ─────────────────────────────────────────────────────────────
   int _selectedTab = 0;
   int _selectedCategory = 0;
+
+  /// The category whose pages are showing, or null for the four categories
+  /// themselves. The coloring tab opens on the categories: each one shows
+  /// its pages fanned out and how many are finished, and a page already
+  /// started waits at the top with "Continue".
+  int? _openCategory;
   ColoringPage? _selectedPage;
+
+  /// [UserProvider.creationsVersion] when this screen last read its list.
+  int? _seenCreationsVersion;
 
   // ── Drawing state ──────────────────────────────────────────────────────────
   final List<ColoringStroke> _strokes = [];
@@ -369,6 +438,15 @@ class _KulayScreenState extends State<KulayScreen>
   bool _isEraser = false;
   MyCreation? _editingCreation;
 
+  /// Set when the picture was opened from My Creations: going back returns
+  /// there, not to the coloring tab.
+  bool _returnToCreations = false;
+
+  /// What Clear just took away — the coloring, and the picture's place in
+  /// My Creations — kept for a few seconds so Undo can put it all back.
+  _ClearedPage? _pendingClear;
+  Timer? _pendingClearTimer;
+
   // ── Zoom & pan ─────────────────────────────────────────────────────────────
   //
   // There is no zoom *mode* to switch on. One finger always colours; the
@@ -395,11 +473,34 @@ class _KulayScreenState extends State<KulayScreen>
 
   // ── Bucket fill ────────────────────────────────────────────────────────────
   img.Image? _baseImage;
+
+  /// [_baseImage]'s pixels as RGBA bytes, four per pixel — read directly by
+  /// the region search, which is far quicker than a getPixel per pixel.
+  Uint8List? _baseRgba;
   img.Image? _coloredImage;
   ui.Image? _displayImage;
   int _filledPixelsCount = 0;
   double _lastSide = 300;
   bool _isLoadingAutoSave = false;
+
+  /// The loading cover shows only if opening takes long enough to notice;
+  /// a picture already decoded opens without a flash of white over it.
+  bool _showLoadingOverlay = false;
+  Timer? _loadingOverlayTimer;
+
+  /// Each page's coloring in progress — begun but not saved — as a small
+  /// picture for its card in the gallery, so unfinished work shows there
+  /// too and not only once it is saved. Kept beside the page's autosave.
+  final Map<String, Uint8List> _inProgress = {};
+  Timer? _previewTimer;
+
+  /// The draft key the waiting [_previewTimer] belongs to, so leaving can
+  /// tidy it without looking the child up again from a closing screen.
+  String? _previewKey;
+
+  /// Whether the open picture has coloring that is not saved yet — what
+  /// asks, on the way out, whether to save it.
+  bool _dirty = false;
   final GlobalKey _canvasKey = GlobalKey();
 
   // Undo for the raster eraser below. There is no redo — see [_undo].
@@ -422,6 +523,9 @@ class _KulayScreenState extends State<KulayScreen>
   late AnimationController _rippleController;
   late Animation<double> _rippleAnim;
   Offset? _lastPos;
+
+  /// Ticks on every finger move, repainting the drawing alone.
+  final ValueNotifier<int> _strokeTick = ValueNotifier<int>(0);
 
   // ── My Creations ───────────────────────────────────────────────────────────
   final List<MyCreation> _myCreations = [];
@@ -536,12 +640,15 @@ class _KulayScreenState extends State<KulayScreen>
           difficulty: 'Medium',
           timeEstimate: '8 min',
           colors: 3),
+      // Took the soda can's place (2026-10-19). The soda page is gone for
+      // good, its saved creations with it — see
+      // UserProvider.isRemovedColoringCreation.
       ColoringPage(
-          name: 'Soda Pop',
-          imagePath: 'assets/images/paint9.png',
-          difficulty: 'Easy',
-          timeEstimate: '5 min',
-          colors: 3),
+          name: 'Race Car',
+          imagePath: 'assets/images/paint_racecar.png',
+          difficulty: 'Medium',
+          timeEstimate: '8 min',
+          colors: 4),
     ]),
   ];
 
@@ -554,6 +661,13 @@ class _KulayScreenState extends State<KulayScreen>
     super.initState();
     AudioManager.instance.playModuleMusic(ModuleMusic.kulay);
     _loadCreations();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _prewarmPages();
+      _loadInProgressPreviews();
+      // The sign-in read may have missed; this is another go at it.
+      final provider = Provider.of<UserProvider>(context, listen: false);
+      if (!provider.creationsPulled) unawaited(provider.pullCreationsFromCloud());
+    });
 
     _audioPlayer = AudioPlayer();
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
@@ -571,6 +685,21 @@ class _KulayScreenState extends State<KulayScreen>
 
   @override
   void dispose() {
+    _loadingOverlayTimer?.cancel();
+    // Left within moments of clearing the picture: the card's old picture
+    // would stay, saying "in progress" over a page with nothing on it.
+    final waitingKey = _previewKey;
+    if ((_previewTimer?.isActive ?? false) &&
+        waitingKey != null &&
+        _strokes.isEmpty &&
+        _filledPixelsCount == 0) {
+      unawaited(SharedPreferences.getInstance()
+          .then((prefs) => prefs.remove('${waitingKey}_preview')));
+    }
+    _previewTimer?.cancel();
+    _commitClear(rebuild: false);
+    _autoSaveTimer?.cancel();
+    _strokeTick.dispose();
     _audioPlayer.dispose();
     _rippleController.dispose();
     _zoomResetController.dispose();
@@ -631,6 +760,11 @@ class _KulayScreenState extends State<KulayScreen>
   /// made it in the first place. Keeping a redo meant keeping a second copy
   /// of the whole bitmap after every bucket fill for a button nobody pressed.
   Future<void> _undo() async {
+    // Straight after Clear, Undo brings the whole picture back.
+    if (_pendingClear != null) {
+      await _restoreCleared();
+      return;
+    }
     if (_strokes.isNotEmpty) {
       // The baked bitmap may include the very stroke just undone — there is
       // no way to un-bake one stroke out of it, so the whole cache is
@@ -677,21 +811,344 @@ class _KulayScreenState extends State<KulayScreen>
     _autoSave();
   }
 
+  /// Clear, said yes to: the picture goes back to blank, and a picture
+  /// already saved leaves My Creations and is no longer ticked. Nothing is
+  /// thrown away yet — for a few seconds Undo (the note under the picture,
+  /// or the Undo tool) puts it all back. The star it gave stays either way.
+  Future<void> _wipePage() async {
+    _commitClear();
+    final page = _selectedPage;
+    if (page == null) return;
+    final owned = <(int, MyCreation)>[
+      for (int i = 0; i < _myCreations.length; i++)
+        if (page.owns(_myCreations[i])) (i, _myCreations[i]),
+    ];
+    final hadColor = _strokes.isNotEmpty || _filledPixelsCount > 0;
+    if (!hadColor && owned.isEmpty) {
+      _clearAll();
+      return;
+    }
+    final place = _placeOf(page);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final snapshot = _ClearedPage(
+      page: page,
+      strokes: List.of(_strokes),
+      paths: List.of(_strokePaths),
+      colored: _coloredImage,
+      filled: _filledPixelsCount,
+      bucketImages: List.of(_bucketUndoImages),
+      bucketCounts: List.of(_bucketUndoPixelCounts),
+      creations: owned,
+      editing: _editingCreation,
+      dirty: _dirty,
+      wasDone: place != null &&
+          userProvider.isKulayPageCompleted(place.$1.name, place.$2),
+    );
+    _clearAll();
+    setState(() {
+      _pendingClear = snapshot;
+      _myCreations.removeWhere(page.owns);
+      _editingCreation = null;
+    });
+    if (owned.isNotEmpty) {
+      _saveCreationsToHive();
+      if (place != null) {
+        await userProvider.updateKulayProgress('coloring', false,
+            category: place.$1.name, index: place.$2);
+      }
+    }
+    _pendingClearTimer?.cancel();
+    _pendingClearTimer = Timer(const Duration(seconds: 6), _commitClear);
+  }
+
+  /// Makes the last Clear final: Undo can no longer bring it back, and the
+  /// saved pictures it took out of My Creations are deleted from the device.
+  void _commitClear({bool rebuild = true}) {
+    _pendingClearTimer?.cancel();
+    final gone = _pendingClear;
+    if (gone == null) return;
+    _pendingClear = null;
+    for (final (_, c) in gone.creations) {
+      if (kIsWeb ||
+          c.thumbnailPath.isEmpty ||
+          c.thumbnailPath.startsWith('assets/')) {
+        continue;
+      }
+      try {
+        File(c.thumbnailPath).deleteSync();
+      } catch (e) {
+        debugPrint('Error deleting thumbnail: $e');
+      }
+    }
+    if (rebuild && mounted) setState(() {});
+  }
+
+  /// Undo after Clear: the coloring, the saved picture in My Creations at
+  /// the place it had, and its tick.
+  Future<void> _restoreCleared() async {
+    final c = _pendingClear;
+    if (c == null) return;
+    _pendingClearTimer?.cancel();
+    if (_selectedPage != c.page) {
+      _commitClear();
+      return;
+    }
+    final colored = c.colored;
+    final display =
+        colored != null && c.filled > 0 ? await _imageToUi(colored) : null;
+    if (!mounted) return;
+    final oldBaked = _bakedStrokes;
+    setState(() {
+      _pendingClear = null;
+      _strokes
+        ..clear()
+        ..addAll(c.strokes);
+      _strokePaths
+        ..clear()
+        ..addAll(c.paths);
+      if (colored != null) _coloredImage = colored;
+      _displayImage = display;
+      _filledPixelsCount = c.filled;
+      _bakedStrokes = null;
+      _bakedCount = 0;
+      _editingCreation = c.editing;
+      for (final (i, creation) in c.creations) {
+        _myCreations.insert(math.min(i, _myCreations.length), creation);
+      }
+    });
+    oldBaked?.dispose();
+    _bucketUndoImages
+      ..clear()
+      ..addAll(c.bucketImages);
+    _bucketUndoPixelCounts
+      ..clear()
+      ..addAll(c.bucketCounts);
+    unawaited(_rebakeStrokes());
+    // A saved picture that had no unsaved coloring goes back to having
+    // none, so its card does not turn "in progress".
+    if (c.dirty || c.creations.isEmpty) {
+      await _autoSave();
+    } else {
+      await _clearAutoSave();
+      _dirty = false;
+    }
+    if (c.creations.isNotEmpty) {
+      _saveCreationsToHive();
+      final place = _placeOf(c.page);
+      if (c.wasDone && place != null && mounted) {
+        await Provider.of<UserProvider>(context, listen: false)
+            .updateKulayProgress('coloring', true,
+                category: place.$1.name, index: place.$2);
+      }
+    }
+  }
+
+  /// Folds the oldest finished strokes into the fill picture.
+  ///
+  /// Every stroke used to be kept forever, every point of it, and a page
+  /// colored again day after day grew with each visit until it took seconds
+  /// to open and its saved copy ran to tens of megabytes. Past
+  /// [kulayNeedsBake] the oldest strokes become pixels of the fill picture,
+  /// which is the same size however much is on it. It looks exactly the same;
+  /// only those strokes can no longer be undone one by one — the newest
+  /// [kulayBakeKeep] still can.
+  Future<void> _bakeStrokesIntoFill() async {
+    final base = _baseImage;
+    final side = _lastSide;
+    if (base == null || side <= 0) return;
+    // The leading strokes that are settled: drawn the same way every time.
+    var n = 0;
+    while (n < _strokes.length &&
+        (_strokes[n].isEraser || _strokes[n].maskResolved)) {
+      n++;
+    }
+    n = math.min(n, _strokes.length - kulayBakeKeep);
+    if (n <= 0) return;
+
+    final w = base.width;
+    final h = base.height;
+    final fill = await _imageToUi(_coloredImage ?? base);
+    final size = Size(side, side);
+    final rect = StrokePainter.containRect(fill, size);
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    canvas.drawImage(fill, Offset.zero, Paint());
+    // From the canvas the strokes were drawn on to the picture's own pixels.
+    canvas.scale(w / rect.width, h / rect.height);
+    canvas.translate(-rect.left, -rect.top);
+    // Their own layer, as on screen: an eraser stroke clears strokes, never
+    // the picture under them.
+    canvas.saveLayer(rect, Paint());
+    for (int i = 0; i < n; i++) {
+      StrokePainter.drawStroke(canvas, _strokes[i],
+          i < _strokePaths.length ? _strokePaths[i] : null, size);
+    }
+    canvas.restore();
+    final out = await recorder.endRecording().toImage(w, h);
+    fill.dispose();
+    final bytes = await out.toByteData(format: ui.ImageByteFormat.rawRgba);
+    if (bytes == null || !mounted) {
+      out.dispose();
+      return;
+    }
+    final baked = img.Image.fromBytes(
+        width: w, height: h, bytes: bytes.buffer, numChannels: 4);
+    final oldBaked = _bakedStrokes;
+    setState(() {
+      _strokes.removeRange(0, n);
+      _strokePaths.removeRange(0, math.min(n, _strokePaths.length));
+      _coloredImage = baked;
+      _displayImage = out;
+      // Something is in the fill now: it has to be saved with the picture.
+      if (_filledPixelsCount == 0) _filledPixelsCount = 1;
+      _bakedStrokes = null;
+      _bakedCount = 0;
+    });
+    oldBaked?.dispose();
+    // A fill undo from before would bring back a picture without them.
+    _bucketUndoImages.clear();
+    _bucketUndoPixelCounts.clear();
+    unawaited(_rebakeStrokes());
+  }
+
+  /// The category a page is in, and its place there.
+  (ColoringCategory, int)? _placeOf(ColoringPage page) {
+    for (final cat in _categories) {
+      final i = cat.pages.indexOf(page);
+      if (i >= 0) return (cat, i);
+    }
+    return null;
+  }
+
+  /// The next page to color after [page], with its category's index.
+  (int, ColoringPage)? _nextUnfinished(ColoringPage page) {
+    final order = <(int, int)>[
+      for (int c = 0; c < _categories.length; c++)
+        for (int i = 0; i < _categories[c].pages.length; i++) (c, i),
+    ];
+    final here = order.indexWhere((o) => _categories[o.$1].pages[o.$2] == page);
+    final next = kulayNextUnfinished(
+        [for (final o in order) _pageFinished(_categories[o.$1], o.$2)],
+        here < 0 ? 0 : here);
+    if (next == null) return null;
+    final (c, i) = order[next];
+    return (c, _categories[c].pages[i]);
+  }
+
   // ─────────────────────────────────────────────────────────────────────────
   //  Bucket fill helpers
   // ─────────────────────────────────────────────────────────────────────────
 
   Future<void> _loadPageImage() async {
     if (_selectedPage == null) return;
+    final art = await _pageArt(_selectedPage!.imagePath);
+    if (art == null) return;
+    _baseImage = art.image;
+    _baseRgba = art.rgba;
+    // A copy to color on: the decoded picture stays clean in the cache.
+    _coloredImage = art.image.clone();
+    _displayImage = art.display;
+  }
+
+  /// Every picture decoded once and kept for as long as the app runs.
+  ///
+  /// Opening a page used to decode its picture again each time, in Dart, on
+  /// the thread that draws the screen — the long "Loading your artwork…".
+  /// The pictures ship inside the app, so nothing here needs the internet;
+  /// it was only ever the phone's own work, and now it is done once.
+  static final Map<String, _PageArt> _artCache = {};
+  static final Map<String, Future<_PageArt?>> _artLoading = {};
+
+  static Future<_PageArt?> _pageArt(String path) {
+    final cached = _artCache[path];
+    if (cached != null) return Future.value(cached);
+    return _artLoading[path] ??= () async {
+      try {
+        final data = await rootBundle.load(path);
+        final decoded = await _decodeFast(data.buffer.asUint8List());
+        if (decoded == null) return null;
+        final art = _PageArt(
+            decoded.image,
+            decoded.rgba,
+            decoded.display,
+            await _outlinesOf(
+                decoded.rgba, decoded.image.width, decoded.image.height));
+        _artCache[path] = art;
+        return art;
+      } catch (e) {
+        debugPrint('Error loading coloring image: $e');
+        return null;
+      } finally {
+        _artLoading.remove(path);
+      }
+    }();
+  }
+
+  /// The picture's outlines alone, once per picture: black, with the
+  /// picture's darkness as its opacity, so its soft edges stay soft.
+  static Future<ui.Image?> _outlinesOf(Uint8List rgba, int w, int h) async {
     try {
-      final data = await rootBundle.load(_selectedPage!.imagePath);
-      final bytes = data.buffer.asUint8List();
-      _baseImage = img.decodeImage(bytes);
-      if (_baseImage == null) return;
-      _coloredImage = _baseImage!.clone();
-      _displayImage = await _imageToUi(_coloredImage!);
+      final out = Uint8List(w * h * 4);
+      for (int i = 0, o = 0; i < w * h; i++, o += 4) {
+        final lum = 0.299 * rgba[o] + 0.587 * rgba[o + 1] + 0.114 * rgba[o + 2];
+        out[o + 3] = ((255 - lum) * rgba[o + 3] / 255).round().clamp(0, 255);
+      }
+      final completer = Completer<ui.Image>();
+      ui.decodeImageFromPixels(
+          out, w, h, ui.PixelFormat.rgba8888, completer.complete);
+      return await completer.future;
     } catch (e) {
-      debugPrint('Error loading coloring image: $e');
+      debugPrint('Outlines not prepared: $e');
+      return null;
+    }
+  }
+
+  /// Decodes with the phone's own image decoder (the browser's on the web),
+  /// many times faster than decoding in Dart, and without holding up the
+  /// screen. Falls back to the Dart decoder if the platform refuses.
+  static Future<({img.Image image, Uint8List rgba, ui.Image display})?>
+      _decodeFast(Uint8List bytes) async {
+    try {
+      final codec = await ui.instantiateImageCodec(bytes);
+      final frame = await codec.getNextFrame();
+      codec.dispose();
+      final display = frame.image;
+      final data =
+          await display.toByteData(format: ui.ImageByteFormat.rawStraightRgba);
+      if (data == null) return null;
+      final rgba =
+          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      final image = img.Image.fromBytes(
+        width: display.width,
+        height: display.height,
+        bytes: rgba.buffer,
+        bytesOffset: rgba.offsetInBytes,
+        numChannels: 4,
+      );
+      return (image: image, rgba: rgba, display: display);
+    } catch (e) {
+      debugPrint('Native decode refused, decoding in Dart: $e');
+      final decoded = img.decodeImage(bytes);
+      if (decoded == null) return null;
+      final image = decoded.convert(numChannels: 4);
+      final rgba = image.getBytes(order: img.ChannelOrder.rgba);
+      final completer = Completer<ui.Image>();
+      ui.decodeImageFromPixels(rgba, image.width, image.height,
+          ui.PixelFormat.rgba8888, completer.complete);
+      return (image: image, rgba: rgba, display: await completer.future);
+    }
+  }
+
+  /// The pictures decoded in the background while the child is still
+  /// choosing, one at a time, so the one they tap is already waiting.
+  Future<void> _prewarmPages() async {
+    for (final cat in _categories) {
+      for (final page in cat.pages) {
+        if (!mounted) return;
+        await _pageArt(page.imagePath);
+        // A frame between pictures, so the gallery keeps scrolling smoothly.
+        await Future<void>.delayed(const Duration(milliseconds: 16));
+      }
     }
   }
 
@@ -747,8 +1204,28 @@ class _KulayScreenState extends State<KulayScreen>
     return '${dir.path}/$key.png';
   }
 
+  /// Saves the draft once the strokes pause, not after every one: each
+  /// save encodes every stroke (and, with fills, the whole picture), which
+  /// a weak phone felt as a hitch at the end of every line. Leaving the
+  /// picture or finishing it saves at once (see [_flushAutoSave]).
+  void _scheduleAutoSave() {
+    _dirty = true;
+    _autoSaveTimer?.cancel();
+    _autoSaveTimer = Timer(const Duration(milliseconds: 1500), _autoSave);
+  }
+
+  /// A draft still waiting to be saved, saved now.
+  Future<void> _flushAutoSave() async {
+    if (!(_autoSaveTimer?.isActive ?? false)) return;
+    _autoSaveTimer!.cancel();
+    await _autoSave();
+  }
+
+  Timer? _autoSaveTimer;
+
   Future<void> _autoSave() async {
     if (_selectedPage == null) return;
+    _dirty = true;
     final pageName = _selectedPage!.name;
     final key = _autoSaveKey(pageName);
     final prefs = await SharedPreferences.getInstance();
@@ -761,7 +1238,14 @@ class _KulayScreenState extends State<KulayScreen>
     // Save bucket-fill image. The web has no files, so there it is kept in
     // the preferences as text instead — before, every fill was lost on the
     // web as soon as the child left the page.
-    if (_coloredImage != null) {
+    //
+    // Only when something was filled. Brush strokes are saved above; the
+    // picture with no fill is just the page, and writing it out after every
+    // stroke, then decoding it again on opening, was time for nothing.
+    if (_coloredImage == null || _filledPixelsCount == 0) {
+      await prefs.remove('${key}_imageData');
+      await prefs.remove('${key}_imagePath');
+    } else {
       try {
         final bytes = img.encodePng(_coloredImage!);
         if (kIsWeb) {
@@ -781,6 +1265,75 @@ class _KulayScreenState extends State<KulayScreen>
     await prefs.setInt('${key}_color', _selectedColor.value);
     await prefs.setDouble('${key}_brushSize', _brushSize);
     await prefs.setBool('${key}_isEraser', _isEraser);
+    _schedulePreview();
+  }
+
+  Future<void> _loadInProgressPreviews() async {
+    final prefs = await SharedPreferences.getInstance();
+    final found = <String, Uint8List>{};
+    final empty = <String>[];
+    for (final cat in _categories) {
+      for (final page in cat.pages) {
+        final key = _autoSaveKey(page.name);
+        final saved = prefs.getString('${key}_preview');
+        if (saved == null || saved.isEmpty) continue;
+        // A card picture with no drawing behind it is left over, not work
+        // in progress: dropped rather than shown.
+        if (!kulayDraftHasContent(prefs, key)) {
+          empty.add(page.name);
+          continue;
+        }
+        try {
+          found[page.name] = base64Decode(saved);
+        } catch (_) {}
+      }
+    }
+    for (final name in empty) {
+      await _clearAutoSaveForPage(name);
+    }
+    if (!mounted) return;
+    setState(() => _inProgress
+      ..clear()
+      ..addAll(found));
+  }
+
+  /// A short wait first: a stroke draws only once its stay-inside-the-lines
+  /// mask is ready, and a picture taken at once would miss the last one.
+  void _schedulePreview() {
+    _previewTimer?.cancel();
+    final page = _selectedPage;
+    _previewKey = page == null ? null : _autoSaveKey(page.name);
+    _previewTimer =
+        Timer(const Duration(milliseconds: 600), () => _savePreview());
+  }
+
+  /// Pictures the canvas as it is now for the page's card.
+  Future<void> _savePreview() async {
+    _previewTimer?.cancel();
+    final page = _selectedPage;
+    if (page == null) return;
+    final key = _autoSaveKey(page.name);
+    final prefs = await SharedPreferences.getInstance();
+    if (_strokes.isEmpty && _filledPixelsCount == 0) {
+      // Cleared: the card goes back to the page itself.
+      await prefs.remove('${key}_preview');
+      if (mounted) setState(() => _inProgress.remove(page.name));
+      return;
+    }
+    final boundary =
+        _canvasKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+    if (boundary == null) return;
+    try {
+      final image = await boundary.toImage(pixelRatio: 1.0);
+      final data = await image.toByteData(format: ui.ImageByteFormat.png);
+      image.dispose();
+      if (data == null) return;
+      final bytes = data.buffer.asUint8List();
+      await prefs.setString('${key}_preview', base64Encode(bytes));
+      if (mounted) setState(() => _inProgress[page.name] = bytes);
+    } catch (e) {
+      debugPrint('Progress picture skipped: $e');
+    }
   }
 
   Future<void> _loadAutoSave() async {
@@ -815,10 +1368,10 @@ class _KulayScreenState extends State<KulayScreen>
 
     if (kIsWeb && imageData != null && imageData.isNotEmpty) {
       try {
-        final image = img.decodeImage(base64Decode(imageData));
-        if (image != null && _baseImage != null) {
-          loadedColoredImage = image;
-          loadedDisplayImage = await _imageToUi(loadedColoredImage);
+        final decoded = await _decodeFast(base64Decode(imageData));
+        if (decoded != null && _baseImage != null) {
+          loadedColoredImage = decoded.image;
+          loadedDisplayImage = decoded.display;
         }
       } catch (e) {
         debugPrint('Error loading autosave image: $e');
@@ -827,11 +1380,10 @@ class _KulayScreenState extends State<KulayScreen>
       try {
         final file = File(imagePath);
         if (await file.exists()) {
-          final bytes = await file.readAsBytes();
-          final image = img.decodeImage(bytes);
-          if (image != null && _baseImage != null) {
-            loadedColoredImage = image;
-            loadedDisplayImage = await _imageToUi(loadedColoredImage);
+          final decoded = await _decodeFast(await file.readAsBytes());
+          if (decoded != null && _baseImage != null) {
+            loadedColoredImage = decoded.image;
+            loadedDisplayImage = decoded.display;
           }
         }
       } catch (e) {
@@ -867,7 +1419,9 @@ class _KulayScreenState extends State<KulayScreen>
       if (brushSize != null) _brushSize = _snapBrush(brushSize);
       if (isEraser != null) _isEraser = isEraser;
       _isLoadingAutoSave = false;
+      _showLoadingOverlay = false;
     });
+    _loadingOverlayTimer?.cancel();
     oldBaked?.dispose();
   }
 
@@ -883,6 +1437,8 @@ class _KulayScreenState extends State<KulayScreen>
     await prefs.remove('${key}_brushSize');
     await prefs.remove('${key}_isEraser');
     await prefs.remove('${key}_side');
+    await prefs.remove('${key}_preview');
+    if (mounted) setState(() => _inProgress.remove(pageName));
 
     try {
       final imagePath = await _autoSaveImagePath(pageName);
@@ -932,22 +1488,28 @@ class _KulayScreenState extends State<KulayScreen>
   // Each brush stroke is clipped to the outlined region where it started, so
   // young children can scribble freely without the color crossing the lines.
   // Masks are cached per region (children recolor the same area repeatedly).
-  static const int _maskCacheLimit = 8;
+  // Room for every region of a busy drawing, so reopening one searches each
+  // region once; a mask is about a megabyte, so not unbounded.
+  static const int _maskCacheLimit = 16;
   final List<_RegionMask> _maskCache = [];
 
   Future<ui.Image?> _computeRegionMask(Offset local) async {
     final base = _baseImage;
-    if (base == null) return null;
+    final px = _baseRgba;
+    if (base == null || px == null) return null;
     final w = base.width;
     final h = base.height;
     final coords = _localToImageCoords(local, _lastSide);
     int sx = coords.dx.toInt().clamp(0, w - 1);
     int sy = coords.dy.toInt().clamp(0, h - 1);
 
+    // Pixels straight from the RGBA bytes, four per pixel. A getPixel per
+    // pixel made an object each time, and a reopened drawing waits on one
+    // search per brushed region before its strokes can show.
     bool isPaintable(int x, int y) {
-      final p = base.getPixel(x, y);
-      if (p.a < 50) return false;
-      final lum = 0.299 * p.r + 0.587 * p.g + 0.114 * p.b;
+      final o = (y * w + x) * 4;
+      if (px[o + 3] < 50) return false;
+      final lum = 0.299 * px[o] + 0.587 * px[o + 1] + 0.114 * px[o + 2];
       return lum >= 100;
     }
 
@@ -977,48 +1539,52 @@ class _KulayScreenState extends State<KulayScreen>
     }
 
     // BFS over similar pixels — same rules as the bucket fill.
-    final startPixel = base.getPixel(sx, sy);
-    final startR = startPixel.r.toInt();
-    final startG = startPixel.g.toInt();
-    final startB = startPixel.b.toInt();
-    final startA = startPixel.a.toInt();
+    final so = (sy * w + sx) * 4;
+    final startR = px[so];
+    final startG = px[so + 1];
+    final startB = px[so + 2];
+    final startA = px[so + 3];
     const threshold = 40;
 
     final visited = Uint8List(w * h);
     final bits = Uint8List(w * h);
-    final qx = <int>[sx];
-    final qy = <int>[sy];
-    int head = 0;
+    // Each pixel joins the queue at most once, so a fixed array holds it.
+    final queue = Int32List(w * h);
+    int head = 0, tail = 0;
+    queue[tail++] = sy * w + sx;
     visited[sy * w + sx] = 1;
 
-    while (head < qx.length) {
-      final x = qx[head];
-      final y = qy[head];
-      head++;
-
-      final p = base.getPixel(x, y);
-      if (p.a < 50 ||
-          (p.r - startR).abs() > threshold ||
-          (p.g - startG).abs() > threshold ||
-          (p.b - startB).abs() > threshold ||
-          (p.a - startA).abs() > threshold) {
+    while (head < tail) {
+      final idx = queue[head++];
+      final o = idx * 4;
+      final a = px[o + 3];
+      if (a < 50 ||
+          (px[o] - startR).abs() > threshold ||
+          (px[o + 1] - startG).abs() > threshold ||
+          (px[o + 2] - startB).abs() > threshold ||
+          (a - startA).abs() > threshold) {
         continue;
       }
-      bits[y * w + x] = 1;
+      bits[idx] = 1;
 
-      void tryAdd(int nx, int ny) {
-        if (nx < 0 || nx >= w || ny < 0 || ny >= h) return;
-        final idx = ny * w + nx;
-        if (visited[idx] != 0) return;
-        visited[idx] = 1;
-        qx.add(nx);
-        qy.add(ny);
+      final x = idx % w;
+      final y = idx ~/ w;
+      if (x + 1 < w && visited[idx + 1] == 0) {
+        visited[idx + 1] = 1;
+        queue[tail++] = idx + 1;
       }
-
-      tryAdd(x + 1, y);
-      tryAdd(x - 1, y);
-      tryAdd(x, y + 1);
-      tryAdd(x, y - 1);
+      if (x > 0 && visited[idx - 1] == 0) {
+        visited[idx - 1] = 1;
+        queue[tail++] = idx - 1;
+      }
+      if (y + 1 < h && visited[idx + w] == 0) {
+        visited[idx + w] = 1;
+        queue[tail++] = idx + w;
+      }
+      if (y > 0 && visited[idx - w] == 0) {
+        visited[idx - w] = 1;
+        queue[tail++] = idx - w;
+      }
     }
 
     // Dilate the region a couple of pixels so the color tucks under the
@@ -1131,19 +1697,28 @@ class _KulayScreenState extends State<KulayScreen>
     if (target <= _bakedCount) return;
     final startCount = _bakedCount;
 
+    // At the screen's own pixels, one for one, up to 1536 across: sharp,
+    // and the cheapest thing to draw every frame. Baked at the canvas's
+    // logical size (about 360), every finished stroke was enlarged about
+    // three times on a phone and went soft and blocky the moment the
+    // finger lifted.
+    final dpr = MediaQuery.maybeDevicePixelRatioOf(context) ?? 2.0;
+    final scale = math.min(dpr, 1536 / side);
+    final px = (side * scale).ceil();
+
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     final size = Size(side, side);
+    canvas.scale(scale);
     canvas.saveLayer(Offset.zero & size, Paint());
     final baked = _bakedStrokes;
-    if (baked != null) canvas.drawImage(baked, Offset.zero, Paint());
+    if (baked != null) StrokePainter.drawBaked(canvas, baked, size);
     for (int i = startCount; i < target; i++) {
       StrokePainter.drawStroke(canvas, _strokes[i],
           i < _strokePaths.length ? _strokePaths[i] : null, size);
     }
     canvas.restore();
-    final image =
-        await recorder.endRecording().toImage(side.ceil(), side.ceil());
+    final image = await recorder.endRecording().toImage(px, px);
 
     // The canvas may have been cleared, undone, or reloaded while this was
     // rendering — any of those resets _bakedCount behind this call's back,
@@ -1288,95 +1863,6 @@ class _KulayScreenState extends State<KulayScreen>
   //  Save
   // ─────────────────────────────────────────────────────────────────────────
 
-  void _showStarRatingDialog(MyCreation creation) {
-    int selectedStars = 0;
-    final loc = AppLocalizations.of(context)!;
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => StatefulBuilder(
-        builder: (dialogCtx, setDialogState) => FunDialog(
-          child: FunDialogCard(
-            frame: FunFrame.purple,
-            padding: const EdgeInsets.fromLTRB(16, 22, 16, 22),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              FunTitle(loc.rateYourArtwork),
-              const SizedBox(height: 8),
-              Text(loc.howManyStars,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF2B2A5C))),
-              const SizedBox(height: 16),
-              // The app's glossy star, grey and faint until chosen.
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(5, (i) {
-                  final idx = i + 1;
-                  final on = idx <= selectedStars;
-                  final star = Image.asset('assets/images/replay_star.webp',
-                      width: 50,
-                      height: 48,
-                      filterQuality: FilterQuality.medium);
-                  return GestureDetector(
-                    onTap: () => setDialogState(() => selectedStars = idx),
-                    child: AnimatedScale(
-                      scale: on ? 1.08 : 1.0,
-                      duration: const Duration(milliseconds: 150),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2),
-                        child: on
-                            ? star
-                            : Opacity(
-                                opacity: 0.45,
-                                child: ColorFiltered(
-                                  colorFilter: const ColorFilter.matrix([
-                                    0.33, 0.33, 0.33, 0, 0, //
-                                    0.33, 0.33, 0.33, 0, 0, //
-                                    0.33, 0.33, 0.33, 0, 0, //
-                                    0, 0, 0, 1, 0,
-                                  ]),
-                                  child: star,
-                                ),
-                              ),
-                      ),
-                    ),
-                  );
-                }),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: 200,
-                child: FunPillButton(
-                  label: loc.done,
-                  colors: FunColors.purple,
-                  onTap: () {
-                    creation.stars = selectedStars > 0 ? selectedStars : null;
-                    _saveCreationsToHive();
-                    Navigator.pop(context);
-                    _snack(AppLocalizations.of(context)!.saved);
-                    final oldBaked = _bakedStrokes;
-                    setState(() {
-                      _strokes.clear();
-                      _strokePaths.clear();
-                      _activeStroke = null;
-                      _editingCreation = null;
-                      _selectedPage = null;
-                      _bakedStrokes = null;
-                      _bakedCount = 0;
-                    });
-                    oldBaked?.dispose();
-                  },
-                ),
-              ),
-            ]),
-          ),
-        ),
-      ),
-    );
-  }
-
   /// A creation's picture: the saved file on the device that made it, else
   /// the small copy kept with it (all a creation restored from the cloud
   /// has), else the page it was colored on.
@@ -1462,7 +1948,7 @@ class _KulayScreenState extends State<KulayScreen>
       try {
         final decoded = img.decodeImage(pngBytes);
         if (decoded != null) {
-          final resized = img.copyResize(decoded, width: 220);
+          final resized = img.copyResize(decoded, width: 300);
           final jpegBytes = img.encodeJpg(resized, quality: 60);
           base64Str = base64Encode(jpegBytes);
         }
@@ -1493,9 +1979,18 @@ class _KulayScreenState extends State<KulayScreen>
   }
 
   /// Whether [pageName] has coloring in progress that was not saved yet.
+  ///
+  /// An empty one does not count: a saved drawing cleared and left without
+  /// saving opened blank while its card still showed the saved colors.
+  /// Clearing without saving changes nothing that was saved, so the saved
+  /// drawing opens — as its card shows — and the empty copy is dropped.
   Future<bool> _hasAutoSave(String pageName) async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.containsKey('${_autoSaveKey(pageName)}_strokes');
+    final key = _autoSaveKey(pageName);
+    if (kulayDraftHasContent(prefs, key)) return true;
+    // Nothing on it: whatever is left of it (a card picture, say) goes.
+    await _clearAutoSaveForPage(pageName);
+    return false;
   }
 
   /// A creation's title in the language the child is using now. The name
@@ -1508,6 +2003,24 @@ class _KulayScreenState extends State<KulayScreen>
       }
     }
     return creation.name;
+  }
+
+  /// A category's name in the reader's language; it showed in English
+  /// ("Flowers", "Toys") whatever the language.
+  String _categoryLabel(String name) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (name) {
+      case 'Animals':
+        return l10n.catAnimals;
+      case 'Flowers':
+        return l10n.catFlowers;
+      case 'Fruits':
+        return l10n.catFruits;
+      case 'Toys':
+        return l10n.catToys;
+      default:
+        return name;
+    }
   }
 
   String _localizedPageName(String name) {
@@ -1529,8 +2042,8 @@ class _KulayScreenState extends State<KulayScreen>
         return l10n.pageSaging;
       case 'Teddy Bear':
         return l10n.pageTeddyBear;
-      case 'Soda Pop':
-        return l10n.pageSodaPop;
+      case 'Race Car':
+        return l10n.pageRaceCar;
       default:
         return name;
     }
@@ -1539,11 +2052,17 @@ class _KulayScreenState extends State<KulayScreen>
   // One-tap save: no typing needed — a daycare child can't use a keyboard,
   // so the artwork is named after its coloring page automatically.
   Future<void> _saveCreation() async {
+    _commitClear();
+    // The picture is about to be saved whole and its draft cleared; a draft
+    // save still waiting would bring the draft back after.
+    _autoSaveTimer?.cancel();
     // Brush strokes AND bucket fills both count as coloring.
     if (_strokes.isEmpty && _filledPixelsCount == 0) {
       _snack(AppLocalizations.of(context)!.colorSomethingFirst);
       return;
     }
+    if (kulayNeedsBake(_strokes)) await _bakeStrokesIntoFill();
+    if (!mounted) return;
 
     final autoName = _localizedPageName(_selectedPage!.name);
     final thumbData = await _captureThumbnailData();
@@ -1574,6 +2093,18 @@ class _KulayScreenState extends State<KulayScreen>
           durationSeconds: _editingCreation!.durationSeconds + elapsed,
         );
         _myCreations[idx] = creation;
+        // The picture saved last time is replaced, not kept beside the new
+        // one: every re-save used to leave its old file behind, a few
+        // hundred kilobytes each, for good.
+        final oldPath = _editingCreation!.thumbnailPath;
+        if (!kIsWeb &&
+            oldPath.isNotEmpty &&
+            oldPath != thumbnailPath &&
+            !oldPath.startsWith('assets/')) {
+          try {
+            File(oldPath).deleteSync();
+          } catch (_) {}
+        }
       } else {
         creation = _editingCreation!;
       }
@@ -1612,35 +2143,316 @@ class _KulayScreenState extends State<KulayScreen>
       debugPrint('Error updating parents prefs: $e');
     }
 
-    // Sync to UserProvider
-    if (mounted) {
+    // Sync to UserProvider — under the page's own category. It was the
+    // category last opened, which a picture reopened from My Creations
+    // need not be in, and the page was then recorded at index -1.
+    bool newStar = false;
+    final place = _placeOf(_selectedPage!);
+    if (mounted && place != null) {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
-      final cat = _categories[_selectedCategory];
-      final pageIndex = cat.pages.indexOf(_selectedPage!);
+      final prefs = await SharedPreferences.getInstance();
+      newStar = !userProvider.isKulayPageCompleted(place.$1.name, place.$2) &&
+          prefs.getBool(
+                  UserProvider.kulayStarredKey(place.$1.name, place.$2)) !=
+              true;
+      if (!mounted) return;
       userProvider.updateKulayProgress('coloring', true,
-          category: cat.name, index: pageIndex);
+          category: place.$1.name, index: place.$2);
     }
 
     _saveCreationsToHive();
     _clearAutoSave();
-    if (mounted) {
-      if (creation.stars == null) {
-        _showStarRatingDialog(creation);
-      } else {
-        _snack(AppLocalizations.of(context)!.saved);
-        final oldBaked = _bakedStrokes;
-        setState(() {
-          _strokes.clear();
-          _strokePaths.clear();
-          _activeStroke = null;
-          _editingCreation = null;
-          _selectedPage = null;
-          _bakedStrokes = null;
-          _bakedCount = 0;
-        });
-        oldBaked?.dispose();
-      }
+    _previewTimer?.cancel();
+    _dirty = false;
+    // Time from here on is the next session's, not added twice.
+    _coloringStartTime = DateTime.now();
+    if (!mounted) return;
+    // The picture stays open under the card: finishing used to send the
+    // child back to the list in the middle of coloring. Finishing again now
+    // updates this same creation.
+    setState(() => _editingCreation = creation);
+    await _showFinished(creation, newStar: newStar);
+  }
+
+  /// The card a finished picture gets, in place of the rating question that
+  /// used to stand in the way: confetti, the picture, "+1 ★" when it earned
+  /// one, three hearts to tap if the child wants to, and the way on — the
+  /// next picture not colored yet, My Creations, or back to this one.
+  Future<void> _showFinished(MyCreation creation,
+      {required bool newStar}) async {
+    final loc = AppLocalizations.of(context)!;
+    final page = _selectedPage;
+    if (page == null) return;
+    final next = _nextUnfinished(page);
+    Sfx.play(Sfx.pop);
+    final confetti =
+        ConfettiController(duration: const Duration(milliseconds: 1500));
+    if (!MediaQuery.of(context).disableAnimations) confetti.play();
+
+    final choice = await showDialog<_AfterFinish>(
+      context: context,
+      builder: (_) => StatefulBuilder(
+        builder: (dialogContext, setDialog) => Stack(
+          alignment: Alignment.center,
+          children: [
+            FunDialog(
+              child: FunDialogCard(
+                frame: FunFrame.purple,
+                padding: const EdgeInsets.fromLTRB(18, 20, 18, 18),
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  FunTitle(loc.coloringGreatJob),
+                  const SizedBox(height: 12),
+                  Stack(clipBehavior: Clip.none, children: [
+                    Container(
+                      width: 170,
+                      height: 170,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(
+                            color: const Color(0xFFFFD54F), width: 4),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF282850).withOpacity(0.16),
+                            blurRadius: 18,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(18),
+                        child: Padding(
+                          padding: const EdgeInsets.all(6),
+                          child: _creationPicture(creation),
+                        ),
+                      ),
+                    ),
+                    if (newStar)
+                      const Positioned(
+                          right: -18, top: -14, child: _PlusOneStar()),
+                  ]),
+                  const SizedBox(height: 14),
+                  // Liking it is up to the child: nothing waits on it.
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(3, (i) {
+                      final on = i < (creation.stars ?? 0);
+                      return GestureDetector(
+                        onTap: () {
+                          setDialog(() {
+                            final k = i + 1;
+                            final now = creation.stars == k ? k - 1 : k;
+                            creation.stars = now == 0 ? null : now;
+                          });
+                          _saveCreationsToHive();
+                        },
+                        child: AnimatedScale(
+                          scale: on ? 1.12 : 1,
+                          duration: const Duration(milliseconds: 150),
+                          child: Container(
+                            width: 46,
+                            height: 46,
+                            margin: const EdgeInsets.symmetric(horizontal: 5),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFFFF0F3),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(Icons.favorite_rounded,
+                                size: 26,
+                                color: on
+                                    ? const Color(0xFFFF4F7B)
+                                    : const Color(0xFFD9D3DC)),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 16),
+                  if (next != null)
+                    _nextPictureButton(next.$2, next.$1,
+                        () => Navigator.pop(dialogContext, _AfterFinish.next))
+                  else
+                    SizedBox(
+                      width: double.infinity,
+                      child: FunPillButton(
+                        label: loc.allPicturesDone,
+                        icon: LucideIcons.party_popper,
+                        colors: FunColors.purple,
+                        onTap: () =>
+                            Navigator.pop(dialogContext, _AfterFinish.home),
+                      ),
+                    ),
+                  const SizedBox(height: 10),
+                  Row(children: [
+                    Expanded(
+                      child: _softButton(
+                          LucideIcons.folder_open,
+                          loc.myCreations,
+                          () =>
+                              Navigator.pop(dialogContext, _AfterFinish.mine)),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _softButton(
+                          LucideIcons.brush,
+                          loc.colorMore,
+                          () =>
+                              Navigator.pop(dialogContext, _AfterFinish.more)),
+                    ),
+                  ]),
+                ]),
+              ),
+            ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConfettiWidget(
+                confettiController: confetti,
+                blastDirectionality: BlastDirectionality.explosive,
+                shouldLoop: false,
+                colors: _palette,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    confetti.dispose();
+    if (!mounted) return;
+
+    switch (choice) {
+      case _AfterFinish.next:
+        final (c, nextPage) = next!;
+        await _leaveColoring();
+        if (!mounted) return;
+        _openCategoryAt(c);
+        await _openPage(nextPage);
+      case _AfterFinish.mine:
+        _returnToCreations = true;
+        await _leaveColoring();
+      case _AfterFinish.home:
+        await _leaveColoring();
+        if (mounted) setState(() => _openCategory = null);
+      case _AfterFinish.more:
+      case null:
+        break;
     }
+  }
+
+  /// The way on from a finished picture: the next one, shown as itself.
+  Widget _nextPictureButton(
+      ColoringPage page, int catIndex, VoidCallback onTap) {
+    final loc = AppLocalizations.of(context)!;
+    const colors = FunColors.purple;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(10, 10, 14, 10),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [colors.top, colors.bottom],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(color: colors.edge, offset: const Offset(0, 4)),
+          ],
+        ),
+        child: Row(children: [
+          Container(
+            width: 56,
+            height: 56,
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: _pageThumb(page),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(loc.nextPicture,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontFamily: 'Fredoka',
+                      fontSize: 20,
+                      fontVariations: [FontVariation('wght', 650)],
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    )),
+                Text(
+                    '${_localizedPageName(page.name)} · '
+                    '${_categoryLabel(_categories[catIndex].name)}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white.withOpacity(0.85),
+                    )),
+              ],
+            ),
+          ),
+          const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 30),
+        ]),
+      ),
+    );
+  }
+
+  /// A quieter way on, under the next picture.
+  Widget _softButton(IconData icon, String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF1F2F8),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Icon(icon, size: 22, color: const Color(0xFF5B49D8)),
+          const SizedBox(height: 3),
+          Text(label,
+              // Two lines: "Ang Aking mga Likha" does not fit one.
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF2B2A5C))),
+        ]),
+      ),
+    );
+  }
+
+  /// Leaves the open picture for the list — or for My Creations, when it
+  /// was opened from there.
+  ///
+  /// It used to ask "Save your coloring?" first. Nothing is lost either
+  /// way — the coloring is kept, and the page's card shows it in progress
+  /// with Continue — so the question was only one more thing to read and
+  /// one more tap on every way out.
+  Future<void> _leaveColoring() async {
+    if (_selectedPage == null) return;
+    _commitClear();
+    await _flushAutoSave();
+    if (!mounted) return;
+    if (_previewTimer?.isActive ?? false) await _savePreview();
+    if (!mounted) return;
+    setState(() {
+      _selectedPage = null;
+      _editingCreation = null;
+      _dirty = false;
+      if (_returnToCreations) _selectedTab = 1;
+      _returnToCreations = false;
+    });
   }
 
   /// The bucket fills as PNG text, or empty when nothing was filled.
@@ -1658,11 +2470,31 @@ class _KulayScreenState extends State<KulayScreen>
   Future<void> _loadCreations() async {
     try {
       final box = await Hive.openBox('userProgress');
-      final List? savedRaw = box.get('coloring_creations');
+      List? savedRaw = box.get('coloring_creations');
       if (savedRaw != null) {
+        // Creations of a page the app no longer has are deleted for good,
+        // saved or not, with their picture files.
+        final removed = savedRaw
+            .where((c) => c is Map && UserProvider.isRemovedColoringCreation(c))
+            .toList();
+        if (removed.isNotEmpty) {
+          for (final c in removed) {
+            final path = '${(c as Map)['thumbnailPath'] ?? ''}';
+            if (!kIsWeb && path.isNotEmpty && !path.startsWith('assets/')) {
+              try {
+                final file = File(path);
+                if (await file.exists()) await file.delete();
+              } catch (_) {}
+            }
+          }
+          savedRaw = savedRaw.where((c) => !removed.contains(c)).toList();
+          await box.put('coloring_creations', savedRaw);
+        }
+        if (!mounted) return;
+        final creations = savedRaw;
         setState(() {
           _myCreations.clear();
-          for (var item in savedRaw) {
+          for (var item in creations) {
             if (item is Map) {
               final strokesRaw = item['strokes'] as List?;
               final List<ColoringStroke> strokes = [];
@@ -1706,10 +2538,58 @@ class _KulayScreenState extends State<KulayScreen>
       debugPrint('Error loading creations: $e');
     }
     await _syncKulayProgressWithCreations();
+    unawaited(_sweepOrphanPictures());
+  }
+
+  /// Deletes saved-picture files no creation points to any more — left by
+  /// re-saves before they replaced their file, and by children who used
+  /// this device before. Pictures of work kept aside for a child to come
+  /// back to (see UserProvider's stash) are kept.
+  Future<void> _sweepOrphanPictures() async {
+    if (kIsWeb) return;
+    try {
+      // Only against a list read in full: if loading failed part way, the
+      // files it missed are still someone's pictures.
+      final stored = Hive.box('userProgress').get('coloring_creations');
+      if (stored is List && stored.length != _myCreations.length) return;
+      final used = <String>{for (final c in _myCreations) c.thumbnailPath};
+      if (Hive.isBoxOpen('stashedWork') ||
+          await Hive.boxExists('stashedWork')) {
+        final stash = await Hive.openBox('stashedWork');
+        for (final entry in stash.values) {
+          final kept =
+              ((entry as Map?)?['hive'] as Map?)?['coloring_creations'];
+          if (kept is List) {
+            for (final c in kept) {
+              if (c is Map) used.add('${c['thumbnailPath'] ?? ''}');
+            }
+          }
+        }
+      }
+      // Compared by file name: a path saved on one version of the folder
+      // need not spell it the same way as the listing does.
+      final usedNames = {for (final u in used) u.split(RegExp(r'[\\/]')).last};
+      final dir = await getApplicationDocumentsDirectory();
+      for (final f in dir.listSync().whereType<File>()) {
+        final name = f.uri.pathSegments.last;
+        if (name.startsWith('creation_') &&
+            name.endsWith('.png') &&
+            !usedNames.contains(name)) {
+          f.deleteSync();
+        }
+      }
+    } catch (e) {
+      debugPrint('Picture sweep skipped: $e');
+    }
   }
 
   Future<void> _syncKulayProgressWithCreations() async {
+    if (!mounted) return;
     final userProvider = Provider.of<UserProvider>(context, listen: false);
+    // Until the cloud's drawings are in, a finished page with no drawing
+    // here is most often one whose drawing has not come down yet — and
+    // taking its mark off wrote "not done" to the cloud for every phone.
+    if (!userProvider.creationsPulled) return;
     for (final cat in _categories) {
       for (int i = 0; i < cat.pages.length; i++) {
         final page = cat.pages[i];
@@ -1833,6 +2713,39 @@ class _KulayScreenState extends State<KulayScreen>
 
   @override
   Widget build(BuildContext context) {
+    final colouring = _selectedTab == 0 && _selectedPage != null;
+    final inCategory = _selectedTab == 0 && _openCategory != null;
+    // Drawings from the child's other phone can arrive after this screen
+    // has read its list — it read it once, so they never showed, while
+    // their check marks did. Read again when they come, but not under a
+    // page that is being colored.
+    final creationsVersion =
+        context.select<UserProvider, int>((p) => p.creationsVersion);
+    _seenCreationsVersion ??= creationsVersion;
+    if (creationsVersion != _seenCreationsVersion && !colouring) {
+      _seenCreationsVersion = creationsVersion;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _loadCreations();
+      });
+    }
+    // The phone's own back button goes through the same question as the
+    // arrow, instead of leaving the coloring book outright — and from a
+    // category it goes back to the categories.
+    return PopScope(
+      canPop: !colouring && !inCategory,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        if (colouring) {
+          _leaveColoring();
+        } else {
+          setState(() => _openCategory = null);
+        }
+      },
+      child: _scaffold(),
+    );
+  }
+
+  Widget _scaffold() {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FC),
       appBar: _appBar(),
@@ -1865,6 +2778,7 @@ class _KulayScreenState extends State<KulayScreen>
   /// built at all. The drawing gets the band back.
   PreferredSizeWidget _appBar() {
     final colouring = _selectedTab == 0 && _selectedPage != null;
+    final inCategory = _selectedTab == 0 && _openCategory != null;
 
     return AppBar(
       backgroundColor: Colors.white,
@@ -1873,23 +2787,26 @@ class _KulayScreenState extends State<KulayScreen>
       leading: CustomBackButton(
         iconColor: AppColors.textDark,
         onPressed: colouring
-            ? () => setState(() {
-                  _selectedPage = null;
-                  _editingCreation = null;
-                })
-            : () => Navigator.pop(context),
+            ? _leaveColoring
+            : inCategory
+                ? () => setState(() => _openCategory = null)
+                : () => Navigator.pop(context),
       ),
       title: Text(
           colouring
               ? _localizedPageName(_selectedPage!.name)
-              : AppLocalizations.of(context)!.coloringBook,
+              : inCategory
+                  ? _categoryLabel(_categories[_openCategory!].name)
+                  : AppLocalizations.of(context)!.coloringBook,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
               color: AppColors.textDark,
               fontSize: 20,
               fontWeight: FontWeight.bold)),
-      bottom: colouring
+      // Inside a category the title already says where the child is; the
+      // tabs come back with the categories.
+      bottom: colouring || inCategory
           ? null
           : PreferredSize(
               preferredSize: const Size.fromHeight(50),
@@ -1963,7 +2880,7 @@ class _KulayScreenState extends State<KulayScreen>
   // ─────────────────────────────────────────────────────────────────────────
 
   Widget _buildColoringTab() {
-    if (_selectedPage == null) return _gallery();
+    if (_selectedPage == null) return DesignScale(child: _gallery());
     return _canvas();
   }
 
@@ -1971,91 +2888,367 @@ class _KulayScreenState extends State<KulayScreen>
   //  GALLERY
   // ─────────────────────────────────────────────────────────────────────────
 
-  IconData _categoryIcon(String name) {
-    switch (name) {
-      case 'Animals':
-        return LucideIcons.paw_print;
-      case 'Flowers':
-        return LucideIcons.flower;
-      case 'Fruits':
-        return LucideIcons.apple;
-      case 'Toys':
-        return LucideIcons.blocks;
-      default:
-        return LucideIcons.palette;
-    }
-  }
-
   Widget _gallery() {
-    final cat = _categories[_selectedCategory];
+    if (_openCategory == null) return _categoryOverview();
+    final cat = _categories[_openCategory!];
     final pages = cat.pages;
 
-    return Column(children: [
-      const SizedBox(height: 12),
-      // The picture categories. Sized to be hit by a small finger rather
-      // than a cursor: the chip was 46 tall with a 15-pixel icon beside
-      // 13-pixel text, which is a control built for an adult thumb.
-      SizedBox(
-        height: 58,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: _categories.length,
-          itemBuilder: (_, i) {
-            final c = _categories[i];
-            final sel = _selectedCategory == i;
-            return GestureDetector(
-              onTap: () => setState(() => _selectedCategory = i),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                margin: const EdgeInsets.only(right: 8, bottom: 4),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 11),
-                decoration: BoxDecoration(
-                  color: sel ? c.color : Colors.white,
-                  borderRadius: BorderRadius.circular(25),
-                  border:
-                      Border.all(color: sel ? c.color : Colors.grey.shade300),
-                  boxShadow: sel
-                      ? [
-                          BoxShadow(
-                              color: c.color.withOpacity(0.3), blurRadius: 8)
-                        ]
-                      : [],
+    return pages.isEmpty
+        ? Center(
+            child: Text(AppLocalizations.of(context)!.noResults,
+                style: TextStyle(color: Colors.grey.shade400)))
+        : GridView.builder(
+            padding: const EdgeInsets.all(16),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.76,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16),
+            itemCount: pages.length,
+            itemBuilder: (_, i) => _pageCard(pages[i], cat),
+          );
+  }
+
+  /// Whether a page counts as finished: saved here, or finished on the
+  /// child's account.
+  bool _pageFinished(ColoringCategory cat, int index) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    return _myCreations.any(cat.pages[index].owns) ||
+        userProvider.isKulayPageCompleted(cat.name, index);
+  }
+
+  /// A page as the child last left it: the unsaved coloring, the saved one,
+  /// or the blank line art.
+  Widget _pageThumb(ColoringPage page) {
+    final inProgress = _inProgress[page.name];
+    if (inProgress != null) {
+      return Image.memory(inProgress,
+          fit: BoxFit.contain,
+          gaplessPlayback: true,
+          filterQuality: FilterQuality.medium);
+    }
+    final saved = _latestCreationOn(page);
+    if (saved != null) return _creationPicture(saved);
+    return Image.asset(page.imagePath,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.medium,
+        errorBuilder: (_, __, ___) => const SizedBox());
+  }
+
+  void _openCategoryAt(int i) {
+    setState(() {
+      _selectedCategory = i;
+      _openCategory = i;
+    });
+  }
+
+  /// The four categories, each with its pages fanned out and how many are
+  /// finished — and, above them, the page the child left half colored.
+  Widget _categoryOverview() {
+    final loc = AppLocalizations.of(context)!;
+
+    // The first page with unsaved coloring on it, to carry on with.
+    (int, ColoringPage)? started;
+    for (int c = 0; c < _categories.length && started == null; c++) {
+      for (final page in _categories[c].pages) {
+        if (_inProgress[page.name] != null) {
+          started = (c, page);
+          break;
+        }
+      }
+    }
+
+    final stars = Provider.of<UserProvider>(context).getKulayProgress()['stars']
+            as int? ??
+        0;
+    const possible = UserProvider.kulayStarCeiling;
+
+    return ListView(
+      padding: const EdgeInsets.only(bottom: 24),
+      children: [
+        ModuleTally(
+          picture: 'assets/images/star_gold.webp',
+          done: stars,
+          total: possible,
+          label: (n) => loc.starsOfPossible(n, possible),
+        ),
+        if (started != null) _continueStrip(started.$1, started.$2, loc),
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            children: [
+              for (int r = 0; r < _categories.length; r += 2)
+                Padding(
+                  padding: EdgeInsets.only(
+                      bottom: r + 2 < _categories.length ? 12 : 0),
+                  child: IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(child: _categoryCard(r, loc)),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: r + 1 < _categories.length
+                              ? _categoryCard(r + 1, loc)
+                              : const SizedBox(),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                child: Row(children: [
-                  Icon(_categoryIcon(c.name),
-                      size: 20, color: sel ? Colors.white : c.color),
-                  const SizedBox(width: 8),
-                  Text(c.name,
-                      style: TextStyle(
-                          color: sel ? Colors.white : Colors.grey.shade700,
-                          fontWeight: sel ? FontWeight.bold : FontWeight.normal,
-                          fontSize: 15)),
-                ]),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _continueStrip(int catIndex, ColoringPage page, AppLocalizations loc) {
+    final cat = _categories[catIndex];
+    return GestureDetector(
+      onTap: () {
+        _openCategoryAt(catIndex);
+        _openPage(page);
+      },
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF282850).withOpacity(0.08),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(children: [
+          Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFEEF0F5), width: 2),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: _pageThumb(page),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(loc.inProgress,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF8A90A0))),
+                Text(_localizedPageName(page.name),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.textDark)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+            decoration: BoxDecoration(
+              color: cat.color,
+              borderRadius: BorderRadius.circular(99),
+            ),
+            child: Text(loc.lessonContinue,
+                style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white)),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _categoryCard(int i, AppLocalizations loc) {
+    final cat = _categories[i];
+    final n = cat.pages.length;
+    int done = 0;
+    for (int p = 0; p < n; p++) {
+      if (_pageFinished(cat, p)) done++;
+    }
+
+    // The pages fanned out like cards in a hand, the middle one on top.
+    final fan = <Widget>[];
+    final order = List<int>.generate(n, (k) => k)
+      ..sort((a, b) =>
+          ((a - (n - 1) / 2).abs()).compareTo((b - (n - 1) / 2).abs()) * -1);
+    for (final k in order) {
+      final turn = (k - (n - 1) / 2) * 12;
+      fan.add(Align(
+        alignment: Alignment.topCenter,
+        child: Transform.translate(
+          offset: Offset(turn * 1.4, 4),
+          child: Transform.rotate(
+            angle: turn * 3.14159 / 180,
+            child: Container(
+              width: 70,
+              height: 84,
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFEEF0F5), width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF282850).withOpacity(0.12),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
-            );
-          },
+              child: _pageThumb(cat.pages[k]),
+            ),
+          ),
+        ),
+      ));
+    }
+
+    return GestureDetector(
+      onTap: () => _openCategoryAt(i),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(10, 12, 10, 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF282850).withOpacity(0.08),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(height: 96, child: Stack(children: fan)),
+            const SizedBox(height: 8),
+            Text(_categoryLabel(cat.name),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.textDark)),
+            const SizedBox(height: 4),
+            Text(loc.levelsDone(done, n),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF8A90A0))),
+            const Spacer(),
+            const SizedBox(height: 8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(9),
+              child: LinearProgressIndicator(
+                value: n == 0 ? 0 : done / n,
+                minHeight: 9,
+                backgroundColor: const Color(0xFFECEEF4),
+                valueColor: AlwaysStoppedAnimation(cat.color),
+              ),
+            ),
+          ],
         ),
       ),
-      const SizedBox(height: 6),
-      Expanded(
-        child: pages.isEmpty
-            ? Center(
-                child: Text(AppLocalizations.of(context)!.noResults,
-                    style: TextStyle(color: Colors.grey.shade400)))
-            : GridView.builder(
-                padding: const EdgeInsets.all(16),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.76,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16),
-                itemCount: pages.length,
-                itemBuilder: (_, i) => _pageCard(pages[i], cat),
-              ),
+    );
+  }
+
+  Widget _statusPill(bool inProgress) {
+    final loc = AppLocalizations.of(context)!;
+    final color = inProgress ? const Color(0xFFE8A21E) : Colors.green;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+              color: color.withOpacity(0.35),
+              blurRadius: 4,
+              offset: const Offset(0, 2)),
+        ],
       ),
-    ]);
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(inProgress ? LucideIcons.brush : LucideIcons.check,
+            size: 12, color: Colors.white),
+        const SizedBox(width: 4),
+        Text(inProgress ? loc.inProgress : loc.completed,
+            style: const TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.bold)),
+      ]),
+    );
+  }
+
+  /// Opens one page to color: with the child's saved colors if they have
+  /// saved it, else with whatever they left unsaved on it.
+  Future<void> _openPage(ColoringPage page) async {
+    _commitClear();
+    _returnToCreations = false;
+    // A page the child has saved opens with their saved colors, and Save
+    // updates that creation. It used to open blank — the in-progress
+    // copy is cleared on save — with Save turned into "View", so the
+    // saved coloring looked lost and coloring it again was never kept.
+    final saved = _latestCreationOn(page);
+    final unsaved = await _hasAutoSave(page.name);
+    if (saved != null && !unsaved) {
+      if (!mounted) return;
+      _editCreation(page, saved);
+      return;
+    }
+    if (!mounted) return;
+    _clearZoom();
+    final oldBaked = _bakedStrokes;
+    setState(() {
+      _selectedPage = page;
+      _strokes.clear();
+      _strokePaths.clear();
+      _activeStroke = null;
+      _baseImage = null;
+      _coloredImage = null;
+      _displayImage = null;
+      _filledPixelsCount = 0;
+      _isLoadingAutoSave = true;
+      _coloringStartTime = DateTime.now();
+      _bakedStrokes = null;
+      _bakedCount = 0;
+      // Unsaved changes to a saved creation: Save updates that creation.
+      _editingCreation = saved;
+      _dirty = unsaved;
+      _showLoadingOverlay = false;
+    });
+    _loadingOverlayTimer?.cancel();
+    _loadingOverlayTimer = Timer(const Duration(milliseconds: 300), () {
+      if (mounted && _isLoadingAutoSave) {
+        setState(() => _showLoadingOverlay = true);
+      }
+    });
+    oldBaked?.dispose();
+    _maskCache.clear();
+    _loadPageImage()
+        .then((_) => _loadAutoSave())
+        .then((_) => _rebuildStrokeMasks());
   }
 
   Widget _pageCard(ColoringPage page, ColoringCategory cat) {
@@ -2065,44 +3258,11 @@ class _KulayScreenState extends State<KulayScreen>
     final bool isCompleted = _myCreations.any(page.owns) ||
         (pageIndex >= 0 &&
             userProvider.isKulayPageCompleted(cat.name, pageIndex));
+    final savedHere = _latestCreationOn(page);
+    final inProgress = _inProgress[page.name];
 
     return GestureDetector(
-      onTap: () async {
-        // A page the child has saved opens with their saved colors, and Save
-        // updates that creation. It used to open blank — the in-progress
-        // copy is cleared on save — with Save turned into "View", so the
-        // saved coloring looked lost and coloring it again was never kept.
-        final saved = _latestCreationOn(page);
-        if (saved != null && !await _hasAutoSave(page.name)) {
-          if (!mounted) return;
-          _editCreation(page, saved);
-          return;
-        }
-        if (!mounted) return;
-        _clearZoom();
-        final oldBaked = _bakedStrokes;
-        setState(() {
-          _selectedPage = page;
-          _strokes.clear();
-          _strokePaths.clear();
-          _activeStroke = null;
-          _baseImage = null;
-          _coloredImage = null;
-          _displayImage = null;
-          _filledPixelsCount = 0;
-          _isLoadingAutoSave = true;
-          _coloringStartTime = DateTime.now();
-          _bakedStrokes = null;
-          _bakedCount = 0;
-          // Unsaved changes to a saved creation: Save updates that creation.
-          _editingCreation = saved;
-        });
-        oldBaked?.dispose();
-        _maskCache.clear();
-        _loadPageImage()
-            .then((_) => _loadAutoSave())
-            .then((_) => _rebuildStrokeMasks());
-      },
+      onTap: () => _openPage(page),
       child: Container(
         decoration: BoxDecoration(
             color: Colors.white,
@@ -2131,19 +3291,29 @@ class _KulayScreenState extends State<KulayScreen>
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.all(12),
-                      child: Image.asset(
-                        page.imagePath,
-                        fit: BoxFit.contain,
-                        filterQuality: FilterQuality.high,
-                        color: isCompleted ? Colors.grey.shade400 : null,
-                        colorBlendMode:
-                            isCompleted ? BlendMode.saturation : null,
-                        errorBuilder: (_, __, ___) => Icon(LucideIcons.palette,
-                            size: 52, color: cat.color.withOpacity(0.4)),
-                      ),
+                      // The child's own coloring once they have saved one —
+                      // the same creation that opens when the card is
+                      // tapped. A finished page showed only its blank line
+                      // art, greyed, so the work looked lost.
+                      child: inProgress != null
+                          ? Image.memory(inProgress,
+                              fit: BoxFit.contain,
+                              gaplessPlayback: true,
+                              filterQuality: FilterQuality.high)
+                          : savedHere != null
+                              ? _creationPicture(savedHere)
+                              : Image.asset(
+                                  page.imagePath,
+                                  fit: BoxFit.contain,
+                                  filterQuality: FilterQuality.high,
+                                  errorBuilder: (_, __, ___) => Icon(
+                                      LucideIcons.palette,
+                                      size: 52,
+                                      color: cat.color.withOpacity(0.4)),
+                                ),
                     ),
                   ),
-                  if (isCompleted)
+                  if (isCompleted && inProgress == null)
                     const Positioned(
                       top: 10,
                       right: 10,
@@ -2153,6 +3323,15 @@ class _KulayScreenState extends State<KulayScreen>
                         child: Icon(LucideIcons.check,
                             size: 16, color: Colors.white),
                       ),
+                    ),
+                  // Still being colored. The tick says finished on its own;
+                  // a "Completed" pill beside it said it twice, and over a
+                  // page with new coloring both said opposite things.
+                  if (inProgress != null)
+                    Positioned(
+                      left: 8,
+                      bottom: 8,
+                      child: _statusPill(true),
                     ),
                 ],
               ),
@@ -2182,7 +3361,14 @@ class _KulayScreenState extends State<KulayScreen>
         child: Stack(
           children: [
             _drawingArea(),
-            if (_isLoadingAutoSave)
+            if (_pendingClear != null)
+              Positioned(
+                left: 16,
+                right: 16,
+                bottom: 12,
+                child: Center(child: _clearedNote()),
+              ),
+            if (_isLoadingAutoSave && _showLoadingOverlay)
               Container(
                 color: Colors.white.withOpacity(0.9),
                 child: Center(
@@ -2208,6 +3394,61 @@ class _KulayScreenState extends State<KulayScreen>
       ),
       _toolPanel(),
     ]);
+  }
+
+  /// Under the picture straight after Clear: what happened, and Undo.
+  Widget _clearedNote() {
+    final loc = AppLocalizations.of(context)!;
+    final fromCreations = _pendingClear?.creations.isNotEmpty ?? false;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1F2340),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        const Icon(LucideIcons.trash_2, size: 18, color: Colors.white),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+              fromCreations ? loc.removedFrom(loc.myCreations) : loc.cleared,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w700)),
+        ),
+        const SizedBox(width: 10),
+        GestureDetector(
+          onTap: _restoreCleared,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFD54F),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(LucideIcons.undo_2,
+                  size: 16, color: Color(0xFF1F2340)),
+              const SizedBox(width: 4),
+              Text(loc.undo,
+                  style: const TextStyle(
+                      color: Color(0xFF1F2340),
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w900)),
+            ]),
+          ),
+        ),
+      ]),
+    );
   }
 
   Widget _drawingArea() {
@@ -2398,11 +3639,27 @@ class _KulayScreenState extends State<KulayScreen>
                 activeStrokePath: _activeStrokePath,
                 bakedImage: _bakedStrokes,
                 bakedCount: _bakedCount,
+                repaint: _strokeTick,
               ),
               size: Size(side, side),
               child: Container(color: Colors.transparent),
             ),
           ),
+
+          // 4. The outlines again, over the coloring: the color's edge then
+          //    sits under the line instead of over it, so the region mask's
+          //    steps never show and the color never thins a line. Its own
+          //    layer, drawn once — not repainted with every stroke.
+          if (_artCache[_selectedPage!.imagePath]?.lines case final lines?)
+            IgnorePointer(
+              child: RepaintBoundary(
+                child: RawImage(
+                  image: lines,
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.low,
+                ),
+              ),
+            ),
         ]),
       ),
     );
@@ -2433,6 +3690,8 @@ class _KulayScreenState extends State<KulayScreen>
   }
 
   void _onCanvasPointerDown(PointerDownEvent e) {
+    // Coloring again after Clear makes the Clear final.
+    _commitClear();
     _eraseSnapshotPushedForStroke = false;
     _lastEraseLocalPoint = null;
     _activeStrokePath = Path()..moveTo(e.localPosition.dx, e.localPosition.dy);
@@ -2454,6 +3713,14 @@ class _KulayScreenState extends State<KulayScreen>
 
   void _onCanvasPointerMove(PointerMoveEvent e) {
     if (_activeStroke == null) return;
+    // A point under 2 px from the last one kept adds nothing a finger can
+    // see, and every point is stored with the picture for good — a slow
+    // hand made thousands of them, and the saved picture grew with every
+    // session it was colored in.
+    if ((e.localPosition - _activeStroke!.points.last).distance < 2.0) {
+      if (_isEraser) _eraseCircleAtLocalPoint(e.localPosition);
+      return;
+    }
     // Extends the curve by exactly the new segment — see
     // [_activeStrokePath]'s doc comment for why this replaced rebuilding
     // the whole curve from point zero on every move.
@@ -2467,12 +3734,12 @@ class _KulayScreenState extends State<KulayScreen>
       _activeStrokePath!.quadraticBezierTo(prev.dx, prev.dy, mid.dx, mid.dy);
     }
     _activeStrokePrevPoint = e.localPosition;
-    setState(() {
-      _activeStroke = _activeStroke!.copyWith(
-        points: [..._activeStroke!.points, e.localPosition],
-      );
-      _lastPos = e.localPosition;
-    });
+    // Added in place, and only the drawing repainted. Copying every point
+    // into a new list and rebuilding the whole screen on each move grew
+    // slower the longer the line, and weak phones stuttered mid-stroke.
+    _activeStroke!.points.add(e.localPosition);
+    _lastPos = e.localPosition;
+    _strokeTick.value++;
     // A real drag (as opposed to the tap this may still turn out to be)
     // erases the bucket-filled bitmap too, not just the brush-stroke layer
     // — otherwise nothing visibly happened when erasing a tap-filled area.
@@ -2498,7 +3765,7 @@ class _KulayScreenState extends State<KulayScreen>
       _activeStrokePrevPoint = null;
       _activeStrokePointCount = 0;
       _rippleController.forward(from: 0);
-      _autoSave();
+      _scheduleAutoSave();
       // A no-op if this stroke's mask (or, for an eraser, nothing) is not
       // resolved yet — _applyRegionMaskToStroke calls this again once it is.
       unawaited(_rebakeStrokes());
@@ -2513,10 +3780,10 @@ class _KulayScreenState extends State<KulayScreen>
     final loc = AppLocalizations.of(context)!;
     return Container(
       color: Colors.white,
-      // Tight at the bottom: the row of tools is the last thing on the
-      // screen, so the padding under it is space taken from the drawing for
-      // nothing.
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+      // Room under the Done button: it is the last thing on the screen, and
+      // with only a sliver below it it sat on the phone's edge and gesture
+      // handle, where a thumb reaching for it brushes the handle instead.
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 20),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         // Color palette — drawn as crayons, each one named on its own
         // wrapper. All eight share the row, laid out in one line the same
@@ -2544,7 +3811,7 @@ class _KulayScreenState extends State<KulayScreen>
           ),
         ),
 
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
 
         // Three brush sizes, not a slider.
         //
@@ -2564,7 +3831,7 @@ class _KulayScreenState extends State<KulayScreen>
           ],
         ),
 
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
 
         // The tools.
         //
@@ -2592,7 +3859,9 @@ class _KulayScreenState extends State<KulayScreen>
               label: AppLocalizations.of(context)!.undo,
               tint: const Color(0xFFA8B82E),
               active: false,
-              disabled: _strokes.isEmpty && _bucketUndoImages.isEmpty,
+              disabled: _strokes.isEmpty &&
+                  _bucketUndoImages.isEmpty &&
+                  _pendingClear == null,
               onTap: _undo),
           _tBtn(
             icon: LucideIcons.trash_2,
@@ -2601,18 +3870,21 @@ class _KulayScreenState extends State<KulayScreen>
             active: false,
             onTap: _confirmClearAll,
           ),
-          _tBtn(
-              // Always saves. On a page already saved it was "View", which
-              // only showed the old creation — coloring the page again was
-              // never kept.
-              icon: LucideIcons.save,
-              label: _editingCreation != null
-                  ? AppLocalizations.of(context)!.update
-                  : AppLocalizations.of(context)!.save,
-              tint: const Color(0xFF3F9BC9),
-              active: false,
-              onTap: _saveCreation),
         ]),
+        const SizedBox(height: 8),
+        // How a picture is finished, said in one big green button. It was
+        // a round "Save" among the tools, the same size as Undo, and nothing
+        // said that saving was how a picture got finished.
+        SizedBox(
+          width: double.infinity,
+          child: FunPillButton(
+            label: AppLocalizations.of(context)!.finishColoring,
+            icon: LucideIcons.check,
+            colors: FunColors.green,
+            height: 48,
+            onTap: _saveCreation,
+          ),
+        ),
       ]),
     );
   }
@@ -2735,6 +4007,39 @@ class _KulayScreenState extends State<KulayScreen>
                   fontWeight: FontWeight.w700,
                   color: Color(0xFF2B2A5C),
                 )),
+            // A saved picture leaves My Creations too: shown, with the
+            // picture, before the child says yes.
+            if (_selectedPage != null &&
+                _myCreations.any(_selectedPage!.owns)) ...[
+              const SizedBox(height: 12),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: _pageThumb(_selectedPage!),
+                ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(loc.clearAlsoRemoves(loc.myCreations),
+                      style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFC53030))),
+                ),
+              ]),
+            ],
             const SizedBox(height: 18),
             // Keeping the drawing is the easier one to hit, because it is
             // the one that cannot lose an hour of work.
@@ -2755,8 +4060,8 @@ class _KulayScreenState extends State<KulayScreen>
                 icon: LucideIcons.rotate_ccw,
                 colors: FunColors.red,
                 onTap: () {
-                  _clearAll();
                   Navigator.pop(dialogContext);
+                  _wipePage();
                 },
               ),
             ),
@@ -2986,17 +4291,14 @@ class _KulayScreenState extends State<KulayScreen>
               if (creation.stars != null)
                 Row(
                   children: [
+                    // Hearts, as the finished card gives them.
                     ...List.generate(
-                        5,
-                        (i) => Icon(
-                              i < creation.stars!
-                                  ? Icons.star_rounded
-                                  : Icons.star_outline_rounded,
-                              size: 14,
-                              color: i < creation.stars!
-                                  ? const Color(0xFFFFB800)
-                                  : const Color(0xFFCBD5E1),
-                            )),
+                        3,
+                        (i) => Icon(Icons.favorite_rounded,
+                            size: 14,
+                            color: i < creation.stars!
+                                ? const Color(0xFFFF4F7B)
+                                : const Color(0xFFE2DCE4))),
                   ],
                 )
               else
@@ -3052,24 +4354,18 @@ class _KulayScreenState extends State<KulayScreen>
                 const SizedBox(height: 4),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(5, (i) {
-                    final star = Image.asset('assets/images/replay_star.webp',
-                        width: 28, height: 27);
-                    return i < creation.stars!
-                        ? star
-                        : Opacity(
-                            opacity: 0.35,
-                            child: ColorFiltered(
-                              colorFilter: const ColorFilter.matrix([
-                                0.33, 0.33, 0.33, 0, 0, //
-                                0.33, 0.33, 0.33, 0, 0, //
-                                0.33, 0.33, 0.33, 0, 0, //
-                                0, 0, 0, 1, 0,
-                              ]),
-                              child: star,
-                            ),
-                          );
-                  }),
+                  // The hearts the finished card gave it.
+                  children: List.generate(
+                    3,
+                    (i) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: Icon(Icons.favorite_rounded,
+                          size: 26,
+                          color: i < creation.stars!
+                              ? const Color(0xFFFF4F7B)
+                              : const Color(0xFFE2DCE4)),
+                    ),
+                  ),
                 ),
               ],
               const SizedBox(height: 12),
@@ -3130,7 +4426,7 @@ class _KulayScreenState extends State<KulayScreen>
                       for (final cat in _categories) {
                         for (final page in cat.pages) {
                           if (page.owns(creation)) {
-                            _editCreation(page, creation);
+                            _editCreation(page, creation, fromCreations: true);
                             return;
                           }
                         }
@@ -3172,7 +4468,10 @@ class _KulayScreenState extends State<KulayScreen>
   /// area. And one colored on a picture the page has since replaced (the
   /// old elephant, the old flower pot) opens the new picture fresh, as a new
   /// creation: its colors belong to a drawing that is no longer there.
-  void _editCreation(ColoringPage page, MyCreation creation) {
+  void _editCreation(ColoringPage page, MyCreation creation,
+      {bool fromCreations = false}) {
+    _commitClear();
+    final place = _placeOf(page);
     final samePicture = creation.sourcePagePath.isEmpty ||
         creation.sourcePagePath == page.imagePath;
     final hasFill = creation.fillImage.isNotEmpty;
@@ -3201,7 +4500,14 @@ class _KulayScreenState extends State<KulayScreen>
       _filledPixelsCount = 0;
       _activeStroke = null;
       _editingCreation = samePicture ? creation : null;
+      _dirty = false;
       _selectedTab = 0;
+      _returnToCreations = fromCreations;
+      // The page's own category, so finishing records the right page.
+      if (place != null) {
+        _selectedCategory = _categories.indexOf(place.$1);
+        _openCategory = _selectedCategory;
+      }
       _coloringStartTime = DateTime.now();
     });
     oldBaked?.dispose();
@@ -3217,7 +4523,7 @@ class _KulayScreenState extends State<KulayScreen>
           : (keepsParts ? '' : creation.base64Image);
       if (base != null && source.isNotEmpty) {
         try {
-          var picture = img.decodeImage(base64Decode(source));
+          var picture = (await _decodeFast(base64Decode(source)))?.image;
           if (picture != null) {
             if (picture.width != base.width || picture.height != base.height) {
               picture = img.copyResize(picture,
@@ -3294,36 +4600,59 @@ class _KulayScreenState extends State<KulayScreen>
     );
   }
 
+  /// Deletes [creation] and every other saved copy of the same page, so the
+  /// page goes back to blank and unticked in the gallery.
+  ///
+  /// Older versions made a new creation on every save of a page; deleting
+  /// one left the others behind, and the card kept showing their colors and
+  /// its check mark. The page is found by [ColoringPage.owns] — its former
+  /// pictures and creations saved before they recorded a page count too —
+  /// rather than only an exact page path, which missed those and reset
+  /// nothing. A creation no page owns is deleted alone.
   Future<void> _deleteCreation(MyCreation creation) async {
-    setState(() => _myCreations.remove(creation));
+    ColoringCategory? category;
+    ColoringPage? page;
+    for (final cat in _categories) {
+      for (final p in cat.pages) {
+        if (p.owns(creation)) {
+          category = cat;
+          page = p;
+          break;
+        }
+      }
+      if (page != null) break;
+    }
+
+    final doomed =
+        page == null ? [creation] : _myCreations.where(page.owns).toList();
+    setState(() {
+      _myCreations.removeWhere(doomed.contains);
+      if (doomed.contains(_editingCreation)) _editingCreation = null;
+    });
     _saveCreationsToHive();
-    if (creation.thumbnailPath.isNotEmpty &&
-        !creation.thumbnailPath.startsWith('assets/')) {
+    for (final c in doomed) {
+      if (kIsWeb ||
+          c.thumbnailPath.isEmpty ||
+          c.thumbnailPath.startsWith('assets/')) {
+        continue;
+      }
       try {
-        File(creation.thumbnailPath).deleteSync();
+        File(c.thumbnailPath).deleteSync();
       } catch (e) {
         debugPrint('Error deleting thumbnail: $e');
       }
     }
 
-    // Reset the original coloring page so it can be colored again
-    if (creation.sourcePagePath.isNotEmpty) {
-      for (final cat in _categories) {
-        final pageIndex = cat.pages.indexWhere(
-          (p) => p.usesImage(creation.sourcePagePath),
-        );
-        if (pageIndex >= 0) {
-          final pageName = cat.pages[pageIndex].name;
-          _clearAutoSaveForPage(pageName);
-          final userProvider =
-              Provider.of<UserProvider>(context, listen: false);
-          userProvider.updateKulayProgress('coloring', false,
-              category: cat.name, index: pageIndex);
-          break;
-        }
-      }
+    // The page itself: its unsaved coloring, its card picture, its tick.
+    if (page != null && category != null) {
+      await _clearAutoSaveForPage(page.name);
+      if (!mounted) return;
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      await userProvider.updateKulayProgress('coloring', false,
+          category: category.name, index: category.pages.indexOf(page));
     }
 
+    if (!mounted) return;
     _snack(AppLocalizations.of(context)!.artworkDeleted);
     await _syncKulayProgressWithCreations();
   }
@@ -3331,8 +4660,100 @@ class _KulayScreenState extends State<KulayScreen>
 
 /// A cached stay-inside-the-lines region: membership bits for fast lookup
 /// plus the alpha mask image used to clip strokes.
+/// A coloring picture, decoded: the pixels to read, the same pixels as raw
+/// RGBA bytes for the region search, and an image ready to draw.
+class _PageArt {
+  final img.Image image;
+  final Uint8List rgba;
+  final ui.Image display;
+
+  /// Just the outlines: black, as opaque as the picture is dark, clear
+  /// where it is white — laid over the coloring.
+  final ui.Image? lines;
+  _PageArt(this.image, this.rgba, this.display, this.lines);
+}
+
 class _RegionMask {
   final Uint8List bits;
   final ui.Image image;
   _RegionMask(this.bits, this.image);
+}
+
+/// Where the finished card sends the child.
+enum _AfterFinish { next, mine, home, more }
+
+/// Everything one Clear took away, kept until Undo or until it is final.
+class _ClearedPage {
+  final ColoringPage page;
+  final List<ColoringStroke> strokes;
+  final List<Path> paths;
+  final img.Image? colored;
+  final int filled;
+  final List<img.Image> bucketImages;
+  final List<int> bucketCounts;
+
+  /// The page's saved pictures, each with the place it had in My Creations.
+  final List<(int, MyCreation)> creations;
+  final MyCreation? editing;
+  final bool dirty;
+  final bool wasDone;
+
+  const _ClearedPage({
+    required this.page,
+    required this.strokes,
+    required this.paths,
+    required this.colored,
+    required this.filled,
+    required this.bucketImages,
+    required this.bucketCounts,
+    required this.creations,
+    required this.editing,
+    required this.dirty,
+    required this.wasDone,
+  });
+}
+
+/// "+1 ★" by the finished picture, rising and fading as the star goes to
+/// the child's count.
+class _PlusOneStar extends StatelessWidget {
+  const _PlusOneStar();
+
+  @override
+  Widget build(BuildContext context) {
+    final still = MediaQuery.of(context).disableAnimations;
+    final chip = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF6D6),
+        borderRadius: BorderRadius.circular(99),
+        border: Border.all(color: const Color(0xFFFFD54F), width: 2),
+      ),
+      child: const Text('+1 ★',
+          style: TextStyle(
+            fontFamily: 'Fredoka',
+            fontSize: 20,
+            fontVariations: [FontVariation('wght', 650)],
+            fontWeight: FontWeight.w700,
+            color: Color(0xFFE5A100),
+          )),
+    );
+    if (still) return chip;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 2200),
+      builder: (_, t, child) {
+        // Pops in, holds, then rises away.
+        final rise = Curves.easeIn.transform(((t - 0.45) / 0.55).clamp(0, 1));
+        final pop = Curves.elasticOut.transform((t / 0.3).clamp(0, 1));
+        return Opacity(
+          opacity: (1 - rise).clamp(0, 1),
+          child: Transform.translate(
+            offset: Offset(0, -90 * rise),
+            child: Transform.scale(scale: 0.4 + 0.6 * pop, child: child),
+          ),
+        );
+      },
+      child: chip,
+    );
+  }
 }

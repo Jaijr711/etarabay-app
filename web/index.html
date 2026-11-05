@@ -157,6 +157,16 @@
       s.src = 'flutter_bootstrap.js';
       s.async = true;
       document.body.appendChild(s);
+      // The offline cache (web/sw.js). Nothing registered it, so it never
+      // ran and the web app could not open without a connection. After the
+      // load, so it never competes with the app for the first download.
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('sw.js').catch(function (e) {
+            console.warn('Offline cache not set up:', e);
+          });
+        });
+      }
     })();
   </script>
 

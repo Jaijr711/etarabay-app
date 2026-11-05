@@ -6,11 +6,16 @@ class CustomBackButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final Color? backgroundColor;
 
+  /// Room around the button. The 8 suits an AppBar's 56-high leading slot;
+  /// a shorter row passes zero, or the box is squeezed out of shape.
+  final EdgeInsetsGeometry margin;
+
   const CustomBackButton({
     super.key,
     this.iconColor = Colors.white,
     this.backgroundColor,
     this.onPressed,
+    this.margin = const EdgeInsets.all(8),
   });
 
   @override
@@ -25,7 +30,7 @@ class CustomBackButton extends StatelessWidget {
       onTap: onPressed ?? () => Navigator.pop(context),
       child: Container(
         padding: const EdgeInsets.all(8),
-        margin: const EdgeInsets.all(8),
+        margin: margin,
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(12),

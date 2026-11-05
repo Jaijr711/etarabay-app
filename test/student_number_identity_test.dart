@@ -13,8 +13,8 @@ void main() {
       // shape; the password does not have to.
       const chosen = 'bahaykubo';
       expect(AuthService.validateDcPasswordFormat(chosen)['isValid'], isFalse);
-      expect(chosen.length,
-          greaterThanOrEqualTo(AuthService.minPasswordLength));
+      expect(
+          chosen.length, greaterThanOrEqualTo(AuthService.minPasswordLength));
     });
 
     test('a Student Number still has to look like one', () {

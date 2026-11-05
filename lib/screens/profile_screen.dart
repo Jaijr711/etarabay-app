@@ -6,8 +6,11 @@ import '../utils/constants.dart';
 import '../utils/page_transitions.dart';
 import 'login_screen.dart';
 import 'choose_avatar_screen.dart';
+import 'parents_lock_screen.dart';
+import '../services/parent_pin.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:confetti/confetti.dart';
-import '../widgets/custom_header_app_bar.dart';
+import '../widgets/kid_page_header.dart';
 import '../widgets/cached_avatar.dart';
 import '../widgets/question_cloud.dart' show DoodleBackground;
 import '../widgets/storybook.dart';
@@ -70,6 +73,21 @@ class ProfileScreen extends StatelessWidget {
   /// nothing here that looks like a game.
   void _logout(BuildContext context) async {
     final loc = AppLocalizations.of(context)!;
+    // With a parent's code on this phone, the code is the question: a
+    // dialog a child can tap through is no lock. A phone without one yet —
+    // updated from a version that kept the code elsewhere — keeps the
+    // dialog rather than leaving the parent no way out.
+    final prefs = await SharedPreferences.getInstance();
+    if (!context.mounted) return;
+    if (await ParentPin.isSet(prefs)) {
+      if (!context.mounted) return;
+      final ok = await Navigator.of(context).push<bool>(PremiumPageRoute<bool>(
+          child: const ParentsLockScreen(verifyOnly: true)));
+      if (ok != true || !context.mounted) return;
+      await _signOut(context);
+      return;
+    }
+    if (!context.mounted) return;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => FunDialog(
@@ -96,7 +114,10 @@ class ProfileScreen extends StatelessWidget {
     );
 
     if (confirmed != true || !context.mounted) return;
+    await _signOut(context);
+  }
 
+  Future<void> _signOut(BuildContext context) async {
     // Ends the session; does not erase the child.
     //
     // This used to call `clearLocalData()`, which empties the profile box,
@@ -120,16 +141,32 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  /// "Ikaw ito, Ana!" — the name a child answers to, not the full one.
+  /// Null before there is a name to say.
+  static String? _firstName(String? name) {
+    final first = (name ?? '').trim().split(RegExp(r'\s+')).first;
+    return first.isEmpty ? null : first;
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final userProfile = userProvider.userProfile;
+    final firstName = _firstName(userProfile?.name);
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomHeaderAppBar(
+      appBar: KidPageHeader(
         title: AppLocalizations.of(context)!.myProfile,
-        baseColor: AppColors.secondary,
+        // Blank until there is a profile; the header keeps its height.
+        subtitle: userProfile == null
+            ? ''
+            : AppLocalizations.of(context)!.homeAge(userProfile.age),
+        bubble: firstName == null
+            ? AppLocalizations.of(context)!.kidBubbleProfilePlain
+            : AppLocalizations.of(context)!.kidBubbleProfile(firstName),
+        color: AppColors.secondary,
+        showBack: true,
       ),
       body: userProfile == null
           ? Center(child: Text(AppLocalizations.of(context)!.noProfileData))

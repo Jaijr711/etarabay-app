@@ -32,7 +32,8 @@ void main() {
         const UpdateInfo(
             versionName: '1.2.51',
             apkUrl: 'x',
-            notes: 'Bago\n\n- Bagong itsura ng Color Fun.\n- Pumili ng avatar.')),
+            notes:
+                'Bago\n\n- Bagong itsura ng Color Fun.\n- Pumili ng avatar.')),
     'locked': (c) => showLockedModuleDialog(c),
     'permission': (c) => showBackgroundPermissionDialog(c),
   };

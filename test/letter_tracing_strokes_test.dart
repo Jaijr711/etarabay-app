@@ -54,9 +54,7 @@ List<List<Offset>> _centre(List<List<Offset>> strokes) {
     for (final stroke in strokes)
       [
         for (final p in stroke)
-          (p.dx.isNaN || p.dy.isNaN)
-              ? p
-              : Offset(p.dx + dx, p.dy + dy)
+          (p.dx.isNaN || p.dy.isNaN) ? p : Offset(p.dx + dx, p.dy + dy)
       ]
   ];
 }

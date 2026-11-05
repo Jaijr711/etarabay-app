@@ -18,15 +18,14 @@ import '../widgets/home_house.dart';
 import '../widgets/success_modal.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../main.dart';
-import '../widgets/pressable.dart';
 import '../widgets/question_cloud.dart';
 import '../widgets/tip_cloud.dart';
 import '../widgets/staggered_entrance.dart';
-import '../widgets/star_tally.dart';
+import '../widgets/module_cards.dart';
 import 'dart:async';
 import 'package:flutter_lucide/flutter_lucide.dart';
-import '../utils/word_fit.dart';
 import '../widgets/replay_dialog.dart';
+import '../widgets/design_scale.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  BADGE MODEL
@@ -185,12 +184,19 @@ class _PamilyaScreenState extends State<PamilyaScreen>
       PamilyaContent.getPamilyaLevel3Games(_currentLang);
 
   // ── Pamilya Level 4: Family Tree ───────────────────────────────────────────
-  List<Map<String, dynamic>> get _pamilyaLevel4Games =>
-      PamilyaContent.getPamilyaLevel4Games(_currentLang);
+  // Each quiz ends on its interactive board, which has a place of its own at
+  // the end of the list. It used to take the last question's place, so the
+  // seventh question in both levels was written and never asked.
+  List<Map<String, dynamic>> get _pamilyaLevel4Games => [
+        ...PamilyaContent.getPamilyaLevel4Games(_currentLang),
+        const {'id': 'tree_game'},
+      ];
 
   // ── Pamilya Level 5: Our Home ──────────────────────────────────────────────
-  List<Map<String, dynamic>> get _pamilyaLevel5Games =>
-      PamilyaContent.getPamilyaLevel5Games(_currentLang);
+  List<Map<String, dynamic>> get _pamilyaLevel5Games => [
+        ...PamilyaContent.getPamilyaLevel5Games(_currentLang),
+        const {'id': 'home_game'},
+      ];
 
   // ── Family Tree ────────────────────────────────────────────────────────────
   Map<String, dynamic> get _familyTreeData =>
@@ -504,8 +510,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
     if (_overlayShowing) return;
     // Its own signal, not the wrong-answer one — see matematika's _onTimeout.
     setState(() => _showTimeUpOverlay = true);
-    Future.delayed(const Duration(milliseconds: 1400), () {
-      if (!mounted) return;
+    _afterDelay(const Duration(milliseconds: 1400), () {
       setState(() {
         _showTimeUpOverlay = false;
         _resetQuestionState();
@@ -568,6 +573,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
   void _switchMainCategory(int index) {
     _stopTimer();
     setState(() {
+      _playSession++;
       _selectedMainCategory = index;
       _selectedLevel = 0;
       _resetLevelState();
@@ -584,21 +590,42 @@ class _PamilyaScreenState extends State<PamilyaScreen>
     _switchLevel(level);
   }
 
+  /// Goes up each time a level is opened or left; a verdict's delayed next
+  /// step only runs in the level it was given in ([_afterDelay]). Asking
+  /// only whether the child was still playing let an answer given just
+  /// before back skip a question in the level opened right after.
+  int _playSession = 0;
+
+  void _afterDelay(Duration delay, VoidCallback then) {
+    final session = _playSession;
+    Future.delayed(delay, () {
+      if (mounted && session == _playSession) then();
+    });
+  }
+
   /// Back to the wall of cards, without leaving the module.
   void _backToPicker() {
     _stopTimer();
     setState(() {
+      _playSession++;
       _playing = false;
       _verdictRunning = false;
       _showCorrectOverlay = false;
       _showWrongOverlay = false;
       _showTimeUpOverlay = false;
+      // The tip too: it used to come back to the cards with the child, and
+      // sat over them, locking them, until its timer ran out.
+      _tipTimer?.cancel();
+      _tipTimer = null;
+      _afterTip = null;
+      _tipMessage = null;
     });
   }
 
   void _switchLevel(int level) {
     _stopTimer();
     setState(() {
+      _playSession++;
       _selectedLevel = level;
       _resetLevelState();
     });
@@ -655,9 +682,13 @@ class _PamilyaScreenState extends State<PamilyaScreen>
       // was there to be read.
       _tipMessage != null;
 
-  void _onCorrect() {
+  /// Scores a right answer and moves on.
+  ///
+  /// [announced] means the "Correct!" card has already been shown, before a
+  /// tip: showing it again once the tip closed told the child twice, with a
+  /// pop-up in between.
+  void _onCorrect({bool announced = false}) {
     if (_showCorrectOverlay) return;
-    HapticFeedback.heavyImpact();
     _stopTimer();
 
     final earned = _starsFromWrong;
@@ -665,9 +696,16 @@ class _PamilyaScreenState extends State<PamilyaScreen>
       _totalScore += _pointsPerCorrect;
       _levelStars += earned;
       _levelScore += _pointsPerCorrect;
-      _showCorrectOverlay = true;
+      if (!announced) _showCorrectOverlay = true;
     });
 
+    if (announced) {
+      _saveQuestionProgress(earned);
+      _advanceOrComplete();
+      return;
+    }
+
+    HapticFeedback.heavyImpact();
     _starBurstController.forward(from: 0);
     _celebrationController.forward(from: 0);
 
@@ -676,8 +714,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
     // for the same event, the second time below where the child is looking.
     _saveQuestionProgress(earned);
 
-    Future.delayed(const Duration(milliseconds: 1600), () {
-      if (!mounted) return;
+    _afterDelay(const Duration(milliseconds: 1600), () {
       setState(() {
         _showCorrectOverlay = false;
         _celebrationController.reset();
@@ -728,8 +765,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
     });
     _saveQuestionProgress(0);
 
-    Future.delayed(const Duration(milliseconds: 1600), () {
-      if (!mounted) return;
+    _afterDelay(const Duration(milliseconds: 1600), () {
       setState(() => _showWrongOverlay = false);
       _advanceOrComplete();
     });
@@ -773,8 +809,15 @@ class _PamilyaScreenState extends State<PamilyaScreen>
         final name = (profile?.name.trim().isNotEmpty ?? false)
             ? profile!.name.trim().split(' ').first
             : 'Ana';
-        final decoys = _nameDecoysFor(name);
-        final opts = shuffledWith(name, decoys);
+        // Two names of the same first letter when there are two, then any
+        // others — chosen before shuffling. Shuffling the whole list first
+        // undid the same-letter rule, and the list held those names twice,
+        // so the board could show "Ani" next to "Ani".
+        final (sameLetter, rest) = _nameDecoysFor(name);
+        sameLetter.shuffle(rnd);
+        rest.shuffle(rnd);
+        final decoys = [...sameLetter, ...rest].take(2).toList();
+        final opts = [name, ...decoys]..shuffle(rnd);
         return (opts, opts.indexOf(name));
 
       case 'about_age':
@@ -802,7 +845,11 @@ class _PamilyaScreenState extends State<PamilyaScreen>
 
       case 'about_birthday':
         final month = profile?.birthday?.month ?? 1;
-        const names = _monthNames;
+        // In the app's language: an English question over Tagalog months
+        // read as a mistake. Ilokano uses the same names as Filipino, as on
+        // the profile screen.
+        final lang = Localizations.localeOf(context).languageCode;
+        final names = lang == 'en' ? _monthNamesEn : _monthNames;
         final answer = names[month - 1];
         final opts = shuffledWith(answer, List.of(names));
         return (opts, opts.indexOf(answer));
@@ -810,8 +857,11 @@ class _PamilyaScreenState extends State<PamilyaScreen>
       default:
         // "Who do you live with?" — no profile field to draw on, and none is
         // needed: for a child this age the answer is the point, not a lookup.
+        // The answers come from the content file, in the child's language;
+        // it used to have none, so every language got this English list
+        // under a question that asked where the child lives.
         final raw = (game['options'] as List?)?.cast<String>() ??
-            const ['👨‍👩‍👧 My family', '🐶 A dog', '🧸 My toys'];
+            const ['👨‍👩‍👧 With my family', '🐶 With a dog', '🧸 With my toys'];
         return (raw, 0);
     }
   }
@@ -831,9 +881,24 @@ class _PamilyaScreenState extends State<PamilyaScreen>
     'Disyembre',
   ];
 
+  static const List<String> _monthNamesEn = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
   /// Names that look and sound like [name], so the child has to read rather
   /// than spot the odd one out.
-  List<String> _nameDecoysFor(String name) {
+  (List<String>, List<String>) _nameDecoysFor(String name) {
     const pool = [
       'Ana',
       'Ani',
@@ -863,13 +928,16 @@ class _PamilyaScreenState extends State<PamilyaScreen>
       'Tina',
       'Vina',
     ];
-    final first = name.isEmpty ? '' : name[0].toLowerCase();
-    final sameLetter = pool
-        .where((p) => p.isNotEmpty && p[0].toLowerCase() == first && p != name)
-        .toList();
-    final rest = pool.where((p) => p != name).toList();
+    // Compared without case: a profile saved as "ana" sat beside the decoy
+    // "Ana", which was then marked wrong.
+    final own = name.toLowerCase();
+    final first = own.isEmpty ? '' : own[0];
+    final others = pool.where((p) => p.toLowerCase() != own);
     // Same initial first — a child who knows their letter still has to look.
-    return [...sameLetter, ...rest];
+    final sameLetter =
+        others.where((p) => p[0].toLowerCase() == first).toList();
+    final rest = others.where((p) => p[0].toLowerCase() != first).toList();
+    return (sameLetter, rest);
   }
 
   void _handleAboutMeAnswer(int index, int correct, String description) {
@@ -931,9 +999,8 @@ class _PamilyaScreenState extends State<PamilyaScreen>
   /// and often under the child's own hand. It is the part worth reading, so
   /// it belongs where they are already looking.
   void _showTipThenAdvance(String tip) {
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      if (!mounted) return;
-      _raiseTip(tip, then: _onCorrect);
+    _afterDelay(const Duration(milliseconds: 1500), () {
+      _raiseTip(tip, then: () => _onCorrect(announced: true));
     });
   }
 
@@ -944,6 +1011,9 @@ class _PamilyaScreenState extends State<PamilyaScreen>
   /// cancellable — otherwise it fires again later and advances a question
   /// the child is already answering.
   void _raiseTip(String tip, {VoidCallback? then}) {
+    // Tips go up on a delay after the answer; a child who pressed Back in
+    // that gap is on the cards now, and the tip is not for them.
+    if (!_playing) return;
     _tipTimer?.cancel();
     _afterTip = then;
     _tipShownAt = DateTime.now();
@@ -986,20 +1056,20 @@ class _PamilyaScreenState extends State<PamilyaScreen>
   /// along the bottom instead — under the answers, often under the child's
   /// own hand, and nothing like the card every other game shows.
   void _correctThenTip(String? tip) {
+    HapticFeedback.heavyImpact();
     setState(() {
       _verdictRunning = true;
       _showCorrectOverlay = true;
     });
     if (tip == null || tip.trim().isEmpty) {
-      Future.delayed(const Duration(milliseconds: 1400), () {
-        if (!mounted) return;
+      _afterDelay(const Duration(milliseconds: 1400), () {
         setState(() => _showCorrectOverlay = false);
-        _onCorrect();
+        _onCorrect(announced: true);
       });
       return;
     }
-    Future.delayed(const Duration(milliseconds: 1400), () {
-      if (mounted) setState(() => _showCorrectOverlay = false);
+    _afterDelay(const Duration(milliseconds: 1400), () {
+      setState(() => _showCorrectOverlay = false);
     });
     _showTipThenAdvance(tip);
   }
@@ -1019,9 +1089,10 @@ class _PamilyaScreenState extends State<PamilyaScreen>
     _pauseTimer();
     setState(() => _selectedRoutineAnswer = index);
     if (index == correct) {
+      HapticFeedback.heavyImpact();
       setState(() => _showCorrectOverlay = true);
-      Future.delayed(const Duration(milliseconds: 1400), () {
-        if (mounted) setState(() => _showCorrectOverlay = false);
+      _afterDelay(const Duration(milliseconds: 1400), () {
+        setState(() => _showCorrectOverlay = false);
       });
       _showTipThenAdvance(tip);
     } else {
@@ -1081,8 +1152,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
 
     // A beat first, so the child sees their own choice light up before the
     // pop-up covers the board.
-    Future.delayed(const Duration(milliseconds: 450), () {
-      if (!mounted) return;
+    _afterDelay(const Duration(milliseconds: 450), () {
       _raiseTip(
         '$emoji ${AppLocalizations.of(context)!.favoriteChosen(_withoutLeadingEmoji(label))}',
         then: _onCorrect,
@@ -1200,8 +1270,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
           _selectedMainCategory == 0 ? 'sarili' : 'pamilya',
           'level$_selectedLevel',
           correct: false);
-      Future.delayed(const Duration(milliseconds: 1200), () {
-        if (!mounted) return;
+      _afterDelay(const Duration(milliseconds: 1200), () {
         setState(() => _showWrongOverlay = false);
       });
     }
@@ -1311,7 +1380,9 @@ class _PamilyaScreenState extends State<PamilyaScreen>
       centerTitle: false,
       leading: CustomBackButton(
         iconColor: AppColors.textDark,
-        onPressed: () => Navigator.pop(context),
+        // Inside a level, back to the cards — the same as the phone's own
+        // back button. A plain pop went past the PopScope and out to Home.
+        onPressed: () => _playing ? _backToPicker() : Navigator.pop(context),
       ),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1445,11 +1516,12 @@ class _PamilyaScreenState extends State<PamilyaScreen>
                         Expanded(child: _buildGameContent()),
                       ],
                     )
-                  : _buildLevelPicker(),
+                  : DesignScale(child: _buildLevelPicker()),
             ),
             if (_playing && _showCorrectOverlay) _buildCorrectOverlay(),
             if (_playing && _showWrongOverlay) _buildWrongOverlay(),
-            if (_tipMessage != null) _buildTipOverlay(_tipMessage!),
+            if (_playing && _tipMessage != null)
+              _buildTipOverlay(_tipMessage!),
           ],
         ),
       ),
@@ -1486,8 +1558,32 @@ class _PamilyaScreenState extends State<PamilyaScreen>
   /// above every question, and putting two live controls where a child rests
   /// their thumb. Both are gone: the categories are headings on one wall the
   /// child leaves to play and comes back to.
+  /// The picture on each lesson, in the order of [_categoryLevelIcons]:
+  /// what that lesson asks about, so the cards stop looking alike.
+  ///
+  /// "All About Me" is the child, so it is a boy or a girl as their profile
+  /// says — the same reading of the profile the gender question uses.
+  /// "My Preferences" asks for a favourite food, colour, game and animal,
+  /// and "Family Activities" opens on eating together at the table.
+  List<List<String>> _lessonPictures(UserProvider userProvider) {
+    final g = (userProvider.userProfile?.gender ?? '').toLowerCase();
+    final me = g.startsWith('f') || g.startsWith('g') ? 'girl' : 'boy';
+    return [
+      ['$me.webp', 'iyak.webp', 'sipilyo.webp', 'kagustuhan.webp'],
+      [
+        'magulang.webp',
+        'tatay.webp',
+        'gawain_pamilya.webp',
+        'family_tree.webp',
+        'bahay.webp',
+      ],
+    ].map((row) => [for (final f in row) 'assets/images/$f']).toList();
+  }
+
   Widget _buildLevelPicker() {
     final userProvider = Provider.of<UserProvider>(context);
+    final loc = AppLocalizations.of(context)!;
+    final pictures = _lessonPictures(userProvider);
 
     int earned = 0;
     for (int cat = 0; cat < _categoryLevelIcons.length; cat++) {
@@ -1498,43 +1594,70 @@ class _PamilyaScreenState extends State<PamilyaScreen>
     const possible =
         UserProvider.sariliStarCeiling + UserProvider.familyStarCeiling;
 
+    // The first lesson not finished yet, across both groups, wears the ring.
+    (int, int)? next;
+    for (int cat = 0; cat < _categoryLevelIcons.length && next == null; cat++) {
+      for (int i = 0; i < _categoryLevelIcons[cat].length; i++) {
+        if (!userProvider.isPamilyaLevelCompleted(cat, i)) {
+          next = (cat, i);
+          break;
+        }
+      }
+    }
+
+    final headings = [
+      (loc.aboutMeShort, pictures[0][0]),
+      (loc.familySectionHeader, pictures[1][0]),
+    ];
+
     return Column(
       children: [
-        StarTally(earned: earned, possible: possible),
+        ModuleTally(
+          picture: 'assets/images/star_gold.webp',
+          done: earned,
+          total: possible,
+          label: (n) => loc.starsOfPossible(n, possible),
+        ),
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
             children: [
               for (int cat = 0; cat < _categoryLevelIcons.length; cat++) ...[
                 Padding(
-                  padding: EdgeInsets.only(top: cat == 0 ? 0 : 22, bottom: 10),
-                  child: Text(
-                    _getMainCategoryTitle(cat),
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textDark,
-                    ),
+                  padding: EdgeInsets.fromLTRB(2, cat == 0 ? 6 : 18, 2, 12),
+                  child: Row(
+                    children: [
+                      Image.asset(headings[cat].$2,
+                          width: 26, height: 26, excludeFromSemantics: true),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          headings[cat].$1,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontFamily: 'Fredoka',
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF4B4F63),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: EdgeInsets.zero,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 14,
-                    mainAxisSpacing: 14,
-                    childAspectRatio: 0.98,
-                  ),
-                  itemCount: _categoryLevelIcons[cat].length,
+                ModuleTileGrid(
+                  count: _categoryLevelIcons[cat].length,
                   // The beat carries on across the second heading — the two
-                  // groups are one wall, not two lists that each start over.
-                  itemBuilder: (_, i) => StaggeredEntrance(
+                  // groups are one list, not two that each start over.
+                  builder: (i, wide) => StaggeredEntrance(
                     index: cat == 0 ? i : _categoryLevelIcons[0].length + i,
                     delayMs: 55,
                     durationMs: 380,
-                    child: _levelCard(cat, i, userProvider),
+                    child: _levelCard(cat, i, userProvider,
+                        picture: pictures[cat][i],
+                        highlight: next == (cat, i),
+                        wide: wide),
                   ),
                 ),
               ],
@@ -1545,105 +1668,30 @@ class _PamilyaScreenState extends State<PamilyaScreen>
     );
   }
 
-  /// The three stars of one level, as they sit on its card.
-  Widget _levelStarStrip(int stars, bool active, {double size = 18}) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(3, (s) {
-        final got = s < stars;
-        return Icon(
-          got ? Icons.star_rounded : Icons.star_outline_rounded,
-          size: size,
-          color: active
-              ? (got ? Colors.white : Colors.white.withOpacity(0.55))
-              : (got ? const Color(0xFFFFB800) : Colors.grey.shade400),
-        );
-      }),
-    );
-  }
-
-  /// One level, in its own colour, with what the child has taken from it.
-  Widget _levelCard(int cat, int i, UserProvider userProvider) {
+  /// One lesson, in its own colour, with a picture of what it is about.
+  Widget _levelCard(int cat, int i, UserProvider userProvider,
+      {required String picture, required bool highlight, required bool wide}) {
     final completed = userProvider.isPamilyaLevelCompleted(cat, i);
     final stars = userProvider.pamilyaLevelStars(cat, i);
     final gradient =
         _levelGradients[(cat == 0 ? i : 4 + i) % _levelGradients.length];
 
-    return Pressable(
+    return ModuleLevelTile(
+      label: AppLocalizations.of(context)!.lessonNumber(i + 1),
+      number: i + 1,
+      title: _getLevelTitle(cat, i),
+      color: gradient.first,
+      picture: ModulePicture(picture, width: 96, height: 90),
+      stars: stars,
+      wide: wide,
+      // The ringed lesson says "Continue": it is where the child carries on.
+      state: completed
+          ? ModuleCardState.done
+          : highlight
+              ? ModuleCardState.resume
+              : ModuleCardState.start,
+      highlight: highlight,
       onTap: () => completed ? _confirmReplay(cat, i) : _openLevel(cat, i),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: gradient,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(26),
-          boxShadow: [
-            BoxShadow(
-              color: gradient.first.withOpacity(0.35),
-              blurRadius: 14,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.22),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${i + 1}',
-                      style: const TextStyle(
-                        fontSize: 19,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Icon(_categoryLevelIcons[cat][i],
-                    color: Colors.white.withOpacity(0.85), size: 20),
-                const Spacer(),
-                if (completed)
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.check_rounded,
-                        size: 16, color: gradient.first),
-                  ),
-              ],
-            ),
-            const Spacer(),
-            WordSafeText(
-              _getLevelTitle(cat, i),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 16,
-                height: 1.15,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 6),
-            _levelStarStrip(stars, true, size: 26),
-          ],
-        ),
-      ),
     );
   }
 
@@ -2107,19 +2155,19 @@ class _PamilyaScreenState extends State<PamilyaScreen>
 
   Widget _buildSariliGame3() {
     final game = _sariliLevel3Games[_currentGameIndex];
-    final choices = game['choices'] as List;
+    final (choices, answer) = _shuffled(game);
     return _gameBoard(
       question: game['question'],
-      labels: choices.map((e) => e.toString()).toList(),
+      labels: choices,
       choices: List.generate(choices.length, (i) {
         final sel = _selectedRoutineAnswer == i;
-        final correct = i == game['correct'];
+        final correct = i == answer;
         return _choiceTile(
           label: choices[i],
           isSelected: sel,
           isCorrect: sel ? correct : null,
           onTap: () => _handleRoutineAnswer(
-              i, game['correct'], game['explanation'], game['tip']),
+              i, answer, game['explanation'], game['tip']),
         );
       }),
     );
@@ -2298,19 +2346,18 @@ class _PamilyaScreenState extends State<PamilyaScreen>
 
   Widget _buildFamilyActivitiesGame() {
     final game = _pamilyaLevel3Games[_currentGameIndex];
-    final choices = game['choices'] as List;
+    final (choices, answer) = _shuffled(game);
     return _gameBoard(
       question: game['question'],
-      labels: choices.map((e) => e.toString()).toList(),
+      labels: choices,
       choices: List.generate(choices.length, (i) {
         final sel = _selectedActivityAnswer == i;
-        final correct = i == game['correct'];
+        final correct = i == answer;
         return _choiceTile(
           label: choices[i],
           isSelected: sel,
           isCorrect: sel ? correct : null,
-          onTap: () =>
-              _handleActivityAnswer(i, game['correct'], game['explanation']),
+          onTap: () => _handleActivityAnswer(i, answer, game['explanation']),
         );
       }),
     );
@@ -2321,23 +2368,36 @@ class _PamilyaScreenState extends State<PamilyaScreen>
   // ─────────────────────────────────────────────────────────────────────────
 
   Widget _buildPamilyaQuizGame(Map<String, dynamic> game) {
-    final choices = game['choices'] as List;
+    final (choices, answer) = _shuffled(game);
     return _gameBoard(
       question: game['question'],
-      labels: choices.map((e) => e.toString()).toList(),
+      labels: choices,
       choices: List.generate(choices.length, (i) {
         final sel = _selectedTreeQuizAnswer == i;
-        final correct = i == game['correct'];
+        final correct = i == answer;
         return _choiceTile(
           label: choices[i],
           isSelected: sel,
           isCorrect: sel ? correct : null,
-          onTap: () => _handleTreeQuizAnswer(
-              i, game['correct'], game['explanation'] ?? ''),
+          onTap: () =>
+              _handleTreeQuizAnswer(i, answer, game['explanation'] ?? ''),
         );
       }),
     );
   }
+
+  /// [game]'s choices in an order of their own, and where the right one
+  /// went — see [shuffledChoices].
+  (List<String>, int) _shuffled(Map<String, dynamic> game) {
+    final name =
+        Provider.of<UserProvider>(context, listen: false).userProfile?.name;
+    return shuffledChoices(
+      (game['choices'] as List).map((e) => e.toString()).toList(),
+      game['correct'] as int,
+      seed: '${game['id']}|${name ?? ''}',
+    );
+  }
+
 
   // ─────────────────────────────────────────────────────────────────────────
   //  PAMILYA GAME 4: Family Tree (Interactive)
@@ -2588,4 +2648,31 @@ class _PamilyaScreenState extends State<PamilyaScreen>
       ]),
     );
   }
+}
+
+/// Puts the right answer somewhere other than where it was written.
+///
+/// The content lists it first in nearly every Daily Routines, Our Home and
+/// Family Tree question, and last in most Family Activities ones, and
+/// nothing mixed them — "always tap the first one" passed a whole level.
+/// Seeded on the question and the child, like About Me's own answers, so the
+/// order holds still while they think instead of reshuffling on a
+/// rebuild. "All of the above" stays last, where it reads as meant.
+(List<String>, int) shuffledChoices(List<String> choices, int correct,
+    {required String seed}) {
+  const everything = {
+    'all of the above',
+    'lahat ng nabanggit',
+    'amin kadagitoy',
+  };
+  final last = choices.isNotEmpty &&
+          everything.contains(choices.last.trim().toLowerCase())
+      ? choices.length - 1
+      : null;
+  final order = [
+    for (int i = 0; i < choices.length; i++)
+      if (i != last) i
+  ]..shuffle(Random(seed.hashCode));
+  if (last != null) order.add(last);
+  return ([for (final i in order) choices[i]], order.indexOf(correct));
 }

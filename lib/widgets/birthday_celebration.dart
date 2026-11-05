@@ -10,6 +10,7 @@ import '../services/audio_source.dart';
 import 'birthday_cake.dart';
 import 'firework.dart';
 import 'pop_balloon.dart';
+import '../services/device_performance.dart';
 
 /// Shows a full-screen, centered birthday celebration overlay with confetti,
 /// floating balloons and an animated "Happy Birthday [name]!" greeting.
@@ -80,8 +81,10 @@ class _BirthdayCelebrationOverlayState
   @override
   void initState() {
     super.initState();
-    _confetti = ConfettiController(duration: const Duration(seconds: 8));
-    _confetti.play();
+    // A few seconds of confetti, then it settles — it used to rain for as
+    // long as the card was open — and none with animations off.
+    _confetti = ConfettiController(duration: const Duration(seconds: 4));
+    if (!DevicePerformance.animationsOff) _confetti.play();
     // The card closes itself once the song runs out, on top of the OK
     // button and the backdrop tap — a child who does not tap anything
     // still gets the card cleared away instead of the greeting sitting
@@ -155,7 +158,7 @@ class _BirthdayCelebrationOverlayState
           child: ConfettiWidget(
             confettiController: _confetti,
             blastDirectionality: BlastDirectionality.explosive,
-            shouldLoop: true,
+            shouldLoop: false,
             numberOfParticles: 24,
             maxBlastForce: 22,
             minBlastForce: 8,

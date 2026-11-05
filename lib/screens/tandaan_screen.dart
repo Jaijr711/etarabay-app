@@ -19,10 +19,10 @@ import '../widgets/custom_back_button.dart';
 import '../widgets/success_modal.dart';
 import '../widgets/pressable.dart';
 import '../widgets/staggered_entrance.dart';
-import '../widgets/star_tally.dart';
+import '../widgets/module_cards.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
-import '../utils/word_fit.dart';
 import '../widgets/replay_dialog.dart';
+import '../widgets/design_scale.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  TANDAAN MO! — Memory / Matching Game
@@ -127,6 +127,10 @@ class _TandaanScreenState extends State<TandaanScreen>
   bool _playing = false;
   final Map<int, List<bool>> _categoryRoundProgress = {};
 
+  /// Stars each finished round earned, by category then round, so a
+  /// category picked up halfway is still rated on all three.
+  final Map<int, Map<int, int>> _roundStars = {};
+
   /// True for exactly one open of a finished category — the one just
   /// confirmed through [_confirmReplayCategory] — so that one open shows the
   /// card grid instead of the completed view. Same pattern as Matematika's
@@ -136,7 +140,6 @@ class _TandaanScreenState extends State<TandaanScreen>
   // ── Animations ───────────────────────────────────────────────────────────
   late AnimationController _starBurstController;
   late AnimationController _shakeController;
-  late AnimationController _timerPulseController;
 
   // ── Category data ────────────────────────────────────────────────────────
   final List<Map<String, dynamic>> _categories = const [
@@ -158,11 +161,13 @@ class _TandaanScreenState extends State<TandaanScreen>
           'label_tl': 'Pusa',
           'label_il': 'Pusa'
         },
+        // The picture is a carabao (kalabaw_mukha), so the card says so: it
+        // was labelled a cow.
         {
           'emoji': '🐮',
-          'label_en': 'Cow',
-          'label_tl': 'Baka',
-          'label_il': 'Baka'
+          'label_en': 'Carabao',
+          'label_tl': 'Kalabaw',
+          'label_il': 'Nuang'
         },
         {
           'emoji': '🐷',
@@ -187,7 +192,7 @@ class _TandaanScreenState extends State<TandaanScreen>
     {
       'title_en': 'Fruits',
       'title_tl': 'Prutas',
-      'title_il': 'Prutas',
+      'title_il': 'Bungbunga',
       'color': AppColors.colors,
       'pairs': [
         {
@@ -200,7 +205,7 @@ class _TandaanScreenState extends State<TandaanScreen>
           'emoji': '🍌',
           'label_en': 'Banana',
           'label_tl': 'Saging',
-          'label_il': 'Saging'
+          'label_il': 'Saba'
         },
         {
           'emoji': '🍇',
@@ -361,10 +366,6 @@ class _TandaanScreenState extends State<TandaanScreen>
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    _timerPulseController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    )..repeat(reverse: true);
 
     _loadCompletedCategories().then((_) {
       if (!_currentCategoryCompleted) {
@@ -381,14 +382,18 @@ class _TandaanScreenState extends State<TandaanScreen>
     for (int cat = 0; cat < _categories.length; cat++) {
       bool allDone = true;
       final rounds = <bool>[];
+      final stars = <int, int>{};
       for (int round = 0; round < 3; round++) {
         final done = prefs.getBool('tandaan_cat_${cat}_round_$round') == true;
         rounds.add(done);
         if (!done) allDone = false;
+        final s = prefs.getInt('tandaan_cat_${cat}_round_${round}_stars');
+        if (s != null) stars[round] = s;
       }
       if (mounted) {
         setState(() {
           _categoryRoundProgress[cat] = rounds;
+          _roundStars[cat] = stars;
           if (allDone) _completedCategories.add(cat);
         });
       }
@@ -417,7 +422,6 @@ class _TandaanScreenState extends State<TandaanScreen>
     _previewTimer?.cancel();
     _starBurstController.dispose();
     _shakeController.dispose();
-    _timerPulseController.dispose();
     AudioManager.instance.resumeHomeMusic();
     super.dispose();
   }
@@ -529,14 +533,26 @@ class _TandaanScreenState extends State<TandaanScreen>
     // Its own signal, not the wrong-answer one — see matematika's _onTimeout.
     // The round earns no stars, but everything banked so far is kept.
     setState(() => _showTimeUpOverlay = true);
-    Future.delayed(const Duration(milliseconds: 1400), () {
-      if (!mounted) return;
+    _afterDelay(const Duration(milliseconds: 1400), () {
       setState(() => _showTimeUpOverlay = false);
       _advanceOrComplete();
     });
   }
 
   // ── Category switch ────────────────────────────────────────────────────────
+
+  /// Goes up each time a category is opened or left. A card's or a
+  /// verdict's delayed step only runs in the board it was given on
+  /// ([_afterDelay]): one left running after back reached into the next
+  /// category's cards by index, and marked its round done for that one.
+  int _playSession = 0;
+
+  void _afterDelay(Duration delay, VoidCallback then) {
+    final session = _playSession;
+    Future.delayed(delay, () {
+      if (mounted && session == _playSession) then();
+    });
+  }
 
   /// Leaves the wall of cards for one category.
   ///
@@ -545,12 +561,23 @@ class _TandaanScreenState extends State<TandaanScreen>
   /// child comes back to the wall and taps the same card again.
   void _openCategory(int index) {
     _stopTimer();
+    _playSession++;
+    // Back where the child left off: rounds already done are not played
+    // again, and their stars still count towards the category's rating.
+    // Every category used to start at round one, so "Continue" undid them.
+    final rounds = _categoryRoundProgress[index] ?? const <bool>[];
+    final resumeAt = _replayingCategory ? 0 : rounds.indexWhere((r) => !r);
+    final start = resumeAt < 0 ? 0 : resumeAt;
     setState(() {
       _playing = true;
       _selectedCategory = index;
-      _currentRound = 0;
+      _currentRound = start;
       _categoryStars = 0;
       _categoryScore = 0;
+      for (int r = 0; r < start; r++) {
+        _categoryStars += _roundStars[index]?[r] ?? 3;
+        _categoryScore += _pointsPerCorrect;
+      }
     });
     // NOT reset here: build() reads _replayingCategory on the very next
     // frame to decide whether to show the card grid or the completed view,
@@ -565,6 +592,7 @@ class _TandaanScreenState extends State<TandaanScreen>
   /// Back to the wall of cards, without leaving the module.
   void _backToPicker() {
     _stopTimer();
+    _playSession++;
     setState(() {
       _playing = false;
       _showCorrectOverlay = false;
@@ -576,6 +604,7 @@ class _TandaanScreenState extends State<TandaanScreen>
   void _switchCategory(int index) {
     if (_selectedCategory == index) return;
     _stopTimer();
+    _playSession++;
     setState(() {
       _selectedCategory = index;
       _currentRound = 0;
@@ -623,8 +652,7 @@ class _TandaanScreenState extends State<TandaanScreen>
       // Match!
       _isProcessing = true;
       HapticFeedback.heavyImpact();
-      Future.delayed(const Duration(milliseconds: 400), () {
-        if (!mounted) return;
+      _afterDelay(const Duration(milliseconds: 400), () {
         setState(() {
           _cards[first].isMatched = true;
           _cards[second].isMatched = true;
@@ -639,8 +667,7 @@ class _TandaanScreenState extends State<TandaanScreen>
       _wrongAttempts++;
       HapticFeedback.vibrate();
       _shakeController.forward(from: 0);
-      Future.delayed(const Duration(milliseconds: 800), () {
-        if (!mounted) return;
+      _afterDelay(const Duration(milliseconds: 800), () {
         setState(() {
           _cards[first].isFlipped = false;
           _cards[second].isFlipped = false;
@@ -661,16 +688,19 @@ class _TandaanScreenState extends State<TandaanScreen>
       _categoryStars += earned;
       _categoryScore += _pointsPerCorrect;
       _showCorrectOverlay = true;
+      (_roundStars[_selectedCategory] ??= {})[_currentRound] = earned;
     });
     _persistScore();
+    unawaited(SharedPreferences.getInstance().then((p) => p.setInt(
+        'tandaan_cat_${_selectedCategory}_round_${_currentRound}_stars',
+        earned)));
     _starBurstController.forward(from: 0);
 
     // No bottom banner. The big card that pops up over the board already
     // says this, so the strip underneath repeated it word for word — twice
     // for the same event, the second time below where the child is looking.
 
-    Future.delayed(const Duration(milliseconds: 1600), () {
-      if (!mounted) return;
+    _afterDelay(const Duration(milliseconds: 1600), () {
       setState(() => _showCorrectOverlay = false);
       _advanceOrComplete();
     });
@@ -717,6 +747,12 @@ class _TandaanScreenState extends State<TandaanScreen>
   Future<void> _markRoundDone(int round) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('tandaan_cat_${_selectedCategory}_round_$round', true);
+    // Saved here, not through the provider, so nothing sent it up: a round
+    // reached the cloud only if its category's stars happened to change.
+    if (mounted) {
+      unawaited(
+          Provider.of<UserProvider>(context, listen: false).requestSync());
+    }
 
     if (mounted) {
       setState(() {
@@ -805,13 +841,17 @@ class _TandaanScreenState extends State<TandaanScreen>
         // This category's points, not the module's running total.
         score: _categoryScore,
         stars: avgStars,
-        primaryLabel: _selectedCategory < _categories.length - 1
+        // On to the next category not yet finished, not simply the next one
+        // along: that could be finished already, and opened on its "done"
+        // page.
+        primaryLabel: _nextCategoryToPlay() != null
             ? AppLocalizations.of(context)!.continueText
             : AppLocalizations.of(context)!.done,
         onPrimaryTap: () {
           Navigator.pop(context);
-          if (_selectedCategory < _categories.length - 1) {
-            _openCategory(_selectedCategory + 1);
+          final next = _nextCategoryToPlay();
+          if (next != null) {
+            _openCategory(next);
           } else {
             // The last one: back to the wall, where the card the child has
             // just finished is now ticked. This used to leave the module.
@@ -935,7 +975,7 @@ class _TandaanScreenState extends State<TandaanScreen>
                         _buildFeedbackBanner(),
                       ],
                     )
-                  : _buildLevelPicker(),
+                  : DesignScale(child: _buildLevelPicker()),
             ),
             if (_playing && _showCorrectOverlay) _buildCorrectOverlay(),
           ],
@@ -999,8 +1039,18 @@ class _TandaanScreenState extends State<TandaanScreen>
   /// to remember, on a screen where the whole game is "do not touch the wrong
   /// thing". It is a screen of its own now, which they leave to play and come
   /// back to when a category is finished.
+  /// What is on each category's top card: an animal, a fruit, the shapes,
+  /// and letters — the things its pairs are made of.
+  static const List<String> _categoryPictures = [
+    'assets/images/dog.webp',
+    'assets/images/apple.webp',
+    'assets/images/tandaan/hugis.webp',
+    'assets/images/tandaan/titik.webp',
+  ];
+
   Widget _buildLevelPicker() {
     final userProvider = Provider.of<UserProvider>(context);
+    final loc = AppLocalizations.of(context)!;
     final progress = userProvider.getTandaanProgress();
     final perCategory =
         (progress['categoryStars'] as List<dynamic>?) ?? const [];
@@ -1009,111 +1059,89 @@ class _TandaanScreenState extends State<TandaanScreen>
 
     int starsOf(int i) =>
         i < perCategory.length ? (perCategory[i] as int? ?? 0) : 0;
+    int next = -1;
+    for (int i = 0; i < _categories.length; i++) {
+      if (!_completedCategories.contains(i)) {
+        next = i;
+        break;
+      }
+    }
+
+    Widget deck(int i) => StaggeredEntrance(
+          index: i,
+          delayMs: 55,
+          durationMs: 380,
+          child: _categoryDeck(i, starsOf(i), highlight: i == next),
+        );
 
     return Column(
       children: [
-        StarTally(earned: earned, possible: possible),
+        ModuleTally(
+          picture: 'assets/images/star_gold.webp',
+          done: earned,
+          total: possible,
+          label: (n) => loc.starsOfPossible(n, possible),
+        ),
         Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 14,
-              mainAxisSpacing: 14,
-              childAspectRatio: 0.98,
-            ),
-            itemCount: _categories.length,
-            // The wall assembles rather than appearing. Each card is a
-            // beat behind the one before it, which walks a child's eye
-            // across them instead of dropping seven at once.
-            itemBuilder: (_, i) => StaggeredEntrance(
-              index: i,
-              delayMs: 55,
-              durationMs: 380,
-              child: _categoryCard(i, starsOf(i)),
-            ),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(14, 16, 14, 24),
+            children: [
+              for (int r = 0; r < _categories.length; r += 2)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(child: deck(r)),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: r + 1 < _categories.length
+                            ? deck(r + 1)
+                            : const SizedBox(),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
           ),
         ),
       ],
     );
   }
 
-  /// One category, in its own colour, with what the child took from it.
-  Widget _categoryCard(int i, int stars) {
+  /// One category as a little pile of memory cards: two face down in its
+  /// colour, and one face up on top showing what the pairs are of. The
+  /// stars it has earned sit underneath.
+  Widget _categoryDeck(int i, int stars, {required bool highlight}) {
     final color = _categories[i]['color'] as Color;
     final completed = _completedCategories.contains(i);
 
     return Pressable(
       onTap: () => completed ? _confirmReplayCategory(i) : _openCategory(i),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [color, color.withOpacity(0.75)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+      child: Column(
+        children: [
+          AspectRatio(
+            aspectRatio: 1 / 1.05,
+            child: _MemoryDeck(
+              color: color,
+              picture: _categoryPictures[i % _categoryPictures.length],
+              highlight: highlight,
+            ),
           ),
-          borderRadius: BorderRadius.circular(26),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.35),
-              blurRadius: 14,
-              offset: const Offset(0, 6),
+          const SizedBox(height: 8),
+          Text(
+            _getCategoryTitleLocalized(i),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w900,
+              color: AppColors.textDark,
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.22),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(_categoryIcons[i], color: Colors.white, size: 20),
-                ),
-                const Spacer(),
-                if (completed)
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.check_rounded, size: 16, color: color),
-                  ),
-              ],
-            ),
-            const Spacer(),
-            WordSafeText(
-              _getCategoryTitleLocalized(i),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 16,
-                height: 1.15,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(3, (n) {
-                final got = n < stars;
-                return Icon(
-                  got ? Icons.star_rounded : Icons.star_outline_rounded,
-                  size: 26,
-                  color: got ? Colors.white : Colors.white.withOpacity(0.55),
-                );
-              }),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 6),
+          ModuleStars(count: stars, size: 20),
+        ],
       ),
     );
   }
@@ -1412,6 +1440,17 @@ class _TandaanScreenState extends State<TandaanScreen>
     return null;
   }
 
+  /// After the one just finished, the next category still to do — looking
+  /// on from it first, then from the start.
+  int? _nextCategoryToPlay() {
+    final n = _categories.length;
+    for (int k = 1; k < n; k++) {
+      final i = (_selectedCategory + k) % n;
+      if (!_completedCategories.contains(i)) return i;
+    }
+    return null;
+  }
+
   Widget _buildInstructionCard(Color color) {
     return Container(
       width: double.infinity,
@@ -1463,143 +1502,65 @@ class _TandaanScreenState extends State<TandaanScreen>
     );
   }
 
+  /// What the shapes and letters show on a card: 3D shapes from the same
+  /// set as the medals and Settings, and toy letter blocks. Animals and fruit
+  /// already come out of [ObjectPicture] as the app's own pictures.
+  static const Map<String, String> _faceAssets = {
+    '⚪': 'assets/images/tandaan/shape_circle.webp',
+    '🟦': 'assets/images/tandaan/shape_square.webp',
+    '🔺': 'assets/images/tandaan/shape_triangle.webp',
+    '⭐': 'assets/images/tandaan/shape_star.webp',
+    '❤': 'assets/images/tandaan/shape_heart.webp',
+    '🔷': 'assets/images/tandaan/shape_diamond.webp',
+    'Aa': 'assets/images/tandaan/letter_a.webp',
+    'Bb': 'assets/images/tandaan/letter_b.webp',
+    'Cc': 'assets/images/tandaan/letter_c.webp',
+    'Dd': 'assets/images/tandaan/letter_d.webp',
+    'Ee': 'assets/images/tandaan/letter_e.webp',
+    'Ff': 'assets/images/tandaan/letter_f.webp',
+  };
+
+  /// The picture for a card's [emoji], with the variation selectors that
+  /// make one emoji two strings taken off.
+  static String? _faceAsset(String emoji) => _faceAssets[
+      emoji.trim().replaceAll('\uFE0F', '').replaceAll('\uFE0E', '')];
+
   /// One card, drawn to fill the [cell] the grid worked out for it.
   ///
-  /// The face used to be built at a fixed 46-pixel picture over 12-pixel text
-  /// inside a `FittedBox(scaleDown)` — and scaleDown only ever shrinks. A
-  /// bigger card was therefore a bigger white square with the same small
-  /// picture floating in it, which is not what bigger cards means to a child
-  /// trying to tell a dog from a carabao.
+  /// The picture is sized from the cell, never shrunk into a fixed box: a
+  /// bigger card has to mean a bigger picture to a child telling a dog from a
+  /// carabao. A wrong pair shakes before it turns back.
   Widget _buildCard(int index, _CardData card, double cell) {
     final color = _currentCategory['color'] as Color;
-    final isEmoji = card.emoji.length <= 2 && card.emoji != 'Aa';
-    final showFront = card.isFlipped || card.isMatched;
-    final art = (cell * 0.46).clamp(40.0, 110.0);
-    final labelSize = (cell * 0.115).clamp(11.0, 20.0);
+    final art = cell * .6;
+    final asset = _faceAsset(card.emoji);
+    final picture = asset != null
+        ? Image.asset(asset,
+            width: art,
+            height: art,
+            fit: BoxFit.contain,
+            excludeFromSemantics: true)
+        : ObjectPicture(emoji: card.emoji, size: art);
+    final wrong = card.isFlipped && !card.isMatched;
 
     return GestureDetector(
       onTap: () => _onCardTap(index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.easeInOutBack,
-        decoration: BoxDecoration(
-          gradient: showFront
-              ? null
-              : LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [color, color.withOpacity(0.78)],
-                ),
-          color: showFront
-              ? (card.isMatched ? Colors.green.withOpacity(0.12) : Colors.white)
-              : null,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: card.isMatched ? Colors.green : color.withOpacity(0.45),
-            width: card.isMatched ? 4 : 2.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: (card.isMatched ? Colors.green : color).withOpacity(0.35),
-              blurRadius: 14,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 400),
-          transitionBuilder: (child, anim) {
-            return ScaleTransition(
-              scale: Tween<double>(begin: 0.85, end: 1.0).animate(anim),
-              child: FadeTransition(
-                opacity: anim,
-                child: child,
-              ),
-            );
-          },
-          child: showFront
-              ? Stack(
-                  key: ValueKey('front_$index'),
-                  children: [
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(6),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // The face of the card is the game here — a
-                              // child is matching what they see, not reading
-                              // the word under it. A drawn picture when one
-                              // exists; the emoji until then.
-                              isEmoji
-                                  ? ObjectPicture(emoji: card.emoji, size: art)
-                                  : Text(
-                                      card.emoji,
-                                      style: TextStyle(
-                                        fontSize: art * 0.6,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                              const SizedBox(height: 2),
-                              Text(
-                                card.label,
-                                maxLines: 1,
-                                style: TextStyle(
-                                  fontSize: labelSize,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.textDark.withOpacity(0.75),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    if (card.isMatched)
-                      Positioned(
-                        top: 5,
-                        right: 5,
-                        child: Container(
-                          padding: const EdgeInsets.all(3),
-                          decoration: const BoxDecoration(
-                            color: Colors.green,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(LucideIcons.check,
-                              color: Colors.white, size: 15),
-                        ),
-                      ),
-                  ],
-                )
-              : Container(
-                  key: ValueKey('back_$index'),
-                  alignment: Alignment.center,
-                  child: Container(
-                    width: (cell * 0.38).clamp(34.0, 88.0),
-                    height: (cell * 0.38).clamp(34.0, 88.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.25),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.7),
-                        width: 2.5,
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '?',
-                        style: TextStyle(
-                          fontSize: (cell * 0.24).clamp(20.0, 52.0),
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+      child: AnimatedBuilder(
+        animation: _shakeController,
+        builder: (_, child) {
+          final v = wrong ? _shakeController.value : 0.0;
+          return Transform.translate(
+            offset: Offset(sin(v * pi * 6) * 5 * (1 - v), 0),
+            child: child,
+          );
+        },
+        child: _MemoryCard(
+          color: color,
+          picture: picture,
+          label: card.label,
+          faceUp: card.isFlipped || card.isMatched,
+          matched: card.isMatched,
+          size: cell,
         ),
       ),
     );
@@ -1642,4 +1603,406 @@ class _TandaanScreenState extends State<TandaanScreen>
       ),
     );
   }
+}
+
+/// Two cards face down, fanned, and one face up on top — the look of a
+/// memory game before it starts.
+class _MemoryDeck extends StatelessWidget {
+  final Color color;
+  final String picture;
+  final bool highlight;
+
+  const _MemoryDeck({
+    required this.color,
+    required this.picture,
+    required this.highlight,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, box) {
+      final w = box.maxWidth, h = box.maxHeight;
+      final cardW = w * 0.8, cardH = h * 0.88;
+      Widget card(
+          {required Widget child,
+          Color? fill,
+          double turns = 0,
+          double shift = 0,
+          bool ring = false}) {
+        final radius = BorderRadius.circular(16);
+        return Positioned(
+          left: w * 0.1,
+          top: h * 0.06,
+          width: cardW,
+          height: cardH,
+          child: Transform.translate(
+            offset: Offset(cardW * shift, 0),
+            child: Transform.rotate(
+              angle: turns,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: fill ?? Colors.white,
+                  borderRadius: radius,
+                  border: Border.all(color: Colors.white, width: 4),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF282850).withOpacity(0.18),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                foregroundDecoration: ring
+                    ? BoxDecoration(
+                        borderRadius: BorderRadius.circular(19),
+                        border: Border.all(color: color, width: 3),
+                      )
+                    : null,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: child,
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      final back = Stack(
+        fit: StackFit.expand,
+        children: [
+          const CustomPaint(painter: _CardDots()),
+          Center(
+            child: Text(
+              '?',
+              style: TextStyle(
+                fontFamily: 'Fredoka',
+                fontSize: cardW * 0.26,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      );
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          card(child: back, fill: color, turns: -0.157, shift: -0.08),
+          card(child: back, fill: color, turns: 0.122, shift: 0.08),
+          card(
+            ring: highlight,
+            child: Center(
+              child: FractionallySizedBox(
+                widthFactor: 0.72,
+                heightFactor: 0.72,
+                child: Image.asset(picture,
+                    fit: BoxFit.contain, excludeFromSemantics: true),
+              ),
+            ),
+          ),
+        ],
+      );
+    });
+  }
+}
+
+/// The dotted back of a memory card.
+class _CardDots extends CustomPainter {
+  const _CardDots();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = Colors.white.withOpacity(0.35);
+    for (double y = 7; y < size.height; y += 14) {
+      for (double x = 7; x < size.width; x += 14) {
+        canvas.drawCircle(Offset(x, y), 2, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_CardDots old) => false;
+}
+
+/// One memory card, drawn as a thick 3D card that really turns over.
+///
+/// Chosen from the preview (B): the back is the category's colour with candy
+/// dots, a dashed rim and Tarabay peeking up from the bottom beside a "?";
+/// the face is white with a coloured rim, the picture large, and its name on
+/// a pill. A card has a solid edge under it, so it reads as something to pick
+/// up, and turning it is a real half-turn, not a fade. A found pair goes
+/// green, pops, gets a tick and throws a few stars.
+class _MemoryCard extends StatelessWidget {
+  final Color color;
+  final Widget picture;
+  final String label;
+  final bool faceUp;
+  final bool matched;
+  final double size;
+
+  const _MemoryCard({
+    required this.color,
+    required this.picture,
+    required this.label,
+    required this.faceUp,
+    required this.matched,
+    required this.size,
+  });
+
+  static const Color _green = Color(0xFF22A559);
+  static const Color _greenEdge = Color(0xFF178A45);
+
+  @override
+  Widget build(BuildContext context) {
+    final still = MediaQuery.disableAnimationsOf(context);
+    final card = TweenAnimationBuilder<double>(
+      tween: Tween(end: faceUp ? 1 : 0),
+      duration: Duration(milliseconds: still ? 0 : 550),
+      curve: const Cubic(.3, 1.35, .5, 1),
+      builder: (_, t, __) {
+        final angle = t * pi;
+        final front = angle > pi / 2;
+        return Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.0014)
+            ..rotateY(angle),
+          child: front
+              ? Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.rotationY(pi),
+                  child: _front(),
+                )
+              : _back(),
+        );
+      },
+    );
+
+    // A found pair pops once, gets its tick, and throws six little stars.
+    return TweenAnimationBuilder<double>(
+      key: ValueKey(matched),
+      tween: Tween(begin: 0, end: matched ? 1 : 0),
+      duration: Duration(milliseconds: still ? 0 : 800),
+      builder: (_, v, child) => Transform.scale(
+        scale: 1 + .1 * sin(pi * (v * 1.6).clamp(0.0, 1.0)),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned.fill(child: child!),
+            if (matched)
+              Positioned(
+                right: -6,
+                top: -6,
+                child: Transform.scale(
+                  scale: Curves.elasticOut.transform((v * 2).clamp(0.0, 1.0)),
+                  child: Container(
+                    width: 26,
+                    height: 26,
+                    decoration: BoxDecoration(
+                      color: _green,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 3),
+                      boxShadow: const [
+                        BoxShadow(color: _greenEdge, offset: Offset(0, 3)),
+                      ],
+                    ),
+                    child: const Icon(Icons.check_rounded,
+                        size: 15, color: Colors.white),
+                  ),
+                ),
+              ),
+            if (matched && v > 0 && v < 1)
+              for (int k = 0; k < 6; k++)
+                Positioned.fill(
+                  child: Center(
+                    child: Transform.translate(
+                      offset: Offset(cos(k / 6 * 2 * pi) * size * .5 * v,
+                          sin(k / 6 * 2 * pi) * size * .5 * v),
+                      child: Opacity(
+                        opacity: 1 - v,
+                        child: const Icon(Icons.star_rounded,
+                            size: 16, color: Color(0xFFFFC531)),
+                      ),
+                    ),
+                  ),
+                ),
+          ],
+        ),
+      ),
+      child: card,
+    );
+  }
+
+  double get _radius => (size * .2).clamp(14.0, 26.0);
+
+  List<BoxShadow> _thickness(Color edge, {bool glow = false}) => [
+        BoxShadow(color: edge, offset: const Offset(0, 6)),
+        if (glow) BoxShadow(color: _green.withOpacity(.22), spreadRadius: 4),
+        BoxShadow(
+          color: const Color(0xFF1E1E3C).withOpacity(.18),
+          blurRadius: 16,
+          offset: const Offset(0, 12),
+        ),
+      ];
+
+  Widget _back() {
+    final deep = Color.lerp(color, Colors.black, .3)!;
+    final r = BorderRadius.circular(_radius);
+    return Container(
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: r,
+        boxShadow: _thickness(deep),
+      ),
+      child: ClipRRect(
+        borderRadius: r,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            const CustomPaint(painter: _CandyDots()),
+            Padding(
+              padding: EdgeInsets.all(size * .06),
+              child: CustomPaint(painter: _DashedRim(_radius * .75)),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: -size * .06,
+              child: Center(
+                child: Image.asset(
+                  'assets/images/mascot_wave.webp',
+                  width: size * .78,
+                  excludeFromSemantics: true,
+                ),
+              ),
+            ),
+            Positioned(
+              right: size * .09,
+              top: size * .08,
+              child: Container(
+                width: size * .3,
+                height: size * .3,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(color: deep, offset: const Offset(0, 3))
+                  ],
+                ),
+                child: Text(
+                  '?',
+                  style: TextStyle(
+                    fontFamily: 'Fredoka',
+                    fontWeight: FontWeight.w700,
+                    fontSize: size * .18,
+                    height: 1,
+                    color: deep,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The rim and name pill in the category's colour, deepened when that
+  /// colour is pale: white letters on the mint of Shapes could not be read.
+  Color get _strong => color.computeLuminance() > .45
+      ? Color.lerp(color, Colors.black, .3)!
+      : color;
+
+  Widget _front() {
+    final rim = matched ? _green : _strong;
+    final edge = matched ? _greenEdge : Color.lerp(color, Colors.black, .32)!;
+    return Container(
+      padding: EdgeInsets.all(size * .06),
+      decoration: BoxDecoration(
+        gradient: RadialGradient(
+          center: const Alignment(0, -.2),
+          radius: .9,
+          colors: [
+            Colors.white,
+            Colors.white,
+            Color.lerp(color, Colors.white, .82)!
+          ],
+          stops: const [0, .55, 1],
+        ),
+        borderRadius: BorderRadius.circular(_radius),
+        border: Border.all(color: rim, width: 4),
+        boxShadow: _thickness(edge, glow: matched),
+      ),
+      child: Column(
+        children: [
+          Expanded(child: Center(child: picture)),
+          const SizedBox(height: 3),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: size * .09, vertical: 2),
+            decoration: BoxDecoration(
+              color: rim,
+              borderRadius: BorderRadius.circular(99),
+            ),
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: (size * .11).clamp(10.0, 18.0),
+                fontWeight: FontWeight.w900,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// White candy dots on a card's back, two sizes on offset rows.
+class _CandyDots extends CustomPainter {
+  const _CandyDots();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final big = Paint()..color = Colors.white.withOpacity(.3);
+    final small = Paint()..color = Colors.white.withOpacity(.18);
+    for (double y = 0; y < size.height + 30; y += 30) {
+      for (double x = 0; x < size.width + 30; x += 30) {
+        canvas.drawCircle(Offset(x, y), 6, big);
+        canvas.drawCircle(Offset(x + 15, y + 15), 4, small);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_CandyDots old) => false;
+}
+
+/// The dashed line just inside a card's back.
+class _DashedRim extends CustomPainter {
+  final double radius;
+  const _DashedRim(this.radius);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(.55)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+    final path = Path()
+      ..addRRect(
+          RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(radius)));
+    for (final metric in path.computeMetrics()) {
+      for (double d = 0; d < metric.length; d += 12) {
+        canvas.drawPath(metric.extractPath(d, d + 6), paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashedRim old) => old.radius != radius;
 }

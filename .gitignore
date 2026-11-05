@@ -105,3 +105,6 @@ e-tarabay-*-firebase-adminsdk-*.json
 
 # Windows specific
 NUL
+
+# Golden-test failure images, written by flutter test on a mismatch.
+test/failures/

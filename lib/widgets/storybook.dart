@@ -84,6 +84,19 @@ class StorybookScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The phone's back does what the close button does. It used to pop the
+    // page with no answer, so a poem heard to the end and left that way was
+    // never marked done.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) onClose();
+      },
+      child: _page(context),
+    );
+  }
+
+  Widget _page(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFDFCFF),
       appBar: _header(context),

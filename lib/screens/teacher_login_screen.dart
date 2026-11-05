@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../services/auth_messages.dart';
 import 'package:e_tarabay/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -80,10 +81,16 @@ class _TeacherLoginScreenState extends State<TeacherLoginScreen> {
     // Re-verify the saved password against the current cloud hash in case it
     // was changed on another device. If it no longer matches, drop the saved
     // credential and make them sign in with the new password.
-    final valid = await _authService.verifyTeacherPassword(creds['password']!);
+    final valid = await _authService.checkTeacherPassword(creds['password']!);
     if (!mounted) return;
-    if (valid) {
+    if (valid == true) {
       _enterDashboard();
+    } else if (valid == null) {
+      // Could not reach the check — a slow or missing signal. That says
+      // nothing about the password, so the fingerprint stays set up; it used
+      // to be wiped here, as if the password had been changed.
+      setState(() => _isLoading = false);
+      _showErrorDialog(authMessage(context, const {'code': 'connectionError'}));
     } else {
       await BiometricService.clearCredentials(BiometricService.teacherKey);
       if (!mounted) return;

@@ -7,6 +7,7 @@ import '../data/badge_catalog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_model.dart';
+import '../services/push_scheduler.dart';
 
 class UserProvider extends ChangeNotifier {
   UserProfile? _userProfile;
@@ -17,6 +18,22 @@ class UserProvider extends ChangeNotifier {
   String? _currentStudentId;
   StreamSubscription<DocumentSnapshot>? _profileSubscription;
   bool _hasSyncedFromCloud = false;
+
+  /// Whether this session has read the cloud's drawings yet. Until it has,
+  /// this phone's list is not the whole gallery — on a phone just signed
+  /// into it is empty — and uploading it replaced the cloud's with it: the
+  /// drawings made on the other phone were erased.
+  bool _creationsPulled = false;
+  int _creationsPullRetries = 0;
+
+  /// The drawings a write is out for and not yet answered.
+  String? _creationsInFlight;
+
+  /// Goes up each time drawings arrive from the cloud, so Color Fun knows to
+  /// read its list again.
+  int _creationsVersion = 0;
+  bool get creationsPulled => _creationsPulled;
+  int get creationsVersion => _creationsVersion;
 
   /// How many times [syncFromFirebase] has retried after a failed initial
   /// pull this session — see the retry scheduled at the bottom of that
@@ -75,6 +92,26 @@ class UserProvider extends ChangeNotifier {
   static String appliedResetKeyFor(String? studentId) =>
       'applied_reset_marker_$studentId';
 
+  /// Set when a child signs in on a phone that holds none of their work,
+  /// until the server's first answer. [_appliedResetKey] and
+  /// [_appliedForceLogoutKey] live on the phone, so a new phone had applied
+  /// neither: it restored the child's progress and then carried out every
+  /// reset a teacher had ever made — stars, badges and drawings gone, and
+  /// the loss uploaded — and an old sign-out from the developer threw them
+  /// straight back out. Such a phone takes the markers as already applied.
+  static String freshDeviceKeyFor(String? studentId) =>
+      'fresh_device_$studentId';
+
+  /// Whether an account marker ([lastResetAt], [forceLogoutAt]) should be
+  /// acted on here: only one this phone has not seen, and never an old one
+  /// found on a phone that has nothing of the child's to undo.
+  static bool shouldApplyMarker({
+    required String marker,
+    required String? applied,
+    required bool freshDevice,
+  }) =>
+      applied != marker && !freshDevice;
+
   /// The id of the last developer-dashboard message this device has shown
   /// for the signed-in student — kept per student for the same reason
   /// [_appliedResetKey] is: a shared device can hold more than one child's
@@ -131,6 +168,16 @@ class UserProvider extends ChangeNotifier {
     'tandaan': ['tandaan_'],
   };
 
+  /// Keys that belong to this device only and never go to the cloud backup.
+  ///
+  /// A colouring page's unsaved draft (its strokes, fill and card picture)
+  /// starts with `kulay_` like real progress, so it was sent up and merged
+  /// back down. Once the child saved or cleared the page, the next merge
+  /// brought the old card picture back: "in progress" with colours on the
+  /// card, and an empty page when opened. The pictures are also big enough
+  /// to push the student's record towards Firestore's size limit.
+  static bool isDeviceOnlyKey(String key) => key.startsWith('kulay_autosave_');
+
   UserProfile? get userProfile => _userProfile;
   bool get hasUserProfile => _userProfile != null;
   bool get isInitialized => _isInitialized;
@@ -165,10 +212,13 @@ class UserProvider extends ChangeNotifier {
       _isAccountDeleted = false; // Reset when setting new user
       _prefs?.setString('session_student_id', id!);
       _hasSyncedFromCloud = false; // Reset for new user
+      _creationsPulled = false;
+      _creationsPullRetries = 0;
       _startProfileListener();
     } else {
       _prefs?.remove('session_student_id');
       _hasSyncedFromCloud = false;
+      _creationsPulled = false;
       _stopProfileListener();
     }
     notifyListeners();
@@ -184,9 +234,21 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Store the LRN the student typed at login locally (device only) so the
-  /// certificate can display it. This is never synced to the cloud as
-  /// plaintext (the cloud only keeps the hashed `lrnHash`).
+  /// Store the child's Student Number (DC-2026-0001) from their record,
+  /// locally (device only), so the certificate can display it. Not the
+  /// password typed at login: that starts out as the same number but the
+  /// parent can change it. Never synced back from this profile.
+  /// The Student Number to keep after a profile arrives from the cloud: the
+  /// record's own, else the one this phone already had.
+  static String studentNumberFor({
+    required Object? record,
+    required String? kept,
+  }) {
+    final fromRecord = '${record ?? ''}'.trim();
+    if (fromRecord.isNotEmpty) return fromRecord;
+    return (kept ?? '').trim();
+  }
+
   Future<void> setSessionLrn(String lrn) async {
     if (_userProfile == null || lrn.trim().isEmpty) return;
     _userProfile!.lrn = lrn.trim();
@@ -195,10 +257,13 @@ class UserProvider extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    // What is still waiting goes first, while it is known whose it is.
+    await _pushes.flush();
     _currentStudentId = null;
     _currentRole = null;
     _userProfile = null;
     _hasSyncedFromCloud = false;
+    _creationsPulled = false;
     _isAccountDeleted = false;
     _stopProfileListener();
 
@@ -259,6 +324,12 @@ class UserProvider extends ChangeNotifier {
               // silently undo it.
               final previous = _userProfile;
               _userProfile = UserProfile.fromJson(profileData);
+              // The cloud's profile never carries the Student Number (the
+              // push leaves it out), so taking it whole blanked the number
+              // seconds after sign-in, and the certificate printed an empty
+              // line. The record has it at its root.
+              _userProfile!.lrn =
+                  studentNumberFor(record: data['lrn'], kept: previous?.lrn);
               if (_hasSyncedFromCloud && previous != null) {
                 _userProfile!.stars = previous.stars;
                 _userProfile!.lessonsCompleted = previous.lessonsCompleted;
@@ -286,6 +357,7 @@ class UserProvider extends ChangeNotifier {
                 _userProfile!.certificateAwardedAt =
                     previous.certificateAwardedAt;
               } else if (_isInitialized) {
+                keepLocalClaims(_userProfile!, previous);
                 // Before the first pull lands, what arrives here can be
                 // Firestore's cached copy of the document from an earlier
                 // session — older than what this device has already
@@ -352,8 +424,7 @@ class UserProvider extends ChangeNotifier {
               final acknowledged =
                   prefs.getString(_acknowledgedAdminMessageKey);
               // Read on any device counts — see acknowledgeAdminMessage.
-              final ackedInCloud =
-                  data['adminMessageAckId']?.toString() == id;
+              final ackedInCloud = data['adminMessageAckId']?.toString() == id;
               if (acknowledged != id && !ackedInCloud) {
                 _pendingAdminMessageId = id;
                 _pendingAdminMessageText = text;
@@ -374,14 +445,23 @@ class UserProvider extends ChangeNotifier {
           // reset marker below — a marker this device applies once, keyed
           // per student so a second child on this device isn't kicked by a
           // marker meant for the first.
+          final markerPrefs = _prefs ?? await SharedPreferences.getInstance();
+          _prefs ??= markerPrefs;
+          final freshKey = freshDeviceKeyFor(_currentStudentId);
+          final freshDevice = markerPrefs.getBool(freshKey) == true;
+
           final forceLogoutMarker = data['forceLogoutAt']?.toString();
           if (forceLogoutMarker != null && forceLogoutMarker.isNotEmpty) {
-            final prefs = _prefs ?? await SharedPreferences.getInstance();
-            _prefs ??= prefs;
+            final prefs = markerPrefs;
             final applied = prefs.getString(_appliedForceLogoutKey);
             if (applied != forceLogoutMarker) {
               await prefs.setString(_appliedForceLogoutKey, forceLogoutMarker);
-              _forceLogoutPending = true;
+              if (shouldApplyMarker(
+                  marker: forceLogoutMarker,
+                  applied: applied,
+                  freshDevice: freshDevice)) {
+                _forceLogoutPending = true;
+              }
             }
           }
 
@@ -403,14 +483,21 @@ class UserProvider extends ChangeNotifier {
             final prefs = _prefs ?? await SharedPreferences.getInstance();
             _prefs ??= prefs;
             final appliedMarker = prefs.getString(_appliedResetKey);
-            if (appliedMarker != resetMarker) {
+            if (shouldApplyMarker(
+                marker: resetMarker,
+                applied: appliedMarker,
+                freshDevice: freshDevice)) {
               // A teacher who reset one module did not ask for the child's
               // stars, badges and certificates to go with it.
               await _clearLocalStudentProgressKeys(
                   scope: data['lastResetScope']?.toString() ?? 'all');
-              await prefs.setString(_appliedResetKey, resetMarker);
             }
+            await prefs.setString(_appliedResetKey, resetMarker);
           }
+
+          // The server has answered for this phone: from here a reset or a
+          // sign-out is a new one, and is carried out.
+          if (freshDevice && fromServer) await markerPrefs.remove(freshKey);
 
           notifyListeners();
         }
@@ -434,6 +521,9 @@ class UserProvider extends ChangeNotifier {
         _hasSyncedFromCloud = true;
         _syncRetryCount = 0;
         debugPrint('Back online: flushing offline progress.');
+        // Not every sign-in runs syncFromFirebase (a parent switching
+        // children does not), and the drawings come only from this read.
+        unawaited(pullCreationsFromCloud());
         unawaited(_syncToFirebase());
       }
     }, onError: (Object e) {
@@ -607,6 +697,12 @@ class UserProvider extends ChangeNotifier {
       await _initializeBoxes();
       _startConfigListener();
       _watchSignIn();
+      // Hidden or closed: send what is waiting, so nothing sits on the
+      // phone until the child plays again.
+      _lifecycle = AppLifecycleListener(
+        onHide: () => _pushes.flush(),
+        onDetach: () => _pushes.flush(),
+      );
     } catch (e) {
       debugPrint('CRITICAL: UserProvider initialization failed: $e');
     }
@@ -874,10 +970,8 @@ class UserProvider extends ChangeNotifier {
     final id = _currentStudentId;
     if (id == null) return;
     try {
-      unawaited(FirebaseFirestore.instance
-          .collection('students')
-          .doc(id)
-          .update({
+      unawaited(
+          FirebaseFirestore.instance.collection('students').doc(id).update({
         'avatar': preset,
         'profile.avatar': preset,
         'avatarChosen': true,
@@ -954,7 +1048,11 @@ class UserProvider extends ChangeNotifier {
         }
 
         if (mergedProfileData.isNotEmpty) {
+          final local = _userProfile;
           _userProfile = UserProfile.fromJson(mergedProfileData);
+          // The profile here is this same child's (another child's is
+          // cleared at sign-in): what they claimed offline stays.
+          keepLocalClaims(_userProfile!, local);
           await _profileBox.put('currentUser', _userProfile!.toJson());
         }
 
@@ -1000,10 +1098,10 @@ class UserProvider extends ChangeNotifier {
         await checkAndAwardCertificates(allowRevoke: false);
         _syncToFirebase();
 
-        // Restore Creations
-        if (data.containsKey('creations') && data['creations'] is List) {
-          await _progressBox.put('coloring_creations', data['creations']);
-        }
+        // Saved by a version from before the drawings had their own place.
+        await pullCreationsFromCloud(
+            legacy:
+                data['creations'] is List ? data['creations'] as List : null);
 
         _hasSyncedFromCloud = true;
         _syncRetryCount = 0;
@@ -1070,6 +1168,18 @@ class UserProvider extends ChangeNotifier {
     await _progressBox.clear();
     await _clearProgressPrefs();
     _initProgressBox();
+    // Whatever arrives next — the cloud's copy, or a child starting fresh —
+    // is already in today's layouts. The version marks went with the box,
+    // and without them the next launch re-ran the old migrations on that
+    // data: the restored nine song slots were read as the old fourteen,
+    // shifted and cut, and finished songs moved to the wrong songs or were
+    // lost.
+    await _progressBox.put(
+        _magbasaKantaLayoutVersionKey, _magbasaKantaLayoutVersion);
+    await _progressBox.put(_starVersionKey, _starWeightingVersion);
+    // Nothing here is anyone's unsent work any more: it was kept aside
+    // first (see startStudentSession) or it is gone with the account.
+    await _prefs?.setBool(_unpushedKey, false);
     notifyListeners();
   }
 
@@ -1078,21 +1188,172 @@ class UserProvider extends ChangeNotifier {
   /// (also handles a teacher deleting an account and enrolling a fresh one).
   Future<void> startStudentSession(String id) async {
     await _ensureInitialized();
-    final prevId = _prefs?.getString('session_student_id');
-    if (prevId != null && prevId != id) {
+    // Whose work is on this device. This used to be read from the session,
+    // which logout() clears: so after one child logged out, the next child
+    // to sign in was taken for the same one, kept their stars, and the sync
+    // carried them up into the new child's record.
+    // Read even if this provider's own start-up has not set _prefs yet: a
+    // null here was taken for "nobody's work", and the last child's unsent
+    // work was cleared instead of kept.
+    final prefs = _prefs ?? await SharedPreferences.getInstance();
+    final owner = prefs.getString(_localOwnerKey) ??
+        prefs.getString('session_student_id');
+    if (shouldClearLocalData(owner: owner, newId: id)) {
+      // What the last child did here that never reached the cloud — played
+      // offline, then handed over — is kept under their name instead of
+      // going with the rest. It used to be wiped: the upload waits for the
+      // first pull from the cloud, which never came while offline.
+      if (owner != null) await _stashUnpushedWork(owner);
       await clearLocalData();
+      // Nothing of this child's is left here unless some was kept for them:
+      // everything they will have comes from the cloud, which already shows
+      // every reset made so far.
+      bool keptForThem = false;
+      try {
+        keptForThem = (await Hive.openBox(_stashBoxName)).containsKey(id);
+      } catch (_) {}
+      if (!keptForThem) await prefs.setBool(freshDeviceKeyFor(id), true);
+      // And this child's own, if they were the one handed over before.
+      await _restoreStashedWork(id);
     }
+    await prefs.setString(_localOwnerKey, id);
     setCurrentStudentId(id);
   }
+
+  /// Set while there is work on this device the cloud has not been sent.
+  static const String _unpushedKey = 'local_unpushed';
+
+  /// Where unsent work waits for its child to sign in again.
+  static const String _stashBoxName = 'stashedWork';
+
+  /// Keeps [owner]'s progress, profile and drawings aside when it has not
+  /// been sent to the cloud yet. Kept 90 days.
+  Future<void> _stashUnpushedWork(String owner) async {
+    final prefs = _prefs ?? await SharedPreferences.getInstance();
+    if (prefs.getBool(_unpushedKey) != true) return;
+    try {
+      final stash = await Hive.openBox(_stashBoxName);
+      final prefixes = ['mat_', ...moduleKeyPrefixes.values.expand((p) => p)];
+      await stash.put(owner, {
+        'hive': {
+          for (final k in _progressBox.keys) '$k': _progressBox.get(k),
+        },
+        'prefs': {
+          for (final k in prefs.getKeys())
+            if (prefixes.any(k.startsWith) && !isDeviceOnlyKey(k))
+              k: prefs.get(k),
+        },
+        'profile': _profileBox.get('currentUser'),
+        'savedAt': DateTime.now().toIso8601String(),
+      });
+      final old = DateTime.now().subtract(const Duration(days: 90));
+      for (final k in stash.keys.toList()) {
+        final at = DateTime.tryParse('${(stash.get(k) as Map?)?['savedAt']}');
+        if (at != null && at.isBefore(old)) await stash.delete(k);
+      }
+      debugPrint('Unsent work of $owner kept until they sign in again');
+    } catch (e) {
+      debugPrint('Could not keep unsent work: $e');
+    }
+  }
+
+  /// Puts [id]'s kept work back, merged into what is here, and marks it to
+  /// be sent: the pull that follows merges the cloud's side in, and the next
+  /// push carries both up.
+  Future<void> _restoreStashedWork(String id) async {
+    try {
+      final stash = await Hive.openBox(_stashBoxName);
+      final saved = stash.get(id);
+      if (saved is! Map) return;
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      final hive = (saved['hive'] as Map?) ?? const {};
+      for (final e in hive.entries) {
+        final key = '${e.key}';
+        await _progressBox.put(
+            key, _mergeHiveValue(e.value, _progressBox.get(key)));
+      }
+      final kept = (saved['prefs'] as Map?) ?? const {};
+      for (final e in kept.entries) {
+        final key = '${e.key}';
+        final v = _mergeHiveValue(e.value, prefs.get(key));
+        if (v is bool) {
+          await prefs.setBool(key, v);
+        } else if (v is int) {
+          await prefs.setInt(key, v);
+        } else if (v is double) {
+          await prefs.setDouble(key, v);
+        } else if (v is String) {
+          await prefs.setString(key, v);
+        } else if (v is List) {
+          await prefs.setStringList(key, [for (final s in v) '$s']);
+        }
+      }
+      if (saved['profile'] != null) {
+        await _profileBox.put('currentUser', saved['profile']);
+        _loadUserProfile();
+      }
+      await prefs.setBool(_unpushedKey, true);
+      await stash.delete(id);
+      debugPrint('Unsent work of $id put back');
+    } catch (e) {
+      debugPrint('Could not put back unsent work: $e');
+    }
+  }
+
+  /// Keeps what this device recorded about medals and certificates when a
+  /// profile from the cloud replaces the one here before the two have met.
+  ///
+  /// Before the first pull lands, the copy that arrives can be Firestore's
+  /// cache from an earlier session. Taking it whole took back the medals a
+  /// child claimed offline, and the certificate made of them. Claims only
+  /// grow here; withdrawing one is the badge check's job, which runs after.
+  @visibleForTesting
+  static void keepLocalClaims(UserProfile into, UserProfile? local) {
+    if (local == null) return;
+    for (final e in local.achievements.entries) {
+      if ((into.achievements[e.key] ?? 0) < e.value) {
+        into.achievements = {...into.achievements, e.key: e.value};
+      }
+    }
+    into.claimedBadges =
+        {...into.claimedBadges, ...local.claimedBadges}.toList();
+    into.badgeClaimedAt = {...local.badgeClaimedAt, ...into.badgeClaimedAt};
+    into.certificates = {...into.certificates, ...local.certificates}.toList();
+    into.certificateAwardedAt = {
+      ...local.certificateAwardedAt,
+      ...into.certificateAwardedAt,
+    };
+    if (local.lessonsCompleted > into.lessonsCompleted) {
+      into.lessonsCompleted = local.lessonsCompleted;
+    }
+  }
+
+  /// Which child the progress kept on this device belongs to. Unlike the
+  /// session, it outlives a logout.
+  static const String _localOwnerKey = 'local_progress_owner';
+
+  /// Whether signing [newId] in has to clear the progress on this device
+  /// first: whenever it is not known to be theirs.
+  static bool shouldClearLocalData({
+    required String? owner,
+    required String newId,
+  }) =>
+      owner != newId;
 
   /// Full wipe + logout — used when the teacher has deleted the account so no
   /// residual local progress remains for the next (new) account.
   Future<void> logoutAndClearData() async {
     _stopProfileListener();
+    // A pause or sign-out from the developer dashboard: what is waiting goes
+    // up first, and what cannot go up yet is kept for the child's return.
+    await _pushes.flush();
+    final owner = _prefs?.getString(_localOwnerKey) ?? _currentStudentId;
+    if (owner != null && !_isAccountDeleted) await _stashUnpushedWork(owner);
     await clearLocalData();
     _currentStudentId = null;
     _currentRole = null;
     _hasSyncedFromCloud = false;
+    _creationsPulled = false;
     _isAccountDeleted = false;
     _isDisabledByDev = false;
     _forceLogoutPending = false;
@@ -1163,6 +1424,194 @@ class UserProvider extends ChangeNotifier {
   /// not finished it yet. A replay replaces this rather than adding to it.
   int matematikaLevelStars(int level) =>
       _progressBox.get('mat_level_${level}_stars') as int? ?? 0;
+
+  /// Reads the cloud's drawings into this phone's, merged, not replaced:
+  /// replacing this phone's list with the cloud's thin copy on every sign-in
+  /// left saved drawings to reopen as a blurred copy, or blank.
+  ///
+  /// It used to be one try with four seconds to answer, at the very end of
+  /// the sign-in pull, and a miss was only logged — so on a slow network the
+  /// other phone's drawings never came, while its check marks (which travel
+  /// with the rest of the progress) did: pages "done" with nothing on them.
+  /// Now a miss is retried, and nothing uploads this phone's drawings until
+  /// the read has worked (see [_creationsPulled]).
+  Future<bool> pullCreationsFromCloud({List? legacy}) async {
+    final id = _currentStudentId;
+    if (id == null) return false;
+    if (_creationsPulled) return true;
+    List? cloud;
+    try {
+      final extra = await FirebaseFirestore.instance
+          .collection('students')
+          .doc(id)
+          .collection('extra')
+          .doc('creations')
+          .get(const GetOptions(source: Source.serverAndCache))
+          .timeout(const Duration(seconds: 10));
+      if (id != _currentStudentId) return false;
+      final list = extra.data()?['list'];
+      if (list is List) cloud = list;
+    } catch (e) {
+      debugPrint('Creations not fetched: $e');
+      if (_creationsPullRetries < _maxSyncRetries) {
+        _creationsPullRetries++;
+        final delay = Duration(seconds: 4 * _creationsPullRetries);
+        unawaited(Future.delayed(delay, () {
+          if (id == _currentStudentId && !_creationsPulled) {
+            pullCreationsFromCloud(legacy: legacy);
+          }
+        }));
+      }
+      return false;
+    }
+    cloud ??= legacy;
+    if (cloud != null) {
+      await _progressBox.put(
+          'coloring_creations',
+          mergeRestoredCreations(
+              _progressBox.get('coloring_creations'), cloud));
+    }
+    _creationsPulled = true;
+    _creationsPullRetries = 0;
+    // After the drawings, so it can tell a race car colored since from the
+    // soda it replaced.
+    await _removeSodaPage();
+    _creationsVersion++;
+    notifyListeners();
+    return true;
+  }
+
+  /// The drawings as the cloud keeps them: the small picture and what is
+  /// needed to place it, newest first, one per page, at most 15.
+  ///
+  /// One per page because each save of a page is its own drawing: a child
+  /// who colored the same page five times used five of the fifteen places,
+  /// and other pages' drawings were left off the cloud. There are only ten
+  /// pages, so now every page's latest fits.
+  static List<Map<String, dynamic>> creationsForCloud(dynamic local) {
+    final all = <Map<String, dynamic>>[
+      if (local is List)
+        for (final item in local)
+          if (item is Map)
+            {
+              'name': item['name'] ?? 'My Artwork',
+              'date': item['date'] ?? 0,
+              'stars': item['stars'],
+              'durationSeconds': item['durationSeconds'] ?? 0,
+              'sourcePagePath': item['sourcePagePath'] ?? '',
+              'base64Image': item['base64Image'] ?? '',
+            }
+    ]..sort((a, b) => (b['date'] as int).compareTo(a['date'] as int));
+    final seenPages = <String>{};
+    final kept = <Map<String, dynamic>>[];
+    for (final c in all) {
+      final page = '${c['sourcePagePath']}';
+      // A drawing saved before pages were recorded can't be matched to one.
+      if (page.isNotEmpty && !seenPages.add(page)) continue;
+      kept.add(c);
+      if (kept.length == 15) break;
+    }
+    return kept;
+  }
+
+  /// Which drawings, at which save, rated how — enough to tell whether the
+  /// cloud's copy of the drawings is out of date without sending them.
+  static String creationsSignature(List<Map<String, dynamic>> creations) =>
+      creations
+          .map((c) => '${c['date']}:${c['sourcePagePath']}:${c['stars']}:'
+              '${'${c['base64Image'] ?? ''}'.length}')
+          .join('|');
+
+  /// This phone's creations with the cloud's merged in, for a sign-in.
+  ///
+  /// This phone's copy of a page always stays: the cloud keeps only a
+  /// small picture of each, not its strokes, colors or file. The cloud's is
+  /// added only for a page this phone has none of. An updated drawing is
+  /// saved under a new time, so matching by time alone would bring its
+  /// older version back. Pages the app no longer has are left out.
+  static List<dynamic> mergeRestoredCreations(dynamic local, List cloud) {
+    final merged = <dynamic>[if (local is List) ...local];
+    final haveDates = <dynamic>{};
+    final havePages = <String>{};
+    for (final c in merged) {
+      if (c is! Map) continue;
+      haveDates.add(c['date']);
+      final page = '${c['sourcePagePath'] ?? ''}';
+      if (page.isNotEmpty) havePages.add(page);
+    }
+    for (final c in cloud) {
+      if (c is! Map || haveDates.contains(c['date'])) continue;
+      final page = '${c['sourcePagePath'] ?? ''}';
+      if (page.isNotEmpty && havePages.contains(page)) continue;
+      merged.add(c);
+    }
+    return merged
+        .where((c) => !(c is Map && isRemovedColoringCreation(c)))
+        .toList();
+  }
+
+  /// Whether [creation] was colored on the soda can, which the app no
+  /// longer has (2026-10-19): it is deleted wherever it turns up, saved on
+  /// this phone or restored from the cloud.
+  static bool isRemovedColoringCreation(Map creation) {
+    const soda = 'assets/images/paint9.png';
+    final source = '${creation['sourcePagePath'] ?? ''}';
+    if (source == soda || '${creation['thumbnailPath'] ?? ''}' == soda) {
+      return true;
+    }
+    // Saved before creations recorded their page: known only by name.
+    final name = '${creation['name'] ?? ''}';
+    return source.isEmpty && (name == 'Soda Pop' || name == 'Soda');
+  }
+
+  /// The soda can's coloring page was replaced by a race car, and the
+  /// soda is removed for good, once per child on this phone.
+  ///
+  /// Its saved creations go, and its check mark: the race car sits in the
+  /// same place (Toys, second page) and would otherwise show as finished
+  /// before it was ever colored. The cloud copy of that mark is overwritten
+  /// directly, because the backup merges a finished flag over an unfinished
+  /// one and would hand it straight back. Kept on this phone only (not a
+  /// backed-up key), so every phone the child uses clears its own copy.
+  Future<void> _removeSodaPage() async {
+    final id = _currentStudentId;
+    if (id == null) return;
+    final doneKey = 'repair_soda_removed_$id';
+    if (_prefs?.getBool(doneKey) == true) return;
+
+    final raw = _progressBox.get('coloring_creations');
+    var raceCarColored = false;
+    if (raw is List) {
+      final kept = raw
+          .where((c) => !(c is Map && isRemovedColoringCreation(c)))
+          .toList();
+      if (kept.length != raw.length) {
+        await _progressBox.put('coloring_creations', kept);
+      }
+      const raceCar = 'assets/images/paint_racecar.png';
+      raceCarColored = kept.any((c) =>
+          c is Map &&
+          (c['sourcePagePath'] == raceCar || c['thumbnailPath'] == raceCar));
+    }
+
+    // Run on every new phone the child signs in on, after the drawings have
+    // come down — and it was taking the check mark off a race car the child
+    // had colored since, for every phone at once.
+    const mark = 'kulay_page_Toys_1';
+    if (raceCarColored) {
+      await _prefs?.setBool(doneKey, true);
+      return;
+    }
+    await _progressBox.put(mark, false);
+    await _prefs?.setBool(mark, false);
+    unawaited(FirebaseFirestore.instance
+        .collection('students')
+        .doc(id)
+        .update({'rawProgress.$mark': false}).catchError(
+            (Object e) => debugPrint('Soda removal: cloud write failed: $e')));
+    await _updateKulayTotalProgress();
+    await _prefs?.setBool(doneKey, true);
+  }
 
   /// Gives finished Matematika levels back a rating when they have none.
   ///
@@ -1818,6 +2267,23 @@ class UserProvider extends ChangeNotifier {
       if (_prefs != null) {
         await _prefs!.setBool(key, completed);
       }
+      // Un-finishing a page (its drawing deleted) is written to the cloud
+      // directly, first. The push below merges the cloud's copy in before
+      // sending, and that merge lets a finished flag beat an unfinished one,
+      // so the deleted page came straight back ticked. Firestore shows this
+      // write in its local copy at once, so the merge then sees it too.
+      final id = _currentStudentId;
+      if (!completed && id != null) {
+        try {
+          unawaited(FirebaseFirestore.instance
+              .collection('students')
+              .doc(id)
+              .update({'rawProgress.$key': false}).catchError((Object e) =>
+                  debugPrint('Un-finish $key: cloud write failed: $e')));
+        } catch (e) {
+          debugPrint('Un-finish $key: cloud unavailable: $e');
+        }
+      }
     } else {
       await _progressBox.put('kulay_$activity', completed);
       // Also update prefs if it's one of the base activities
@@ -1853,13 +2319,59 @@ class UserProvider extends ChangeNotifier {
 
     // One finished picture, one star — see the magbasa award for why this
     // is not three.
-    if (totalCompleted > currentScore) {
-      await addStars(1);
+    //
+    // The star belongs to the picture, once. Clearing a finished picture
+    // takes it out of My Creations and unticks it, but the star the child
+    // was given for it stays; finishing it again gives no second one. Each
+    // page that has been paid for carries a flag, and only a page without
+    // one earns.
+    final prefs = _prefs;
+    if (prefs == null) {
+      if (totalCompleted > currentScore) await addStars(1);
+      return;
     }
+    if (prefs.getBool(_kulayStarredMarker) != true) {
+      // First run with flags: everything finished so far was paid for under
+      // the old count, so it is flagged without paying again — only a rise
+      // over that count is new.
+      for (var cat in totals.keys) {
+        for (int i = 0; i < totals[cat]!; i++) {
+          if (_kulayPageDone(cat, i)) {
+            await prefs.setBool(kulayStarredKey(cat, i), true);
+          }
+        }
+      }
+      await prefs.setBool(_kulayStarredMarker, true);
+      if (totalCompleted > currentScore) await addStars(1);
+      return;
+    }
+    int earned = 0;
+    for (var cat in totals.keys) {
+      for (int i = 0; i < totals[cat]!; i++) {
+        final key = kulayStarredKey(cat, i);
+        if (_kulayPageDone(cat, i) && prefs.getBool(key) != true) {
+          await prefs.setBool(key, true);
+          earned++;
+        }
+      }
+    }
+    if (earned > 0) await addStars(earned);
   }
+
+  /// Marks that every finished page has been given its star flag.
+  static const String _kulayStarredMarker = 'kulay_starred_v1';
+
+  /// Set once a page has given its star, and never cleared by un-finishing.
+  static String kulayStarredKey(String category, int index) =>
+      'kulay_starred_${category}_$index';
+
+  bool _kulayPageDone(String cat, int i) =>
+      _progressBox.get('kulay_page_${cat}_$i') == true ||
+      (_prefs?.getBool('kulay_page_${cat}_$i') == true);
 
   Map<String, dynamic> getKulayProgress() {
     int totalCompleted = 0;
+    int starred = 0;
 
     // Page completions (check both for resilience)
     final totals = {'Animals': 3, 'Flowers': 2, 'Fruits': 2, 'Toys': 2};
@@ -1884,6 +2396,10 @@ class UserProvider extends ChangeNotifier {
           totalCompleted++;
           doneForCat.add(i);
         }
+        // A page cleared after it was finished keeps the star it gave.
+        if (done || _prefs?.getBool(kulayStarredKey(cat, i)) == true) {
+          starred++;
+        }
       }
       pageDone[cat] = doneForCat;
     }
@@ -1894,8 +2410,9 @@ class UserProvider extends ChangeNotifier {
       // Travels with the record so a report opened for another child shows
       // their drawings and not this device's.
       'totalCreations': _prefs?.getInt('kulay_total_creations') ?? 0,
-      // Colouring has no wrong answer, so each finished page is worth 3.
-      'stars': totalCompleted,
+      // Colouring has no wrong answer, so each finished page is worth one —
+      // and stays worth it after the picture is cleared.
+      'stars': starred,
       'possibleStars': kulayStarCeiling,
       'pageDone': pageDone,
     };
@@ -2495,7 +3012,7 @@ class UserProvider extends ChangeNotifier {
     // state for the same reason, and switching would be just as unsafe.
     if (!_hasSyncedFromCloud) return false;
 
-    await _syncToFirebase();
+    await _pushes.flush(force: true);
 
     try {
       // One small write to the same document, awaited. Firestore delivers a
@@ -2548,6 +3065,57 @@ class UserProvider extends ChangeNotifier {
     return local;
   }
 
+  /// The `rawProgress` fields one push writes: each key whose value differs
+  /// from the cloud's copy [cloudRaw] (every key, when there is no copy to
+  /// compare with), and a delete for each device-only draft the cloud still
+  /// holds from before drafts were kept off it.
+  @visibleForTesting
+  static Map<Object, Object?> rawProgressUpdates(
+      Map<String, dynamic> local, Object? cloudRaw) {
+    final cloud = cloudRaw is Map ? cloudRaw : null;
+    final out = <Object, Object?>{};
+    for (final e in local.entries) {
+      if (cloud != null &&
+          cloud.containsKey(e.key) &&
+          sameStoredValue(cloud[e.key], e.value)) {
+        continue;
+      }
+      out[FieldPath(['rawProgress', e.key])] = e.value;
+    }
+    if (cloud != null) {
+      for (final k in cloud.keys) {
+        if (isDeviceOnlyKey('$k')) {
+          out[FieldPath(['rawProgress', '$k'])] = FieldValue.delete();
+        }
+      }
+    }
+    return out;
+  }
+
+  /// Whether two stored values hold the same thing, looking inside lists
+  /// and maps.
+  @visibleForTesting
+  static bool sameStoredValue(dynamic a, dynamic b) {
+    if (a is List && b is List) {
+      if (a.length != b.length) return false;
+      for (int i = 0; i < a.length; i++) {
+        if (!sameStoredValue(a[i], b[i])) return false;
+      }
+      return true;
+    }
+    if (a is Map && b is Map) {
+      if (a.length != b.length) return false;
+      for (final k in a.keys) {
+        if (!b.containsKey(k) && !b.containsKey('$k')) return false;
+        if (!sameStoredValue(a[k], b.containsKey(k) ? b[k] : b['$k'])) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return a == b;
+  }
+
   /// Merges every key under the cloud document's `rawProgress` into local
   /// storage — Hive for the compound per-module structures, SharedPreferences
   /// for the flat per-activity flags and running totals — using
@@ -2564,9 +3132,18 @@ class UserProvider extends ChangeNotifier {
     for (final entry in rawProgress.entries) {
       final key = entry.key;
       final cloudVal = entry.value;
+      // A draft sent up before drafts were kept local: never brought back.
+      if (isDeviceOnlyKey(key)) continue;
 
-      final mergedHive = _mergeHiveValue(_progressBox.get(key), cloudVal);
-      await _progressBox.put(key, mergedHive);
+      // Written only when the merge changed something. Every push merges the
+      // whole cloud copy back in, and putting each of a few hundred keys
+      // again — unchanged — had Hive rewrite its whole file on nearly every
+      // push, the drawings in it included.
+      final current = _progressBox.get(key);
+      final mergedHive = _mergeHiveValue(current, cloudVal);
+      if (!sameStoredValue(current, mergedHive)) {
+        await _progressBox.put(key, mergedHive);
+      }
 
       final merged = _mergeHiveValue(prefs.get(key), cloudVal);
       if (merged is bool) {
@@ -2583,7 +3160,28 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  /// Asks for this child's record to go to the cloud — batched: see
+  /// [PushScheduler]. Everything is already saved on the phone; this only
+  /// decides when the cloud copy catches up.
   Future<void> _syncToFirebase() async {
+    if (_currentStudentId == null) return;
+    // Cleared once the push is handed to Firestore, which keeps it through
+    // a restart and sends it when it can.
+    await _prefs?.setBool(_unpushedKey, true);
+    _pushes.schedule();
+  }
+
+  /// Sends the waiting changes now (leaving the app, signing out).
+  Future<void> flushSync() => _pushes.flush();
+
+  /// For a screen that saved progress itself rather than through one of
+  /// the update methods here, so it still goes to the cloud.
+  Future<void> requestSync() => _syncToFirebase();
+
+  late final PushScheduler _pushes = PushScheduler(_pushToCloudNow);
+  AppLifecycleListener? _lifecycle;
+
+  Future<void> _pushToCloudNow() async {
     await _ensureInitialized();
     if (_currentStudentId == null || _userProfile == null) return;
 
@@ -2601,12 +3199,13 @@ class UserProvider extends ChangeNotifier {
       // the push below deliberately never does either; a device that has
       // nothing cached yet (its very first sync) has nothing to merge, and
       // this is simply skipped.
+      Map<String, dynamic>? cachedData;
       try {
         final cached = await FirebaseFirestore.instance
             .collection('students')
             .doc(_currentStudentId)
             .get(const GetOptions(source: Source.cache));
-        final cachedData = cached.data();
+        cachedData = cached.data();
         if (cachedData != null) {
           await _mergeRawProgressFromCloud(cachedData);
           _userProfile!.stars = recountStarsFromProgress();
@@ -2635,9 +3234,9 @@ class UserProvider extends ChangeNotifier {
         'mat_', // legacy Matematika prefix, kept for older installs
         ...moduleKeyPrefixes.values.expand((p) => p),
       ];
-      final keys = prefs
-          .getKeys()
-          .where((k) => backupPrefixes.any((p) => k.startsWith(p)));
+      // Drafts stay out; any sent up by an older version are deleted below.
+      final keys = prefs.getKeys().where((k) =>
+          backupPrefixes.any((p) => k.startsWith(p)) && !isDeviceOnlyKey(k));
 
       final Map<String, dynamic> rawProgressData = {};
       for (var key in keys) {
@@ -2661,7 +3260,10 @@ class UserProvider extends ChangeNotifier {
       // Matematika's per-level ratings, for installs that earned them before
       // they were mirrored into SharedPreferences.
       for (int lvl = 0; lvl < matematikaLevelCount; lvl++) {
-        for (final key in ['mat_level_${lvl}_stars', 'mat_level_${lvl}_score']) {
+        for (final key in [
+          'mat_level_${lvl}_stars',
+          'mat_level_${lvl}_score'
+        ]) {
           final val = _progressBox.get(key);
           if (val is int && val > (rawProgressData[key] as int? ?? 0)) {
             rawProgressData[key] = val;
@@ -2669,27 +3271,8 @@ class UserProvider extends ChangeNotifier {
         }
       }
 
-      List<Map<String, dynamic>> cloudCreations = [];
-      final rawCreations = _progressBox.get('coloring_creations');
-      if (rawCreations is List) {
-        for (var item in rawCreations) {
-          if (item is Map) {
-            cloudCreations.add({
-              'name': item['name'] ?? 'My Artwork',
-              'date': item['date'] ?? 0,
-              'stars': item['stars'],
-              'durationSeconds': item['durationSeconds'] ?? 0,
-              'sourcePagePath': item['sourcePagePath'] ?? '',
-              'base64Image': item['base64Image'] ?? '',
-            });
-          }
-        }
-        cloudCreations
-            .sort((a, b) => (b['date'] as int).compareTo(a['date'] as int));
-        if (cloudCreations.length > 15) {
-          cloudCreations = cloudCreations.sublist(0, 15);
-        }
-      }
+      final cloudCreations =
+          creationsForCloud(_progressBox.get('coloring_creations'));
 
       // Send it without waiting for the server to answer.
       //
@@ -2704,16 +3287,53 @@ class UserProvider extends ChangeNotifier {
       // The write itself needs no supervision. Firestore stores it locally
       // and delivers it on its own as soon as the network is back, which is
       // exactly the behaviour we want: play now, sync later.
-      unawaited(FirebaseFirestore.instance
+      final studentDoc = FirebaseFirestore.instance
           .collection('students')
-          .doc(_currentStudentId)
-          .update({
+          .doc(_currentStudentId);
+      unawaited(studentDoc.update(<Object, Object?>{
         'progress': progressData,
         'profile': profileData,
-        'rawProgress': rawProgressData,
-        'creations': cloudCreations,
+        // Key by key, never the whole map: replacing it let a second phone
+        // on the same account, pushing from an older copy, take back from
+        // the cloud whatever this one had sent in between.
+        ...rawProgressUpdates(rawProgressData, cachedData?['rawProgress']),
+        // The drawings live in their own document now (below): in this
+        // one they went out with every answer, and came back down to the
+        // teacher's phone each time.
+        'creations': FieldValue.delete(),
         'lastActive': FieldValue.serverTimestamp(),
       }).catchError((Object e) => debugPrint('Deferred sync failed: $e')));
+      await _prefs?.setBool(_unpushedKey, false);
+
+      // The drawings, only when they changed since the last push — and never
+      // before this phone has read the cloud's (see [_creationsPulled]).
+      //
+      // The signature is kept once the write is accepted, not before: kept
+      // straight away, a write the server refused was never tried again.
+      // v2: the old signatures were kept that way, so a phone whose gallery
+      // another phone erased believed it had already sent it. Renaming them
+      // has every phone send its drawings once more.
+      final signature = creationsSignature(cloudCreations);
+      final sigKey = 'cloud_creations_sig_v2_$_currentStudentId';
+      // Offline the write waits for the network, and a push every few
+      // minutes would queue the same drawings again behind it.
+      if (_creationsPulled &&
+          _prefs?.getString(sigKey) != signature &&
+          _creationsInFlight != signature) {
+        final prefs = _prefs;
+        _creationsInFlight = signature;
+        unawaited(studentDoc.collection('extra').doc('creations').set({
+          'list': cloudCreations,
+          'updatedAt': FieldValue.serverTimestamp(),
+        }).then<void>((_) async {
+          await prefs?.setString(sigKey, signature);
+        }).catchError((Object e) async {
+          debugPrint('Creations sync failed: $e');
+          await prefs?.remove(sigKey);
+        }).whenComplete(() {
+          if (_creationsInFlight == signature) _creationsInFlight = null;
+        }));
+      }
     } catch (e) {
       debugPrint('Error preparing Firebase sync: $e');
     }
@@ -3099,22 +3719,6 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// The items to practise, worst first.
-  ///
-  /// Across every module when [module] is null.
-  List<({String module, String item, int weight})> practiceList(
-      {String? module, int limit = 8}) {
-    final rows = <({String module, String item, int weight})>[];
-    for (final m in practiceMisses.entries) {
-      if (module != null && m.key != module) continue;
-      for (final i in m.value.entries) {
-        rows.add((module: m.key, item: i.key, weight: i.value));
-      }
-    }
-    rows.sort((a, b) => b.weight.compareTo(a.weight));
-    return rows.take(limit).toList();
-  }
-
   String? get lastPlayedIso => _gb?.get(_lastPlayedKey) as String?;
 
   /// Consecutive days ending today, or 0 before the child has ever played.
@@ -3198,6 +3802,21 @@ class UserProvider extends ChangeNotifier {
   /// The certificates the child has been awarded.
   List<String> get earnedCertificates => _userProfile?.certificates ?? const [];
 
+  String get _certificateCelebrateKey =>
+      'certificate_celebrate_$_currentStudentId';
+
+  /// A certificate was just earned and the child has not been shown it yet.
+  bool get certificateCelebrationPending =>
+      _currentStudentId != null &&
+      _prefs?.getBool(_certificateCelebrateKey) == true &&
+      hasCertificate('e_tarabay_graduate');
+
+  /// The pop-up has been seen (or put off with "Not now").
+  Future<void> markCertificateCelebrated() async {
+    await _prefs?.remove(_certificateCelebrateKey);
+    notifyListeners();
+  }
+
   /// Whether [id] has already been awarded, so it is not given twice.
   bool hasCertificate(String id) =>
       _userProfile?.certificates.contains(id) ?? false;
@@ -3250,6 +3869,13 @@ class UserProvider extends ChangeNotifier {
       _userProfile!.certificateAwardedAt[id] =
           DateTime.now().millisecondsSinceEpoch;
     }
+    // It used to arrive in silence: the child finished everything and
+    // nothing said so. Kept until the pop-up has been seen, so a certificate
+    // earned with the app about to close is still announced next time. Not
+    // on the sign-in pull — that finds a certificate already won elsewhere.
+    if (allowRevoke && newlyEarned.isNotEmpty) {
+      await _prefs?.setBool(_certificateCelebrateKey, true);
+    }
     for (final id in withdrawn) {
       _userProfile!.certificates.remove(id);
       _userProfile!.certificateAwardedAt.remove(id);
@@ -3264,11 +3890,6 @@ class UserProvider extends ChangeNotifier {
   }
 
   // ─── BADGE CLAIMING ─────────────────────────────────────────────
-
-  bool isBadgeClaimed(String badgeId) {
-    if (_userProfile == null) return false;
-    return _userProfile!.claimedBadges.contains(badgeId);
-  }
 
   /// Badges the child has collected and still holds.
   ///
@@ -3387,15 +4008,6 @@ class UserProvider extends ChangeNotifier {
     return newlyEarned;
   }
 
-  // RESET PROGRESS
-  Future<void> resetAllProgress() async {
-    await _ensureInitialized();
-    await _progressBox.clear();
-    _initProgressBox();
-    await _syncToFirebase();
-    notifyListeners();
-  }
-
   // GET SPECIFIC PROGRESS
   bool isMagbasaActivityCompleted(String category, int index) {
     if (!_isInitialized) return false;
@@ -3404,14 +4016,6 @@ class UserProvider extends ChangeNotifier {
       return true;
     }
     return _progressBox.get('magbasa_${category}_$index') ?? false;
-  }
-
-  bool isKulayActivityCompleted(String activity) {
-    if (!_isInitialized) return false;
-    if (_prefs != null && _prefs!.getBool('kulay_$activity') == true) {
-      return true;
-    }
-    return _progressBox.get('kulay_$activity') ?? false;
   }
 
   bool isKulayPageCompleted(String category, int index) {
@@ -3508,6 +4112,8 @@ class UserProvider extends ChangeNotifier {
   void dispose() {
     _stopProfileListener();
     _configSubscription?.cancel();
+    _pushes.dispose();
+    _lifecycle?.dispose();
     super.dispose();
   }
 }

@@ -37,6 +37,10 @@ const SHELL = 'etarabay-shell-' + BUILD;
 // v2: v1 caches were filled before hashes were recorded, so nothing in them
 // can be told apart from a stale copy. Renaming drops them once.
 const ASSETS = 'etarabay-assets-v2';
+// Files from other sites the app cannot start without, each at a versioned
+// address that never changes: the Firebase web SDK, and the fallback fonts
+// the engine fetches for letters the app's own fonts lack.
+const CDN = 'etarabay-cdn-v1';
 
 /// Where the hashes of what the assets cache holds are kept between workers.
 const HASHES_KEY = '__asset_hashes__';
@@ -97,7 +101,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
-      const keep = new Set([SHELL, ASSETS]);
+      const keep = new Set([SHELL, ASSETS, CDN]);
       for (const name of await caches.keys()) {
         if (!keep.has(name)) await caches.delete(name);
       }
@@ -114,6 +118,10 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
+  if (isStaticCdn(url)) {
+    event.respondWith(cdnCacheFirst(req));
+    return;
+  }
   // Firestore and Firebase Auth are left alone entirely. Their answers are
   // per-child and change constantly; Firestore keeps its own offline copy and
   // a cached reply here would hand a child someone else's stale progress.
@@ -163,6 +171,25 @@ async function dropChangedAssets() {
 
 /// Never fetched twice. A picture changed under the same name is dropped on
 /// activation by dropChangedAssets, so the cached copy is otherwise right.
+function isStaticCdn(url) {
+  return (
+    (url.hostname === 'www.gstatic.com' &&
+      url.pathname.startsWith('/firebasejs/')) ||
+    url.hostname === 'fonts.gstatic.com'
+  );
+}
+
+/// Like cacheFirst, for another site's file: a script or font loaded from
+/// there comes back opaque (status 0), which is still the file.
+async function cdnCacheFirst(req) {
+  const cache = await caches.open(CDN);
+  const hit = await cache.match(req);
+  if (hit) return hit;
+  const res = await fetch(req);
+  if (res && (res.ok || res.type === 'opaque')) await cache.put(req, res.clone());
+  return res;
+}
+
 async function cacheFirst(req, cacheName) {
   const cache = await caches.open(cacheName);
   const hit = await cache.match(req, { ignoreSearch: true });

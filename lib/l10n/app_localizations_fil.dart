@@ -170,7 +170,7 @@ class AppLocalizationsFil extends AppLocalizations {
   String get chooseFirst => 'Pumili muna ng sagot!';
 
   @override
-  String get chooseLeftFirst => 'Pumili muna ng bilang sa kaliwa!';
+  String get chooseLeftFirst => 'Pindutin muna ang grupo sa kaliwa!';
 
   @override
   String get popAllBalloonsWith => 'Putukin ang lahat ng lobo na may bilang na';
@@ -304,14 +304,6 @@ class AppLocalizationsFil extends AppLocalizations {
   String get colorSomethingFirst => 'Kulayan muna ang isang bagay!';
 
   @override
-  String get justNow => 'Ngayon lang';
-
-  @override
-  String timeAgo(int amount) {
-    return '${amount}m ang nakalipas';
-  }
-
-  @override
   String get saved => 'Nai-save!';
 
   @override
@@ -364,9 +356,6 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get undo => 'Ibalik';
-
-  @override
-  String get redo => 'Ulitin';
 
   @override
   String get clear => 'Tanggalin';
@@ -716,7 +705,7 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String countThenDragToBasket(String items) {
-    return 'Bilangin ang mga $items at itapat sa basket';
+    return 'Bilangin ang mga $items, at itapat ang tamang numero sa basket';
   }
 
   @override
@@ -848,7 +837,7 @@ class AppLocalizationsFil extends AppLocalizations {
   String get pageTeddyBear => 'Teddy Bear';
 
   @override
-  String get pageSodaPop => 'Soft Drinks';
+  String get pageRaceCar => 'Karerang Kotse';
 
   @override
   String favoriteChosen(String choice) {
@@ -1237,9 +1226,6 @@ class AppLocalizationsFil extends AppLocalizations {
   String get forgotPin => 'Nakalimutan? Gamitin ang Student Number';
 
   @override
-  String get or => 'o';
-
-  @override
   String get openReport => 'Buksan';
 
   @override
@@ -1333,9 +1319,6 @@ class AppLocalizationsFil extends AppLocalizations {
       'Walang daliri o mukhang nakatakda sa teleponong ito, kaya hindi magagamit ang paraang ito.';
 
   @override
-  String get strongest => 'Pinakamalakas';
-
-  @override
   String get credentialsUpdated => 'Na-update ang login.';
 
   @override
@@ -1427,10 +1410,6 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get childLoginNote =>
       'Ang tinitipa ng anak mo para buksan ang app. Kayang palitan ito ng guro.';
-
-  @override
-  String get usernameTaken =>
-      'May gumagamit na ng username na iyon. Pumili ng iba.';
 
   @override
   String get playedToday => 'Naglaro ngayon';
@@ -1777,9 +1756,604 @@ class AppLocalizationsFil extends AppLocalizations {
   }
 
   @override
-  String get onboardingQuote =>
-      '“Mabuhay ka na parang mamamatay ka bukas. Mag-aral ka na parang mabubuhay ka magpakailanman.”\n― Mahatma Gandhi';
+  String get welcomeTo => 'Maligayang Pagdating sa';
+
+  @override
+  String get skip => 'Laktawan';
 
   @override
   String get audioRecordingTune => 'Rekording ng Boses';
+
+  @override
+  String get inProgress => 'Ginagawa pa';
+
+  @override
+  String get leaveColoringTitle => 'I-save ang kinulayan mo?';
+
+  @override
+  String get leaveColoringBody =>
+      'Hindi mawawala ang kinulayan mo kahit hindi mo ito i-save.';
+
+  @override
+  String get notNow => 'Mamaya na';
+
+  @override
+  String get allStudentsTab => 'Lahat';
+
+  @override
+  String get protectedBadge => 'Protektado: magla-lock kapag umalis sa app';
+
+  @override
+  String get showLabel => 'Ipakita';
+
+  @override
+  String get hideLabel => 'Itago';
+
+  @override
+  String get newBadgeShort => 'Bago';
+
+  @override
+  String get consentStep => 'Pahintulot';
+
+  @override
+  String get enrollStepChild => 'Sino ang bata?';
+
+  @override
+  String get enrollStepParent => 'Sino ang magulang o guardian?';
+
+  @override
+  String get enrollStepConsent => 'Pahintulot ng magulang';
+
+  @override
+  String stepNumber(int current, int total) {
+    return 'Hakbang $current sa $total';
+  }
+
+  @override
+  String get reviewBeforeEnroll => 'Tingnan bago i-enroll';
+
+  @override
+  String get childLabel => 'Bata';
+
+  @override
+  String get parentLabelShort => 'Magulang';
+
+  @override
+  String get numberLabel => 'Numero';
+
+  @override
+  String get parentConsentCheck =>
+      'Pumayag ang magulang o guardian na itala ang impormasyong ito para lang sa pag-aaral ng bata sa E-Tarabay.';
+
+  @override
+  String get consentLawNote =>
+      'Ayon sa Data Privacy Act of 2012 (RA 10173). Itatala ang petsa ng pagpayag.';
+
+  @override
+  String get privacyAgreementTitle => 'Kasunduan sa Privacy';
+
+  @override
+  String get privacyAgreementSubtitle =>
+      'Para sa kaligtasan ng impormasyon ng mga bata.';
+
+  @override
+  String get privacyPromise1 =>
+      'Hindi ko ibabahagi sa iba ang pangalan, kaarawan, at numero ng magulang ng mga bata.';
+
+  @override
+  String get privacyPromise2 =>
+      'Gagamitin ko lamang ang impormasyon para sa pag-aaral ng mga bata.';
+
+  @override
+  String get privacyPromise3 =>
+      'Hindi ko iiwanang bukas ang app, at may lock ang aking phone.';
+
+  @override
+  String get privacyPromise4 =>
+      'Agad kong ipaaalam sa paaralan kung mawala ang phone o may ibang makakita ng impormasyon.';
+
+  @override
+  String get signatureLabel => 'Buong pangalan mo bilang pirma';
+
+  @override
+  String get signatureHint => 'Hal. Gng. Maria Santos';
+
+  @override
+  String get agreeCheck => 'Sumasang-ayon ako sa kasunduan.';
+
+  @override
+  String get enterDashboard => 'Magpatuloy sa dashboard';
+
+  @override
+  String agreedOn(String name, String date) {
+    return 'Sinang-ayunan ni $name noong $date';
+  }
+
+  @override
+  String get privacyPolicy => 'Patakaran sa Privacy';
+
+  @override
+  String get privacyPolicyNote => 'Ang pangakong sinang-ayunan mo';
+
+  @override
+  String get lockTitle => 'Ilagay ang password';
+
+  @override
+  String get lockBody => 'Protektado ang impormasyon ng mga bata.';
+
+  @override
+  String get teacherPasswordField => 'Password ng teacher';
+
+  @override
+  String get unlockButton => 'Buksan';
+
+  @override
+  String get lockReason => 'Buksan ang teacher dashboard';
+
+  @override
+  String get pinTitle => 'Ilagay ang PIN';
+
+  @override
+  String pinWrong(int left) {
+    String _temp0 = intl.Intl.pluralLogic(
+      left,
+      locale: localeName,
+      other: 'Mali ang PIN. $left na subok na lang.',
+      one: 'Mali ang PIN. 1 subok na lang.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get pinBlocked =>
+      'Masyadong maraming mali. Password na ang kailangan.';
+
+  @override
+  String get teacherForgotPin => 'Nakalimutan ang PIN?';
+
+  @override
+  String get usePassword => 'Gamitin ang password';
+
+  @override
+  String get createPinTitle => 'Gumawa ng PIN';
+
+  @override
+  String get createPinBody =>
+      '4 na numero na magbubukas ng dashboard sa phone na ito.';
+
+  @override
+  String get confirmPinTitle => 'Ulitin ang PIN';
+
+  @override
+  String get teacherPinMismatch => 'Hindi magkapareho ang PIN. Subukan muli.';
+
+  @override
+  String get currentPinTitle => 'Ilagay ang kasalukuyang PIN';
+
+  @override
+  String get changePin => 'Palitan ang PIN';
+
+  @override
+  String get changePinNote => '4 na numerong nagbubukas ng dashboard';
+
+  @override
+  String get pinSaved => 'Na-save ang bagong PIN.';
+
+  @override
+  String get deleteDigit => 'Burahin';
+
+  @override
+  String get passwordToResetPin =>
+      'Ilagay ang password ng teacher para gumawa ng bagong PIN.';
+
+  @override
+  String get privacyAgreementIntro =>
+      'Hawak mo ang personal na impormasyon ng mga bata. Basahin at sang-ayunan ang mga ito:';
+
+  @override
+  String get agreeToContinueHint =>
+      'I-type ang pangalan at i-check ang kasunduan para magpatuloy.';
+
+  @override
+  String get lawPill => 'RA 10173';
+
+  @override
+  String get reportStarsTile => 'Bituin';
+
+  @override
+  String get reportDoneTile => 'Natapos';
+
+  @override
+  String get reportLastPlayedTile => 'Huling laro';
+
+  @override
+  String get lastPlayedToday => 'Ngayon';
+
+  @override
+  String get lastPlayedYesterday => 'Kahapon';
+
+  @override
+  String lastPlayedDays(int days) {
+    return '$days araw';
+  }
+
+  @override
+  String practiceMisses(int count) {
+    return '$count mali';
+  }
+
+  @override
+  String get childWorksHeader => 'Mga gawa ng bata';
+
+  @override
+  String get teacherToolsHeader => 'Mga tool ng teacher';
+
+  @override
+  String get toolEditInfo => 'I-edit ang info';
+
+  @override
+  String get toolEditInfoNote => 'Pangalan, kasarian, magulang';
+
+  @override
+  String get toolLogin => 'Login ng bata';
+
+  @override
+  String get toolLoginNote => 'Ibigay sa magulang';
+
+  @override
+  String get toolReset => 'I-reset ang progreso';
+
+  @override
+  String get toolResetNote => 'Isang module o lahat';
+
+  @override
+  String percentDone(int percent) {
+    return '$percent% tapos';
+  }
+
+  @override
+  String ofStars(int count) {
+    return 'sa $count bituin';
+  }
+
+  @override
+  String get levelsHeader => 'Bawat antas';
+
+  @override
+  String resetModule(String name) {
+    return 'I-reset ang $name';
+  }
+
+  @override
+  String resetSheetSub(String name) {
+    return '$name · hindi maibabalik';
+  }
+
+  @override
+  String get resetPickModules => 'Piliing module';
+
+  @override
+  String get resetPickModulesNote => 'Ang mga napili lang ang mabubura';
+
+  @override
+  String get resetAllModules => 'Lahat ng module';
+
+  @override
+  String get resetAllModulesNote => 'Babalik sa simula ang buong progreso';
+
+  @override
+  String resetWarnKeepDrawings(int count) {
+    return 'Mabubura ang bituin at tapos na laro sa $count module. Hindi buburahin ang mga drawing.';
+  }
+
+  @override
+  String resetWarnDrawings(int count) {
+    return 'Mabubura ang bituin at tapos na laro sa $count module, pati ang mga drawing.';
+  }
+
+  @override
+  String get resetConfirm => 'Naiintindihan kong hindi na ito maibabalik.';
+
+  @override
+  String get tabLogin => 'Login';
+
+  @override
+  String get noChanges => 'Walang binago';
+
+  @override
+  String get childPicksPicture =>
+      'Ang bata ang pipili ng sariling larawan sa unang sign-in.';
+
+  @override
+  String get parentNumberUse =>
+      'Para lang sa pagtawag tungkol sa pag-aaral ng bata.';
+
+  @override
+  String get showLoginCard => 'Ipakita ang login card';
+
+  @override
+  String get removeStudentAction => 'Alisin ang mag-aaral';
+
+  @override
+  String get loginUser => 'User';
+
+  @override
+  String get loginCardTitle => 'Login card';
+
+  @override
+  String get loginCardStudent => 'Mag-aaral sa E-Tarabay';
+
+  @override
+  String get loginCardKeep =>
+      'Itago ang card na ito. Huwag ipakita sa ibang tao.';
+
+  @override
+  String get copyLogin => 'Kopyahin ang login';
+
+  @override
+  String get loginCardHint =>
+      'Ipakita sa magulang o hayaang kunan nila ito ng larawan.';
+
+  @override
+  String get familySectionHeader => 'Ang Aking Pamilya';
+
+  @override
+  String levelStarsEarned(int count) {
+    return '$count sa 3 bituin';
+  }
+
+  @override
+  String levelsDone(int done, int total) {
+    return '$done sa $total ang tapos';
+  }
+
+  @override
+  String get privacyNoticeTitle => 'Abiso sa Privacy';
+
+  @override
+  String get privacyNoticeSubtitle =>
+      'Paano iniingatan ng E-Tarabay ang impormasyon ng iyong anak.';
+
+  @override
+  String get pnCollectTitle => 'Ano ang itinatala';
+
+  @override
+  String get pnCollectBody =>
+      'Ang pangalan, birthday, Student Number, kasarian at larawan ng anak mo, ang kanyang progreso at mga drawing, at ang pangalan at numero ng magulang.';
+
+  @override
+  String get pnWhyTitle => 'Bakit';
+
+  @override
+  String get pnWhyBody =>
+      'Para lang sa pag-aaral ng anak mo: para maitabi ang progreso at maipakita ito sa iyo at sa kanyang teacher. Hindi ito ibinebenta o ginagamit sa ads.';
+
+  @override
+  String get pnWhoTitle => 'Sino ang nakakakita';
+
+  @override
+  String get pnWhoBody =>
+      'Ang teacher ng anak mo, na nangakong ililihim ito, at ikaw sa phone na ito gamit ang iyong code.';
+
+  @override
+  String get pnKeepTitle => 'Gaano katagal';
+
+  @override
+  String get pnKeepBody =>
+      'Hanggang alisin ng teacher ang anak mo sa klase. Saka buburahin ang record at ang mga drawing.';
+
+  @override
+  String get pnRightsTitle => 'Ang iyong karapatan';
+
+  @override
+  String get pnRightsBody =>
+      'Maaari mong hilingin sa teacher o sa paaralan na ipakita, itama o burahin ang impormasyon ng anak mo (Data Privacy Act of 2012, RA 10173).';
+
+  @override
+  String get pnProblemTitle => 'Kung may problema';
+
+  @override
+  String get pnProblemBody =>
+      'Kung nawala ang phone o may ibang nakakita ng impormasyon ng anak mo, sabihan agad ang teacher o ang paaralan.';
+
+  @override
+  String get pnAcknowledge => 'Naiintindihan ko';
+
+  @override
+  String get parentPinBubbleEnter => 'Code muna, Magulang!';
+
+  @override
+  String get parentPinBubbleSet => 'Gumawa tayo ng code!';
+
+  @override
+  String get parentPinBubbleConfirm => 'Isa pa ulit!';
+
+  @override
+  String get parentPinBubbleForgot => 'Walang problema!';
+
+  @override
+  String get parentPinBubbleDone => 'Ayos, Magulang!';
+
+  @override
+  String parentPinEnterSub(String name) {
+    return 'Para makita ang report ni $name.';
+  }
+
+  @override
+  String get parentPinEnterSubPlain => 'Para makita ang report ng iyong anak.';
+
+  @override
+  String get parentPinConfirmSub =>
+      'Para sigurado, ulitin ang code na ginawa mo.';
+
+  @override
+  String get parentPinForgotSub =>
+      'Nasa login card na bigay ng teacher. Pagkatapos, gagawa ka ng bagong code.';
+
+  @override
+  String get parentPinRemembered => 'Naalala ko na ang code';
+
+  @override
+  String get parentPinBubbleFirst => 'Para sa magulang lang!';
+
+  @override
+  String get parentPinFirstSub =>
+      'Ilagay ang Student Number ng anak mo, na nasa login card. Pagkatapos, gagawa ka ng code.';
+
+  @override
+  String get parentPinBubbleLogout => 'Code muna bago lumabas!';
+
+  @override
+  String parentPinLogoutSub(String name) {
+    return 'Para mag-logout sa account ni $name.';
+  }
+
+  @override
+  String get parentPinLogoutSubPlain => 'Para mag-logout sa account na ito.';
+
+  @override
+  String get kidBubbleLessons => 'Tara, mag-aral tayo!';
+
+  @override
+  String get kidBubbleAwards => 'Ang galing mo!';
+
+  @override
+  String get kidBubbleSettings => 'Ayusin natin!';
+
+  @override
+  String kidBubbleProfile(String name) {
+    return 'Ikaw ito, $name!';
+  }
+
+  @override
+  String get kidBubbleCertLocked => 'Malapit na!';
+
+  @override
+  String get kidBubbleCertEarned => 'Ang galing mo!';
+
+  @override
+  String kidSubLessons(int stars) {
+    return 'Bituin: $stars sa 5';
+  }
+
+  @override
+  String kidSubAwards(int count) {
+    return 'Nakuha: $count';
+  }
+
+  @override
+  String kidSubCert(int earned, int total) {
+    return '$earned sa $total';
+  }
+
+  @override
+  String get kidBubbleProfilePlain => 'Ikaw ito!';
+
+  @override
+  String get kidSubSettings => 'Wika at tunog';
+
+  @override
+  String get lessonStart => 'Simulan';
+
+  @override
+  String get lessonContinue => 'Ituloy';
+
+  @override
+  String get lessonDone => 'Tapos na!';
+
+  @override
+  String get lessonLocked => 'Sarado pa';
+
+  @override
+  String get badgeSpecialShelf => 'Espesyal';
+
+  @override
+  String get claimShort => 'Kunin!';
+
+  @override
+  String lessonActivities(int done, int total) {
+    return '$done sa $total na gawain';
+  }
+
+  @override
+  String lessonLevels(int done, int total) {
+    return '$done sa $total na antas';
+  }
+
+  @override
+  String lessonNumber(int n) {
+    return 'Aralin $n';
+  }
+
+  @override
+  String get aboutMeShort => 'Ako';
+
+  @override
+  String tallyLetters(int done, int total) {
+    return '$done sa $total na titik';
+  }
+
+  @override
+  String tallyNumbers(int done, int total) {
+    return '$done sa $total na bilang';
+  }
+
+  @override
+  String get pickLetter => 'Pumili ng titik';
+
+  @override
+  String get pickNumber => 'Pumili ng bilang';
+
+  @override
+  String get traceNextHint => 'Ang kumikinang ang susunod mong isusulat!';
+
+  @override
+  String traceLockedHint(String letter) {
+    return 'Isulat muna ang $letter.';
+  }
+
+  @override
+  String get finishColoring => 'Tapos na!';
+
+  @override
+  String get coloringGreatJob => 'Ang galing mo!';
+
+  @override
+  String get nextPicture => 'Susunod';
+
+  @override
+  String get colorMore => 'Kulayan pa';
+
+  @override
+  String get allPicturesDone => 'Lahat tapos na!';
+
+  @override
+  String clearAlsoRemoves(String place) {
+    return 'Mawawala rin sa iyong mga Likha';
+  }
+
+  @override
+  String removedFrom(String place) {
+    return 'Inalis sa iyong mga Likha';
+  }
+
+  @override
+  String get cleared => 'Nabura';
+
+  @override
+  String certEarnedTitle(String name) {
+    return 'Binabati kita,\n$name!';
+  }
+
+  @override
+  String get certEarnedBody => 'Nakuha mo ang iyong\nSertipiko ng Pagtatapos!';
+
+  @override
+  String get certEarnedView => 'Tingnan ang Sertipiko';
+
+  @override
+  String get lineMatched => 'natugma';
+
+  @override
+  String get studentFallback => 'Mag-aaral';
 }

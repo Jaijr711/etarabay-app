@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class StaggeredEntrance extends StatefulWidget {
@@ -23,6 +25,7 @@ class _StaggeredEntranceState extends State<StaggeredEntrance>
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+  Timer? _start;
 
   @override
   void initState() {
@@ -49,34 +52,33 @@ class _StaggeredEntranceState extends State<StaggeredEntrance>
       ),
     );
 
-    final totalDelay = Duration(
-      milliseconds: widget.index * widget.delayMs,
-    );
-
-    Future.delayed(totalDelay, () {
+    // A timer that leaving the screen cancels, rather than a delay that
+    // fired anyway, after the item was gone.
+    _start = Timer(Duration(milliseconds: widget.index * widget.delayMs), () {
       if (mounted) _controller.forward();
     });
   }
 
   @override
   void dispose() {
+    _start?.cancel();
     _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return FadeTransition(
-          opacity: _fadeAnimation,
-          child: SlideTransition(
-            position: _slideAnimation,
-            child: widget.child,
-          ),
-        );
-      },
+    // Animations off — the phone's own setting, or a phone too weak to draw
+    // them smoothly (see DevicePerformance): the item is simply there.
+    if (MediaQuery.disableAnimationsOf(context)) return widget.child;
+    // The transitions listen to the controller themselves; wrapping them in
+    // a builder too rebuilt this whole item on every frame of its entrance.
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: widget.child,
+      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:e_tarabay/providers/user_provider.dart';
 import 'package:e_tarabay/services/auth_service.dart';
 
 /// The generator and the rule that judges it have to agree.
@@ -26,8 +27,8 @@ void main() {
           if (n != 4271) 'DC-2026-$n'
       };
       for (var i = 0; i < 20; i++) {
-        expect(AuthService.mintStudentNumber(taken, year: 2026),
-            'DC-2026-4271');
+        expect(
+            AuthService.mintStudentNumber(taken, year: 2026), 'DC-2026-4271');
       }
     });
 
@@ -45,6 +46,26 @@ void main() {
         issued.add(AuthService.mintStudentNumber(issued, year: 2026));
       }
       expect(issued.length, 30);
+    });
+  });
+
+  // The cloud's copy of the profile never carries the number, and taking it
+  // whole left the certificate's Student Number line blank.
+  group('the Student Number survives a profile from the cloud', () {
+    const keep = UserProvider.studentNumberFor;
+
+    test("the record's own number is used", () {
+      expect(keep(record: 'DC-2026-0001', kept: ''), 'DC-2026-0001');
+      expect(keep(record: 'DC-2026-0001', kept: 'old'), 'DC-2026-0001');
+    });
+
+    test('a record without one keeps what this phone had', () {
+      expect(keep(record: null, kept: 'DC-2026-0001'), 'DC-2026-0001');
+      expect(keep(record: '  ', kept: 'DC-2026-0001'), 'DC-2026-0001');
+    });
+
+    test('blank only when nobody has it', () {
+      expect(keep(record: null, kept: null), isEmpty);
     });
   });
 }

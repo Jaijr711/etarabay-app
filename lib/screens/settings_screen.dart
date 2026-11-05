@@ -1,6 +1,5 @@
 import 'package:e_tarabay/l10n/app_localizations.dart';
 import 'dart:async';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -9,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
 import '../providers/user_provider.dart';
 import '../main.dart';
-import '../widgets/custom_header_app_bar.dart';
+import '../widgets/kid_page_header.dart';
 import '../widgets/floating_bottom_nav_bar.dart';
 import '../widgets/staggered_entrance.dart';
 import '../utils/page_transitions.dart';
@@ -20,6 +19,8 @@ import 'lessons_screen.dart';
 import 'awards_screen.dart';
 import 'developer_login_screen.dart';
 import 'home_screen.dart';
+import '../widgets/design_scale.dart';
+import '../widgets/soft_backdrop.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -162,10 +163,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainerHighest,
       extendBody: true,
-      appBar: CustomHeaderAppBar(
+      appBar: KidPageHeader(
         title: loc.settingsTitle,
-        baseColor: colorScheme.primary,
-        showBackButton: false,
+        subtitle: loc.kidSubSettings,
+        bubble: loc.kidBubbleSettings,
+        color: AppColors.navSettings,
       ),
       bottomNavigationBar: FloatingBottomNavBar(
         selectedIndex: 3,
@@ -206,203 +208,158 @@ class _SettingsScreenState extends State<SettingsScreen> {
               assetPath: 'assets/images/setting.webp'),
         ],
       ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/bg_settings.jpg',
-              fit: BoxFit.cover,
-            ),
-          ),
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-              child: Container(
-                color: Colors.white.withOpacity(0.08),
+      body: DesignScale(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.asset(
+                'assets/images/bg_settings.jpg',
+                fit: BoxFit.cover,
               ),
             ),
-          ),
-          ListView(
-            padding: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-              top: 16,
-              bottom: 120,
+            const Positioned.fill(
+              child: SoftBackdrop(),
             ),
-            children: [
-              // Language Section
-              StaggeredEntrance(
-                index: 0,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _sectionHeader(loc.language, const Color(0xFF2C7BE5)),
-                    Card.filled(
-                      clipBehavior: Clip.antiAlias,
-                      child: Column(
-                        children: [
-                          _LanguageTile(
-                            label: 'English',
-                            code: 'en',
-                            isSelected:
-                                languageProvider.currentLanguageCode == 'en',
-                            onTap: () => _setLanguage('en'),
-                          ),
-                          const Divider(height: 0, indent: 72),
-                          _LanguageTile(
-                            label: 'Filipino',
-                            code: 'fil',
-                            isSelected:
-                                languageProvider.currentLanguageCode == 'fil',
-                            onTap: () => _setLanguage('fil'),
-                          ),
-                          const Divider(height: 0, indent: 72),
-                          _LanguageTile(
-                            label: 'Ilokano',
-                            code: 'ilo',
-                            isSelected:
-                                languageProvider.currentLanguageCode == 'ilo',
-                            onTap: () => _setLanguage('ilo'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+            ListView(
+              padding: const EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 16,
+                bottom: 120,
               ),
-              const SizedBox(height: 20),
-              StaggeredEntrance(
-                index: 1,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _sectionHeader(loc.audio, const Color(0xFF2E9E5B)),
-                    Card.filled(
-                      clipBehavior: Clip.antiAlias,
-                      child: Column(
-                        children: [
-                          SwitchListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            secondary: const _IconBadge(
-                                icon: LucideIcons.volume_2,
-                                color: Color(0xFF2E9E5B)),
-                            title: Text(loc.sound,
-                                style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.w700)),
-                            value: _soundEnabled,
-                            onChanged: (value) {
-                              setState(() => _soundEnabled = value);
-                              SharedPreferences.getInstance().then(
-                                (prefs) =>
-                                    prefs.setBool('sound_enabled', value),
-                              );
-                            },
-                          ),
-                          const Divider(height: 0, indent: 72),
-                          SwitchListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            secondary: const _IconBadge(
-                                icon: LucideIcons.music,
-                                color: Color(0xFF2E9E5B)),
-                            title: Text(loc.music,
-                                style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.w700)),
-                            value: _musicEnabled,
-                            onChanged: _toggleMusic,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              StaggeredEntrance(
-                index: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _sectionHeader(loc.notifications, const Color(0xFFF5A623)),
-                    Card.filled(
-                      clipBehavior: Clip.antiAlias,
-                      child: SwitchListTile(
-                        secondary: const _IconBadge(
-                            icon: LucideIcons.bell, color: Color(0xFFF5A623)),
-                        title: Text(loc.notifications),
-                        value: _notificationsEnabled,
-                        onChanged: _toggleNotifications,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              StaggeredEntrance(
-                index: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _sectionHeader(loc.about, const Color(0xFF7C3AED)),
-                    Card.filled(
-                      clipBehavior: Clip.antiAlias,
-                      child: ListTile(
-                        onTap: _onVersionTapped,
-                        leading: const _IconBadge(
-                            icon: LucideIcons.info, color: Color(0xFF7C3AED)),
-                        title: Text(loc.version),
-                        trailing: Text(
-                          _appVersion,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primary,
+              children: [
+                StaggeredEntrance(
+                  index: 0,
+                  child: _SettingsCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(14, 12, 14, 4),
+                          child: Row(
+                            children: [
+                              const _Icon3D('globe'),
+                              const SizedBox(width: 12),
+                              Text(loc.language, style: _rowTitle),
+                            ],
                           ),
                         ),
-                      ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 6, 10, 12),
+                          child: _LanguageSwitch(
+                            current: languageProvider.currentLanguageCode,
+                            onPick: _setLanguage,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              // Bottom Transparent Logo
-              StaggeredEntrance(
-                index: 4,
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
+                const SizedBox(height: 14),
+                StaggeredEntrance(
+                  index: 1,
+                  child: _SettingsCard(
+                    child: Column(
+                      children: [
+                        _ToggleRow(
+                          asset: _soundEnabled ? 'speaker' : 'speaker_off',
+                          label: loc.sound,
+                          value: _soundEnabled,
+                          onChanged: (value) {
+                            setState(() => _soundEnabled = value);
+                            SharedPreferences.getInstance().then(
+                              (prefs) => prefs.setBool('sound_enabled', value),
+                            );
+                          },
+                        ),
+                        const Divider(
+                            height: 0, indent: 66, color: Color(0xFFEFEAF8)),
+                        _ToggleRow(
+                          asset: 'music',
+                          label: loc.music,
+                          value: _musicEnabled,
+                          onChanged: _toggleMusic,
+                        ),
+                        const Divider(
+                            height: 0, indent: 66, color: Color(0xFFEFEAF8)),
+                        _ToggleRow(
+                          asset: _notificationsEnabled ? 'bell' : 'bell_off',
+                          label: loc.notifications,
+                          value: _notificationsEnabled,
+                          onChanged: _toggleNotifications,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                StaggeredEntrance(
+                  index: 2,
+                  child: _SettingsCard(
+                    child: InkWell(
+                      onTap: _onVersionTapped,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 12),
+                        child: Row(
+                          children: [
+                            const _Icon3D('info'),
+                            const SizedBox(width: 12),
+                            Expanded(
+                                child: Text(loc.version, style: _rowTitle)),
+                            Text(
+                              _appVersion,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primary,
+                              ),
                             ),
                           ],
                         ),
-                        child: Image.asset(
-                          'assets/images/app_logo-transparent.png',
-                          width: 112,
-                          height: 112,
-                          fit: BoxFit.contain,
-                        ),
                       ),
-                      if (audioManager.isPlaying) ...[
-                        const SizedBox(height: 10),
-                        _MusicPill(text: loc.backgroundMusicPlaying),
-                      ],
-                    ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
-        ],
+                const SizedBox(height: 24),
+                // Bottom Transparent Logo
+                StaggeredEntrance(
+                  index: 3,
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.08),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Image.asset(
+                            'assets/images/app_logo-transparent.png',
+                            width: 112,
+                            height: 112,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        if (audioManager.isPlaying) ...[
+                          const SizedBox(height: 10),
+                          _MusicPill(text: loc.backgroundMusicPlaying),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -423,149 +380,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  /// A heading you can find without looking for it.
-  ///
-  /// These were 13-pixel grey on a blurred photograph — technically present,
-  /// practically invisible. The colour is the section's own, so a row and its
-  /// heading belong together at a glance.
-  Widget _sectionHeader(String label, Color color) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 6, bottom: 10),
-      child: Row(
-        children: [
-          Container(
-            width: 5,
-            height: 20,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(3),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w800,
-              color: color,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  LANGUAGE TILE
-// ─────────────────────────────────────────────────────────────────────────────
-class _LanguageTile extends StatelessWidget {
-  final String label;
-  final String code;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _LanguageTile({
-    required this.label,
-    required this.code,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  ({String short, Color color}) get _meta {
-    switch (code) {
-      case 'fil':
-        return (short: 'FIL', color: const Color(0xFFFF6584));
-      case 'ilo':
-        return (short: 'ILO', color: const Color(0xFFFFB347));
-      default:
-        return (short: 'EN', color: const Color(0xFF4A90D9));
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final meta = _meta;
-
-    return ListTile(
-      onTap: onTap,
-      leading: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              meta.color,
-              meta.color.withOpacity(0.75),
-            ],
-          ),
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: meta.color.withOpacity(0.35),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            meta.short,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
-              fontSize: 12,
-              letterSpacing: 0.5,
-            ),
-          ),
-        ),
-      ),
-      title: Text(
-        label,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-          color: isSelected ? colorScheme.primary : colorScheme.onSurface,
-        ),
-      ),
-      trailing: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 200),
-        child: isSelected
-            ? Icon(LucideIcons.circle_check,
-                key: const ValueKey('selected'), color: colorScheme.primary)
-            : const SizedBox(key: ValueKey('empty'), width: 24),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  ICON BADGE
-// ─────────────────────────────────────────────────────────────────────────────
-class _IconBadge extends StatelessWidget {
-  final IconData icon;
-
-  /// The section's colour. Every badge was the same theme primary before, so
-  /// four different settings looked like one long undifferentiated list.
-  final Color color;
-
-  const _IconBadge({required this.icon, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.14),
-        shape: BoxShape.circle,
-      ),
-      child: Icon(icon, color: color, size: 24),
-    );
-  }
+  static const TextStyle _rowTitle = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.w700,
+    color: AppColors.textDark,
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -599,6 +418,188 @@ class _MusicPill extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  CARD, 3D ICON, LANGUAGE SWITCH, TOGGLE ROW
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// A white card for one group of settings.
+class _SettingsCard extends StatelessWidget {
+  final Widget child;
+
+  const _SettingsCard({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    // Plain white under the picture background. A Material surface picked
+    // up the theme's tint and came out grey-lilac.
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF46288C).withOpacity(0.10),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Material(type: MaterialType.transparency, child: child),
+      ),
+    );
+  }
+}
+
+/// One of Settings' 3D pictures (Fluent Emoji 3D, MIT; the licence is in
+/// the app's licence list).
+class _Icon3D extends StatelessWidget {
+  final String name;
+  final bool dim;
+
+  const _Icon3D(this.name, {this.dim = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final picture = Image.asset(
+      'assets/images/settings/$name.webp',
+      width: 40,
+      height: 40,
+      excludeFromSemantics: true,
+    );
+    if (!dim) return picture;
+    return Opacity(
+      opacity: 0.5,
+      child: ColorFiltered(
+        colorFilter: const ColorFilter.matrix(<double>[
+          0.33, 0.33, 0.33, 0, 0, //
+          0.33, 0.33, 0.33, 0, 0,
+          0.33, 0.33, 0.33, 0, 0,
+          0, 0, 0, 1, 0,
+        ]),
+        child: picture,
+      ),
+    );
+  }
+}
+
+/// English · Filipino · Ilocano as one three-part button: the chosen one is
+/// lifted out in white.
+class _LanguageSwitch extends StatelessWidget {
+  final String current;
+  final ValueChanged<String> onPick;
+
+  const _LanguageSwitch({required this.current, required this.onPick});
+
+  static const _languages = [
+    ('en', 'English'),
+    ('fil', 'Filipino'),
+    ('ilo', 'Ilocano'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1ECFB),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          for (final (code, label) in _languages)
+            Expanded(
+              child: Semantics(
+                button: true,
+                selected: code == current,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => onPick(code),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: code == current ? Colors.white : null,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: code == current
+                          ? [
+                              BoxShadow(
+                                color:
+                                    const Color(0xFF46288C).withOpacity(0.15),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Center(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          label,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: code == current
+                                ? const Color(0xFF5B2BB5)
+                                : const Color(0xFF5B5470),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A setting that is on or off: its picture, its name and a switch. The
+/// whole row answers a tap, not just the switch.
+class _ToggleRow extends StatelessWidget {
+  final String asset;
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _ToggleRow({
+    required this.asset,
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => onChanged(!value),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
+        child: Row(
+          children: [
+            // Sound and the bell have their own "off" pictures; music fades.
+            _Icon3D(asset, dim: !value && asset == 'music'),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(label, style: _SettingsScreenState._rowTitle),
+            ),
+            Switch(
+              value: value,
+              onChanged: onChanged,
+              activeColor: Colors.white,
+              activeTrackColor: AppColors.navSettings,
+            ),
+          ],
+        ),
       ),
     );
   }

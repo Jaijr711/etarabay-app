@@ -5,6 +5,7 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../utils/constants.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
+import '../services/device_performance.dart';
 
 class SuccessModal extends StatefulWidget {
   final String title;
@@ -46,7 +47,9 @@ class _SuccessModalState extends State<SuccessModal> {
     super.initState();
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 3));
-    _confettiController.play();
+    // No confetti with animations off: on a weak phone the particles were
+    // most of what this card cost to draw.
+    if (!DevicePerformance.animationsOff) _confettiController.play();
   }
 
   @override
@@ -79,6 +82,19 @@ class _SuccessModalState extends State<SuccessModal> {
 
   @override
   Widget build(BuildContext context) {
+    // The phone's back is the card's own Back. On its own it only closed the
+    // card, leaving the child on a finished board with no way on — and in
+    // Numbers, answering again there scored the level a second time.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) widget.onSecondaryTap();
+      },
+      child: _dialog(),
+    );
+  }
+
+  Widget _dialog() {
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,

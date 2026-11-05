@@ -23,12 +23,35 @@ import '../widgets/success_modal.dart';
 import '../widgets/custom_back_button.dart';
 import '../widgets/pressable.dart';
 import '../widgets/staggered_entrance.dart';
-import '../widgets/star_tally.dart';
+import '../widgets/module_cards.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
-import '../utils/word_fit.dart';
 import '../widgets/replay_dialog.dart';
+import '../widgets/design_scale.dart';
 
-// ─── CustomPainter: draws animated lines between matched nodes ───────────────
+// ─── The line board's lines: walking dots, one colour per pair ──────────────
+
+/// One colour for each group on the left, so a child can follow which group
+/// went to which number. The boards have three pairs; more would repeat.
+const List<Color> _pairColors = [
+  Color(0xFFFF6B6B),
+  Color(0xFF3B82F6),
+  Color(0xFFF59E0B),
+];
+const Color _lineRight = Color(0xFF22A559);
+const Color _lineWrong = Color(0xFFEF4444);
+const Color _ringGrey = Color(0xFFC9CED8);
+
+Color _pairColor(int leftIndex) => _pairColors[leftIndex % _pairColors.length];
+
+/// Draws each joined pair as a row of dots walking from the group to its
+/// number, as chosen from the preview.
+///
+/// The old line was a 3-pixel indigo stroke, the same for every pair, run
+/// through a 56-pixel gap — the three crossed into one tangle. Now each pair
+/// has its colour, the dots grow toward the number so the line says where it
+/// goes, and both ends leave level so crossing lines spread apart. A line
+/// draws itself in from the left when it is joined, walks until the board is
+/// graded, then stops green or red with a tick or a cross where it lands.
 class _Game3LinePainter extends CustomPainter {
   final List<Offset> leftDots;
   final List<Offset> rightDots;
@@ -36,8 +59,21 @@ class _Game3LinePainter extends CustomPainter {
   final Map<int, bool> wrongFlash;
 
   /// Until the board is graded a line is neither right nor wrong, so it is
-  /// drawn in the app's own indigo rather than green.
+  /// drawn in its pair's colour rather than green.
   final bool checked;
+
+  /// When each line was joined (milliseconds), for drawing it in.
+  final Map<int, int> bornAt;
+  final int nowMs;
+
+  /// How far the dots have walked, 0 to 1 of one gap.
+  final double march;
+
+  /// The star burst over the right answers, 0 to 1.
+  final double burst;
+
+  /// Animations off: the dots stand still and appear at once.
+  final bool still;
 
   _Game3LinePainter({
     required this.leftDots,
@@ -45,45 +81,125 @@ class _Game3LinePainter extends CustomPainter {
     required this.matches,
     required this.wrongFlash,
     required this.checked,
+    required this.bornAt,
+    required this.nowMs,
+    required this.march,
+    required this.burst,
+    required this.still,
   });
+
+  static const double _step = 13;
 
   @override
   void paint(Canvas canvas, Size size) {
+    final white = Paint()..color = Colors.white;
     for (final entry in matches.entries) {
       final leftIdx = entry.key;
       final rightIdx = entry.value;
-
       if (leftIdx >= leftDots.length || rightIdx >= rightDots.length) continue;
 
       final isWrong = wrongFlash[leftIdx] == true;
-      final color = isWrong
-          ? Colors.red
-          : checked
-              ? Colors.green
-              : AppColors.primary;
+      final color =
+          checked ? (isWrong ? _lineWrong : _lineRight) : _pairColor(leftIdx);
+      final a = leftDots[leftIdx];
+      final b = rightDots[rightIdx];
+      final dx = b.dx - a.dx;
 
-      final linePaint = Paint()
-        ..color = color
-        ..strokeWidth = 3.0
-        ..strokeCap = StrokeCap.round
-        ..style = PaintingStyle.stroke;
-
-      final dotPaint = Paint()
-        ..color = color
-        ..style = PaintingStyle.fill;
-
-      final p1 = leftDots[leftIdx];
-      final p2 = rightDots[rightIdx];
-      final mid = Offset((p1.dx + p2.dx) / 2, (p1.dy + p2.dy) / 2 - 10);
-
+      // Level at both ends, so lines leave and arrive straight.
       final path = Path()
-        ..moveTo(p1.dx, p1.dy)
-        ..quadraticBezierTo(mid.dx, mid.dy, p2.dx, p2.dy);
-      canvas.drawPath(path, linePaint);
+        ..moveTo(a.dx, a.dy)
+        ..cubicTo(a.dx + dx * .55, a.dy, b.dx - dx * .55, b.dy, b.dx, b.dy);
+      final metric = path.computeMetrics().first;
+      final len = metric.length;
 
-      canvas.drawCircle(p1, 5.5, dotPaint);
-      canvas.drawCircle(p2, 5.5, dotPaint);
+      final born = bornAt[leftIdx];
+      final reveal = (still || checked || born == null)
+          ? 1.0
+          : ((nowMs - born) / 500).clamp(0.0, 1.0);
+      final walking = !(still || checked);
+      for (double s = (walking ? march * _step : _step / 2) + 8;
+          s <= len * reveal - 12;
+          s += _step) {
+        final f = s / len;
+        canvas.drawCircle(
+          metric.getTangentForOffset(s)!.position,
+          3 + 3.2 * f,
+          Paint()..color = color.withOpacity(.55 + .45 * f),
+        );
+      }
+
+      // The group's end: a button in the pair's colour.
+      canvas.drawCircle(a, 10.5, white);
+      canvas.drawCircle(a, 7.5, Paint()..color = color);
+      canvas.drawCircle(a, 2.8, white);
+
+      // The number's end: an arrow while joining, the verdict once graded.
+      canvas.drawCircle(b, 12.5, white);
+      canvas.drawCircle(b, 9.5, Paint()..color = color);
+      final mark = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.7
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round;
+      if (!checked) {
+        final v = metric.getTangentForOffset(len)!.vector;
+        final ang = atan2(v.dy, v.dx);
+        Offset turn(double x, double y) => Offset(
+            b.dx + x * cos(ang) - y * sin(ang),
+            b.dy + x * sin(ang) + y * cos(ang));
+        canvas.drawPath(
+            Path()
+              ..moveTo(turn(-3.5, -5).dx, turn(-3.5, -5).dy)
+              ..lineTo(turn(2.5, 0).dx, turn(2.5, 0).dy)
+              ..lineTo(turn(-3.5, 5).dx, turn(-3.5, 5).dy),
+            mark);
+      } else if (isWrong) {
+        canvas.drawLine(
+            b + const Offset(-3.6, -3.6), b + const Offset(3.6, 3.6), mark);
+        canvas.drawLine(
+            b + const Offset(3.6, -3.6), b + const Offset(-3.6, 3.6), mark);
+      } else {
+        canvas.drawPath(
+            Path()
+              ..moveTo(b.dx - 4.5, b.dy + .2)
+              ..lineTo(b.dx - 1.5, b.dy + 3.2)
+              ..lineTo(b.dx + 4.1, b.dy - 3.2),
+            mark);
+        // A burst of little stars where a right answer lands.
+        if (burst > 0 && burst < 1) {
+          for (int k = 0; k < 6; k++) {
+            final angle = k / 6 * pi * 2 + .3;
+            final r = 12 + 26 * burst;
+            _star(
+              canvas,
+              b + Offset(r * cos(angle), r * sin(angle)),
+              5.5 * (1 - burst * .5),
+              const Color(0xFFFFC531).withOpacity(1 - burst),
+            );
+          }
+        }
+      }
     }
+  }
+
+  void _star(Canvas canvas, Offset c, double r, Color fill) {
+    final p = Path();
+    for (int i = 0; i < 10; i++) {
+      final a = pi / 5 * i - pi / 2;
+      final rr = i.isOdd ? r * .45 : r;
+      final pt = Offset(c.dx + rr * cos(a), c.dy + rr * sin(a));
+      i == 0 ? p.moveTo(pt.dx, pt.dy) : p.lineTo(pt.dx, pt.dy);
+    }
+    p.close();
+    canvas.drawPath(p, Paint()..color = fill);
+    canvas.drawPath(
+        p,
+        Paint()
+          ..color = Colors.white.withOpacity(fill.opacity)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5
+          ..strokeJoin = StrokeJoin.round);
   }
 
   @override
@@ -110,7 +226,6 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   /// whole point of taking the level strip off the board.
   bool _playing = false;
 
-  int _levelStars = 0;
   int _levelScore = 0;
   int _wrongAttempts = 0;
 
@@ -131,6 +246,11 @@ class _MatematikaScreenState extends State<MatematikaScreen>
 
   String _feedbackMessage = '';
   Color _feedbackColor = Colors.transparent;
+
+  /// A number was tapped before a group, in Match with Line: the hint under
+  /// the question says what to do first, in place of the usual instruction.
+  bool _nudgeLeft = false;
+  Timer? _nudgeTimer;
   bool _showCorrectOverlay = false;
 
   int? _selectedAnswer;
@@ -194,7 +314,13 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   int _consecutiveCorrectStreak = 0;
 
   late AnimationController _starBurstController;
-  late AnimationController _timerPulseController;
+
+  /// Walks the dots on the line board; runs only while that board is up.
+  late AnimationController _marchController;
+
+  /// When each line on the line board was joined, by group, so it can
+  /// draw itself in.
+  final Map<int, int> _lineBornAt = {};
 
   // ─── Game data ──────────────────────────────────────────────────────────────
 
@@ -273,7 +399,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       'item_name_il': 'sabong',
       'item_name_tl': 'bulaklak',
       'correct': 2,
-      'choices': [1, 2, 3]
+      'choices': [2, 3, 4]
     },
     {
       'emoji': '🎈',
@@ -281,7 +407,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       'item_name_il': 'lobo',
       'item_name_tl': 'lobo',
       'correct': 4,
-      'choices': [3, 4, 5]
+      'choices': [2, 3, 4]
     },
     {
       'emoji': '🚗',
@@ -297,7 +423,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       'item_name_il': 'bituen',
       'item_name_tl': 'bituin',
       'correct': 5,
-      'choices': [4, 5, 6]
+      'choices': [5, 6, 7]
     },
     {
       'emoji': '⚽',
@@ -305,10 +431,12 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       'item_name_il': 'bola',
       'item_name_tl': 'bola',
       'correct': 6,
-      'choices': [5, 6, 7]
+      'choices': [4, 5, 6]
     },
   ];
 
+  // The right number sits left, right, middle, left, right: it was always the
+  // middle chip, so a child could pass the level without counting once.
   final List<Map<String, dynamic>> _game3Levels = const [
     {
       'target_cat_en': 'fruit',
@@ -441,13 +569,15 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       'rightCount': 2,
       'correct': 'equal',
     },
+    // "Same number?" where the answer is No. The only Yes/No board used to be
+    // a Yes, so "Hindi" was never right anywhere in the level.
     {
-      'type': 'more',
-      'leftObjects': ['🐟', '🐟', '🐟', '🐟'],
-      'leftCount': 4,
+      'type': 'equal',
+      'leftObjects': ['🐟', '🐟', '🐟'],
+      'leftCount': 3,
       'rightObjects': ['🐟', '🐟'],
       'rightCount': 2,
-      'correct': 'left',
+      'correct': 'notEqual',
     },
   ];
 
@@ -469,15 +599,17 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     },
   ];
 
+  // Left, right, middle, left, right — the gap's number was the middle choice
+  // four times in five.
   final List<Map<String, dynamic>> _game7Levels = const [
     {
       'sequence': [1, 2, null, 4, 5],
-      'answers': [2, 3, 4],
+      'answers': [3, 4, 5],
       'correct': 3
     },
     {
       'sequence': [2, 3, 4, null, 6],
-      'answers': [4, 5, 6],
+      'answers': [3, 4, 5],
       'correct': 5
     },
     {
@@ -492,7 +624,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     },
     {
       'sequence': [3, 4, 5, null, 7],
-      'answers': [5, 6, 7],
+      'answers': [4, 5, 6],
       'correct': 6
     },
   ];
@@ -602,7 +734,6 @@ class _MatematikaScreenState extends State<MatematikaScreen>
 
   void _awardStars(int earned) {
     setState(() {
-      _levelStars += earned;
       _levelScore += _pointsPerCorrect;
     });
   }
@@ -618,12 +749,13 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       duration: const Duration(milliseconds: 700),
       vsync: this,
     );
-    _timerPulseController = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    )..repeat(reverse: true);
     _shakeController = AnimationController(
       duration: const Duration(milliseconds: 450),
+      vsync: this,
+    );
+    // One gap of the dots every 13/24 of a second: 24 pixels a second.
+    _marchController = AnimationController(
+      duration: const Duration(milliseconds: 542),
       vsync: this,
     );
 
@@ -681,9 +813,10 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   @override
   void dispose() {
     _timer?.cancel();
+    _nudgeTimer?.cancel();
     _starBurstController.dispose();
-    _timerPulseController.dispose();
     _shakeController.dispose();
+    _marchController.dispose();
     AudioManager.instance.resumeHomeMusic();
     super.dispose();
   }
@@ -749,8 +882,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     // points: the child never got to answer.
     _saveQuestionProgress(0, points: 0);
 
-    Future.delayed(const Duration(milliseconds: 1400), () {
-      if (!mounted) return;
+    _afterDelay(const Duration(milliseconds: 1400), () {
       setState(() {
         _showTimeUpOverlay = false;
         _resetQuestionState();
@@ -768,7 +900,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       // Replaying: start at question one and let every question be answered
       // again, whatever the saved progress says.
       _currentGameIndex = 0;
-      _levelStars = 0;
+      _runStars.clear();
       _levelScore = 0;
       _wrongAttempts = 0;
       _resetQuestionState();
@@ -791,7 +923,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     }
 
     _currentGameIndex = firstUncompleted;
-    _levelStars = 0;
+    _runStars.clear();
     _levelScore = 0;
     _wrongAttempts = 0;
     _resetQuestionState();
@@ -847,11 +979,25 @@ class _MatematikaScreenState extends State<MatematikaScreen>
 
   // ─── Level switch ────────────────────────────────────────────────────────────
 
+  /// Goes up each time a level is opened or left. A verdict's delayed next
+  /// step checks it ([_afterDelay]): asking only whether the child was still
+  /// playing let one answered just before back, then a quick reopen, skip the
+  /// new level's first question — or finish the new level on the spot.
+  int _playSession = 0;
+
+  void _afterDelay(Duration delay, VoidCallback then) {
+    final session = _playSession;
+    Future.delayed(delay, () {
+      if (mounted && session == _playSession) then();
+    });
+  }
+
   void _switchLevel(int level) {
     _stopTimer();
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final alreadyFinished = userProvider.isMatematikaLevelCompleted(level);
     setState(() {
+      _playSession++;
       _selectedLevel = level;
       // A finished level is replayed from the beginning: there is no
       // "next unfinished question" to resume at.
@@ -875,6 +1021,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   void _backToPicker() {
     _stopTimer();
     setState(() {
+      _playSession++;
       _playing = false;
       _verdictRunning = false;
       _showCorrectOverlay = false;
@@ -1017,8 +1164,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     // where the child is looking.
     _saveQuestionProgress(earned, points: _pointsPerCorrect);
 
-    Future.delayed(const Duration(milliseconds: 1600), () {
-      if (!mounted) return;
+    _afterDelay(const Duration(milliseconds: 1600), () {
       setState(() => _showCorrectOverlay = false);
       _advanceOrComplete();
     });
@@ -1053,8 +1199,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     });
     _saveQuestionProgress(0, points: _pointsPerWrongAttempt);
 
-    Future.delayed(const Duration(milliseconds: 1600), () {
-      if (!mounted) return;
+    _afterDelay(const Duration(milliseconds: 1600), () {
       setState(() {
         _showWrongOverlay = false;
         _selectedAnswer = null;
@@ -1082,9 +1227,36 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     });
     userProvider.updateMatematikaGameProgress(
         _selectedLevel, _currentGameIndex, true);
+    _runStars[_currentGameIndex] = earned;
 
     // ── Also persist directly so ForParentsScreen can read progress ──────
-    _persistMatematikaProgress(points);
+    _persistMatematikaProgress(points, earned);
+  }
+
+  /// Stars each question earned in this run of the level, by question.
+  final Map<int, int> _runStars = {};
+
+  /// The level's rating from every question in it: this run's stars for
+  /// the ones answered now, the saved stars for the ones answered before.
+  ///
+  /// A level picked up halfway used to be rated on this run alone, divided
+  /// by all of its questions — a child who got every one right was given a
+  /// single star, and it replaced the three the level had.
+  Future<int> _levelRating() async {
+    final total = _currentGames.length;
+    if (total == 0) return 1;
+    final prefs = await SharedPreferences.getInstance();
+    final thisRun = _runStars.values;
+    final fallback = thisRun.isEmpty
+        ? 3
+        : (thisRun.reduce((a, b) => a + b) / thisRun.length).round();
+    var sum = 0;
+    for (int g = 0; g < total; g++) {
+      sum += _runStars[g] ??
+          prefs.getInt('mat_level_${_selectedLevel}_game_${g}_stars') ??
+          fallback;
+    }
+    return (sum / total).ceil().clamp(1, 3);
   }
 
   /// Banks the stars just earned.
@@ -1093,12 +1265,14 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   /// adds to it — including on a replay. Practising the same level again is
   /// exactly what we want a young child to do, and a star that refuses to
   /// move when they answer correctly reads as the game being broken.
-  Future<void> _persistMatematikaProgress(int points) async {
+  Future<void> _persistMatematikaProgress(int points, int stars) async {
     final prefs = await SharedPreferences.getInstance();
     final gameKey = 'mat_level_${_selectedLevel}_game_$_currentGameIndex';
 
     // Mark this specific game as done
     await prefs.setBool(gameKey, true);
+    // And what it earned, for rating a level finished over two visits.
+    await prefs.setInt('${gameKey}_stars', stars);
 
     if (points > 0) {
       await prefs.setInt(
@@ -1126,7 +1300,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
         _dropCorrect = true;
         _verdictRunning = true;
       });
-      Future.delayed(const Duration(milliseconds: 350), _onCorrect);
+      _afterDelay(const Duration(milliseconds: 350), _onCorrect);
     } else {
       setState(() => _dropWrong = true);
       _onWrong();
@@ -1156,8 +1330,14 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   void _handleRightTap(int shuffledIndex) {
     if (_lineChecked) return;
     if (_selectedLeftIndex == null) {
-      _showFeedback(
-          AppLocalizations.of(context)!.chooseLeftFirst, Colors.orange);
+      // Said in the hint line, not the banner: the banner came up at the
+      // bottom, over the last row of the board and under the child's hand.
+      HapticFeedback.selectionClick();
+      _nudgeTimer?.cancel();
+      setState(() => _nudgeLeft = true);
+      _nudgeTimer = Timer(const Duration(milliseconds: 1800), () {
+        if (mounted) setState(() => _nudgeLeft = false);
+      });
       return;
     }
     if (_lineMatches.containsValue(shuffledIndex)) return;
@@ -1170,6 +1350,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     HapticFeedback.selectionClick();
     setState(() {
       _lineMatches[leftIdx] = shuffledIndex;
+      _lineBornAt[leftIdx] = DateTime.now().millisecondsSinceEpoch;
       _selectedLeftIndex = null;
     });
 
@@ -1207,8 +1388,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       // ticks appearing are seen first — that was the real reason this board
       // had its own delay, and it survives without a second card.
       setState(() => _verdictRunning = true);
-      Future.delayed(const Duration(milliseconds: 600), () {
-        if (!mounted) return;
+      _afterDelay(const Duration(milliseconds: 600), () {
         _onCorrect();
       });
       return;
@@ -1217,8 +1397,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     HapticFeedback.vibrate();
     _shakeController.forward(from: 0);
 
-    Future.delayed(const Duration(milliseconds: 900), () {
-      if (!mounted) return;
+    _afterDelay(const Duration(milliseconds: 900), () {
       setState(() {
         // Keep the lines the child got right and lift only the mistakes, so
         // the board still shows what worked.
@@ -1245,9 +1424,10 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       if (box == null) return Offset.zero;
       final pos = box.localToGlobal(Offset.zero, ancestor: stackBox);
       final size = box.size;
+      // The centre of the connector dot, 14 outside the box.
       return isLeft
-          ? Offset(pos.dx + size.width, pos.dy + size.height / 2)
-          : Offset(pos.dx, pos.dy + size.height / 2);
+          ? Offset(pos.dx + size.width + 14, pos.dy + size.height / 2)
+          : Offset(pos.dx - 14, pos.dy + size.height / 2);
     }).toList();
   }
 
@@ -1269,7 +1449,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       setState(() => _poppedBalloons.add(balloonIndex));
       if (_poppedBalloons.containsAll(allCorrectIndices)) {
         setState(() => _verdictRunning = true);
-        Future.delayed(const Duration(milliseconds: 350), _onCorrect);
+        _afterDelay(const Duration(milliseconds: 350), _onCorrect);
       }
     } else {
       setState(() => _wrongBalloons.add(balloonIndex));
@@ -1285,7 +1465,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     if (_selectedSide != null) return;
 
     final correct = _currentGame['correct'] as String;
-    if (correct == 'equal') {
+    if (_currentGame['type'] == 'equal') {
       return; // In equal question mode, child must choose Oo or Hindi button
     }
 
@@ -1295,11 +1475,11 @@ class _MatematikaScreenState extends State<MatematikaScreen>
 
     if (isCorrect) {
       setState(() => _verdictRunning = true);
-      Future.delayed(const Duration(milliseconds: 300), _onCorrect);
+      _afterDelay(const Duration(milliseconds: 300), _onCorrect);
     } else {
       setState(() => _verdictRunning = true);
-      Future.delayed(const Duration(milliseconds: 300), () {
-        if (mounted) setState(() => _selectedSide = null);
+      _afterDelay(const Duration(milliseconds: 300), () {
+        setState(() => _selectedSide = null);
         _onWrong();
       });
     }
@@ -1316,7 +1496,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
         _selectedSide = 'equal';
         _verdictRunning = true;
       });
-      Future.delayed(const Duration(milliseconds: 300), _onCorrect);
+      _afterDelay(const Duration(milliseconds: 300), _onCorrect);
     } else {
       _onWrong();
     }
@@ -1363,15 +1543,14 @@ class _MatematikaScreenState extends State<MatematikaScreen>
 
     if (_puzzleSlots.join() == correct.join()) {
       setState(() => _isPuzzleSolved = true);
-      Future.delayed(const Duration(milliseconds: 450), _onCorrect);
+      _afterDelay(const Duration(milliseconds: 450), _onCorrect);
       return;
     }
 
     // Wrong order: empty the boxes so the child can try the whole row again
     // rather than hunting for which single box is out of place.
     _onWrong();
-    Future.delayed(const Duration(milliseconds: 1400), () {
-      if (!mounted) return;
+    _afterDelay(const Duration(milliseconds: 1400), () {
       setState(
           () => _puzzleSlots = List<int?>.filled(_puzzleNumbers.length, null));
     });
@@ -1396,13 +1575,14 @@ class _MatematikaScreenState extends State<MatematikaScreen>
 
   // ─── Dialogs ─────────────────────────────────────────────────────────────────
 
-  void _showLevelComplete() {
+  Future<void> _showLevelComplete() async {
     if (!_playing) return;
     _verdictRunning = false;
     _stopTimer();
     _replaying = false;
-    final total = _currentGames.length;
-    final avgStars = total == 0 ? 1 : (_levelStars / total).ceil().clamp(1, 3);
+    final session = _playSession;
+    final avgStars = await _levelRating();
+    if (!mounted || session != _playSession || !_playing) return;
 
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     userProvider.awardMatematikaLevelCompletion(
@@ -1460,6 +1640,12 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   }
 
   Widget _buildScaffold(BuildContext context) {
+    final walking = _playing &&
+        _selectedLevel == 2 &&
+        !MediaQuery.disableAnimationsOf(context);
+    if (walking != _marchController.isAnimating) {
+      walking ? _marchController.repeat() : _marchController.stop();
+    }
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FC),
       appBar: _buildAppBar(),
@@ -1494,7 +1680,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
                         _buildFeedbackBanner(),
                       ],
                     )
-                  : _buildLevelPicker(),
+                  : DesignScale(child: _buildLevelPicker()),
             ),
             // One card for a correct answer, one for a wrong one, one for
             // the clock — the same three in every game in the module.
@@ -1576,127 +1762,79 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   /// leave it to play, and come back to watch a card fill in.
   Widget _buildLevelPicker() {
     final userProvider = Provider.of<UserProvider>(context);
+    final loc = AppLocalizations.of(context)!;
     int earned = 0;
     for (int i = 0; i < _levelTitles.length; i++) {
       earned += userProvider.matematikaLevelStars(i);
     }
     const possible = UserProvider.matematikaStarCeiling;
+    // The first level not finished yet wears the ring: the one to do next.
+    int next = -1;
+    for (int i = 0; i < _levelTitles.length; i++) {
+      if (!userProvider.isMatematikaLevelCompleted(i)) {
+        next = i;
+        break;
+      }
+    }
 
     return Column(
       children: [
-        StarTally(earned: earned, possible: possible),
+        ModuleTally(
+          picture: 'assets/images/star_gold.webp',
+          done: earned,
+          total: possible,
+          label: (n) => loc.starsOfPossible(n, possible),
+        ),
         Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 14,
-              mainAxisSpacing: 14,
-              // Taller than wide: the title takes two lines in Tagalog
-              // and Ilocano more often than it does in English.
-              childAspectRatio: 0.98,
-            ),
-            itemCount: _levelTitles.length,
-            // The wall assembles rather than appearing. Each card is a
-            // beat behind the one before it, which walks a child's eye
-            // across them instead of dropping seven at once.
-            itemBuilder: (_, i) => StaggeredEntrance(
-              index: i,
-              delayMs: 55,
-              durationMs: 380,
-              child: _levelCard(i, userProvider),
-            ),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
+            children: [
+              ModuleTileGrid(
+                count: _levelTitles.length,
+                // The tiles assemble rather than appearing. Each is a beat
+                // behind the one before it, which walks a child's eye down
+                // them instead of dropping seven at once.
+                builder: (i, wide) => StaggeredEntrance(
+                  index: i,
+                  delayMs: 55,
+                  durationMs: 380,
+                  child: _levelCard(i, userProvider,
+                      highlight: i == next, wide: wide),
+                ),
+              ),
+            ],
           ),
         ),
       ],
     );
   }
 
-  /// One level, in its own colour, with what the child has taken from it.
-  Widget _levelCard(int i, UserProvider userProvider) {
+  /// One level, in its own colour, with a picture of what it asks for.
+  Widget _levelCard(int i, UserProvider userProvider,
+      {required bool highlight, required bool wide}) {
     final completed = userProvider.isMatematikaLevelCompleted(i);
     final stars = userProvider.matematikaLevelStars(i);
     final gradient = _levelGradients[i % _levelGradients.length];
 
-    return Pressable(
+    return ModuleLevelTile(
+      label: AppLocalizations.of(context)!.level(i + 1),
+      number: i + 1,
+      title: _getLevelTitleLocalized(i),
+      color: gradient.first,
+      // The level pictures carry their own tile shadows and a little room
+      // for them, so they go in without another shadow.
+      picture: ModulePicture('assets/images/bilang/level${i + 1}.webp',
+          width: 96, height: 90, shadow: false),
+      stars: stars,
+      wide: wide,
+      // The ringed level says "Continue": it is where the child carries on.
+      state: completed
+          ? ModuleCardState.done
+          : highlight
+              ? ModuleCardState.resume
+              : ModuleCardState.start,
+      highlight: highlight,
       onTap: () => completed ? _confirmReplay(i) : _openLevel(i),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: gradient,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(26),
-          boxShadow: [
-            BoxShadow(
-              color: gradient.first.withOpacity(0.35),
-              blurRadius: 14,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                // The number lives in the badge rather than on a line of its
-                // own. Stacked, the card needed 168 logical pixels of fixed
-                // height and a 360-wide phone gives each cell 167 — an
-                // overflow stripe on the most common screen there is.
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.22),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${i + 1}',
-                      style: const TextStyle(
-                        fontSize: 19,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Icon(_levelIcons[i],
-                    color: Colors.white.withOpacity(0.85), size: 20),
-                const Spacer(),
-                if (completed)
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.check_rounded,
-                        size: 16, color: gradient.first),
-                  ),
-              ],
-            ),
-            const Spacer(),
-            WordSafeText(
-              _getLevelTitleLocalized(i),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 16,
-                height: 1.15,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 6),
-            _levelStarStrip(stars, true, size: 26),
-          ],
-        ),
-      ),
     );
   }
 
@@ -1712,22 +1850,6 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       stars: userProvider.matematikaLevelStars(i),
       points: userProvider.matematikaLevelScore(i),
       onRepeat: () => _openLevel(i),
-    );
-  }
-
-  Widget _levelStarStrip(int stars, bool active, {double size = 18}) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(3, (s) {
-        final got = s < stars;
-        return Icon(
-          got ? Icons.star_rounded : Icons.star_outline_rounded,
-          size: size,
-          color: active
-              ? (got ? Colors.white : Colors.white.withOpacity(0.55))
-              : (got ? const Color(0xFFFFB800) : Colors.grey.shade400),
-        );
-      }),
     );
   }
 
@@ -1751,23 +1873,32 @@ class _MatematikaScreenState extends State<MatematikaScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: activeGradient),
-                      shape: BoxShape.circle,
+              // Takes what the count beside it leaves, and ends in "…" when a
+              // long title ("Pagkakasunod-sunod ng mga bilang") does not fit.
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: activeGradient),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(_levelIcons[_selectedLevel],
+                          color: Colors.white, size: 14),
                     ),
-                    child: Icon(_levelIcons[_selectedLevel],
-                        color: Colors.white, size: 14),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(_getLevelTitleLocalized(_selectedLevel),
-                      style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.bold)),
-                ],
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(_getLevelTitleLocalized(_selectedLevel),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
@@ -2428,13 +2559,27 @@ class _MatematikaScreenState extends State<MatematikaScreen>
           // Instruction
           _questionText(_getMatchFromMap(game)),
           const SizedBox(height: 3),
-          Text(
-            AppLocalizations.of(context)!.tapLeftTapRight,
-            style: TextStyle(
-                fontSize: 11,
-                color: Colors.grey.shade500,
-                fontStyle: FontStyle.italic),
-            textAlign: TextAlign.center,
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: _nudgeLeft
+                ? Text(
+                    AppLocalizations.of(context)!.chooseLeftFirst,
+                    key: const ValueKey('nudge'),
+                    style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFFF08A00),
+                        fontWeight: FontWeight.w800),
+                    textAlign: TextAlign.center,
+                  )
+                : Text(
+                    AppLocalizations.of(context)!.tapLeftTapRight,
+                    key: const ValueKey('hint'),
+                    style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade500,
+                        fontStyle: FontStyle.italic),
+                    textAlign: TextAlign.center,
+                  ),
           ),
           const SizedBox(height: 10),
 
@@ -2465,9 +2610,9 @@ class _MatematikaScreenState extends State<MatematikaScreen>
                     text: ' / $count',
                     style: const TextStyle(color: AppColors.primary),
                   ),
-                  const TextSpan(
-                    text: '  natugma',
-                    style: TextStyle(
+                  TextSpan(
+                    text: '  ${AppLocalizations.of(context)!.lineMatched}',
+                    style: const TextStyle(
                         color: Colors.grey,
                         fontSize: 12,
                         fontWeight: FontWeight.normal),
@@ -2487,8 +2632,11 @@ class _MatematikaScreenState extends State<MatematikaScreen>
                 Positioned.fill(
                   child: IgnorePointer(
                     child: AnimatedBuilder(
-                      animation: Listenable.merge(
-                          [_shakeController, _starBurstController]),
+                      animation: Listenable.merge([
+                        _shakeController,
+                        _starBurstController,
+                        _marchController
+                      ]),
                       builder: (_, __) {
                         final lDots =
                             _getDotPositions(_leftNodeKeys, isLeft: true);
@@ -2501,6 +2649,11 @@ class _MatematikaScreenState extends State<MatematikaScreen>
                             matches: Map.from(_lineMatches),
                             wrongFlash: Map.from(_wrongFlash),
                             checked: _lineChecked,
+                            bornAt: Map.from(_lineBornAt),
+                            nowMs: DateTime.now().millisecondsSinceEpoch,
+                            march: _marchController.value,
+                            burst: _starBurstController.value,
+                            still: MediaQuery.disableAnimationsOf(context),
                           ),
                         );
                       },
@@ -2512,66 +2665,93 @@ class _MatematikaScreenState extends State<MatematikaScreen>
                 // Every box as tall as the room allows. They were a fixed
                 // 66 pixels with 26-pixel pictures, floating in a board with
                 // half its height spare — too small to count three apples in.
-                LayoutBuilder(builder: (_, box) {
-                  final nodeH =
-                      ((box.maxHeight / count) - 18).clamp(44.0, 150.0);
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // LEFT – emoji groups
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: List.generate(count, (i) {
-                              final objs =
-                                  (pairs[i]['objects'] as List<dynamic>)
-                                      .cast<String>();
-                              final isMatch = _lineMatches.containsKey(i);
-                              final isSel = _selectedLeftIndex == i;
-                              final isWrong = _wrongFlash[i] == true;
-                              return _buildLeftNode(
-                                height: nodeH,
-                                nodeKey: _leftNodeKeys[i],
-                                emojis: objs,
-                                selected: isSel,
-                                matched: isMatch,
-                                isWrong: isWrong,
-                                checked: _lineChecked,
-                                onTap: () => _handleLeftTap(i),
-                              );
-                            }),
+                AnimatedBuilder(
+                  animation: _marchController,
+                  builder: (_, __) => LayoutBuilder(builder: (_, box) {
+                    final nodeH =
+                        ((box.maxHeight / count) - 18).clamp(44.0, 150.0);
+                    // A slow breath, once a second, for the chosen group's dot
+                    // and for the numbers it could go to.
+                    final pulse = .5 -
+                        .5 *
+                            cos(2 *
+                                pi *
+                                (DateTime.now().millisecondsSinceEpoch % 1000) /
+                                1000);
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // LEFT – emoji groups
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: List.generate(count, (i) {
+                                final objs =
+                                    (pairs[i]['objects'] as List<dynamic>)
+                                        .cast<String>();
+                                final isMatch = _lineMatches.containsKey(i);
+                                final isSel = _selectedLeftIndex == i;
+                                final isWrong = _wrongFlash[i] == true;
+                                return _buildLeftNode(
+                                  height: nodeH,
+                                  nodeKey: _leftNodeKeys[i],
+                                  emojis: objs,
+                                  selected: isSel,
+                                  matched: isMatch,
+                                  isWrong: isWrong,
+                                  checked: _lineChecked,
+                                  pairColor: _pairColor(i),
+                                  pulse: pulse,
+                                  onTap: () => _handleLeftTap(i),
+                                );
+                              }),
+                            ),
                           ),
-                        ),
 
-                        // Centre gap (lines pass through here)
-                        const SizedBox(width: 56),
+                          // Centre gap (lines pass through here). Wide enough
+                          // that three crossing lines stay apart.
+                          const SizedBox(width: 96),
 
-                        // RIGHT – numbers (shuffled)
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: List.generate(count, (shuffled) {
-                              final orig = _shuffledRightIndices[shuffled];
-                              final isMatch =
-                                  _lineMatches.containsValue(shuffled);
-                              return _buildRightNode(
-                                height: nodeH,
-                                nodeKey: _rightNodeKeys[shuffled],
-                                number: orig + 1,
-                                matched: isMatch,
-                                isWrong: wrongRights.contains(shuffled),
-                                checked: _lineChecked,
-                                onTap: () => _handleRightTap(shuffled),
-                              );
-                            }),
+                          // RIGHT – numbers (shuffled)
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: List.generate(count, (shuffled) {
+                                final orig = _shuffledRightIndices[shuffled];
+                                final isMatch =
+                                    _lineMatches.containsValue(shuffled);
+                                int? from;
+                                _lineMatches.forEach((l, r) {
+                                  if (r == shuffled) from = l;
+                                });
+                                return _buildRightNode(
+                                  height: nodeH,
+                                  nodeKey: _rightNodeKeys[shuffled],
+                                  number: orig + 1,
+                                  matched: isMatch,
+                                  isWrong: wrongRights.contains(shuffled),
+                                  checked: _lineChecked,
+                                  pairColor:
+                                      from == null ? null : _pairColor(from!),
+                                  // A group is chosen: the numbers still free
+                                  // breathe in its colour, to say "now one of
+                                  // these".
+                                  invite: !isMatch && _selectedLeftIndex != null
+                                      ? _pairColor(_selectedLeftIndex!)
+                                      : null,
+                                  pulse: pulse,
+                                  onTap: () => _handleRightTap(shuffled),
+                                );
+                              }),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
+                        ],
+                      ),
+                    );
+                  }),
+                ),
 
                 // The old full-screen red circle sat in the middle of the
                 // board and hid the very lines that show which pairs were
@@ -2603,26 +2783,29 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     required bool matched,
     required bool isWrong,
     required bool checked,
+    required Color pairColor,
+    required double pulse,
     required VoidCallback onTap,
   }) {
-    // A connected group only turns green after the whole board is graded.
-    final Color linked = checked ? Colors.green : AppColors.primary;
+    // A connected group only turns green after the whole board is graded;
+    // until then it wears its pair's colour.
+    final Color linked = isWrong
+        ? _lineWrong
+        : checked
+            ? _lineRight
+            : pairColor;
 
-    final Color border = isWrong
-        ? Colors.red
-        : matched
-            ? linked
-            : selected
-                ? AppColors.primary
-                : Colors.grey.shade300;
+    final Color border = matched || isWrong
+        ? linked
+        : selected
+            ? pairColor
+            : Colors.grey.shade300;
 
-    final Color bg = isWrong
-        ? Colors.red.withOpacity(0.07)
-        : matched
-            ? linked.withOpacity(0.07)
-            : selected
-                ? AppColors.primary.withOpacity(0.09)
-                : Colors.white;
+    final Color bg = matched || isWrong
+        ? linked.withOpacity(0.07)
+        : selected
+            ? pairColor.withOpacity(0.09)
+            : Colors.white;
 
     return GestureDetector(
       key: nodeKey,
@@ -2634,7 +2817,8 @@ class _MatematikaScreenState extends State<MatematikaScreen>
         height: height,
         margin: const EdgeInsets.only(top: 4, bottom: 9),
         padding: const EdgeInsets.all(8),
-        decoration: _nodeDecoration(bg, border, glow: selected),
+        decoration:
+            _nodeDecoration(bg, border, glow: selected ? pairColor : null),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
@@ -2645,38 +2829,21 @@ class _MatematikaScreenState extends State<MatematikaScreen>
             // Laid out like the counting boards too: as big as the box
             // allows, in whatever grid makes them biggest.
             Positioned.fill(child: _countableObjects(emojis)),
-            // Right-edge connector dot
+            // Right-edge connector dot. This box has 8 of padding, so 8 more
+            // to reach the same 14-outside-the-edge spot the line ends at.
             Positioned(
-              right: -19,
+              right: -32,
               top: 0,
               bottom: 0,
               child: Center(
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  width: 11,
-                  height: 11,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: isWrong
-                        ? Colors.red
-                        : matched
-                            ? linked
-                            : selected
-                                ? AppColors.primary
-                                : Colors.grey.shade400,
-                    border: Border.all(color: Colors.white, width: 1.5),
-                  ),
-                ),
+                // Once joined, the line's own end sits here, arrow and
+                // verdict included; the hook would only cover it.
+                child: matched || isWrong
+                    ? const SizedBox(width: 20, height: 20)
+                    : _connectorDot(selected ? pairColor : null,
+                        pulse: selected ? pulse : null),
               ),
             ),
-            // The tick is a verdict, so it only appears after grading.
-            if (matched && checked && !isWrong)
-              const Positioned(
-                top: 4,
-                right: -2,
-                child: Icon(LucideIcons.circle_check,
-                    color: Colors.green, size: 14),
-              ),
           ],
         ),
       ),
@@ -2686,7 +2853,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   /// A match box as the other boards' answers are drawn: a white face, a
   /// rim, and a solid edge under it in the rim's colour — the rim carrying
   /// whether it is picked (blue), joined, right (green) or wrong (red).
-  BoxDecoration _nodeDecoration(Color bg, Color rim, {bool glow = false}) {
+  BoxDecoration _nodeDecoration(Color bg, Color rim, {Color? glow}) {
     // The plain grey rim is the white tiles' own grey.
     final edge = rim == Colors.grey.shade300 ? const Color(0xFFCDD3DD) : rim;
     return BoxDecoration(
@@ -2698,10 +2865,10 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       boxShadow: [
         BoxShadow(color: edge, offset: const Offset(0, 5)),
         BoxShadow(
-          color: glow
-              ? AppColors.primary.withOpacity(0.28)
+          color: glow != null
+              ? glow.withOpacity(0.32)
               : Colors.black.withOpacity(0.10),
-          blurRadius: glow ? 12 : 8,
+          blurRadius: glow != null ? 12 : 8,
           offset: const Offset(0, 7),
         ),
       ],
@@ -2717,14 +2884,21 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     required bool matched,
     required bool isWrong,
     required bool checked,
+    required Color? pairColor,
+    required Color? invite,
+    required double pulse,
     required VoidCallback onTap,
   }) {
     final Color linked = isWrong
-        ? Colors.red
+        ? _lineWrong
         : checked
-            ? Colors.green
-            : AppColors.primary;
-    final border = matched ? linked : Colors.grey.shade300;
+            ? _lineRight
+            : pairColor ?? AppColors.primary;
+    final border = matched
+        ? linked
+        : invite != null
+            ? Color.lerp(const Color(0xFFCDD3DD), invite, .35 + .65 * pulse)!
+            : Colors.grey.shade300;
     final bg = matched ? linked.withOpacity(0.07) : Colors.white;
 
     return GestureDetector(
@@ -2750,24 +2924,39 @@ class _MatematikaScreenState extends State<MatematikaScreen>
             ),
             // Left-edge connector dot
             Positioned(
-              left: -19,
+              left: -24,
               top: 0,
               bottom: 0,
               child: Center(
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  width: 11,
-                  height: 11,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: matched ? linked : Colors.grey.shade400,
-                    border: Border.all(color: Colors.white, width: 1.5),
-                  ),
-                ),
-              ),
+                  child: matched
+                      ? const SizedBox(width: 20, height: 20)
+                      : _connectorDot(null)),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// The round hook on a box's edge where a line attaches: white with a grey
+  /// ring while free, filled with the line's colour once it has one. The
+  /// chosen group's hook breathes ([pulse] 0 to 1).
+  Widget _connectorDot(Color? color, {double? pulse}) {
+    return Container(
+      width: 20,
+      height: 20,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color ?? Colors.white,
+        border: Border.all(color: Colors.white, width: 3),
+        boxShadow: [
+          BoxShadow(color: color ?? _ringGrey, spreadRadius: 3),
+          if (pulse != null && color != null)
+            BoxShadow(
+              color: color.withOpacity(.3 * (1 - pulse)),
+              spreadRadius: 3 + 4 * pulse,
+            ),
+        ],
       ),
     );
   }
@@ -2941,7 +3130,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     // White until answered; then the right side turns green and a wrongly
     // chosen one red. "Same number" boards are answered with Yes / No, so
     // their sides stay white.
-    final bool? verdict = !answered || correct == 'equal'
+    final bool? verdict = !answered || isEqualMode
         ? null
         : sideKey == correct
             ? true

@@ -1,6 +1,8 @@
 import 'parents_lock_screen.dart';
+import 'privacy_notice_screen.dart';
 import '../services/parent_pin.dart';
 import 'choose_avatar_screen.dart';
+import 'setup_resume_screen.dart';
 import 'dart:convert';
 
 import 'package:e_tarabay/l10n/app_localizations.dart';
@@ -161,14 +163,30 @@ class _LoginScreenState extends State<LoginScreen> {
         (profileMap?['avatar'] ?? studentData['avatar'] ?? '').toString(),
       );
       if (!mounted) return;
-      // Keep the typed LRN locally for certificate display (cloud stays hashed).
-      await userProvider.setSessionLrn(password);
+      // The Student Number from the record, not the password typed: the parent
+      // may have changed the password, and the certificate prints this.
+      await userProvider.setSessionLrn((studentData['lrn'] ?? '').toString());
       if (!mounted) return;
 
       // The one moment an adult is certainly holding this phone. After it,
       // the phone is the child's. A parent who has already made their code —
       // signing in their second child, say — goes straight through.
       final prefs = await SharedPreferences.getInstance();
+      // Until the steps below are done, the next open finishes them rather
+      // than going straight Home (see SetupResumeScreen).
+      await prefs.setBool(setupPendingKeyFor(studentId), true);
+      if (!mounted) return;
+      // What the app keeps about the child, read by the parent before
+      // anything else, once on this phone.
+      if (!await PrivacyNotice.isAcknowledged(prefs)) {
+        if (!mounted) return;
+        await Navigator.push(
+          context,
+          PremiumPageRoute(
+              child: const PrivacyNoticeScreen(requireAcknowledge: true)),
+        );
+        if (!mounted) return;
+      }
       if (!await ParentPin.isSet(prefs)) {
         if (!mounted) return;
         await Navigator.push(
@@ -201,6 +219,9 @@ class _LoginScreenState extends State<LoginScreen> {
           if (!mounted) return;
         }
       }
+
+      await prefs.remove(setupPendingKeyFor(studentId));
+      if (!mounted) return;
 
       // Navigate to home immediately — no blocking spinner. The full progress
       // sync runs in the background and the UI updates silently once it lands

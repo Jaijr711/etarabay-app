@@ -2353,10 +2353,3 @@ List<List<Offset>>? strokesForMode(int mode, String letter) {
       return numberStrokes[letter];
   }
 }
-
-/// Testing/verification helper: concatenates a Stroke_Set in order.
-/// Not used at runtime — the screen walks each stroke in turn rather than
-/// the whole character at once. Kept for tests and for checking data by
-/// hand.
-List<Offset> flattenStrokes(List<List<Offset>> strokes) =>
-    strokes.expand((s) => s).toList();

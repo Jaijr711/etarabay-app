@@ -85,6 +85,9 @@ class BadgeDef {
     required this.rule,
   });
 
+  /// The 3D picture on the medal: one file per badge, named after its id.
+  String get image => 'assets/images/badges/$id.webp';
+
   BadgeProgress progressFrom(Map<String, dynamic> progress) => rule(progress);
 }
 
@@ -204,13 +207,6 @@ const List<BadgeDef> badgeCatalog = [
     rule: _streakRule,
   ),
 ];
-
-BadgeDef? badgeById(String id) {
-  for (final b in badgeCatalog) {
-    if (b.id == id) return b;
-  }
-  return null;
-}
 
 // Rules are top-level functions so the catalog stays a `const` list.
 //

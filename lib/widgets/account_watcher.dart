@@ -6,8 +6,13 @@ import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
 
 import '../l10n/app_localizations.dart';
+import '../models/certificate_model.dart';
+import '../providers/language_provider.dart';
 import '../providers/user_provider.dart';
+import '../screens/certificates_screen.dart';
 import '../services/developer_service.dart';
+import '../utils/page_transitions.dart';
+import 'certificate_earned_popup.dart';
 
 /// Tells the child, wherever they are, that their account is gone.
 ///
@@ -39,6 +44,7 @@ class AccountWatcher extends StatefulWidget {
 class _AccountWatcherState extends State<AccountWatcher> {
   bool _showing = false;
   bool _showingAdminMessage = false;
+  bool _showingCertificate = false;
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +71,41 @@ class _AccountWatcherState extends State<AccountWatcher> {
           .addPostFrameCallback((_) => _showAdminMessage(message, category));
     }
 
+    // The certificate is earned wherever the last thing was done — claiming
+    // the twelfth badge, finishing the last lesson — so it is announced from
+    // here, over whatever screen that was.
+    if (userProvider.certificateCelebrationPending &&
+        !_showingCertificate &&
+        !_showing &&
+        !_showingAdminMessage) {
+      _showingCertificate = true;
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _celebrateCertificate());
+    }
+
     return widget.child;
+  }
+
+  Future<void> _celebrateCertificate() async {
+    final navigator = widget.navigatorKey.currentState;
+    final dialogContext = widget.navigatorKey.currentContext;
+    if (navigator == null || dialogContext == null) {
+      _showingCertificate = false;
+      return;
+    }
+    final provider = context.read<UserProvider>();
+    final view = await showCertificateEarnedPopup(dialogContext,
+        name: provider.userProfile?.name ?? '');
+    if (!mounted) return;
+    await provider.markCertificateCelebrated();
+    _showingCertificate = false;
+    if (view && mounted) {
+      final lang = context.read<LanguageProvider>().currentLanguageCode;
+      await navigator.pushPremium(CertificateDetailScreen(
+        certificate: allCertificates['e_tarabay_graduate']!,
+        langCode: lang,
+      ));
+    }
   }
 
   /// The developer dashboard's note to this student, shown over whatever

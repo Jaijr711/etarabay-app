@@ -14,6 +14,13 @@ rules_version = '2';
 //  These rules require an authenticated app instance (anonymous is fine),
 //  which blocks arbitrary public internet access to the database while
 //  keeping the current app behaviour working.
+//
+//  KNOWN LIMIT (data privacy): every copy of the app signs in anonymously,
+//  the teacher's included, so these rules cannot tell the teacher from a
+//  child's device. Any installed copy of the app can therefore read every
+//  child's record. Closing that needs the teacher to sign in with an
+//  account of their own (Firebase Email/Password, created by the
+//  developers) and rules that check it — deliberately left for later.
 // ─────────────────────────────────────────────────────────────────────────────
 
 service cloud.firestore {
@@ -22,6 +29,14 @@ service cloud.firestore {
     // Student records: readable/writable by any authenticated app instance.
     match /students/{studentId} {
       allow read, write: if request.auth != null;
+
+      // The child's drawings (students/{id}/extra/creations). A match on a
+      // document does not reach the documents under it, so without this the
+      // catch-all below refused every drawing the moment these rules were
+      // deployed.
+      match /{sub=**} {
+        allow read, write: if request.auth != null;
+      }
     }
 
     // App config (teacher credential hash, developer dashboard password

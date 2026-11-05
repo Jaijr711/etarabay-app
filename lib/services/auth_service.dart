@@ -5,12 +5,19 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../providers/user_provider.dart' show UserProvider;
 
 /// Password/credential verification for both gated areas of the app: the
 /// teacher dashboard and the hidden developer dashboard. Every password
 /// this class ever touches is hashed with [hashLrn] before it reaches
 /// Firestore — nothing here ever stores or transmits one in plaintext.
 class AuthService {
+  /// How long a teacher's or parent's save waits for the server. Firestore
+  /// holds a write until the server answers, which offline is never: the
+  /// form sat with its spinner, or closed and said nothing. Past this the
+  /// save reports the connection instead.
+  static const Duration writeTimeout = Duration(seconds: 10);
+
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   /// The Firestore rules require *some* authenticated app instance —
@@ -61,7 +68,13 @@ class AuthService {
 
   /// Verify a teacher password against the hash stored in `config/teacher`.
   /// Uses serverAndCache so it works offline after the first online login.
-  Future<bool> verifyTeacherPassword(String password) async {
+  Future<bool> verifyTeacherPassword(String password) async =>
+      (await checkTeacherPassword(password)) ?? false;
+
+  /// Like [verifyTeacherPassword], but says when it could not tell: null
+  /// when the check itself failed (no signal, a timeout), so a slow network
+  /// is never taken for a changed password.
+  Future<bool?> checkTeacherPassword(String password) async {
     try {
       final snap = await _db
           .collection('config')
@@ -72,7 +85,7 @@ class AuthService {
       return storedHash.isNotEmpty && storedHash == hashLrn(password);
     } catch (e) {
       debugPrint('verifyTeacherPassword error: $e');
-      return false;
+      return null;
     }
   }
 
@@ -232,7 +245,11 @@ class AuthService {
         return {'status': 'Error', 'message': 'Nothing to update.'};
       }
 
-      await _db.collection('students').doc(studentId).update(updates);
+      await _db
+          .collection('students')
+          .doc(studentId)
+          .update(updates)
+          .timeout(writeTimeout);
       return {'status': 'Success'};
     } catch (e) {
       debugPrint('updateStudentCredentials error: $e');
@@ -450,6 +467,7 @@ class AuthService {
     String parentName = '',
     String parentContact = '',
     String? avatar,
+    bool parentConsented = false,
   }) async {
     try {
       // Check if Student Number already exists to prevent duplicates (compare hashes)
@@ -457,7 +475,10 @@ class AuthService {
       final existingCheck = await _db
           .collection('students')
           .where('lrnHash', isEqualTo: lrnHash)
-          .get();
+          // The server, never this phone's cache: offline, the cache does
+          // not know a number another phone already enrolled.
+          .get(const GetOptions(source: Source.server))
+          .timeout(writeTimeout);
 
       if (existingCheck.docs.isNotEmpty) {
         return {
@@ -471,7 +492,8 @@ class AuthService {
       final usernameCheck = await _db
           .collection('students')
           .where('username', isEqualTo: username.trim())
-          .get();
+          .get(const GetOptions(source: Source.server))
+          .timeout(writeTimeout);
 
       if (usernameCheck.docs.isNotEmpty) {
         return {
@@ -500,6 +522,12 @@ class AuthService {
         'parentContact': parentContact,
         'avatar': avatar,
         'enrolledAt': FieldValue.serverTimestamp(),
+        // The parent's yes to keeping these details (RA 10173), and when.
+        if (parentConsented)
+          'parentConsent': {
+            'version': 1,
+            'agreedAt': FieldValue.serverTimestamp(),
+          },
         'progress': {
           'overallProgress': 0.0,
           'totalCompleted': 0,
@@ -520,7 +548,7 @@ class AuthService {
         }
       };
 
-      await docRef.set(studentData);
+      await docRef.set(studentData).timeout(writeTimeout);
 
       return {
         'status': 'Success',
@@ -534,6 +562,21 @@ class AuthService {
         'code': 'enrollFailed',
         'message': 'Could not enroll student. Please check your connection.',
       };
+    }
+  }
+
+  /// The drawings' own document (students/{id}/extra/creations), emptied
+  /// with the rest of a reset.
+  Future<void> _clearCloudCreations(String studentId) async {
+    try {
+      await _db
+          .collection('students')
+          .doc(studentId)
+          .collection('extra')
+          .doc('creations')
+          .set({'list': [], 'updatedAt': FieldValue.serverTimestamp()});
+    } catch (e) {
+      debugPrint('Drawings not cleared: $e');
     }
   }
 
@@ -615,7 +658,7 @@ class AuthService {
       await _db.collection('students').doc(studentId).update({
         ...updates,
         ...profileUpdates,
-      });
+      }).timeout(writeTimeout);
     } catch (e) {
       debugPrint('Error updating student: $e');
     }
@@ -624,11 +667,26 @@ class AuthService {
   /// Delete a student record.
   Future<void> deleteStudent(String studentId) async {
     try {
-      await _db.collection('students').doc(studentId).delete();
+      // The drawings live in a document of their own under the record, and
+      // deleting a document leaves the ones under it behind. A child the
+      // teacher removed kept their pictures in the cloud with nobody able to
+      // reach them — the opposite of what removing them promises a parent.
+      await _creationsDoc(studentId).delete().timeout(writeTimeout);
+      await _db
+          .collection('students')
+          .doc(studentId)
+          .delete()
+          .timeout(writeTimeout);
     } catch (e) {
       debugPrint('Error deleting student: $e');
     }
   }
+
+  DocumentReference<Map<String, dynamic>> _creationsDoc(String studentId) => _db
+      .collection('students')
+      .doc(studentId)
+      .collection('extra')
+      .doc('creations');
 
   /// Delete all student records from Firestore.
   Future<Map<String, dynamic>> deleteAllStudents() async {
@@ -645,16 +703,18 @@ class AuthService {
         };
       }
 
-      // Firestore batches are limited to 500 operations
-      const int batchLimit = 500;
+      // Firestore batches are limited to 500 operations: two per child,
+      // the record and its drawings (see deleteStudent).
+      const int batchLimit = 250;
       for (var i = 0; i < docs.length; i += batchLimit) {
         final batch = _db.batch();
         final end =
             (i + batchLimit < docs.length) ? i + batchLimit : docs.length;
         for (var j = i; j < end; j++) {
+          batch.delete(_creationsDoc(docs[j].id));
           batch.delete(docs[j].reference);
         }
-        await batch.commit();
+        await batch.commit().timeout(writeTimeout);
       }
 
       return {
@@ -729,7 +789,7 @@ class AuthService {
             'studentId': newId,
           });
         }
-        await batch.commit();
+        await batch.commit().timeout(writeTimeout);
       }
 
       return {
@@ -792,7 +852,8 @@ class AuthService {
           // certificates, none of which were reset in the cloud, so nothing
           // ever brought them back.
           'lastResetScope': 'all',
-        });
+        }).timeout(writeTimeout);
+        await _clearCloudCreations(studentId);
       }
       // Only when this *is* the child's device.
       //
@@ -849,6 +910,24 @@ class AuthService {
     }
   }
 
+  /// The `rawProgress` keys that belong to [categories] (module names such
+  /// as 'kulay' or 'matematika'), by the same prefixes the device uses.
+  @visibleForTesting
+  static List<String> moduleRawKeys(
+      Object? rawProgress, List<String> categories) {
+    if (rawProgress is! Map) return const [];
+    final prefixes = [
+      for (final cat in categories) ...?UserProvider.moduleKeyPrefixes[cat],
+    ];
+    return [
+      for (final k in rawProgress.keys)
+        if (prefixes.any('$k'.startsWith) &&
+            // Only keys a field path can name as written.
+            !'$k'.contains('.'))
+          '$k',
+    ];
+  }
+
   /// Reset specific activity categories for a student
   Future<bool> resetStudentSpecificActivities(
       String studentId, List<String> categories) async {
@@ -861,6 +940,19 @@ class AuthService {
         // and nothing else.
         'lastResetScope': categories.join(','),
       };
+
+      // The raw records of the chosen modules go too. Only the summaries
+      // above were reset before, and the child's device merged the raw
+      // records straight back — "finished beats unfinished" — so the
+      // reset undid itself at the next sync.
+      final doc = await _db
+          .collection('students')
+          .doc(studentId)
+          .get(const GetOptions(source: Source.server))
+          .timeout(writeTimeout);
+      for (final key in moduleRawKeys(doc.data()?['rawProgress'], categories)) {
+        updates['rawProgress.$key'] = FieldValue.delete();
+      }
 
       for (final cat in categories) {
         switch (cat) {
@@ -904,7 +996,14 @@ class AuthService {
         }
       }
 
-      await _db.collection('students').doc(studentId).update(updates);
+      await _db
+          .collection('students')
+          .doc(studentId)
+          .update(updates)
+          .timeout(writeTimeout);
+      if (updates.containsKey('creations')) {
+        await _clearCloudCreations(studentId);
+      }
 
       // Local prefs cleanup, for the same reason as above: only if the
       // device pressing the button is the one the child plays on.

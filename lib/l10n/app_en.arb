@@ -85,7 +85,7 @@
   "repeat": "Repeat",
   "congratulations": "Congratulations!",
   "chooseFirst": "Choose an answer first!",
-  "chooseLeftFirst": "Choose a number on the left first!",
+  "chooseLeftFirst": "Tap a group on the left first!",
   "popAllBalloonsWith": "Pop all the balloons with",
   "left": "Left",
   "right": "Right",
@@ -147,15 +147,6 @@
   "familyTreeSubtitle": "Who are your relatives?",
   "myHomeSubtitle": "Where do you live?",
   "colorSomethingFirst": "Color something first!",
-  "justNow": "just now",
-  "timeAgo": "{amount}m ago",
-  "@timeAgo": {
-    "placeholders": {
-      "amount": {
-        "type": "int"
-      }
-    }
-  },
   "saved": "Saved!",
   "coloringBook": "Coloring Book",
   "myCreations": "My Creations",
@@ -174,7 +165,6 @@
   "brush": "Brush",
   "eraser": "Eraser",
   "undo": "Undo",
-  "redo": "Redo",
   "clear": "Clear",
   "upper": "Capital Letter",
   "lower": "Small Letter",
@@ -334,7 +324,7 @@
   "doneAlready": "Done already!",
   "noGamesAvailable2": "No games available",
   "countAndDragCorrectNumber": "Count and drag the correct number!",
-  "countThenDragToBasket": "Count the {items} then drag them to the basket",
+  "countThenDragToBasket": "Count the {items}, then drag the right number to the basket",
   "@countThenDragToBasket": {
     "placeholders": {
       "items": {
@@ -389,7 +379,10 @@
   "pageMansanas": "Apple",
   "pageSaging": "Banana",
   "pageTeddyBear": "Teddy Bear",
-  "pageSodaPop": "Soda",
+  "pageRaceCar": "Race Car",
+  "@pageRaceCar": {
+    "description": "Coloring page: a race car"
+  },
   "favoriteChosen": "Your Favorite is {choice}!",
   "@favoriteChosen": {
     "placeholders": {
@@ -663,10 +656,6 @@
   "@forgotPin": {
     "description": "Link back to the LRN as a recovery route"
   },
-  "or": "or",
-  "@or": {
-    "description": "Divider between two ways of signing in"
-  },
   "openReport": "Open",
   "@openReport": {
     "description": "Button that opens the parents report"
@@ -801,10 +790,6 @@
   "@biometricUnavailable": {
     "description": "Shown when the device has no biometrics"
   },
-  "strongest": "Going best",
-  "@strongest": {
-    "description": "Parents summary wording"
-  },
   "credentialsUpdated": "Login updated.",
   "@credentialsUpdated": {
     "description": "Message shown to a teacher or parent"
@@ -920,10 +905,6 @@
   },
   "childLoginNote": "What your child types to open the app. The teacher can change it too.",
   "@childLoginNote": {
-    "description": "Parent account wording"
-  },
-  "usernameTaken": "That username is taken. Please pick another.",
-  "@usernameTaken": {
     "description": "Parent account wording"
   },
   "playedToday": "Played today",
@@ -1319,12 +1300,456 @@
       }
     }
   },
-  "onboardingQuote": "“Live as if you were to die tomorrow. Learn as if you were to live forever.”\n― Mahatma Gandhi",
-  "@onboardingQuote": {
-    "description": "Quote on the welcome screen"
-  },
+  "welcomeTo": "Welcome to",
+  "skip": "Skip",
   "audioRecordingTune": "Audio Recording",
   "@audioRecordingTune": {
     "description": "The tune of a song that is a recording, not a known melody"
+  },
+  "inProgress": "In progress",
+  "@inProgress": {
+    "description": "Tag on a coloring page begun but not saved yet"
+  },
+  "leaveColoringTitle": "Save your coloring?",
+  "@leaveColoringTitle": {
+    "description": "Asked when leaving a picture with coloring not saved"
+  },
+  "leaveColoringBody": "Your coloring is kept even if you don't save it.",
+  "@leaveColoringBody": {
+    "description": "Under the save question when leaving a picture"
+  },
+  "notNow": "Not now",
+  "@notNow": {
+    "description": "Leave without saving now"
+  },
+  "allStudentsTab": "All",
+  "protectedBadge": "Protected: locks when you leave the app",
+  "showLabel": "Show",
+  "hideLabel": "Hide",
+  "newBadgeShort": "New",
+  "consentStep": "Consent",
+  "enrollStepChild": "Who is the child?",
+  "enrollStepParent": "Who is the parent or guardian?",
+  "enrollStepConsent": "Parent's consent",
+  "stepNumber": "Step {current} of {total}",
+  "@stepNumber": {
+    "description": "Step counter in the enrol sheet",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewBeforeEnroll": "Check before enrolling",
+  "childLabel": "Child",
+  "parentLabelShort": "Parent",
+  "numberLabel": "Number",
+  "parentConsentCheck": "The parent or guardian agreed to record this information only for the child's learning in E-Tarabay.",
+  "consentLawNote": "Under the Data Privacy Act of 2012 (RA 10173). The date of consent is recorded.",
+  "privacyAgreementTitle": "Privacy Agreement",
+  "privacyAgreementSubtitle": "To keep the children's information safe.",
+  "privacyPromise1": "I will not share the children's names, birthdays or their parents' numbers with anyone.",
+  "privacyPromise2": "I will use the information only for the children's learning.",
+  "privacyPromise3": "I will not leave the app open, and my phone has a lock.",
+  "privacyPromise4": "I will tell the school at once if the phone is lost or someone else sees the information.",
+  "signatureLabel": "Your full name as your signature",
+  "signatureHint": "e.g. Mrs. Maria Santos",
+  "agreeCheck": "I agree to this agreement.",
+  "enterDashboard": "Continue to the dashboard",
+  "agreedOn": "Agreed by {name} on {date}",
+  "@agreedOn": {
+    "description": "Who agreed to the privacy agreement and when",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "privacyPolicy": "Privacy policy",
+  "privacyPolicyNote": "The promise you agreed to",
+  "lockTitle": "Enter the password",
+  "lockBody": "The children's information is protected.",
+  "teacherPasswordField": "Teacher's password",
+  "unlockButton": "Open",
+  "lockReason": "Open the teacher dashboard",
+  "pinTitle": "Enter the PIN",
+  "pinWrong": "{left, plural, =1{Wrong PIN. 1 try left.} other{Wrong PIN. {left} tries left.}}",
+  "@pinWrong": {
+    "description": "Wrong PIN on the teacher lock",
+    "placeholders": {
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "pinBlocked": "Too many wrong tries. The password is needed now.",
+  "teacherForgotPin": "Forgot the PIN?",
+  "usePassword": "Use the password",
+  "createPinTitle": "Make a PIN",
+  "createPinBody": "4 numbers that open the dashboard on this phone.",
+  "confirmPinTitle": "Enter the PIN again",
+  "teacherPinMismatch": "The PINs are not the same. Try again.",
+  "currentPinTitle": "Enter your current PIN",
+  "changePin": "Change the PIN",
+  "changePinNote": "4 numbers that open the dashboard",
+  "pinSaved": "New PIN saved.",
+  "deleteDigit": "Delete",
+  "passwordToResetPin": "Enter the teacher's password to make a new PIN.",
+  "privacyAgreementIntro": "You hold the children's personal information. Read and agree to these:",
+  "agreeToContinueHint": "Type your name and tick the agreement to continue.",
+  "lawPill": "RA 10173",
+  "reportStarsTile": "Stars",
+  "reportDoneTile": "Done",
+  "reportLastPlayedTile": "Last played",
+  "lastPlayedToday": "Today",
+  "lastPlayedYesterday": "Yesterday",
+  "lastPlayedDays": "{days} days",
+  "@lastPlayedDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "practiceMisses": "{count} wrong",
+  "@practiceMisses": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "childWorksHeader": "Child's work",
+  "teacherToolsHeader": "Teacher tools",
+  "toolEditInfo": "Edit info",
+  "toolEditInfoNote": "Name, gender, parent",
+  "toolLogin": "Child's login",
+  "toolLoginNote": "Give it to the parent",
+  "toolReset": "Reset progress",
+  "toolResetNote": "One module or all",
+  "percentDone": "{percent}% done",
+  "@percentDone": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "ofStars": "of {count} stars",
+  "@ofStars": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "levelsHeader": "Each level",
+  "resetModule": "Reset {name}",
+  "@resetModule": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "resetSheetSub": "{name} · cannot be undone",
+  "@resetSheetSub": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "resetPickModules": "Chosen modules",
+  "resetPickModulesNote": "Only the chosen ones are cleared",
+  "resetAllModules": "All modules",
+  "resetAllModulesNote": "All progress goes back to the start",
+  "resetWarnKeepDrawings": "Stars and finished games in {count} module(s) will be cleared. The drawings are kept.",
+  "@resetWarnKeepDrawings": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "resetWarnDrawings": "Stars and finished games in {count} module(s) will be cleared, and the drawings too.",
+  "@resetWarnDrawings": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "resetConfirm": "I understand this cannot be undone.",
+  "tabLogin": "Login",
+  "noChanges": "No changes",
+  "childPicksPicture": "The child picks their own picture at their first sign-in.",
+  "parentNumberUse": "Only for calling about the child's learning.",
+  "showLoginCard": "Show the login card",
+  "removeStudentAction": "Remove student",
+  "loginUser": "User",
+  "loginCardTitle": "Login card",
+  "loginCardStudent": "Student at E-Tarabay",
+  "loginCardKeep": "Keep this card safe. Do not show it to other people.",
+  "copyLogin": "Copy the login",
+  "loginCardHint": "Show it to the parent or let them take a photo of it.",
+  "familySectionHeader": "My family",
+  "levelStarsEarned": "{count} of 3 stars",
+  "@levelStarsEarned": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "levelsDone": "{done} of {total} done",
+  "@levelsDone": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "privacyNoticeTitle": "Privacy Notice",
+  "privacyNoticeSubtitle": "How E-Tarabay looks after your child's information.",
+  "pnCollectTitle": "What we keep",
+  "pnCollectBody": "Your child's name, birthday, Student Number, gender and picture, their progress and drawings, and a parent's name and contact number.",
+  "pnWhyTitle": "Why",
+  "pnWhyBody": "Only for your child's learning: to save their progress and show it to you and to their teacher. It is never sold or used for ads.",
+  "pnWhoTitle": "Who can see it",
+  "pnWhoBody": "Your child's teacher, who has promised to keep it private, and you on this phone with your code.",
+  "pnKeepTitle": "How long",
+  "pnKeepBody": "Until the teacher removes your child from the class. Then the record and the drawings are deleted.",
+  "pnRightsTitle": "Your rights",
+  "pnRightsBody": "You may ask the teacher or the school to show, correct or delete your child's information (Data Privacy Act of 2012, RA 10173).",
+  "pnProblemTitle": "If something is wrong",
+  "pnProblemBody": "If the phone is lost or someone else has seen your child's information, tell the teacher or the school at once.",
+  "pnAcknowledge": "I understand",
+  "parentPinBubbleEnter": "Code first, Parent!",
+  "parentPinBubbleSet": "Let's make a code!",
+  "parentPinBubbleConfirm": "Once more!",
+  "parentPinBubbleForgot": "No problem!",
+  "parentPinBubbleDone": "All set, Parent!",
+  "parentPinEnterSub": "To see {name}'s report.",
+  "@parentPinEnterSub": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "parentPinEnterSubPlain": "To see your child's report.",
+  "parentPinConfirmSub": "To be sure, type the code you just made again.",
+  "parentPinForgotSub": "It is on the login card from the teacher. After that, you will make a new code.",
+  "parentPinRemembered": "I remember the code",
+  "parentPinBubbleFirst": "For parents only!",
+  "parentPinFirstSub": "Type your child's Student Number from the login card. Then you will make a code.",
+  "parentPinBubbleLogout": "Code first, before leaving!",
+  "parentPinLogoutSub": "To log out of {name}'s account.",
+  "@parentPinLogoutSub": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "parentPinLogoutSubPlain": "To log out of this account.",
+  "kidBubbleLessons": "Let's learn!",
+  "kidBubbleAwards": "You're amazing!",
+  "kidBubbleSettings": "Let's set things up!",
+  "kidBubbleProfile": "This is you, {name}!",
+  "@kidBubbleProfile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "kidBubbleCertLocked": "Almost there!",
+  "kidBubbleCertEarned": "Well done!",
+  "kidSubLessons": "Stars: {stars} of 5",
+  "@kidSubLessons": {
+    "placeholders": {
+      "stars": {
+        "type": "int"
+      }
+    }
+  },
+  "kidSubAwards": "Collected: {count}",
+  "@kidSubAwards": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "kidSubCert": "{earned} of {total}",
+  "@kidSubCert": {
+    "placeholders": {
+      "earned": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "kidBubbleProfilePlain": "This is you!",
+  "kidSubSettings": "Language and sounds",
+  "lessonStart": "Start",
+  "lessonContinue": "Continue",
+  "lessonDone": "Done!",
+  "lessonLocked": "Locked",
+  "badgeSpecialShelf": "Special",
+  "claimShort": "Claim!",
+  "lessonActivities": "{done} of {total} activities",
+  "@lessonActivities": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "lessonLevels": "{done} of {total} levels",
+  "@lessonLevels": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "lessonNumber": "Lesson {n}",
+  "@lessonNumber": {
+    "description": "Small label over each About Me lesson card",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "aboutMeShort": "Me",
+  "@aboutMeShort": {
+    "description": "Heading over the About Me lessons"
+  },
+  "tallyLetters": "{done} of {total} letters",
+  "@tallyLetters": {
+    "description": "Trace It: letters finished in this set",
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "tallyNumbers": "{done} of {total} numbers",
+  "@tallyNumbers": {
+    "description": "Trace It: numbers finished in this set",
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "pickLetter": "Pick a letter",
+  "@pickLetter": {
+    "description": "Trace It: heading over the wall of letters"
+  },
+  "pickNumber": "Pick a number",
+  "@pickNumber": {
+    "description": "Trace It: heading over the wall of numbers"
+  },
+  "traceNextHint": "The shining one is the next to write!",
+  "@traceNextHint": {
+    "description": "Trace It: hint under the wall of letters"
+  },
+  "traceLockedHint": "Write {letter} first.",
+  "@traceLockedHint": {
+    "description": "Trace It: shown when a letter not reached yet is tapped",
+    "placeholders": {
+      "letter": {
+        "type": "String"
+      }
+    }
+  },
+  "finishColoring": "Done!",
+  "@finishColoring": {
+    "description": "Color Fun: the big button under the crayons that finishes a picture"
+  },
+  "coloringGreatJob": "Great job!",
+  "@coloringGreatJob": {
+    "description": "Color Fun: title of the card shown when a picture is finished"
+  },
+  "nextPicture": "Next",
+  "@nextPicture": {
+    "description": "Color Fun: the button that opens the next picture not colored yet"
+  },
+  "colorMore": "Color more",
+  "@colorMore": {
+    "description": "Color Fun: closes the finished card and goes back to the same picture"
+  },
+  "allPicturesDone": "All done!",
+  "@allPicturesDone": {
+    "description": "Color Fun: shown instead of Next when every picture is finished"
+  },
+  "clearAlsoRemoves": "It leaves {place} too",
+  "@clearAlsoRemoves": {
+    "description": "Color Fun: warning in the Clear question when the picture is saved",
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "removedFrom": "Removed from {place}",
+  "@removedFrom": {
+    "description": "Color Fun: note after clearing a saved picture, with Undo beside it",
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "cleared": "Cleared",
+  "@cleared": {
+    "description": "Color Fun: note after clearing a picture, with Undo beside it"
+  },
+  "certEarnedTitle": "Congratulations,\n{name}!",
+  "@certEarnedTitle": {
+    "description": "Certificate pop-up title, the moment the child earns it",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "certEarnedBody": "You earned your\nCertificate of Completion!",
+  "certEarnedView": "See my Certificate",
+  "lineMatched": "matched",
+  "@lineMatched": {
+    "description": "Numbers, Match with Line: after \"2 / 3\", how many pairs are matched"
+  },
+  "studentFallback": "Student",
+  "@studentFallback": {
+    "description": "Shown in place of the child's name when the profile has none"
   }
 }

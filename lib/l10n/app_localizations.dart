@@ -403,7 +403,7 @@ abstract class AppLocalizations {
   /// No description provided for @chooseLeftFirst.
   ///
   /// In en, this message translates to:
-  /// **'Choose a number on the left first!'**
+  /// **'Tap a group on the left first!'**
   String get chooseLeftFirst;
 
   /// No description provided for @popAllBalloonsWith.
@@ -646,18 +646,6 @@ abstract class AppLocalizations {
   /// **'Color something first!'**
   String get colorSomethingFirst;
 
-  /// No description provided for @justNow.
-  ///
-  /// In en, this message translates to:
-  /// **'just now'**
-  String get justNow;
-
-  /// No description provided for @timeAgo.
-  ///
-  /// In en, this message translates to:
-  /// **'{amount}m ago'**
-  String timeAgo(int amount);
-
   /// No description provided for @saved.
   ///
   /// In en, this message translates to:
@@ -765,12 +753,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Undo'**
   String get undo;
-
-  /// No description provided for @redo.
-  ///
-  /// In en, this message translates to:
-  /// **'Redo'**
-  String get redo;
 
   /// No description provided for @clear.
   ///
@@ -1418,7 +1400,7 @@ abstract class AppLocalizations {
   /// No description provided for @countThenDragToBasket.
   ///
   /// In en, this message translates to:
-  /// **'Count the {items} then drag them to the basket'**
+  /// **'Count the {items}, then drag the right number to the basket'**
   String countThenDragToBasket(String items);
 
   /// No description provided for @whatIsMissingNumber.
@@ -1661,11 +1643,11 @@ abstract class AppLocalizations {
   /// **'Teddy Bear'**
   String get pageTeddyBear;
 
-  /// No description provided for @pageSodaPop.
+  /// Coloring page: a race car
   ///
   /// In en, this message translates to:
-  /// **'Soda'**
-  String get pageSodaPop;
+  /// **'Race Car'**
+  String get pageRaceCar;
 
   /// No description provided for @favoriteChosen.
   ///
@@ -2363,12 +2345,6 @@ abstract class AppLocalizations {
   /// **'Forgot code? Use the Student Number'**
   String get forgotPin;
 
-  /// Divider between two ways of signing in
-  ///
-  /// In en, this message translates to:
-  /// **'or'**
-  String get or;
-
   /// Button that opens the parents report
   ///
   /// In en, this message translates to:
@@ -2530,12 +2506,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No fingerprint or face is set up on this phone, so this login is unavailable.'**
   String get biometricUnavailable;
-
-  /// Parents summary wording
-  ///
-  /// In en, this message translates to:
-  /// **'Going best'**
-  String get strongest;
 
   /// Message shown to a teacher or parent
   ///
@@ -2716,12 +2686,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'What your child types to open the app. The teacher can change it too.'**
   String get childLoginNote;
-
-  /// Parent account wording
-  ///
-  /// In en, this message translates to:
-  /// **'That username is taken. Please pick another.'**
-  String get usernameTaken;
 
   /// When the child last played
   ///
@@ -3299,17 +3263,1031 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{Birthday today!} other{{count} birthdays today!}}'**
   String birthdayToday(int count);
 
-  /// Quote on the welcome screen
+  /// No description provided for @welcomeTo.
   ///
   /// In en, this message translates to:
-  /// **'“Live as if you were to die tomorrow. Learn as if you were to live forever.”\n― Mahatma Gandhi'**
-  String get onboardingQuote;
+  /// **'Welcome to'**
+  String get welcomeTo;
+
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
 
   /// The tune of a song that is a recording, not a known melody
   ///
   /// In en, this message translates to:
   /// **'Audio Recording'**
   String get audioRecordingTune;
+
+  /// Tag on a coloring page begun but not saved yet
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get inProgress;
+
+  /// Asked when leaving a picture with coloring not saved
+  ///
+  /// In en, this message translates to:
+  /// **'Save your coloring?'**
+  String get leaveColoringTitle;
+
+  /// Under the save question when leaving a picture
+  ///
+  /// In en, this message translates to:
+  /// **'Your coloring is kept even if you don\'t save it.'**
+  String get leaveColoringBody;
+
+  /// Leave without saving now
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get notNow;
+
+  /// No description provided for @allStudentsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get allStudentsTab;
+
+  /// No description provided for @protectedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Protected: locks when you leave the app'**
+  String get protectedBadge;
+
+  /// No description provided for @showLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Show'**
+  String get showLabel;
+
+  /// No description provided for @hideLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide'**
+  String get hideLabel;
+
+  /// No description provided for @newBadgeShort.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get newBadgeShort;
+
+  /// No description provided for @consentStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Consent'**
+  String get consentStep;
+
+  /// No description provided for @enrollStepChild.
+  ///
+  /// In en, this message translates to:
+  /// **'Who is the child?'**
+  String get enrollStepChild;
+
+  /// No description provided for @enrollStepParent.
+  ///
+  /// In en, this message translates to:
+  /// **'Who is the parent or guardian?'**
+  String get enrollStepParent;
+
+  /// No description provided for @enrollStepConsent.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent\'s consent'**
+  String get enrollStepConsent;
+
+  /// Step counter in the enrol sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Step {current} of {total}'**
+  String stepNumber(int current, int total);
+
+  /// No description provided for @reviewBeforeEnroll.
+  ///
+  /// In en, this message translates to:
+  /// **'Check before enrolling'**
+  String get reviewBeforeEnroll;
+
+  /// No description provided for @childLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Child'**
+  String get childLabel;
+
+  /// No description provided for @parentLabelShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent'**
+  String get parentLabelShort;
+
+  /// No description provided for @numberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Number'**
+  String get numberLabel;
+
+  /// No description provided for @parentConsentCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'The parent or guardian agreed to record this information only for the child\'s learning in E-Tarabay.'**
+  String get parentConsentCheck;
+
+  /// No description provided for @consentLawNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Under the Data Privacy Act of 2012 (RA 10173). The date of consent is recorded.'**
+  String get consentLawNote;
+
+  /// No description provided for @privacyAgreementTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Agreement'**
+  String get privacyAgreementTitle;
+
+  /// No description provided for @privacyAgreementSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'To keep the children\'s information safe.'**
+  String get privacyAgreementSubtitle;
+
+  /// No description provided for @privacyPromise1.
+  ///
+  /// In en, this message translates to:
+  /// **'I will not share the children\'s names, birthdays or their parents\' numbers with anyone.'**
+  String get privacyPromise1;
+
+  /// No description provided for @privacyPromise2.
+  ///
+  /// In en, this message translates to:
+  /// **'I will use the information only for the children\'s learning.'**
+  String get privacyPromise2;
+
+  /// No description provided for @privacyPromise3.
+  ///
+  /// In en, this message translates to:
+  /// **'I will not leave the app open, and my phone has a lock.'**
+  String get privacyPromise3;
+
+  /// No description provided for @privacyPromise4.
+  ///
+  /// In en, this message translates to:
+  /// **'I will tell the school at once if the phone is lost or someone else sees the information.'**
+  String get privacyPromise4;
+
+  /// No description provided for @signatureLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your full name as your signature'**
+  String get signatureLabel;
+
+  /// No description provided for @signatureHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Mrs. Maria Santos'**
+  String get signatureHint;
+
+  /// No description provided for @agreeCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'I agree to this agreement.'**
+  String get agreeCheck;
+
+  /// No description provided for @enterDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to the dashboard'**
+  String get enterDashboard;
+
+  /// Who agreed to the privacy agreement and when
+  ///
+  /// In en, this message translates to:
+  /// **'Agreed by {name} on {date}'**
+  String agreedOn(String name, String date);
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy'**
+  String get privacyPolicy;
+
+  /// No description provided for @privacyPolicyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The promise you agreed to'**
+  String get privacyPolicyNote;
+
+  /// No description provided for @lockTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the password'**
+  String get lockTitle;
+
+  /// No description provided for @lockBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The children\'s information is protected.'**
+  String get lockBody;
+
+  /// No description provided for @teacherPasswordField.
+  ///
+  /// In en, this message translates to:
+  /// **'Teacher\'s password'**
+  String get teacherPasswordField;
+
+  /// No description provided for @unlockButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get unlockButton;
+
+  /// No description provided for @lockReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the teacher dashboard'**
+  String get lockReason;
+
+  /// No description provided for @pinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the PIN'**
+  String get pinTitle;
+
+  /// Wrong PIN on the teacher lock
+  ///
+  /// In en, this message translates to:
+  /// **'{left, plural, =1{Wrong PIN. 1 try left.} other{Wrong PIN. {left} tries left.}}'**
+  String pinWrong(int left);
+
+  /// No description provided for @pinBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many wrong tries. The password is needed now.'**
+  String get pinBlocked;
+
+  /// No description provided for @teacherForgotPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot the PIN?'**
+  String get teacherForgotPin;
+
+  /// No description provided for @usePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the password'**
+  String get usePassword;
+
+  /// No description provided for @createPinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Make a PIN'**
+  String get createPinTitle;
+
+  /// No description provided for @createPinBody.
+  ///
+  /// In en, this message translates to:
+  /// **'4 numbers that open the dashboard on this phone.'**
+  String get createPinBody;
+
+  /// No description provided for @confirmPinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the PIN again'**
+  String get confirmPinTitle;
+
+  /// No description provided for @teacherPinMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The PINs are not the same. Try again.'**
+  String get teacherPinMismatch;
+
+  /// No description provided for @currentPinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your current PIN'**
+  String get currentPinTitle;
+
+  /// No description provided for @changePin.
+  ///
+  /// In en, this message translates to:
+  /// **'Change the PIN'**
+  String get changePin;
+
+  /// No description provided for @changePinNote.
+  ///
+  /// In en, this message translates to:
+  /// **'4 numbers that open the dashboard'**
+  String get changePinNote;
+
+  /// No description provided for @pinSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'New PIN saved.'**
+  String get pinSaved;
+
+  /// No description provided for @deleteDigit.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteDigit;
+
+  /// No description provided for @passwordToResetPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the teacher\'s password to make a new PIN.'**
+  String get passwordToResetPin;
+
+  /// No description provided for @privacyAgreementIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'You hold the children\'s personal information. Read and agree to these:'**
+  String get privacyAgreementIntro;
+
+  /// No description provided for @agreeToContinueHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type your name and tick the agreement to continue.'**
+  String get agreeToContinueHint;
+
+  /// No description provided for @lawPill.
+  ///
+  /// In en, this message translates to:
+  /// **'RA 10173'**
+  String get lawPill;
+
+  /// No description provided for @reportStarsTile.
+  ///
+  /// In en, this message translates to:
+  /// **'Stars'**
+  String get reportStarsTile;
+
+  /// No description provided for @reportDoneTile.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get reportDoneTile;
+
+  /// No description provided for @reportLastPlayedTile.
+  ///
+  /// In en, this message translates to:
+  /// **'Last played'**
+  String get reportLastPlayedTile;
+
+  /// No description provided for @lastPlayedToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get lastPlayedToday;
+
+  /// No description provided for @lastPlayedYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get lastPlayedYesterday;
+
+  /// No description provided for @lastPlayedDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days'**
+  String lastPlayedDays(int days);
+
+  /// No description provided for @practiceMisses.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} wrong'**
+  String practiceMisses(int count);
+
+  /// No description provided for @childWorksHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Child\'s work'**
+  String get childWorksHeader;
+
+  /// No description provided for @teacherToolsHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Teacher tools'**
+  String get teacherToolsHeader;
+
+  /// No description provided for @toolEditInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit info'**
+  String get toolEditInfo;
+
+  /// No description provided for @toolEditInfoNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Name, gender, parent'**
+  String get toolEditInfoNote;
+
+  /// No description provided for @toolLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Child\'s login'**
+  String get toolLogin;
+
+  /// No description provided for @toolLoginNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Give it to the parent'**
+  String get toolLoginNote;
+
+  /// No description provided for @toolReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset progress'**
+  String get toolReset;
+
+  /// No description provided for @toolResetNote.
+  ///
+  /// In en, this message translates to:
+  /// **'One module or all'**
+  String get toolResetNote;
+
+  /// No description provided for @percentDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% done'**
+  String percentDone(int percent);
+
+  /// No description provided for @ofStars.
+  ///
+  /// In en, this message translates to:
+  /// **'of {count} stars'**
+  String ofStars(int count);
+
+  /// No description provided for @levelsHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Each level'**
+  String get levelsHeader;
+
+  /// No description provided for @resetModule.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset {name}'**
+  String resetModule(String name);
+
+  /// No description provided for @resetSheetSub.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} · cannot be undone'**
+  String resetSheetSub(String name);
+
+  /// No description provided for @resetPickModules.
+  ///
+  /// In en, this message translates to:
+  /// **'Chosen modules'**
+  String get resetPickModules;
+
+  /// No description provided for @resetPickModulesNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the chosen ones are cleared'**
+  String get resetPickModulesNote;
+
+  /// No description provided for @resetAllModules.
+  ///
+  /// In en, this message translates to:
+  /// **'All modules'**
+  String get resetAllModules;
+
+  /// No description provided for @resetAllModulesNote.
+  ///
+  /// In en, this message translates to:
+  /// **'All progress goes back to the start'**
+  String get resetAllModulesNote;
+
+  /// No description provided for @resetWarnKeepDrawings.
+  ///
+  /// In en, this message translates to:
+  /// **'Stars and finished games in {count} module(s) will be cleared. The drawings are kept.'**
+  String resetWarnKeepDrawings(int count);
+
+  /// No description provided for @resetWarnDrawings.
+  ///
+  /// In en, this message translates to:
+  /// **'Stars and finished games in {count} module(s) will be cleared, and the drawings too.'**
+  String resetWarnDrawings(int count);
+
+  /// No description provided for @resetConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand this cannot be undone.'**
+  String get resetConfirm;
+
+  /// No description provided for @tabLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get tabLogin;
+
+  /// No description provided for @noChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'No changes'**
+  String get noChanges;
+
+  /// No description provided for @childPicksPicture.
+  ///
+  /// In en, this message translates to:
+  /// **'The child picks their own picture at their first sign-in.'**
+  String get childPicksPicture;
+
+  /// No description provided for @parentNumberUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Only for calling about the child\'s learning.'**
+  String get parentNumberUse;
+
+  /// No description provided for @showLoginCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the login card'**
+  String get showLoginCard;
+
+  /// No description provided for @removeStudentAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove student'**
+  String get removeStudentAction;
+
+  /// No description provided for @loginUser.
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get loginUser;
+
+  /// No description provided for @loginCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Login card'**
+  String get loginCardTitle;
+
+  /// No description provided for @loginCardStudent.
+  ///
+  /// In en, this message translates to:
+  /// **'Student at E-Tarabay'**
+  String get loginCardStudent;
+
+  /// No description provided for @loginCardKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep this card safe. Do not show it to other people.'**
+  String get loginCardKeep;
+
+  /// No description provided for @copyLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy the login'**
+  String get copyLogin;
+
+  /// No description provided for @loginCardHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Show it to the parent or let them take a photo of it.'**
+  String get loginCardHint;
+
+  /// No description provided for @familySectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'My family'**
+  String get familySectionHeader;
+
+  /// No description provided for @levelStarsEarned.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of 3 stars'**
+  String levelStarsEarned(int count);
+
+  /// No description provided for @levelsDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} done'**
+  String levelsDone(int done, int total);
+
+  /// No description provided for @privacyNoticeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Notice'**
+  String get privacyNoticeTitle;
+
+  /// No description provided for @privacyNoticeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How E-Tarabay looks after your child\'s information.'**
+  String get privacyNoticeSubtitle;
+
+  /// No description provided for @pnCollectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What we keep'**
+  String get pnCollectTitle;
+
+  /// No description provided for @pnCollectBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your child\'s name, birthday, Student Number, gender and picture, their progress and drawings, and a parent\'s name and contact number.'**
+  String get pnCollectBody;
+
+  /// No description provided for @pnWhyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Why'**
+  String get pnWhyTitle;
+
+  /// No description provided for @pnWhyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Only for your child\'s learning: to save their progress and show it to you and to their teacher. It is never sold or used for ads.'**
+  String get pnWhyBody;
+
+  /// No description provided for @pnWhoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Who can see it'**
+  String get pnWhoTitle;
+
+  /// No description provided for @pnWhoBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your child\'s teacher, who has promised to keep it private, and you on this phone with your code.'**
+  String get pnWhoBody;
+
+  /// No description provided for @pnKeepTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How long'**
+  String get pnKeepTitle;
+
+  /// No description provided for @pnKeepBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Until the teacher removes your child from the class. Then the record and the drawings are deleted.'**
+  String get pnKeepBody;
+
+  /// No description provided for @pnRightsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your rights'**
+  String get pnRightsTitle;
+
+  /// No description provided for @pnRightsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You may ask the teacher or the school to show, correct or delete your child\'s information (Data Privacy Act of 2012, RA 10173).'**
+  String get pnRightsBody;
+
+  /// No description provided for @pnProblemTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'If something is wrong'**
+  String get pnProblemTitle;
+
+  /// No description provided for @pnProblemBody.
+  ///
+  /// In en, this message translates to:
+  /// **'If the phone is lost or someone else has seen your child\'s information, tell the teacher or the school at once.'**
+  String get pnProblemBody;
+
+  /// No description provided for @pnAcknowledge.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand'**
+  String get pnAcknowledge;
+
+  /// No description provided for @parentPinBubbleEnter.
+  ///
+  /// In en, this message translates to:
+  /// **'Code first, Parent!'**
+  String get parentPinBubbleEnter;
+
+  /// No description provided for @parentPinBubbleSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s make a code!'**
+  String get parentPinBubbleSet;
+
+  /// No description provided for @parentPinBubbleConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Once more!'**
+  String get parentPinBubbleConfirm;
+
+  /// No description provided for @parentPinBubbleForgot.
+  ///
+  /// In en, this message translates to:
+  /// **'No problem!'**
+  String get parentPinBubbleForgot;
+
+  /// No description provided for @parentPinBubbleDone.
+  ///
+  /// In en, this message translates to:
+  /// **'All set, Parent!'**
+  String get parentPinBubbleDone;
+
+  /// No description provided for @parentPinEnterSub.
+  ///
+  /// In en, this message translates to:
+  /// **'To see {name}\'s report.'**
+  String parentPinEnterSub(String name);
+
+  /// No description provided for @parentPinEnterSubPlain.
+  ///
+  /// In en, this message translates to:
+  /// **'To see your child\'s report.'**
+  String get parentPinEnterSubPlain;
+
+  /// No description provided for @parentPinConfirmSub.
+  ///
+  /// In en, this message translates to:
+  /// **'To be sure, type the code you just made again.'**
+  String get parentPinConfirmSub;
+
+  /// No description provided for @parentPinForgotSub.
+  ///
+  /// In en, this message translates to:
+  /// **'It is on the login card from the teacher. After that, you will make a new code.'**
+  String get parentPinForgotSub;
+
+  /// No description provided for @parentPinRemembered.
+  ///
+  /// In en, this message translates to:
+  /// **'I remember the code'**
+  String get parentPinRemembered;
+
+  /// No description provided for @parentPinBubbleFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'For parents only!'**
+  String get parentPinBubbleFirst;
+
+  /// No description provided for @parentPinFirstSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Type your child\'s Student Number from the login card. Then you will make a code.'**
+  String get parentPinFirstSub;
+
+  /// No description provided for @parentPinBubbleLogout.
+  ///
+  /// In en, this message translates to:
+  /// **'Code first, before leaving!'**
+  String get parentPinBubbleLogout;
+
+  /// No description provided for @parentPinLogoutSub.
+  ///
+  /// In en, this message translates to:
+  /// **'To log out of {name}\'s account.'**
+  String parentPinLogoutSub(String name);
+
+  /// No description provided for @parentPinLogoutSubPlain.
+  ///
+  /// In en, this message translates to:
+  /// **'To log out of this account.'**
+  String get parentPinLogoutSubPlain;
+
+  /// No description provided for @kidBubbleLessons.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s learn!'**
+  String get kidBubbleLessons;
+
+  /// No description provided for @kidBubbleAwards.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re amazing!'**
+  String get kidBubbleAwards;
+
+  /// No description provided for @kidBubbleSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s set things up!'**
+  String get kidBubbleSettings;
+
+  /// No description provided for @kidBubbleProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'This is you, {name}!'**
+  String kidBubbleProfile(String name);
+
+  /// No description provided for @kidBubbleCertLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Almost there!'**
+  String get kidBubbleCertLocked;
+
+  /// No description provided for @kidBubbleCertEarned.
+  ///
+  /// In en, this message translates to:
+  /// **'Well done!'**
+  String get kidBubbleCertEarned;
+
+  /// No description provided for @kidSubLessons.
+  ///
+  /// In en, this message translates to:
+  /// **'Stars: {stars} of 5'**
+  String kidSubLessons(int stars);
+
+  /// No description provided for @kidSubAwards.
+  ///
+  /// In en, this message translates to:
+  /// **'Collected: {count}'**
+  String kidSubAwards(int count);
+
+  /// No description provided for @kidSubCert.
+  ///
+  /// In en, this message translates to:
+  /// **'{earned} of {total}'**
+  String kidSubCert(int earned, int total);
+
+  /// No description provided for @kidBubbleProfilePlain.
+  ///
+  /// In en, this message translates to:
+  /// **'This is you!'**
+  String get kidBubbleProfilePlain;
+
+  /// No description provided for @kidSubSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Language and sounds'**
+  String get kidSubSettings;
+
+  /// No description provided for @lessonStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get lessonStart;
+
+  /// No description provided for @lessonContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get lessonContinue;
+
+  /// No description provided for @lessonDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done!'**
+  String get lessonDone;
+
+  /// No description provided for @lessonLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked'**
+  String get lessonLocked;
+
+  /// No description provided for @badgeSpecialShelf.
+  ///
+  /// In en, this message translates to:
+  /// **'Special'**
+  String get badgeSpecialShelf;
+
+  /// No description provided for @claimShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Claim!'**
+  String get claimShort;
+
+  /// No description provided for @lessonActivities.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} activities'**
+  String lessonActivities(int done, int total);
+
+  /// No description provided for @lessonLevels.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} levels'**
+  String lessonLevels(int done, int total);
+
+  /// Small label over each About Me lesson card
+  ///
+  /// In en, this message translates to:
+  /// **'Lesson {n}'**
+  String lessonNumber(int n);
+
+  /// Heading over the About Me lessons
+  ///
+  /// In en, this message translates to:
+  /// **'Me'**
+  String get aboutMeShort;
+
+  /// Trace It: letters finished in this set
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} letters'**
+  String tallyLetters(int done, int total);
+
+  /// Trace It: numbers finished in this set
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} numbers'**
+  String tallyNumbers(int done, int total);
+
+  /// Trace It: heading over the wall of letters
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a letter'**
+  String get pickLetter;
+
+  /// Trace It: heading over the wall of numbers
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a number'**
+  String get pickNumber;
+
+  /// Trace It: hint under the wall of letters
+  ///
+  /// In en, this message translates to:
+  /// **'The shining one is the next to write!'**
+  String get traceNextHint;
+
+  /// Trace It: shown when a letter not reached yet is tapped
+  ///
+  /// In en, this message translates to:
+  /// **'Write {letter} first.'**
+  String traceLockedHint(String letter);
+
+  /// Color Fun: the big button under the crayons that finishes a picture
+  ///
+  /// In en, this message translates to:
+  /// **'Done!'**
+  String get finishColoring;
+
+  /// Color Fun: title of the card shown when a picture is finished
+  ///
+  /// In en, this message translates to:
+  /// **'Great job!'**
+  String get coloringGreatJob;
+
+  /// Color Fun: the button that opens the next picture not colored yet
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get nextPicture;
+
+  /// Color Fun: closes the finished card and goes back to the same picture
+  ///
+  /// In en, this message translates to:
+  /// **'Color more'**
+  String get colorMore;
+
+  /// Color Fun: shown instead of Next when every picture is finished
+  ///
+  /// In en, this message translates to:
+  /// **'All done!'**
+  String get allPicturesDone;
+
+  /// Color Fun: warning in the Clear question when the picture is saved
+  ///
+  /// In en, this message translates to:
+  /// **'It leaves {place} too'**
+  String clearAlsoRemoves(String place);
+
+  /// Color Fun: note after clearing a saved picture, with Undo beside it
+  ///
+  /// In en, this message translates to:
+  /// **'Removed from {place}'**
+  String removedFrom(String place);
+
+  /// Color Fun: note after clearing a picture, with Undo beside it
+  ///
+  /// In en, this message translates to:
+  /// **'Cleared'**
+  String get cleared;
+
+  /// Certificate pop-up title, the moment the child earns it
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations,\n{name}!'**
+  String certEarnedTitle(String name);
+
+  /// No description provided for @certEarnedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You earned your\nCertificate of Completion!'**
+  String get certEarnedBody;
+
+  /// No description provided for @certEarnedView.
+  ///
+  /// In en, this message translates to:
+  /// **'See my Certificate'**
+  String get certEarnedView;
+
+  /// Numbers, Match with Line: after "2 / 3", how many pairs are matched
+  ///
+  /// In en, this message translates to:
+  /// **'matched'**
+  String get lineMatched;
+
+  /// Shown in place of the child's name when the profile has none
+  ///
+  /// In en, this message translates to:
+  /// **'Student'**
+  String get studentFallback;
 }
 
 class _AppLocalizationsDelegate

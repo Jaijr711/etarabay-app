@@ -38,7 +38,8 @@ void main() {
     // what this sheet is for. Borrow a real one from the machine.
     final file = File(r'C:\Windows\Fonts\arialbd.ttf');
     if (file.existsSync()) {
-      final bytes = ByteData.view(Uint8List.fromList(file.readAsBytesSync()).buffer);
+      final bytes =
+          ByteData.view(Uint8List.fromList(file.readAsBytesSync()).buffer);
       await (FontLoader('Roboto')..addFont(Future.value(bytes))).load();
     }
   });

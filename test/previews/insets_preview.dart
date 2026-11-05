@@ -80,7 +80,10 @@ void main() {
       const PamilyaScreen(),
       (t) async => t.tap(find.text('All About Me').first)
     ),
-    'kulay': (const KulayScreen(), (t) async => t.tap(find.text('Puppy').first)),
+    'kulay': (
+      const KulayScreen(),
+      (t) async => t.tap(find.text('Puppy').first)
+    ),
     'tandaan': (const TandaanScreen(), null),
     'trace': (const TraceItScreen(), null),
     'magbasa': (const MagbasaScreen(), null),
@@ -121,8 +124,7 @@ void main() {
               MultiProvider(
                 providers: [
                   ChangeNotifierProvider(create: (_) => UserProvider()),
-                  ChangeNotifierProvider(
-                      create: (_) => LanguageProvider('en')),
+                  ChangeNotifierProvider(create: (_) => LanguageProvider('en')),
                   ChangeNotifierProvider<AudioManager>.value(
                       value: AudioManager.instance),
                 ],
@@ -169,15 +171,14 @@ void main() {
           ),
         ));
         Future<void> settle() async {
-          await tester
-              .runAsync(() => Future.delayed(const Duration(milliseconds: 1500)));
+          await tester.runAsync(
+              () => Future.delayed(const Duration(milliseconds: 1500)));
           for (int i = 0; i < 6; i++) {
             await tester.pump(const Duration(milliseconds: 200));
           }
           await tester.runAsync(() async {
             for (final img in tester.widgetList<Image>(find.byType(Image))) {
-              await precacheImage(
-                  img.image, tester.element(find.byWidget(img)),
+              await precacheImage(img.image, tester.element(find.byWidget(img)),
                   onError: (_, __) {});
             }
           });

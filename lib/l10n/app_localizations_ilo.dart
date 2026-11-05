@@ -170,7 +170,7 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get chooseFirst => 'Umuna nga agpili iti sungbat!';
 
   @override
-  String get chooseLeftFirst => 'Umuna nga agpili iti numero iti kannigid!';
+  String get chooseLeftFirst => 'Umuna nga italmeg ti grupo iti kannigid!';
 
   @override
   String get popAllBalloonsWith => 'Bittaken amin a palpalubo a addaan';
@@ -303,14 +303,6 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get colorSomethingFirst => 'Agmaris umuna ti uray ania!';
 
   @override
-  String get justNow => 'itan';
-
-  @override
-  String timeAgo(int amount) {
-    return '${amount}m ti naglabas';
-  }
-
-  @override
   String get saved => 'Naidulin!';
 
   @override
@@ -363,9 +355,6 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String get undo => 'Isubli';
-
-  @override
-  String get redo => 'Uliten';
 
   @override
   String get clear => 'Dalusan';
@@ -719,7 +708,7 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String countThenDragToBasket(String items) {
-    return 'Bilangen dagiti $items ket iyakar iti basket';
+    return 'Bilangen dagiti $items, ket iyakar ti kusto a numero iti basket';
   }
 
   @override
@@ -755,7 +744,7 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get unknownStudent => 'Saan nga am-ammo nga agad-adal';
 
   @override
-  String get version => 'Bersyon';
+  String get version => 'Bersion';
 
   @override
   String get backgroundMusicPlaying => 'Agtukar ti kanta';
@@ -851,7 +840,7 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get pageTeddyBear => 'Teddy Bear';
 
   @override
-  String get pageSodaPop => 'Soda';
+  String get pageRaceCar => 'Kotse a Pagkarera';
 
   @override
   String favoriteChosen(String choice) {
@@ -1049,7 +1038,7 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get badgeFirstStepsHint => 'Gun-oden ti umuna a 3 nga bituen';
 
   @override
-  String get badgeAlphabetTitle => 'Esperto iti Alpabeto';
+  String get badgeAlphabetTitle => 'Eksperto iti Alpabeto';
 
   @override
   String get badgeAlphabetHint =>
@@ -1093,7 +1082,7 @@ class AppLocalizationsIlo extends AppLocalizations {
       'Gun-oden ti 3 a bituen iti amin a 4 a tukad Ti Bagik';
 
   @override
-  String get badgeMathWhizTitle => 'Esperto iti Numero';
+  String get badgeMathWhizTitle => 'Eksperto iti Numero';
 
   @override
   String get badgeMathWhizHint =>
@@ -1135,7 +1124,7 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String get claimBadgeBody =>
-      'Naalam daytoy medelia! Alaem tapno mainayon iti koleksionmo.';
+      'Naalam daytoy medalia! Alaem tapno mainayon iti koleksionmo.';
 
   @override
   String claimBadge(String title) {
@@ -1238,9 +1227,6 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get forgotPin => 'Nalipatam ti kodigo? Usarem ti Numero ti Agad-adal.';
 
   @override
-  String get or => 'wenno';
-
-  @override
   String get openReport => 'Lukatan';
 
   @override
@@ -1333,9 +1319,6 @@ class AppLocalizationsIlo extends AppLocalizations {
   @override
   String get biometricUnavailable =>
       'Awan iti marka ti ramay wenno rupa a naisaad iti daytoy a telepono, isu a saan a mausar daytoy.';
-
-  @override
-  String get strongest => 'Kapipiaan';
 
   @override
   String get credentialsUpdated => 'Nabaliwan ti pannakasrek.';
@@ -1437,10 +1420,6 @@ class AppLocalizationsIlo extends AppLocalizations {
   @override
   String get childLoginNote =>
       'Ania ti kayat ti anakmo tapno malukatanna ti aplikasion. Mabalin met a sukatan daytoy ti mannursuro';
-
-  @override
-  String get usernameTaken =>
-      'Adda agus-usar iti dayta a username. Agpili iti sabali.';
 
   @override
   String get playedToday => 'Nagay-ayam ita nga aldaw';
@@ -1793,9 +1772,603 @@ class AppLocalizationsIlo extends AppLocalizations {
   }
 
   @override
-  String get onboardingQuote =>
-      '“Agbiagka a kasla matayka inton bigat. Agsursuroka a kasla agbiagka nga agnanayon.”\n― Mahatma Gandhi';
+  String get welcomeTo => 'Naragsak a Isasangbay iti';
+
+  @override
+  String get skip => 'Labsan';
 
   @override
   String get audioRecordingTune => 'Panagrekord ti uni';
+
+  @override
+  String get inProgress => 'Ar-aramiden pay';
+
+  @override
+  String get leaveColoringTitle => 'Idulin ti inmarismo?';
+
+  @override
+  String get leaveColoringBody =>
+      'Saan a mapukaw ti inmarismo uray saanmo nga idulin.';
+
+  @override
+  String get notNow => 'Madamdama';
+
+  @override
+  String get allStudentsTab => 'Amin';
+
+  @override
+  String get protectedBadge => 'Nasalakniban: aglock no pumanawka iti app';
+
+  @override
+  String get showLabel => 'Ipakita';
+
+  @override
+  String get hideLabel => 'Ilemmeng';
+
+  @override
+  String get newBadgeShort => 'Baro';
+
+  @override
+  String get consentStep => 'Pammalubos';
+
+  @override
+  String get enrollStepChild => 'Siasino ti ubing?';
+
+  @override
+  String get enrollStepParent => 'Siasino ti nagannak wenno guardian?';
+
+  @override
+  String get enrollStepConsent => 'Pammalubos ti nagannak';
+
+  @override
+  String stepNumber(int current, int total) {
+    return 'Addang $current iti $total';
+  }
+
+  @override
+  String get reviewBeforeEnroll => 'Kitaen sakbay nga i-enroll';
+
+  @override
+  String get childLabel => 'Ubing';
+
+  @override
+  String get parentLabelShort => 'Nagannak';
+
+  @override
+  String get numberLabel => 'Numero';
+
+  @override
+  String get parentConsentCheck =>
+      'Immanamong ti nagannak wenno guardian a maidulin daytoy nga impormasion para laeng iti panagadal ti ubing iti E-Tarabay.';
+
+  @override
+  String get consentLawNote =>
+      'Segun iti Data Privacy Act of 2012 (RA 10173). Maidulin ti petsa ti panangannamong.';
+
+  @override
+  String get privacyAgreementTitle => 'Katulagan iti Privacy';
+
+  @override
+  String get privacyAgreementSubtitle =>
+      'Para iti kinatalged ti impormasion dagiti ubbing.';
+
+  @override
+  String get privacyPromise1 =>
+      'Saanko nga ibingay iti sabali dagiti nagan, kasangay, ken numero ti nagannak dagiti ubbing.';
+
+  @override
+  String get privacyPromise2 =>
+      'Usarek laeng ti impormasion para iti panagadal dagiti ubbing.';
+
+  @override
+  String get privacyPromise3 =>
+      'Saanko a baybay-an a nakalukat ti app, ken adda lock ti teleponok.';
+
+  @override
+  String get privacyPromise4 =>
+      'Ipakaammok a dagus iti eskuelaan no mapukaw ti telepono wenno adda sabali a makakita iti impormasion.';
+
+  @override
+  String get signatureLabel => 'Ti naan-anay a naganmo kas pirma';
+
+  @override
+  String get signatureHint => 'Kas pagarigan: Mrs. Maria Santos';
+
+  @override
+  String get agreeCheck => 'Umanamongak iti katulagan.';
+
+  @override
+  String get enterDashboard => 'Agtuloy iti dashboard';
+
+  @override
+  String agreedOn(String name, String date) {
+    return 'Inanamongan ni $name idi $date';
+  }
+
+  @override
+  String get privacyPolicy => 'Pagannurotan iti Privacy';
+
+  @override
+  String get privacyPolicyNote => 'Ti kari nga inanamongam';
+
+  @override
+  String get lockTitle => 'Isurat ti sikreto a pammagbalin';
+
+  @override
+  String get lockBody => 'Nasalakniban ti impormasion dagiti ubbing.';
+
+  @override
+  String get teacherPasswordField => 'Password ti mannursuro';
+
+  @override
+  String get unlockButton => 'Lukatan';
+
+  @override
+  String get lockReason => 'Lukatan ti dashboard ti mannursuro';
+
+  @override
+  String get pinTitle => 'Ikabil ti PIN';
+
+  @override
+  String pinWrong(int left) {
+    String _temp0 = intl.Intl.pluralLogic(
+      left,
+      locale: localeName,
+      other: 'Di umiso ti PIN. $left pay a padas ti nabati.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get pinBlocked => 'Adu unay ti biddut. Ti password ti masapul itan.';
+
+  @override
+  String get teacherForgotPin => 'Nalipatam ti PIN?';
+
+  @override
+  String get usePassword => 'Usaren ti password';
+
+  @override
+  String get createPinTitle => 'Agaramid iti PIN';
+
+  @override
+  String get createPinBody =>
+      '4 a numero a manglukat iti dashboard iti daytoy a telepono.';
+
+  @override
+  String get confirmPinTitle => 'Ulitem ti PIN';
+
+  @override
+  String get teacherPinMismatch => 'Saan nga agpada ti PIN. Padasem manen.';
+
+  @override
+  String get currentPinTitle => 'Ikabil ti agdama a PIN';
+
+  @override
+  String get changePin => 'Sukatan ti PIN';
+
+  @override
+  String get changePinNote => '4 a numero a manglukat iti dashboard';
+
+  @override
+  String get pinSaved => 'Naidulin ti baro a PIN.';
+
+  @override
+  String get deleteDigit => 'Burasen';
+
+  @override
+  String get passwordToResetPin =>
+      'Ikabil ti password ti mannursuro tapno agaramid iti baro a PIN.';
+
+  @override
+  String get privacyAgreementIntro =>
+      'Iggemmo ti personal nga impormasion dagiti ubbing. Basaem ken anamongam dagitoy:';
+
+  @override
+  String get agreeToContinueHint =>
+      'Isuratmo ti naganmo ken i-check ti katulagan tapno agtuloy.';
+
+  @override
+  String get lawPill => 'RA 10173';
+
+  @override
+  String get reportStarsTile => 'Bituen';
+
+  @override
+  String get reportDoneTile => 'Nalpas';
+
+  @override
+  String get reportLastPlayedTile => 'Naudi a ay-ayam';
+
+  @override
+  String get lastPlayedToday => 'Ita';
+
+  @override
+  String get lastPlayedYesterday => 'Idi kalman';
+
+  @override
+  String lastPlayedDays(int days) {
+    return '$days nga aldaw';
+  }
+
+  @override
+  String practiceMisses(int count) {
+    return '$count a biddut';
+  }
+
+  @override
+  String get childWorksHeader => 'Dagiti aramid ti ubing';
+
+  @override
+  String get teacherToolsHeader => 'Dagiti ramit ti mannursuro';
+
+  @override
+  String get toolEditInfo => 'Baliwan ti impormasion';
+
+  @override
+  String get toolEditInfoNote => 'Nagan, kinatao, nagannak';
+
+  @override
+  String get toolLogin => 'Login ti ubing';
+
+  @override
+  String get toolLoginNote => 'Itedmo iti nagannak';
+
+  @override
+  String get toolReset => 'I-reset ti panagdur-as';
+
+  @override
+  String get toolResetNote => 'Maysa a module wenno amin';
+
+  @override
+  String percentDone(int percent) {
+    return '$percent% nalpas';
+  }
+
+  @override
+  String ofStars(int count) {
+    return 'iti $count a bituen';
+  }
+
+  @override
+  String get levelsHeader => 'Tunggal tukad';
+
+  @override
+  String resetModule(String name) {
+    return 'I-reset ti $name';
+  }
+
+  @override
+  String resetSheetSub(String name) {
+    return '$name · saan a maisubli';
+  }
+
+  @override
+  String get resetPickModules => 'Pilien a module';
+
+  @override
+  String get resetPickModulesNote => 'Dagiti napili laeng ti mapunas';
+
+  @override
+  String get resetAllModules => 'Amin a module';
+
+  @override
+  String get resetAllModulesNote => 'Agsubli iti rugi ti amin a panagdur-as';
+
+  @override
+  String resetWarnKeepDrawings(int count) {
+    return 'Mapunas dagiti bituen ken nalpas nga ay-ayam iti $count a module. Saan a mapunas dagiti drowing.';
+  }
+
+  @override
+  String resetWarnDrawings(int count) {
+    return 'Mapunas dagiti bituen ken nalpas nga ay-ayam iti $count a module, agraman dagiti drowing.';
+  }
+
+  @override
+  String get resetConfirm => 'Maawatak a saanen a maisubli daytoy.';
+
+  @override
+  String get tabLogin => 'Login';
+
+  @override
+  String get noChanges => 'Awan ti nabaliwan';
+
+  @override
+  String get childPicksPicture =>
+      'Ti ubing ti mangpili iti bukodna a ladawan iti umuna a panagserrek.';
+
+  @override
+  String get parentNumberUse =>
+      'Para laeng iti panagawag maipapan iti panagadal ti ubing.';
+
+  @override
+  String get showLoginCard => 'Ipakita ti login card';
+
+  @override
+  String get removeStudentAction => 'Ikkaten ti agad-adal';
+
+  @override
+  String get loginUser => 'User';
+
+  @override
+  String get loginCardTitle => 'Login card';
+
+  @override
+  String get loginCardStudent => 'Agad-adal iti E-Tarabay';
+
+  @override
+  String get loginCardKeep =>
+      'Idulin daytoy a card. Saanmo nga ipakita iti sabali a tao.';
+
+  @override
+  String get copyLogin => 'Kopiaen ti login';
+
+  @override
+  String get loginCardHint =>
+      'Ipakita iti nagannak wenno palubosam ida nga mangala iti ladawanna.';
+
+  @override
+  String get familySectionHeader => 'Ti pamiliak';
+
+  @override
+  String levelStarsEarned(int count) {
+    return '$count iti 3 a bituen';
+  }
+
+  @override
+  String levelsDone(int done, int total) {
+    return '$done iti $total ti nalpas';
+  }
+
+  @override
+  String get privacyNoticeTitle => 'Pakaammo maipapan iti Privacy';
+
+  @override
+  String get privacyNoticeSubtitle =>
+      'No kasano nga aywanan ti E-Tarabay ti impormasion ti anakmo.';
+
+  @override
+  String get pnCollectTitle => 'Ania ti maidulin';
+
+  @override
+  String get pnCollectBody =>
+      'Ti nagan, kasangay, Numero ti Agad-adal, kinatao ken ladawan ti anakmo, ti panagdur-asna ken dagiti drowingna, ken ti nagan ken numero ti nagannak.';
+
+  @override
+  String get pnWhyTitle => 'Apay';
+
+  @override
+  String get pnWhyBody =>
+      'Para laeng iti panagadal ti anakmo: tapno maidulin ti panagdur-asna ken maipakita kenka ken iti mannursurona. Saan a mailako wenno mausar iti ads.';
+
+  @override
+  String get pnWhoTitle => 'Siasino ti makakita';
+
+  @override
+  String get pnWhoBody =>
+      'Ti mannursuro ti anakmo, a nangikari a saanna nga ibingay, ken sika iti daytoy a telepono babaen ti kodigom.';
+
+  @override
+  String get pnKeepTitle => 'Kasano kabayag';
+
+  @override
+  String get pnKeepBody =>
+      'Agingga nga ikkaten ti mannursuro ti anakmo iti klase. Kalpasanna, mapunas ti rekord ken dagiti drowing.';
+
+  @override
+  String get pnRightsTitle => 'Dagiti karbengam';
+
+  @override
+  String get pnRightsBody =>
+      'Mabalinmo a kiddawen iti mannursuro wenno iti eskuelaan nga ipakita, ilinteg wenno punasen ti impormasion ti anakmo (Data Privacy Act of 2012, RA 10173).';
+
+  @override
+  String get pnProblemTitle => 'No adda problema';
+
+  @override
+  String get pnProblemBody =>
+      'No napukaw ti telepono wenno adda sabali a nakakita iti impormasion ti anakmo, ibagam a dagus iti mannursuro wenno iti eskuelaan.';
+
+  @override
+  String get pnAcknowledge => 'Maawatak';
+
+  @override
+  String get parentPinBubbleEnter => 'Kodigo pay, Nagannak!';
+
+  @override
+  String get parentPinBubbleSet => 'Agaramid ta iti kodigo!';
+
+  @override
+  String get parentPinBubbleConfirm => 'Maminsan pay!';
+
+  @override
+  String get parentPinBubbleForgot => 'Awan ti problema!';
+
+  @override
+  String get parentPinBubbleDone => 'Nasayaat, Nagannak!';
+
+  @override
+  String parentPinEnterSub(String name) {
+    return 'Tapno makita ti report ni $name.';
+  }
+
+  @override
+  String get parentPinEnterSubPlain => 'Tapno makita ti report ti anakmo.';
+
+  @override
+  String get parentPinConfirmSub =>
+      'Tapno masigurado, i-type manen ti kodigo nga inaramidmo.';
+
+  @override
+  String get parentPinForgotSub =>
+      'Adda iti login card nga inted ti mannursuro. Kalpasanna, agaramidka iti baro a kodigo.';
+
+  @override
+  String get parentPinRemembered => 'Malagipko ti kodigo';
+
+  @override
+  String get parentPinBubbleFirst => 'Para laeng iti nagannak!';
+
+  @override
+  String get parentPinFirstSub =>
+      'I-type ti Numero ti Agad-adal ti anakmo nga adda iti login card. Kalpasanna, agaramidka iti kodigo.';
+
+  @override
+  String get parentPinBubbleLogout => 'Kodigo pay sakbay a rummuar!';
+
+  @override
+  String parentPinLogoutSub(String name) {
+    return 'Tapno ag-logout iti account ni $name.';
+  }
+
+  @override
+  String get parentPinLogoutSubPlain =>
+      'Tapno ag-logout iti daytoy nga account.';
+
+  @override
+  String get kidBubbleLessons => 'Intayon agadal!';
+
+  @override
+  String get kidBubbleAwards => 'Nagsayaatka!';
+
+  @override
+  String get kidBubbleSettings => 'Urnosentayo!';
+
+  @override
+  String kidBubbleProfile(String name) {
+    return 'Sika daytoy, $name!';
+  }
+
+  @override
+  String get kidBubbleCertLocked => 'Asidegen!';
+
+  @override
+  String get kidBubbleCertEarned => 'Nagsayaatka!';
+
+  @override
+  String kidSubLessons(int stars) {
+    return 'Bituen: $stars iti 5';
+  }
+
+  @override
+  String kidSubAwards(int count) {
+    return 'Naala: $count';
+  }
+
+  @override
+  String kidSubCert(int earned, int total) {
+    return '$earned iti $total';
+  }
+
+  @override
+  String get kidBubbleProfilePlain => 'Sika daytoy!';
+
+  @override
+  String get kidSubSettings => 'Pagsasao ken uni';
+
+  @override
+  String get lessonStart => 'Rugian';
+
+  @override
+  String get lessonContinue => 'Ituloyen';
+
+  @override
+  String get lessonDone => 'Nalpasen!';
+
+  @override
+  String get lessonLocked => 'Nakaserra pay';
+
+  @override
+  String get badgeSpecialShelf => 'Espesyal';
+
+  @override
+  String get claimShort => 'Alaem!';
+
+  @override
+  String lessonActivities(int done, int total) {
+    return '$done iti $total nga aramid';
+  }
+
+  @override
+  String lessonLevels(int done, int total) {
+    return '$done iti $total a tukad';
+  }
+
+  @override
+  String lessonNumber(int n) {
+    return 'Leksion $n';
+  }
+
+  @override
+  String get aboutMeShort => 'Siak';
+
+  @override
+  String tallyLetters(int done, int total) {
+    return '$done iti $total a letra';
+  }
+
+  @override
+  String tallyNumbers(int done, int total) {
+    return '$done iti $total a numero';
+  }
+
+  @override
+  String get pickLetter => 'Agpili ti letra';
+
+  @override
+  String get pickNumber => 'Agpili ti numero';
+
+  @override
+  String get traceNextHint => 'Ti agsilsilap ti sumaruno nga isuratmo!';
+
+  @override
+  String traceLockedHint(String letter) {
+    return 'Isuratmo pay nga umuna ti $letter.';
+  }
+
+  @override
+  String get finishColoring => 'Nalpasen!';
+
+  @override
+  String get coloringGreatJob => 'Nagsayaat!';
+
+  @override
+  String get nextPicture => 'Sumaruno';
+
+  @override
+  String get colorMore => 'Kolorán pay';
+
+  @override
+  String get allPicturesDone => 'Nalpas amin!';
+
+  @override
+  String clearAlsoRemoves(String place) {
+    return 'Mapukaw met kadagiti inaramidmo';
+  }
+
+  @override
+  String removedFrom(String place) {
+    return 'Naikkat kadagiti inaramidmo';
+  }
+
+  @override
+  String get cleared => 'Naikkat';
+
+  @override
+  String certEarnedTitle(String name) {
+    return 'Kablaawan,\n$name!';
+  }
+
+  @override
+  String get certEarnedBody => 'Naalam ti\nSertipiko ti Pannakalpas!';
+
+  @override
+  String get certEarnedView => 'Kitaen ti Sertipiko';
+
+  @override
+  String get lineMatched => 'naipares';
+
+  @override
+  String get studentFallback => 'Estudiante';
 }

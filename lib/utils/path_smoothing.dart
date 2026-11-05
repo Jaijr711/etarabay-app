@@ -31,8 +31,7 @@ Path smoothPolylinePath(List<Offset> pts, {double cornerRadius = 14}) {
         final lenIn = vIn.distance;
         final lenOut = vOut.distance;
         if (lenIn == 0 || lenOut == 0) continue;
-        final r =
-            math.min(cornerRadius, math.min(lenIn / 2, lenOut / 2));
+        final r = math.min(cornerRadius, math.min(lenIn / 2, lenOut / 2));
         final a = curr - (vIn / lenIn) * r;
         final b = curr + (vOut / lenOut) * r;
         path.lineTo(a.dx, a.dy);

@@ -169,7 +169,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chooseFirst => 'Choose an answer first!';
 
   @override
-  String get chooseLeftFirst => 'Choose a number on the left first!';
+  String get chooseLeftFirst => 'Tap a group on the left first!';
 
   @override
   String get popAllBalloonsWith => 'Pop all the balloons with';
@@ -301,14 +301,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get colorSomethingFirst => 'Color something first!';
 
   @override
-  String get justNow => 'just now';
-
-  @override
-  String timeAgo(int amount) {
-    return '${amount}m ago';
-  }
-
-  @override
   String get saved => 'Saved!';
 
   @override
@@ -361,9 +353,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get undo => 'Undo';
-
-  @override
-  String get redo => 'Redo';
 
   @override
   String get clear => 'Clear';
@@ -709,7 +698,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String countThenDragToBasket(String items) {
-    return 'Count the $items then drag them to the basket';
+    return 'Count the $items, then drag the right number to the basket';
   }
 
   @override
@@ -841,7 +830,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pageTeddyBear => 'Teddy Bear';
 
   @override
-  String get pageSodaPop => 'Soda';
+  String get pageRaceCar => 'Race Car';
 
   @override
   String favoriteChosen(String choice) {
@@ -1223,9 +1212,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forgotPin => 'Forgot code? Use the Student Number';
 
   @override
-  String get or => 'or';
-
-  @override
   String get openReport => 'Open';
 
   @override
@@ -1318,9 +1304,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'No fingerprint or face is set up on this phone, so this login is unavailable.';
 
   @override
-  String get strongest => 'Going best';
-
-  @override
   String get credentialsUpdated => 'Login updated.';
 
   @override
@@ -1410,9 +1393,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get childLoginNote =>
       'What your child types to open the app. The teacher can change it too.';
-
-  @override
-  String get usernameTaken => 'That username is taken. Please pick another.';
 
   @override
   String get playedToday => 'Played today';
@@ -1763,9 +1743,602 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get onboardingQuote =>
-      '“Live as if you were to die tomorrow. Learn as if you were to live forever.”\n― Mahatma Gandhi';
+  String get welcomeTo => 'Welcome to';
+
+  @override
+  String get skip => 'Skip';
 
   @override
   String get audioRecordingTune => 'Audio Recording';
+
+  @override
+  String get inProgress => 'In progress';
+
+  @override
+  String get leaveColoringTitle => 'Save your coloring?';
+
+  @override
+  String get leaveColoringBody =>
+      'Your coloring is kept even if you don\'t save it.';
+
+  @override
+  String get notNow => 'Not now';
+
+  @override
+  String get allStudentsTab => 'All';
+
+  @override
+  String get protectedBadge => 'Protected: locks when you leave the app';
+
+  @override
+  String get showLabel => 'Show';
+
+  @override
+  String get hideLabel => 'Hide';
+
+  @override
+  String get newBadgeShort => 'New';
+
+  @override
+  String get consentStep => 'Consent';
+
+  @override
+  String get enrollStepChild => 'Who is the child?';
+
+  @override
+  String get enrollStepParent => 'Who is the parent or guardian?';
+
+  @override
+  String get enrollStepConsent => 'Parent\'s consent';
+
+  @override
+  String stepNumber(int current, int total) {
+    return 'Step $current of $total';
+  }
+
+  @override
+  String get reviewBeforeEnroll => 'Check before enrolling';
+
+  @override
+  String get childLabel => 'Child';
+
+  @override
+  String get parentLabelShort => 'Parent';
+
+  @override
+  String get numberLabel => 'Number';
+
+  @override
+  String get parentConsentCheck =>
+      'The parent or guardian agreed to record this information only for the child\'s learning in E-Tarabay.';
+
+  @override
+  String get consentLawNote =>
+      'Under the Data Privacy Act of 2012 (RA 10173). The date of consent is recorded.';
+
+  @override
+  String get privacyAgreementTitle => 'Privacy Agreement';
+
+  @override
+  String get privacyAgreementSubtitle =>
+      'To keep the children\'s information safe.';
+
+  @override
+  String get privacyPromise1 =>
+      'I will not share the children\'s names, birthdays or their parents\' numbers with anyone.';
+
+  @override
+  String get privacyPromise2 =>
+      'I will use the information only for the children\'s learning.';
+
+  @override
+  String get privacyPromise3 =>
+      'I will not leave the app open, and my phone has a lock.';
+
+  @override
+  String get privacyPromise4 =>
+      'I will tell the school at once if the phone is lost or someone else sees the information.';
+
+  @override
+  String get signatureLabel => 'Your full name as your signature';
+
+  @override
+  String get signatureHint => 'e.g. Mrs. Maria Santos';
+
+  @override
+  String get agreeCheck => 'I agree to this agreement.';
+
+  @override
+  String get enterDashboard => 'Continue to the dashboard';
+
+  @override
+  String agreedOn(String name, String date) {
+    return 'Agreed by $name on $date';
+  }
+
+  @override
+  String get privacyPolicy => 'Privacy policy';
+
+  @override
+  String get privacyPolicyNote => 'The promise you agreed to';
+
+  @override
+  String get lockTitle => 'Enter the password';
+
+  @override
+  String get lockBody => 'The children\'s information is protected.';
+
+  @override
+  String get teacherPasswordField => 'Teacher\'s password';
+
+  @override
+  String get unlockButton => 'Open';
+
+  @override
+  String get lockReason => 'Open the teacher dashboard';
+
+  @override
+  String get pinTitle => 'Enter the PIN';
+
+  @override
+  String pinWrong(int left) {
+    String _temp0 = intl.Intl.pluralLogic(
+      left,
+      locale: localeName,
+      other: 'Wrong PIN. $left tries left.',
+      one: 'Wrong PIN. 1 try left.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get pinBlocked => 'Too many wrong tries. The password is needed now.';
+
+  @override
+  String get teacherForgotPin => 'Forgot the PIN?';
+
+  @override
+  String get usePassword => 'Use the password';
+
+  @override
+  String get createPinTitle => 'Make a PIN';
+
+  @override
+  String get createPinBody =>
+      '4 numbers that open the dashboard on this phone.';
+
+  @override
+  String get confirmPinTitle => 'Enter the PIN again';
+
+  @override
+  String get teacherPinMismatch => 'The PINs are not the same. Try again.';
+
+  @override
+  String get currentPinTitle => 'Enter your current PIN';
+
+  @override
+  String get changePin => 'Change the PIN';
+
+  @override
+  String get changePinNote => '4 numbers that open the dashboard';
+
+  @override
+  String get pinSaved => 'New PIN saved.';
+
+  @override
+  String get deleteDigit => 'Delete';
+
+  @override
+  String get passwordToResetPin =>
+      'Enter the teacher\'s password to make a new PIN.';
+
+  @override
+  String get privacyAgreementIntro =>
+      'You hold the children\'s personal information. Read and agree to these:';
+
+  @override
+  String get agreeToContinueHint =>
+      'Type your name and tick the agreement to continue.';
+
+  @override
+  String get lawPill => 'RA 10173';
+
+  @override
+  String get reportStarsTile => 'Stars';
+
+  @override
+  String get reportDoneTile => 'Done';
+
+  @override
+  String get reportLastPlayedTile => 'Last played';
+
+  @override
+  String get lastPlayedToday => 'Today';
+
+  @override
+  String get lastPlayedYesterday => 'Yesterday';
+
+  @override
+  String lastPlayedDays(int days) {
+    return '$days days';
+  }
+
+  @override
+  String practiceMisses(int count) {
+    return '$count wrong';
+  }
+
+  @override
+  String get childWorksHeader => 'Child\'s work';
+
+  @override
+  String get teacherToolsHeader => 'Teacher tools';
+
+  @override
+  String get toolEditInfo => 'Edit info';
+
+  @override
+  String get toolEditInfoNote => 'Name, gender, parent';
+
+  @override
+  String get toolLogin => 'Child\'s login';
+
+  @override
+  String get toolLoginNote => 'Give it to the parent';
+
+  @override
+  String get toolReset => 'Reset progress';
+
+  @override
+  String get toolResetNote => 'One module or all';
+
+  @override
+  String percentDone(int percent) {
+    return '$percent% done';
+  }
+
+  @override
+  String ofStars(int count) {
+    return 'of $count stars';
+  }
+
+  @override
+  String get levelsHeader => 'Each level';
+
+  @override
+  String resetModule(String name) {
+    return 'Reset $name';
+  }
+
+  @override
+  String resetSheetSub(String name) {
+    return '$name · cannot be undone';
+  }
+
+  @override
+  String get resetPickModules => 'Chosen modules';
+
+  @override
+  String get resetPickModulesNote => 'Only the chosen ones are cleared';
+
+  @override
+  String get resetAllModules => 'All modules';
+
+  @override
+  String get resetAllModulesNote => 'All progress goes back to the start';
+
+  @override
+  String resetWarnKeepDrawings(int count) {
+    return 'Stars and finished games in $count module(s) will be cleared. The drawings are kept.';
+  }
+
+  @override
+  String resetWarnDrawings(int count) {
+    return 'Stars and finished games in $count module(s) will be cleared, and the drawings too.';
+  }
+
+  @override
+  String get resetConfirm => 'I understand this cannot be undone.';
+
+  @override
+  String get tabLogin => 'Login';
+
+  @override
+  String get noChanges => 'No changes';
+
+  @override
+  String get childPicksPicture =>
+      'The child picks their own picture at their first sign-in.';
+
+  @override
+  String get parentNumberUse => 'Only for calling about the child\'s learning.';
+
+  @override
+  String get showLoginCard => 'Show the login card';
+
+  @override
+  String get removeStudentAction => 'Remove student';
+
+  @override
+  String get loginUser => 'User';
+
+  @override
+  String get loginCardTitle => 'Login card';
+
+  @override
+  String get loginCardStudent => 'Student at E-Tarabay';
+
+  @override
+  String get loginCardKeep =>
+      'Keep this card safe. Do not show it to other people.';
+
+  @override
+  String get copyLogin => 'Copy the login';
+
+  @override
+  String get loginCardHint =>
+      'Show it to the parent or let them take a photo of it.';
+
+  @override
+  String get familySectionHeader => 'My family';
+
+  @override
+  String levelStarsEarned(int count) {
+    return '$count of 3 stars';
+  }
+
+  @override
+  String levelsDone(int done, int total) {
+    return '$done of $total done';
+  }
+
+  @override
+  String get privacyNoticeTitle => 'Privacy Notice';
+
+  @override
+  String get privacyNoticeSubtitle =>
+      'How E-Tarabay looks after your child\'s information.';
+
+  @override
+  String get pnCollectTitle => 'What we keep';
+
+  @override
+  String get pnCollectBody =>
+      'Your child\'s name, birthday, Student Number, gender and picture, their progress and drawings, and a parent\'s name and contact number.';
+
+  @override
+  String get pnWhyTitle => 'Why';
+
+  @override
+  String get pnWhyBody =>
+      'Only for your child\'s learning: to save their progress and show it to you and to their teacher. It is never sold or used for ads.';
+
+  @override
+  String get pnWhoTitle => 'Who can see it';
+
+  @override
+  String get pnWhoBody =>
+      'Your child\'s teacher, who has promised to keep it private, and you on this phone with your code.';
+
+  @override
+  String get pnKeepTitle => 'How long';
+
+  @override
+  String get pnKeepBody =>
+      'Until the teacher removes your child from the class. Then the record and the drawings are deleted.';
+
+  @override
+  String get pnRightsTitle => 'Your rights';
+
+  @override
+  String get pnRightsBody =>
+      'You may ask the teacher or the school to show, correct or delete your child\'s information (Data Privacy Act of 2012, RA 10173).';
+
+  @override
+  String get pnProblemTitle => 'If something is wrong';
+
+  @override
+  String get pnProblemBody =>
+      'If the phone is lost or someone else has seen your child\'s information, tell the teacher or the school at once.';
+
+  @override
+  String get pnAcknowledge => 'I understand';
+
+  @override
+  String get parentPinBubbleEnter => 'Code first, Parent!';
+
+  @override
+  String get parentPinBubbleSet => 'Let\'s make a code!';
+
+  @override
+  String get parentPinBubbleConfirm => 'Once more!';
+
+  @override
+  String get parentPinBubbleForgot => 'No problem!';
+
+  @override
+  String get parentPinBubbleDone => 'All set, Parent!';
+
+  @override
+  String parentPinEnterSub(String name) {
+    return 'To see $name\'s report.';
+  }
+
+  @override
+  String get parentPinEnterSubPlain => 'To see your child\'s report.';
+
+  @override
+  String get parentPinConfirmSub =>
+      'To be sure, type the code you just made again.';
+
+  @override
+  String get parentPinForgotSub =>
+      'It is on the login card from the teacher. After that, you will make a new code.';
+
+  @override
+  String get parentPinRemembered => 'I remember the code';
+
+  @override
+  String get parentPinBubbleFirst => 'For parents only!';
+
+  @override
+  String get parentPinFirstSub =>
+      'Type your child\'s Student Number from the login card. Then you will make a code.';
+
+  @override
+  String get parentPinBubbleLogout => 'Code first, before leaving!';
+
+  @override
+  String parentPinLogoutSub(String name) {
+    return 'To log out of $name\'s account.';
+  }
+
+  @override
+  String get parentPinLogoutSubPlain => 'To log out of this account.';
+
+  @override
+  String get kidBubbleLessons => 'Let\'s learn!';
+
+  @override
+  String get kidBubbleAwards => 'You\'re amazing!';
+
+  @override
+  String get kidBubbleSettings => 'Let\'s set things up!';
+
+  @override
+  String kidBubbleProfile(String name) {
+    return 'This is you, $name!';
+  }
+
+  @override
+  String get kidBubbleCertLocked => 'Almost there!';
+
+  @override
+  String get kidBubbleCertEarned => 'Well done!';
+
+  @override
+  String kidSubLessons(int stars) {
+    return 'Stars: $stars of 5';
+  }
+
+  @override
+  String kidSubAwards(int count) {
+    return 'Collected: $count';
+  }
+
+  @override
+  String kidSubCert(int earned, int total) {
+    return '$earned of $total';
+  }
+
+  @override
+  String get kidBubbleProfilePlain => 'This is you!';
+
+  @override
+  String get kidSubSettings => 'Language and sounds';
+
+  @override
+  String get lessonStart => 'Start';
+
+  @override
+  String get lessonContinue => 'Continue';
+
+  @override
+  String get lessonDone => 'Done!';
+
+  @override
+  String get lessonLocked => 'Locked';
+
+  @override
+  String get badgeSpecialShelf => 'Special';
+
+  @override
+  String get claimShort => 'Claim!';
+
+  @override
+  String lessonActivities(int done, int total) {
+    return '$done of $total activities';
+  }
+
+  @override
+  String lessonLevels(int done, int total) {
+    return '$done of $total levels';
+  }
+
+  @override
+  String lessonNumber(int n) {
+    return 'Lesson $n';
+  }
+
+  @override
+  String get aboutMeShort => 'Me';
+
+  @override
+  String tallyLetters(int done, int total) {
+    return '$done of $total letters';
+  }
+
+  @override
+  String tallyNumbers(int done, int total) {
+    return '$done of $total numbers';
+  }
+
+  @override
+  String get pickLetter => 'Pick a letter';
+
+  @override
+  String get pickNumber => 'Pick a number';
+
+  @override
+  String get traceNextHint => 'The shining one is the next to write!';
+
+  @override
+  String traceLockedHint(String letter) {
+    return 'Write $letter first.';
+  }
+
+  @override
+  String get finishColoring => 'Done!';
+
+  @override
+  String get coloringGreatJob => 'Great job!';
+
+  @override
+  String get nextPicture => 'Next';
+
+  @override
+  String get colorMore => 'Color more';
+
+  @override
+  String get allPicturesDone => 'All done!';
+
+  @override
+  String clearAlsoRemoves(String place) {
+    return 'It leaves $place too';
+  }
+
+  @override
+  String removedFrom(String place) {
+    return 'Removed from $place';
+  }
+
+  @override
+  String get cleared => 'Cleared';
+
+  @override
+  String certEarnedTitle(String name) {
+    return 'Congratulations,\n$name!';
+  }
+
+  @override
+  String get certEarnedBody => 'You earned your\nCertificate of Completion!';
+
+  @override
+  String get certEarnedView => 'See my Certificate';
+
+  @override
+  String get lineMatched => 'matched';
+
+  @override
+  String get studentFallback => 'Student';
 }

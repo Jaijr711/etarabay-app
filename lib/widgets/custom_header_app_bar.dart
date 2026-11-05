@@ -19,10 +19,12 @@ class CustomHeaderAppBar extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     // The padding logic ensures the content stays below the system status bar,
-    // mimicking a standard AppBar layout but with custom decoration.
+    // mimicking a standard AppBar layout but with custom decoration. Kept
+    // close to the back button: the roomier band took a sixth of a small
+    // phone for one line of title.
     return Container(
       padding: EdgeInsets.fromLTRB(
-          20, MediaQuery.of(context).padding.top + 20, 20, 24),
+          20, MediaQuery.of(context).padding.top + 12, 20, 16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -30,8 +32,8 @@ class CustomHeaderAppBar extends StatelessWidget
           colors: [baseColor, baseColor.withOpacity(0.85)],
         ),
         borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
+          bottomLeft: Radius.circular(26),
+          bottomRight: Radius.circular(26),
         ),
         boxShadow: [
           BoxShadow(
@@ -55,7 +57,7 @@ class CustomHeaderAppBar extends StatelessWidget
             child: Text(
               title,
               style: const TextStyle(
-                fontSize: 24,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),

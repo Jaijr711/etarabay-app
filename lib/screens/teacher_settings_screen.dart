@@ -1,8 +1,8 @@
 import '../widgets/biometric_setup.dart';
 import 'developer_login_screen.dart';
+import 'teacher_agreement_screen.dart';
 import 'teacher_login_screen.dart';
 import 'package:e_tarabay/l10n/app_localizations.dart';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -19,6 +19,8 @@ import '../utils/page_transitions.dart';
 import '../utils/constants.dart';
 import '../widgets/custom_header_app_bar.dart';
 import '../widgets/staggered_entrance.dart';
+import '../widgets/teacher_pin_flow.dart';
+import '../widgets/soft_backdrop.dart';
 
 class TeacherSettingsScreen extends StatefulWidget {
   const TeacherSettingsScreen({super.key});
@@ -431,6 +433,25 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
     }
   }
 
+  /// The current PIN (or the password, if forgotten), then a new one.
+  Future<void> _changePin() async {
+    final loc = AppLocalizations.of(context)!;
+    final saved = await Navigator.of(context).push<bool>(
+      PremiumPageRoute(
+        child: Builder(
+          builder: (routeContext) => TeacherPinFlow(
+            start: PinFlowStart.change,
+            onDone: () => Navigator.of(routeContext).pop(true),
+            onCancel: () => Navigator.of(routeContext).pop(false),
+          ),
+        ),
+      ),
+    );
+    if (saved == true && mounted) {
+      _showSnack(loc.pinSaved, LucideIcons.circle_check, AppColors.success);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
@@ -452,11 +473,8 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
               fit: BoxFit.cover,
             ),
           ),
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-              child: Container(color: Colors.white.withOpacity(0.08)),
-            ),
+          const Positioned.fill(
+            child: SoftBackdrop(),
           ),
           ListView(
             padding: const EdgeInsets.only(
@@ -494,7 +512,7 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
                           const Divider(height: 0, indent: 72),
                           _LanguageTile(
                             code: 'ilo',
-                            label: 'Ilokano',
+                            label: 'Ilocano',
                             isSelected:
                                 languageProvider.currentLanguageCode == 'ilo',
                             onTap: () => _setLanguage('ilo'),
@@ -590,6 +608,28 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
                             trailing: Icon(LucideIcons.chevron_right,
                                 color: Colors.grey.shade400, size: 18),
                             onTap: _changeCredentialsDialog,
+                          ),
+                          const Divider(height: 0, indent: 72),
+                          ListTile(
+                            leading: const _IconBadge(
+                                icon: LucideIcons.rectangle_ellipsis),
+                            title: Text(loc.changePin),
+                            subtitle: Text(loc.changePinNote),
+                            trailing: Icon(LucideIcons.chevron_right,
+                                color: Colors.grey.shade400, size: 18),
+                            onTap: _changePin,
+                          ),
+                          const Divider(height: 0, indent: 72),
+                          ListTile(
+                            leading: const _IconBadge(
+                                icon: LucideIcons.shield_check),
+                            title: Text(loc.privacyPolicy),
+                            subtitle: Text(loc.privacyPolicyNote),
+                            trailing: Icon(LucideIcons.chevron_right,
+                                color: Colors.grey.shade400, size: 18),
+                            onTap: () => context.pushPremium(
+                              const TeacherAgreementScreen(readOnly: true),
+                            ),
                           ),
                           if (_biometricAvailable) ...[
                             const Divider(height: 0, indent: 72),

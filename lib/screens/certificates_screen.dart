@@ -1,6 +1,5 @@
 import 'dart:math' show pi;
 import 'dart:ui' as ui;
-import '../widgets/custom_back_button.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -16,6 +15,7 @@ import '../widgets/certificate_emblem.dart';
 import '../providers/user_provider.dart';
 import '../providers/language_provider.dart';
 import '../utils/constants.dart';
+import '../widgets/kid_page_header.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 
 class CertificatesScreen extends StatefulWidget {
@@ -85,15 +85,25 @@ class _CertificatesScreenState extends State<CertificatesScreen>
     final langCode = langProvider.currentLanguageCode;
     final earned = userProvider.earnedCertificates;
 
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FF),
+      // Held at the top like the other pages, not scrolled away.
+      appBar: KidPageHeader(
+        title: loc.myCertificate,
+        subtitle: loc.kidSubCert(earned.length, allCertificates.length),
+        bubble: earned.isNotEmpty
+            ? loc.kidBubbleCertEarned
+            : loc.kidBubbleCertLocked,
+        color: AppColors.primary,
+        showBack: true,
+      ),
       body: Stack(
         children: [
           CustomScrollView(
             slivers: [
-              // Animated Header
               SliverToBoxAdapter(
-                child: _buildHeader(context, earned.length),
+                child: _buildProgress(earned.length),
               ),
 
               // Certificates Grid
@@ -154,55 +164,8 @@ class _CertificatesScreenState extends State<CertificatesScreen>
     );
   }
 
-  Widget _buildHeader(BuildContext context, int earnedCount) {
-    final headerContent = Container(
-      padding: const EdgeInsets.fromLTRB(20, 50, 20, 24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.primary,
-            AppColors.primary.withOpacity(0.85),
-          ],
-        ),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Row(
-          children: [
-            CustomBackButton(
-              onPressed: () => Navigator.pop(context),
-              iconColor: Colors.white,
-              backgroundColor: Colors.white.withOpacity(0.2),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                AppLocalizations.of(context)!.myCertificate,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-
+  /// The certificate count and bar: the top of the list, under the header.
+  Widget _buildProgress(int earnedCount) {
     final progressSection = Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: Row(
@@ -257,7 +220,6 @@ class _CertificatesScreenState extends State<CertificatesScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        headerContent,
         progressSection,
       ],
     );
@@ -428,34 +390,39 @@ class _CertificatesScreenState extends State<CertificatesScreen>
                                       // a child at 12/12 badges would see
                                       // "Locked" and have no way to tell why.
                                       if (!isEarned)
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 4,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey.shade300,
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          child: Text(
-                                            AppLocalizations.of(context)!
-                                                .certificateProgress(
-                                              context
-                                                  .read<UserProvider>()
-                                                  .graduateBadgesClaimed,
-                                              UserProvider
-                                                  .graduateBadgeIds.length,
-                                              context
-                                                  .read<UserProvider>()
-                                                  .modulesCompletedCount,
-                                              context
-                                                  .read<UserProvider>()
-                                                  .moduleCount,
+                                        // Wraps to a second line on a small
+                                        // phone rather than running off the
+                                        // card.
+                                        Flexible(
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 4,
                                             ),
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey.shade600,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey.shade300,
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: Text(
+                                              AppLocalizations.of(context)!
+                                                  .certificateProgress(
+                                                context
+                                                    .read<UserProvider>()
+                                                    .graduateBadgesClaimed,
+                                                UserProvider
+                                                    .graduateBadgeIds.length,
+                                                context
+                                                    .read<UserProvider>()
+                                                    .modulesCompletedCount,
+                                                context
+                                                    .read<UserProvider>()
+                                                    .moduleCount,
+                                              ),
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey.shade600,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -767,7 +734,8 @@ class _CertificateDetailScreenState extends State<CertificateDetailScreen>
   }
 
   Widget _buildCertificateView(BuildContext context, dynamic profile) {
-    final name = profile?.name ?? 'Student';
+    final name =
+        profile?.name ?? AppLocalizations.of(context)!.studentFallback;
     final studentNumber = profile?.lrn ?? '';
     final date = DateTime.now();
 
@@ -917,8 +885,10 @@ class _CertificateDetailScreenState extends State<CertificateDetailScreen>
     );
   }
 
+  /// In the certificate's language: it printed English months whatever the
+  /// app was set to. Ilokano uses the Filipino names, as the profile does.
   String _formatDate(DateTime date) {
-    final months = [
+    const en = [
       'January',
       'February',
       'March',
@@ -932,6 +902,21 @@ class _CertificateDetailScreenState extends State<CertificateDetailScreen>
       'November',
       'December'
     ];
+    const fil = [
+      'Enero',
+      'Pebrero',
+      'Marso',
+      'Abril',
+      'Mayo',
+      'Hunyo',
+      'Hulyo',
+      'Agosto',
+      'Setyembre',
+      'Oktubre',
+      'Nobyembre',
+      'Disyembre'
+    ];
+    final months = widget.langCode == 'en' ? en : fil;
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 }

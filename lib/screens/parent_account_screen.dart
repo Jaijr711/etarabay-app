@@ -9,8 +9,10 @@ import '../providers/user_provider.dart';
 import '../services/auth_messages.dart';
 import '../services/auth_service.dart';
 import '../services/biometric_service.dart';
+import '../services/parent_pin.dart';
 import '../utils/constants.dart';
 import '../widgets/custom_back_button.dart';
+import 'privacy_notice_screen.dart';
 
 /// Parent-controlled management of the child's login. The parent (not the
 /// child) can change the child's password (LRN), optionally the username, and
@@ -140,7 +142,11 @@ class _ParentAccountScreenState extends State<ParentAccountScreen> {
       return;
     }
 
-    // Keep biometric in sync with any new credentials.
+    // Keep biometric in sync with any new credentials. Read before the
+    // awaits below: the screen may be gone by the time they finish.
+    final childName =
+        Provider.of<UserProvider>(context, listen: false).userProfile?.name ??
+            '';
     if (_biometricEnabled) {
       await BiometricService.saveCredentials(
         slot: BiometricService.studentKey,
@@ -150,14 +156,10 @@ class _ParentAccountScreenState extends State<ParentAccountScreen> {
             : ((await BiometricService.getCredentials(
                     BiometricService.studentKey))?['password'] ??
                 ''),
-        extra: {
-          'name': Provider.of<UserProvider>(context, listen: false)
-                  .userProfile
-                  ?.name ??
-              ''
-        },
+        extra: {'name': childName},
       );
     }
+    if (!mounted) return;
 
     _newPassCtrl.clear();
     _confirmCtrl.clear();
@@ -235,18 +237,17 @@ class _ParentAccountScreenState extends State<ParentAccountScreen> {
     if (newCtrl.text.trim().length < 4) return;
 
     final prefs = await SharedPreferences.getInstance();
-    // Same key and same hashing as the lock screen writes.
-    final key = 'parent_pin_${_studentId ?? 'none'}';
-    final stored = prefs.getString(key) ?? '';
+    // The same one code the sign-in makes and the lock screen opens with.
+    final hasCode = await ParentPin.isSet(prefs);
+    final current = currentCtrl.text.trim();
     if (!mounted) return;
 
-    if (stored.isNotEmpty &&
-        stored != AuthService.hashLrn(currentCtrl.text.trim())) {
+    if (hasCode && !await ParentPin.matches(prefs, current)) {
       _snack(loc.wrongPin, LucideIcons.circle_alert, Colors.red);
       return;
     }
 
-    await prefs.setString(key, AuthService.hashLrn(newCtrl.text.trim()));
+    await ParentPin.write(prefs, newCtrl.text.trim());
     if (!mounted) return;
     _snack(loc.codeChanged, LucideIcons.circle_check, AppColors.success);
   }
@@ -293,7 +294,7 @@ class _ParentAccountScreenState extends State<ParentAccountScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(AppLocalizations.of(context)!.accountSecurity,
-            style: TextStyle(
+            style: const TextStyle(
                 color: AppColors.textDark,
                 fontSize: 18,
                 fontWeight: FontWeight.bold)),
@@ -410,11 +411,43 @@ class _ParentAccountScreenState extends State<ParentAccountScreen> {
                                         strokeWidth: 2, color: Colors.white))
                                 : Text(
                                     AppLocalizations.of(context)!.saveChanges,
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w600)),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w600)),
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 16),
+                    Material(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      child: ListTile(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18)),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 4),
+                        leading: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(LucideIcons.shield_check,
+                              color: AppColors.primary, size: 20),
+                        ),
+                        title: Text(
+                            AppLocalizations.of(context)!.privacyNoticeTitle,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text(AppLocalizations.of(context)!
+                            .privacyNoticeSubtitle),
+                        trailing: Icon(LucideIcons.chevron_right,
+                            color: Colors.grey.shade400, size: 18),
+                        onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (_) => const PrivacyNoticeScreen())),
+                      ),
                     ),
                     const SizedBox(height: 16),
                     if (_biometricAvailable)

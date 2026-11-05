@@ -19,15 +19,6 @@ class Sfx {
   /// A balloon letting go, in Matematika's "Pop the Balloon".
   static const String pop = 'audio/sfx/pop.wav';
 
-  /// The chime for the [n]th star landing on the level-complete card, 1 to 3.
-  ///
-  /// C, E and G — a major chord taken one note at a time, so one star is the
-  /// start of something rather than a lonely note, two stars is consonant
-  /// rather than a mistake, and three stars is the phrase finishing. A child
-  /// of four is not reading the sentence on that card; this is how they are
-  /// told the difference.
-  static String starChime(int n) => 'audio/sfx/star_${n.clamp(1, 3)}.wav';
-
   /// Three players, used in turn. A child popping balloons as fast as they
   /// can tap would otherwise cut each pop off with the next one, and the
   /// board would sound slower than their finger.

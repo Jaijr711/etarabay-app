@@ -5,6 +5,7 @@ import 'package:e_tarabay/main.dart' show AudioManager;
 import 'package:e_tarabay/providers/language_provider.dart';
 import 'package:e_tarabay/providers/user_provider.dart';
 import 'package:e_tarabay/screens/kulay_screen.dart';
+import 'package:e_tarabay/widgets/custom_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -107,17 +108,27 @@ void main() {
         await tester.pump(const Duration(milliseconds: 200));
       }
       await settle();
+      // Saving keeps the picture open, now as the saved creation.
+      expect(find.text('Update'), findsOneWidget,
+          reason: 'saving stays on the picture');
+
+      // Nothing unsaved: back goes straight to the list, the card marked.
+      await tester.tap(find.byType(CustomBackButton));
+      await settle();
+      expect(find.text('Completed'), findsOneWidget,
+          reason: 'the saved page is marked on its card');
+      await expectLater(find.byKey(const ValueKey('shot')),
+          matchesGoldenFile('../../docs/previews/kulay_list_marked.png'));
 
       // Open the same page again.
       await tester.tap(find.text('Puppy').first);
       await settle();
       expect(find.text('Update'), findsOneWidget,
           reason: 'a saved page opens as its creation');
-      expect(find.text('View'), findsNothing);
       await expectLater(find.byKey(const ValueKey('shot')),
           matchesGoldenFile('../../docs/previews/kulay_reopen.png'));
 
-      // Add to it in blue, update, and open it once more: the change stays.
+      // Add to it, then go back: asked whether to save; saving leaves.
       final blue = tester.getCenter(find.byType(InteractiveViewer)) +
           const Offset(-50, 45);
       final g2 = await tester.startGesture(blue);
@@ -127,7 +138,13 @@ void main() {
       }
       await g2.up();
       await settle();
-      await tester.tap(find.text('Update'));
+      await tester.tap(find.byType(CustomBackButton));
+      await settle();
+      expect(find.text('Save your coloring?'), findsWidgets,
+          reason: 'unsaved coloring asks before leaving');
+      await expectLater(find.byKey(const ValueKey('shot')),
+          matchesGoldenFile('../../docs/previews/kulay_leave_prompt.png'));
+      await tester.tap(find.text('Save').last);
       for (int i = 0; i < 40; i++) {
         await tester.pump(const Duration(milliseconds: 200));
       }

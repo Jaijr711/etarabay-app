@@ -112,8 +112,9 @@ void main() {
     test('it begins exactly where the child had got to', () {
       // If it began anywhere else, progress would jump the moment they moved.
       for (var f = 0.0; f < 1.0; f += 0.05) {
-        expect((polylineSegment(l, f, f + 0.2).first - partialPolyline(l, f).last)
-            .distance,
+        expect(
+            (polylineSegment(l, f, f + 0.2).first - partialPolyline(l, f).last)
+                .distance,
             lessThan(0.001));
       }
     });

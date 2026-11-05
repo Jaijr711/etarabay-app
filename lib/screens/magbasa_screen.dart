@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:e_tarabay/l10n/app_localizations.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -868,8 +869,21 @@ void _retire(AudioPlayer player) {
     try {
       await player.release().timeout(const Duration(seconds: 2));
     } catch (_) {}
+    // Off the web the plugin has no such fault, and a player never disposed
+    // kept its native player and its event listener until the app closed —
+    // one more for every replay, all through a long session.
+    if (!kIsWeb) {
+      try {
+        await player.dispose().timeout(const Duration(seconds: 2));
+      } catch (_) {}
+    }
   }();
 }
+
+/// Whether a new playback position is worth a rebuild: every 150 ms going
+/// forward, and at once on any jump back (a replay, a seek).
+bool _positionWorthShowing(int newMs, int shownMs) =>
+    newMs < shownMs || newMs - shownMs >= 150;
 
 /// Starts a recording from the beginning, and says whether it started.
 ///
@@ -918,6 +932,11 @@ class _PoemScreenState extends State<PoemScreen>
   static const Color _karaokeHighlight = Color(0xFFFF6B6B);
 
   bool _isCompleted = false;
+
+  /// Heard to the end at least once since this page opened. [_isCompleted]
+  /// is the play state and goes back to false on Repeat or play; leaving
+  /// after either used to report the piece as not finished.
+  bool _finishedOnce = false;
   int _currentLineIndex = 0;
   bool _isPlaying = false;
   bool _wasPlayingBeforePause = false;
@@ -976,6 +995,12 @@ class _PoemScreenState extends State<PoemScreen>
   void _setupAudioListeners() {
     _positionSubscription = _audioPlayer.onPositionChanged.listen((pos) {
       if (mounted) {
+        // A few times a second is plenty for the bar and the lines. The
+        // player reports every frame, and each report rebuilt the whole
+        // page for as long as a recording played.
+        if (!_positionWorthShowing(pos.inMilliseconds, _currentPositionMs)) {
+          return;
+        }
         setState(() => _currentPositionMs = pos.inMilliseconds);
         _syncLineFromPosition();
       }
@@ -1056,6 +1081,7 @@ class _PoemScreenState extends State<PoemScreen>
     setState(() {
       _isPlaying = false;
       _isCompleted = true;
+      _finishedOnce = true;
       _currentLineIndex = _lines.length - 1;
     });
     _pulseController.stop();
@@ -1084,7 +1110,6 @@ class _PoemScreenState extends State<PoemScreen>
     } else if (state == AppLifecycleState.resumed) {
       if (_wasPlayingBeforePause) {
         _audioPlayer.resume();
-        _pulseController.repeat(reverse: true);
         _wasPlayingBeforePause = false;
       }
     }
@@ -1153,7 +1178,6 @@ class _PoemScreenState extends State<PoemScreen>
   Future<void> _startPlayback() async {
     setState(() {
       _isPlaying = true;
-      _pulseController.repeat(reverse: true);
     });
 
     if (_isCompleted) {
@@ -1334,7 +1358,7 @@ class _PoemScreenState extends State<PoemScreen>
       // The music is handed back here, inside the tap. Chrome will not let a
       // page start audio outside a user gesture, and dispose runs long after
       // the tap is over.
-      onClose: () => Navigator.pop(context, _isCompleted),
+      onClose: () => Navigator.pop(context, _finishedOnce),
       banner:
           StorybookHint(AppLocalizations.of(context)!.readFullPoemBeforeBack),
       progress: _totalDurationMs > 0
@@ -1487,7 +1511,11 @@ class _StoryScreenState extends State<StoryScreen> with WidgetsBindingObserver {
   int _totalDurationMs = 0;
   int _currentPositionMs = 0;
   Timer? _fallbackTimer;
-  bool _isCompleted = false;
+
+  /// Heard to the end at least once since this page opened. The flag it
+  /// replaced was reset on Repeat or play, and leaving after either reported
+  /// the story as not finished.
+  bool _finishedOnce = false;
 
   StreamSubscription? _positionSubscription;
   StreamSubscription? _durationSubscription;
@@ -1525,6 +1553,9 @@ class _StoryScreenState extends State<StoryScreen> with WidgetsBindingObserver {
       });
       _positionSubscription = _audioPlayer.onPositionChanged.listen((pos) {
         if (mounted) {
+          if (!_positionWorthShowing(pos.inMilliseconds, _currentPositionMs)) {
+            return;
+          }
           setState(() {
             _currentPositionMs = pos.inMilliseconds;
             _updateCurrentLineFromPosition();
@@ -1629,6 +1660,10 @@ class _StoryScreenState extends State<StoryScreen> with WidgetsBindingObserver {
           if (!await _startAudio()) {
             // The command never came back. The highlight still has to move,
             // or the child is left looking at a pause button doing nothing.
+            // Playing first: the timer stops itself on its first tick when
+            // nothing is playing, so the story never moved at all.
+            if (!mounted) return;
+            setState(() => _isPlaying = true);
             _startFallbackTimer(content);
             return;
           }
@@ -1650,7 +1685,6 @@ class _StoryScreenState extends State<StoryScreen> with WidgetsBindingObserver {
     if (!mounted) return;
     setState(() {
       _currentLineIndex = 0;
-      _isCompleted = false;
       _isPlaying = false;
     });
     await _togglePlay();
@@ -1718,7 +1752,7 @@ class _StoryScreenState extends State<StoryScreen> with WidgetsBindingObserver {
     final content = widget.storyData['content'] as List;
     setState(() {
       _isPlaying = false;
-      _isCompleted = true;
+      _finishedOnce = true;
       _currentLineIndex = content.isEmpty ? 0 : content.length - 1;
     });
     // The file is reloaded next time rather than resumed: a completed
@@ -1752,7 +1786,6 @@ class _StoryScreenState extends State<StoryScreen> with WidgetsBindingObserver {
         onSecondaryTap: () {
           Navigator.of(dialogContext).pop();
           setState(() {
-            _isCompleted = false;
             _currentLineIndex = 0;
           });
           _togglePlay();
@@ -1833,7 +1866,7 @@ class _StoryScreenState extends State<StoryScreen> with WidgetsBindingObserver {
     return StorybookScaffold(
       title: widget.storyTitle,
       // Inside the tap, so the module music can come back — see the poem.
-      onClose: () => Navigator.pop(context, _isCompleted),
+      onClose: () => Navigator.pop(context, _finishedOnce),
       progress: _totalDurationMs > 0
           ? _currentPositionMs / _totalDurationMs
           : (content.isEmpty ? 0.0 : (_currentLineIndex + 1) / content.length),
@@ -2041,6 +2074,11 @@ class SongScreen extends StatefulWidget {
 class _SongScreenState extends State<SongScreen>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   bool _isCompleted = false;
+
+  /// Heard to the end at least once since this page opened. [_isCompleted]
+  /// is the play state and goes back to false on Repeat or play; leaving
+  /// after either used to report the piece as not finished.
+  bool _finishedOnce = false;
   int _currentLineIndex = 0;
   bool _isPlaying = false;
   bool _wasPlayingBeforePause = false;
@@ -2122,6 +2160,12 @@ class _SongScreenState extends State<SongScreen>
   void _setupAudioListeners() {
     _positionSubscription = _audioPlayer.onPositionChanged.listen((pos) {
       if (mounted) {
+        // A few times a second is plenty for the bar and the lines. The
+        // player reports every frame, and each report rebuilt the whole
+        // page for as long as a recording played.
+        if (!_positionWorthShowing(pos.inMilliseconds, _currentPositionMs)) {
+          return;
+        }
         setState(() => _currentPositionMs = pos.inMilliseconds);
         _syncLineFromPosition();
       }
@@ -2173,6 +2217,7 @@ class _SongScreenState extends State<SongScreen>
     setState(() {
       _isPlaying = false;
       _isCompleted = true;
+      _finishedOnce = true;
       _currentLineIndex = _lyrics.length - 1;
     });
     _pulseController.stop();
@@ -2201,7 +2246,6 @@ class _SongScreenState extends State<SongScreen>
     } else if (state == AppLifecycleState.resumed) {
       if (_wasPlayingBeforePause) {
         _audioPlayer.resume();
-        _pulseController.repeat(reverse: true);
         _wasPlayingBeforePause = false;
       }
     }
@@ -2269,7 +2313,6 @@ class _SongScreenState extends State<SongScreen>
   Future<void> _startPlayback() async {
     setState(() {
       _isPlaying = true;
-      _pulseController.repeat(reverse: true);
     });
 
     if (_isCompleted) {
@@ -2453,7 +2496,7 @@ class _SongScreenState extends State<SongScreen>
     return StorybookScaffold(
       title: widget.songTitle,
       // Inside the tap — see the poem screen's copy.
-      onClose: () => Navigator.pop(context, _isCompleted),
+      onClose: () => Navigator.pop(context, _finishedOnce),
       progress: _totalDurationMs > 0
           ? _currentPositionMs / _totalDurationMs
           : (lyrics.isEmpty ? 0.0 : (_currentLineIndex + 1) / lyrics.length),

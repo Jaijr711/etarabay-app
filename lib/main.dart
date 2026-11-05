@@ -1,11 +1,15 @@
+import 'data/third_party_licenses.dart';
 import 'services/audio_source.dart';
+import 'services/device_performance.dart';
 import 'services/reminder_service.dart';
 import 'widgets/account_watcher.dart';
 import 'widgets/system_bars_guard.dart';
 import 'widgets/tablet_scale.dart';
+import 'widgets/teacher_lock.dart';
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kDebugMode, kIsWeb;
 import 'package:flutter/gestures.dart' show GestureBinding;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -271,14 +275,6 @@ class AudioManager extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
   }
 
-  Future<void> toggleMusic() async {
-    if (_isPlaying) {
-      await pauseMusic();
-    } else {
-      await resumeMusic();
-    }
-  }
-
   Future<void> setMusicEnabled(bool enabled) async {
     _isMusicEnabled = enabled;
 
@@ -313,19 +309,58 @@ String _diagnosticBuildLabel = 'unknown version';
 // indistinguishable from a stuck loading screen, so while we're chasing an
 // intermittent blank-screen report, show the real error instead: whoever
 // hits it can screenshot the text and that becomes the actual bug report.
+//
+// A child should not be handed a stack trace, though. Outside debug builds
+// they get Tarabay and a short line; under it, small, the build and the
+// error's first line — still enough for the adult's screenshot to say what
+// broke, without the page of red text.
 void _showErrorsOnScreen() {
   ErrorWidget.builder = (FlutterErrorDetails details) {
+    if (kDebugMode) {
+      return Material(
+        color: const Color(0xFFFFF3F3),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              'DIAGNOSTIC BUILD ($_diagnosticBuildLabel) - screenshot this:\n\n'
+              '${details.exceptionAsString()}\n\n'
+              '${details.stack}',
+              style: const TextStyle(color: Colors.red, fontSize: 11),
+            ),
+          ),
+        ),
+      );
+    }
+    final firstLine = details.exceptionAsString().split('\n').first;
     return Material(
-      color: const Color(0xFFFFF3F3),
-      child: SafeArea(
+      color: const Color(0xFFFFF8E8),
+      child: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
-          child: Text(
-            'DIAGNOSTIC BUILD ($_diagnosticBuildLabel) - screenshot this:\n\n'
-            '${details.exceptionAsString()}\n\n'
-            '${details.stack}',
-            style: const TextStyle(color: Colors.red, fontSize: 11),
-          ),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Image.asset('assets/images/mascot_wave.webp',
+                width: 110,
+                height: 110,
+                errorBuilder: (_, __, ___) => const SizedBox()),
+            const SizedBox(height: 10),
+            const Text(
+              'May nangyaring mali.\nSomething went wrong.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF2B2A5C)),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              '$_diagnosticBuildLabel · $firstLine',
+              textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 10, color: Color(0xFF9A98AE)),
+            ),
+          ]),
         ),
       ),
     );
@@ -362,6 +397,7 @@ class _AndroidOnly extends StatelessWidget {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  registerThirdPartyLicenses();
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
     runApp(const _AndroidOnly());
     return;
@@ -458,6 +494,9 @@ void main() async {
   await localStorageReady;
   final prefs = await prefsReady;
   final savedLanguage = prefs.getString('language') ?? 'en';
+  // What this phone can draw smoothly — before the first frame, so a weak
+  // phone never starts on the heavier drawing.
+  await DevicePerformance.init(prefs);
 
   // Initialize UserProvider and wait for its internal async setup
   final userProvider = UserProvider();
@@ -547,20 +586,82 @@ class _CupertinoFallback extends LocalizationsDelegate<CupertinoLocalizations> {
   bool shouldReload(_CupertinoFallback old) => false;
 }
 
+/// The app's look, shared with the screen previews in test/previews so
+/// what they draw is what the phone draws.
+ThemeData appTheme() {
+  // Use the platform default font for all text (no custom font family).
+  // Only the top header/app-bar text is emphasized in bold — handled where
+  // headers are built (see CustomHeaderAppBar and screen headers).
+  final baseText = ThemeData(useMaterial3: true).textTheme;
+  final appTextTheme = baseText.apply(
+    bodyColor: AppColors.textDark,
+    displayColor: AppColors.textDark,
+  );
+  return ThemeData(
+    useMaterial3: true,
+    primaryColor: AppColors.primary,
+    scaffoldBackgroundColor: AppColors.background,
+    textTheme: appTextTheme,
+    appBarTheme: const AppBarTheme(
+      elevation: 0,
+      centerTitle: false,
+      backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
+    ),
+    cardTheme: CardThemeData(
+      color: Colors.white,
+      elevation: 2,
+      shadowColor: Colors.black.withOpacity(0.06),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: const Color(0xFFF8F9FA),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+      ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        elevation: 0,
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        textStyle: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ),
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: AppColors.primary,
+      primary: AppColors.primary,
+      secondary: AppColors.secondary,
+      surface: Colors.white,
+      background: AppColors.background,
+    ),
+  );
+}
+
 class ETarabayApp extends StatelessWidget {
   const ETarabayApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Use the platform default font for all text (no custom font family).
-    // Only the top header/app-bar text is emphasized in bold — handled where
-    // headers are built (see CustomHeaderAppBar and screen headers).
-    final baseText = ThemeData(useMaterial3: true).textTheme;
-    final appTextTheme = baseText.apply(
-      bodyColor: AppColors.textDark,
-      displayColor: AppColors.textDark,
-    );
-
     return MaterialApp(
       title: 'E-Tarabay',
       debugShowCheckedModeBanner: false,
@@ -571,12 +672,28 @@ class ETarabayApp extends StatelessWidget {
       //
       // TabletScale outermost: on an iPad or tablet the phone layout is drawn
       // enlarged instead of stretched — see tablet_scale.dart.
-      builder: (context, child) => TabletScale(
-        // Inside TabletScale, so on a tablet it reads the scaled-down bar.
-        child: SystemBarsGuard(
-          child: AccountWatcher(
-            navigatorKey: appNavigatorKey,
-            child: child ?? const SizedBox.shrink(),
+      builder: (context, child) => ValueListenableBuilder<bool>(
+        valueListenable: DevicePerformance.lite,
+        // On a phone that cannot keep up, animations are off everywhere —
+        // the same switch as the phone's own "remove animations", so every
+        // screen that honours one honours both. See DevicePerformance.
+        builder: (context, lite, _) => MediaQuery(
+          data: lite
+              ? MediaQuery.of(context).copyWith(disableAnimations: true)
+              : MediaQuery.of(context),
+          child: TabletScale(
+            // Inside TabletScale, so on a tablet it reads the scaled-down bar.
+            child: SystemBarsGuard(
+              // Over every screen a logged-in teacher can reach, so the class
+              // is never one tap away from whoever picks the phone up.
+              child: TeacherLockGate(
+                navigatorKey: appNavigatorKey,
+                child: AccountWatcher(
+                  navigatorKey: appNavigatorKey,
+                  child: child ?? const SizedBox.shrink(),
+                ),
+              ),
+            ),
           ),
         ),
       ),
@@ -595,64 +712,7 @@ class ETarabayApp extends StatelessWidget {
         Locale('fil'),
         Locale('ilo'),
       ],
-      theme: ThemeData(
-        useMaterial3: true,
-        primaryColor: AppColors.primary,
-        scaffoldBackgroundColor: AppColors.background,
-        textTheme: appTextTheme,
-        appBarTheme: const AppBarTheme(
-          elevation: 0,
-          centerTitle: false,
-          backgroundColor: Colors.transparent,
-          surfaceTintColor: Colors.transparent,
-        ),
-        cardTheme: CardThemeData(
-          color: Colors.white,
-          elevation: 2,
-          shadowColor: Colors.black.withOpacity(0.06),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: const Color(0xFFF8F9FA),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            elevation: 0,
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-            textStyle: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
-          primary: AppColors.primary,
-          secondary: AppColors.secondary,
-          surface: Colors.white,
-          background: AppColors.background,
-        ),
-      ),
+      theme: appTheme(),
       home: const SplashScreen(),
     );
   }

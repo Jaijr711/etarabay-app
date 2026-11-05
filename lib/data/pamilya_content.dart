@@ -136,8 +136,9 @@ class PamilyaContent {
       },
       {
         'id': 'about_home',
-        'question': 'Where do you live?',
+        'question': 'Who do you live with?',
         'type': 'text_input',
+        'options': ['👨‍👩‍👧 With my family', '🐶 With a dog', '🧸 With my toys'],
         'icon': '🏠',
         'description':
             'Home is the place where you live with your family. Home sweet home!',
@@ -179,8 +180,13 @@ class PamilyaContent {
       },
       {
         'id': 'about_home',
-        'question': 'Saan ka nakatira?',
+        'question': 'Sino ang kasama mo sa bahay?',
         'type': 'text_input',
+        'options': [
+          '👨‍👩‍👧 Kasama ang pamilya ko',
+          '🐶 Kasama ang aso',
+          '🧸 Kasama ang mga laruan ko'
+        ],
         'icon': '🏠',
         'description':
             'Ang iyong tahanan ay ang lugar kung saan ka nakatira kasama ang iyong pamilya. Kay sarap sa sariling tahanan!',
@@ -222,8 +228,13 @@ class PamilyaContent {
       },
       {
         'id': 'about_home',
-        'question': 'Sadino ti pagtaengam?',
+        'question': 'Siasino ti kaduam iti balay?',
         'type': 'text_input',
+        'options': [
+          '👨‍👩‍👧 Kadua ti pamiliak',
+          '🐶 Kadua ti aso',
+          '🧸 Kadua dagiti ay-ayamko'
+        ],
         'icon': '🏠',
         'description':
             'Ti pagtaengam ket ti lugar a pagyanam a kadua ti pamilyam. Naimbag ti balay!',
@@ -664,7 +675,7 @@ class PamilyaContent {
       {
         'id': 'preference_food',
         'question': 'Which food do you like best?',
-        'options': ['🍚 Rice', '🐟 Fish', '🍛 Stew', '🍖 Meat'],
+        'options': ['🍚 Rice', '🐟 Fish', '🍛 Sautéed Veggies', '🍖 Meat'],
         'emojis': ['🍚', '🐟', '🍛', '🍖'],
         'description': 'Choose your favorite food!',
       },
@@ -678,7 +689,7 @@ class PamilyaContent {
       {
         'id': 'preference_game',
         'question': 'Which game do you like best?',
-        'options': ['🪀 Hopscotch', '🏃 Tag', '🧩 Puzzle', '🎯 Ring Toss'],
+        'options': ['🪀 Hopscotch', '🏃 Hide and Seek', '🧩 Puzzle', '🎯 Tumbang Preso'],
         'emojis': ['🪀', '🏃', '🧩', '🎯'],
         'description': 'Fun games to play with friends!',
       },
@@ -729,7 +740,7 @@ class PamilyaContent {
       {
         'id': 'preference_food',
         'question': 'Ania ti makan a kayat mo unay?',
-        'options': ['🍚 Innapoy', '🐟 Ikan', '🍛 Nilaga', '🍖 Karne'],
+        'options': ['🍚 Innapoy', '🐟 Ikan', '🍛 Ginisa a Nateng', '🍖 Karne'],
         'emojis': ['🍚', '🐟', '🍛', '🍖'],
         'description': 'Pilien ti kayatam a Taraon!',
       },
@@ -745,9 +756,9 @@ class PamilyaContent {
         'question': 'Ania ti ay-ayam a kayat mo unay?',
         'options': [
           '🪀 Piko',
-          '🏃 Habulan',
+          '🏃 Taguan',
           '🧩 Palaisipan',
-          '🎯 Panag-ay-ayyam iti darts'
+          '🎯 Tumbang Preso'
         ],
         'emojis': ['🪀', '🏃', '🧩', '🎯'],
         'description': 'Naragsak nga ay-ayam a maay-ayam kadagiti gagayyemmo!',
@@ -799,7 +810,7 @@ class PamilyaContent {
       },
       {
         'id': 'family_brother',
-        'question': 'Who is your older brother?',
+        'question': 'Who is the older boy who plays with you and looks after you?',
         'choices': [
           '👩 Mother',
           '👨 Father',
@@ -818,7 +829,7 @@ class PamilyaContent {
       },
       {
         'id': 'family_sister',
-        'question': 'Who is your older sister?',
+        'question': 'Who is the older girl who helps at home and plays with you?',
         'choices': [
           '👩 Mother',
           '👨 Father',
@@ -928,7 +939,8 @@ class PamilyaContent {
       },
       {
         'id': 'family_brother',
-        'question': 'Sino ang Kuya mo?',
+        'question':
+            'Sino ang nakatatandang batang lalaki na kalaro mo at nagbabantay sa iyo?',
         'choices': ['👩 Ina', '👨 Ama', '👧 Ate', '👦 Kuya'],
         'correct': 3,
         'member': 'Kuya',
@@ -943,7 +955,8 @@ class PamilyaContent {
       },
       {
         'id': 'family_sister',
-        'question': 'Sino ang iyong nakakatandang kapatid na babae?',
+        'question':
+            'Sino ang nakatatandang batang babae na tumutulong sa bahay at kalaro mo?',
         'choices': ['👩 Ina', '👨 Ama', '👧 Ate', '👦 Kuya'],
         'correct': 2,
         'member': 'Ate',
@@ -1042,7 +1055,8 @@ class PamilyaContent {
       },
       {
         'id': 'family_manong',
-        'question': 'Sinno ti inauna nga kabsatmo a lalaki?',
+        'question':
+            'Siasino ti inauna a ubing a lalaki a kaay-ayammo ken mangbantay kenka?',
         'choices': [
           '👩 Nanang',
           '👨 Tatang',
@@ -1063,7 +1077,8 @@ class PamilyaContent {
       },
       {
         'id': 'family_manang',
-        'question': 'Sinno ti inauna nga kabsatmo a babai?',
+        'question':
+            'Siasino ti inauna a ubing a babai a tumultulong iti balay ken kaay-ayammo?',
         'choices': [
           '👩 Nanang',
           '👨 Tatang',
@@ -1147,7 +1162,7 @@ class PamilyaContent {
           'Mother only',
           'Father only',
           'Grandmother only',
-          'Sister/Brother'
+          'Anyone can'
         ],
         'correct': 3,
         'explanation': 'Correct! Anyone in the family can cook.'
@@ -1249,7 +1264,7 @@ class PamilyaContent {
           'Nanang laeng',
           'Tatang laeng',
           'Lilang laeng',
-          'Manang/Manong'
+          'Siasinoman'
         ],
         'correct': 3,
         'explanation': 'Kusto! Siasinoman iti pamilia ket mabalin nga agluto'
@@ -1857,17 +1872,19 @@ class PamilyaContent {
         'id': 'tree_3',
         'question':
             'Ania ti awagmo iti in-inauna a kabsat a lalaki iti Tagalog/Filipino?',
-        'choices': ['Manang', 'Manong', 'Inaudi', 'Lilong'],
+        // The question asks for the Tagalog word, so the Tagalog word is the
+        // answer: it offered only Ilokano ones and marked "Manong" right.
+        'choices': ['Manang', 'Kuya', 'Inaudi', 'Lilong'],
         'correct': 1,
-        'explanation': 'Kusto! Kuya ket ti termino para ti manong'
+        'explanation': 'Kusto! Kuya ti awag ti Tagalog iti manong.'
       },
       {
         'id': 'tree_4',
         'question':
             'Ania ti awagmo iti in-inauna a kabsat a babai iti Tagalog/Filipino?',
-        'choices': ['Manong', 'Manang', 'Inaudi', 'Lilang'],
+        'choices': ['Manong', 'Ate', 'Inaudi', 'Lilang'],
         'correct': 1,
-        'explanation': 'Kusto! Ate ket ti termino para ti manang'
+        'explanation': 'Kusto! Ate ti awag ti Tagalog iti manang.'
       },
       {
         'id': 'tree_5',

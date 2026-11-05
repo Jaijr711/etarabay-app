@@ -141,26 +141,35 @@ class _FloatingBottomNavBarState extends State<FloatingBottomNavBar>
       ),
     );
 
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 10,
-        right: 10,
-        top: hasCenter ? 26 : 0,
-        bottom: bottomPadding > 0 ? bottomPadding + 8 : 16,
+    // The phone's back on any tab but Home goes Home. Each tab replaces the
+    // one before, so it is the only page there is, and back closed the app:
+    // a child on Lessons pressing back to get to Home lost the app instead.
+    return PopScope(
+      canPop: widget.selectedIndex == 0,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) widget.onTap(0);
+      },
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 10,
+          right: 10,
+          top: hasCenter ? 26 : 0,
+          bottom: bottomPadding > 0 ? bottomPadding + 8 : 16,
+        ),
+        child: hasCenter
+            ? Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.topCenter,
+                children: [
+                  pill,
+                  Positioned(
+                    top: -24,
+                    child: _buildCenterButton(),
+                  ),
+                ],
+              )
+            : pill,
       ),
-      child: hasCenter
-          ? Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.topCenter,
-              children: [
-                pill,
-                Positioned(
-                  top: -24,
-                  child: _buildCenterButton(),
-                ),
-              ],
-            )
-          : pill,
     );
   }
 
@@ -210,74 +219,75 @@ class _FloatingBottomNavBarState extends State<FloatingBottomNavBar>
       child: SizedBox(
         height: double.infinity,
         child: AnimatedBuilder(
-        animation: _bounceAnimation,
-        builder: (context, child) {
-          final scale = isSelected
-              ? 1.0 + 0.12 * (1 - _bounceAnimation.value).clamp(0.0, 1.0)
-              : 1.0;
+          animation: _bounceAnimation,
+          builder: (context, child) {
+            final scale = isSelected
+                ? 1.0 + 0.12 * (1 - _bounceAnimation.value).clamp(0.0, 1.0)
+                : 1.0;
 
-          return Transform.scale(
-            scale: scale,
-            // The whole column is the target, edge to edge. A margin here
-            // made the hit area smaller than it looked, and a miss reads to a
-            // child as the app ignoring them rather than as their own aim.
-            child: Semantics(
-              label: item.label,
-              button: true,
-              selected: isSelected,
-              child: Center(
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  curve: Curves.easeOut,
-                  margin: const EdgeInsets.symmetric(horizontal: 2),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
-                  decoration: BoxDecoration(
-                    // A pill around the picture and the word together. The
-                    // disc this replaces was sized for a picture on its own
-                    // and cropped the label the moment it came back.
-                    color: isSelected
-                        ? item.color.withOpacity(0.15)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: item.color.withOpacity(isSelected ? 0.4 : 0),
-                      width: 2,
+            return Transform.scale(
+              scale: scale,
+              // The whole column is the target, edge to edge. A margin here
+              // made the hit area smaller than it looked, and a miss reads to a
+              // child as the app ignoring them rather than as their own aim.
+              child: Semantics(
+                label: item.label,
+                button: true,
+                selected: isSelected,
+                child: Center(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 220),
+                    curve: Curves.easeOut,
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                    decoration: BoxDecoration(
+                      // A pill around the picture and the word together. The
+                      // disc this replaces was sized for a picture on its own
+                      // and cropped the label the moment it came back.
+                      color: isSelected
+                          ? item.color.withOpacity(0.15)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: item.color.withOpacity(isSelected ? 0.4 : 0),
+                        width: 2,
+                      ),
                     ),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _buildIcon(item, isSelected),
-                      const SizedBox(height: 1),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: AnimatedDefaultTextStyle(
-                          duration: const Duration(milliseconds: 220),
-                          style: TextStyle(
-                            fontSize: 11.5,
-                            fontWeight:
-                                isSelected ? FontWeight.w800 : FontWeight.w600,
-                            // The word wears the destination's colour too, so
-                            // picture and label say the same thing rather
-                            // than the label going grey and undoing it.
-                            color: isSelected
-                                ? item.color
-                                : item.color.withOpacity(0.7),
-                          ),
-                          child: Text(
-                            item.label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildIcon(item, isSelected),
+                        const SizedBox(height: 1),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: AnimatedDefaultTextStyle(
+                            duration: const Duration(milliseconds: 220),
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: isSelected
+                                  ? FontWeight.w800
+                                  : FontWeight.w600,
+                              // The word wears the destination's colour too, so
+                              // picture and label say the same thing rather
+                              // than the label going grey and undoing it.
+                              color: isSelected
+                                  ? item.color
+                                  : item.color.withOpacity(0.7),
+                            ),
+                            child: Text(
+                              item.label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
+            );
           },
         ),
       ),
@@ -303,12 +313,14 @@ class _FloatingBottomNavBarState extends State<FloatingBottomNavBar>
               item.assetPath!,
               width: size,
               height: size,
+              // Decoded at its largest size on screen, not the file's.
+              cacheWidth: (33 * MediaQuery.devicePixelRatioOf(context)).ceil(),
               fit: BoxFit.contain,
               errorBuilder: (_, __, ___) => Icon(
                 item.icon,
                 size: size,
-                color: Color.lerp(
-                    item.color.withOpacity(0.55), item.color, value),
+                color:
+                    Color.lerp(item.color.withOpacity(0.55), item.color, value),
               ),
             ),
           );
