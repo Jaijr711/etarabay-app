@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -19,6 +21,42 @@ class AuthService {
   static const Duration writeTimeout = Duration(seconds: 10);
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  /// Whether the server answers right now.
+  ///
+  /// Asked before a removal or a reset. Offline, Firestore keeps such a
+  /// write on the phone and sends it whenever the signal comes back: the
+  /// teacher was told it failed — the save timed out — and the class was
+  /// deleted or reset anyway, hours later, with nobody expecting it.
+  Future<bool> canReachServer() async {
+    try {
+      await ensureAuthenticated();
+      await _db
+          .collection('config')
+          .doc('teacher')
+          .get(const GetOptions(source: Source.server))
+          .timeout(const Duration(seconds: 8));
+      return true;
+    } catch (e) {
+      debugPrint('Server not reachable: $e');
+      return false;
+    }
+  }
+
+  static const Map<String, dynamic> _needsInternet = {
+    'status': 'Error',
+    'code': 'needsInternet',
+    'message': 'No internet. Nothing was changed.',
+  };
+
+  /// Sent, but the server had not answered in time. Firestore still holds
+  /// the write and finishes it once the signal is back — so this is not a
+  /// failure, and must not be reported as one.
+  static const Map<String, dynamic> _finishesOnline = {
+    'status': 'Pending',
+    'code': 'finishesOnline',
+    'message': 'It will finish once the internet is back.',
+  };
 
   /// The Firestore rules require *some* authenticated app instance —
   /// anonymous is fine — before they allow a read at all (see
@@ -136,11 +174,13 @@ class AuthService {
   /// password before it lets a child call this again — so this itself
   /// stays unconditional, the same as a teacher rotating their own password.
   Future<bool> setDeveloperPassword(String newPassword) async {
+    // Offline the write never answered, and the screen spun for good.
+    if (!await canReachServer()) return false;
     try {
       await _db.collection('config').doc('developer').set(
         {'passwordHash': hashLrn(newPassword)},
         SetOptions(merge: true),
-      );
+      ).timeout(writeTimeout);
       return true;
     } catch (e) {
       debugPrint('setDeveloperPassword error: $e');
@@ -155,6 +195,8 @@ class AuthService {
     String? username,
     String? newPassword,
   }) async {
+    // Offline the write never came back, and the dialog spun for good.
+    if (!await canReachServer()) return _needsInternet;
     try {
       final updates = <String, dynamic>{};
       if (username != null && username.trim().isNotEmpty) {
@@ -173,8 +215,11 @@ class AuthService {
       await _db
           .collection('config')
           .doc('teacher')
-          .set(updates, SetOptions(merge: true));
+          .set(updates, SetOptions(merge: true))
+          .timeout(writeTimeout);
       return {'status': 'Success'};
+    } on TimeoutException {
+      return _finishesOnline;
     } catch (e) {
       debugPrint('updateTeacherCredentials error: $e');
       return {
@@ -200,6 +245,10 @@ class AuthService {
     String? username,
     String? newPassword,
   }) async {
+    // Offline the change was reported as failed and then went through once
+    // the signal came back: the parent kept the old password in mind, and
+    // the child could no longer sign in anywhere else.
+    if (!await canReachServer()) return _needsInternet;
     try {
       final updates = <String, dynamic>{};
 
@@ -215,10 +264,17 @@ class AuthService {
 
       if (username != null && username.trim().isNotEmpty) {
         final uname = username.trim();
-        final clash = await _db
-            .collection('students')
-            .where('username', isEqualTo: uname)
-            .get();
+        final QuerySnapshot<Map<String, dynamic>> clash;
+        try {
+          clash = await _db
+              .collection('students')
+              .where('username', isEqualTo: uname)
+              .get(const GetOptions(source: Source.server))
+              .timeout(writeTimeout);
+        } catch (_) {
+          // Nothing has been sent yet.
+          return _needsInternet;
+        }
         final takenByOther = clash.docs.any((d) => d.id != studentId);
         if (takenByOther) {
           return {
@@ -251,6 +307,8 @@ class AuthService {
           .update(updates)
           .timeout(writeTimeout);
       return {'status': 'Success'};
+    } on TimeoutException {
+      return _finishesOnline;
     } catch (e) {
       debugPrint('updateStudentCredentials error: $e');
       return {
@@ -296,6 +354,17 @@ class AuthService {
     }
   }
 
+  /// The spellings of [typed] a login looks for: as typed, all lowercase,
+  /// and with only the first letter capital. Usernames are made lowercase
+  /// ("ana1234"), and a phone keyboard that capitalised the first letter
+  /// had the child told their username did not exist.
+  static List<String> usernameVariants(String typed) {
+    final t = typed.trim();
+    if (t.isEmpty) return [t];
+    final lower = t.toLowerCase();
+    return {t, lower, lower[0].toUpperCase() + lower.substring(1)}.toList();
+  }
+
   /// Login a student/parent using credentials enrolled by the teacher.
   /// Looks up `students` collection in Firestore.
   /// Matches username and LRN (password).
@@ -306,23 +375,24 @@ class AuthService {
 
       final query = _db
           .collection('students')
-          .where('username', isEqualTo: username.trim());
+          .where('username', whereIn: usernameVariants(username));
 
-      // Cache-first: returning students are already cached locally, so login
-      // is instant with no spinner wait. Only fall back to the server when the
-      // student isn't cached yet (e.g. first login on this device).
+      // The server first, the phone's copy only when the server cannot be
+      // reached — so a child can still sign in with no signal at all.
+      //
+      // This was the other way round, for a quicker sign-in. But the phone's
+      // copy is whatever it last saw: a child the teacher had removed still
+      // signed in on it, and a password a parent had changed went on
+      // working while the new one was refused.
       QuerySnapshot<Map<String, dynamic>> querySnapshot;
       try {
-        querySnapshot = await query.get(const GetOptions(source: Source.cache));
-        if (querySnapshot.docs.isEmpty) {
-          querySnapshot = await query
-              .get(const GetOptions(source: Source.server))
-              .timeout(const Duration(seconds: 15));
-        }
-      } catch (_) {
         querySnapshot = await query
             .get(const GetOptions(source: Source.server))
-            .timeout(const Duration(seconds: 15));
+            .timeout(const Duration(seconds: 8));
+      } catch (e) {
+        debugPrint('Login from the cached class: $e');
+        querySnapshot = await query.get(const GetOptions(source: Source.cache));
+        if (querySnapshot.docs.isEmpty) rethrow;
       }
 
       if (querySnapshot.docs.isEmpty) {
@@ -343,7 +413,11 @@ class AuthService {
         };
       }
 
-      final doc = querySnapshot.docs.first;
+      // The spelling typed, when it is one of several that matched.
+      final typed = username.trim();
+      final doc = querySnapshot.docs.firstWhere(
+          (d) => d.data()['username'] == typed,
+          orElse: () => querySnapshot.docs.first);
       final studentData = doc.data();
       final storedHash = (studentData['lrnHash'] ?? '').toString();
       final legacyLrn = (studentData['lrn'] ?? '').toString().trim();
@@ -357,10 +431,12 @@ class AuthService {
         // hash. The plaintext is kept so the teacher can view the password.
         matches = legacyLrn == password.trim();
         if (matches) {
+          // Not waited on: offline it never answers, and the sign-in waited
+          // with it for good.
           try {
-            await doc.reference.update({
+            unawaited(doc.reference.update({
               'lrnHash': hashLrn(password),
-            });
+            }).catchError((Object e) => debugPrint('Hash not added: $e')));
           } catch (_) {}
         }
       }
@@ -469,6 +545,9 @@ class AuthService {
     String? avatar,
     bool parentConsented = false,
   }) async {
+    if (!await canReachServer()) return _needsInternet;
+    final docRef = _db.collection('students').doc();
+    Map<String, dynamic>? studentData;
     try {
       // Check if Student Number already exists to prevent duplicates (compare hashes)
       final lrnHash = hashLrn(lrn);
@@ -504,8 +583,7 @@ class AuthService {
       }
 
       // Create the student record in Firestore
-      final docRef = _db.collection('students').doc();
-      final studentData = {
+      studentData = {
         'name': name,
         'middleName': middleName.trim(),
         'lrnHash': lrnHash,
@@ -555,6 +633,16 @@ class AuthService {
         'studentId': docRef.id,
         'studentData': studentData,
       };
+    } on TimeoutException {
+      // The record itself was sent and is queued; it is there once the
+      // signal is back. Before it, only the checks could time out, and
+      // nothing was written.
+      if (studentData == null) return _needsInternet;
+      return {
+        ..._finishesOnline,
+        'studentId': docRef.id,
+        'studentData': studentData,
+      };
     } catch (e) {
       debugPrint('Enrollment error: $e');
       return {
@@ -588,8 +676,22 @@ class AuthService {
         .snapshots();
   }
 
+  /// The middle name to keep after the teacher edits [newFullName]: the one
+  /// on record while the name still holds it, else none. Kept stale, the
+  /// child's home screen put its initial back into a name that no longer had
+  /// it ("Ana S. Cruz" for "Ana Cruz").
+  static String keptMiddleName(String oldMiddle, String newFullName) {
+    final mid = oldMiddle.trim();
+    if (mid.isEmpty) return '';
+    return newFullName.toLowerCase().contains(mid.toLowerCase()) ? mid : '';
+  }
+
   /// Update student details (name, LRN).
-  Future<void> updateStudent({
+  ///
+  /// `status` is 'Success', 'Pending' (sent, finishing once the signal is
+  /// back) or 'Error'. It used to return nothing and swallow every failure,
+  /// so the teacher was told "Update" for a save that never happened.
+  Future<Map<String, dynamic>> updateStudent({
     required String studentId,
     required String name,
     String? middleName,
@@ -600,6 +702,9 @@ class AuthService {
     String? parentContact,
     String? avatar,
   }) async {
+    // Offline the read below comes from the cache, which may not know a
+    // password the parent changed.
+    if (!await canReachServer()) return _needsInternet;
     try {
       final updates = <String, dynamic>{
         'name': name,
@@ -659,26 +764,44 @@ class AuthService {
         ...updates,
         ...profileUpdates,
       }).timeout(writeTimeout);
+      return {'status': 'Success'};
+    } on TimeoutException {
+      return _finishesOnline;
     } catch (e) {
       debugPrint('Error updating student: $e');
+      return {'status': 'Error', 'code': 'saveFailed'};
     }
   }
 
   /// Delete a student record.
-  Future<void> deleteStudent(String studentId) async {
+  ///
+  /// `status` is 'Success', 'Pending' (sent, finishing once the signal is
+  /// back) or 'Error' — with `code` 'needsInternet' when nothing was sent.
+  Future<Map<String, dynamic>> deleteStudent(String studentId) async {
+    if (!await canReachServer()) return _needsInternet;
+    // The drawings live in a document of their own under the record, and
+    // deleting a document leaves the ones under it behind. A child the
+    // teacher removed kept their pictures in the cloud with nobody able to
+    // reach them — the opposite of what removing them promises a parent.
+    //
+    // One batch, so the two go together. They were two writes, the drawings
+    // first: offline the first one timed out, the record was never deleted,
+    // and the child came back to the list after "removed".
+    final batch = _db.batch()
+      ..delete(_creationsDoc(studentId))
+      ..delete(_db.collection('students').doc(studentId));
     try {
-      // The drawings live in a document of their own under the record, and
-      // deleting a document leaves the ones under it behind. A child the
-      // teacher removed kept their pictures in the cloud with nobody able to
-      // reach them — the opposite of what removing them promises a parent.
-      await _creationsDoc(studentId).delete().timeout(writeTimeout);
-      await _db
-          .collection('students')
-          .doc(studentId)
-          .delete()
-          .timeout(writeTimeout);
+      await batch.commit().timeout(writeTimeout);
+      return {'status': 'Success'};
+    } on TimeoutException {
+      return _finishesOnline;
     } catch (e) {
       debugPrint('Error deleting student: $e');
+      return {
+        'status': 'Error',
+        'code': 'removeFailed',
+        'message': 'Could not remove the child. Please try again.',
+      };
     }
   }
 
@@ -691,7 +814,19 @@ class AuthService {
   /// Delete all student records from Firestore.
   Future<Map<String, dynamic>> deleteAllStudents() async {
     try {
-      final querySnapshot = await _db.collection('students').get();
+      // From the server, never the cache: offline the cached class was
+      // queued for deletion and went the next time the phone was online.
+      final QuerySnapshot<Map<String, dynamic>> querySnapshot;
+      try {
+        await ensureAuthenticated();
+        querySnapshot = await _db
+            .collection('students')
+            .get(const GetOptions(source: Source.server))
+            .timeout(const Duration(seconds: 15));
+      } catch (e) {
+        debugPrint('Class not reachable: $e');
+        return _needsInternet;
+      }
       final docs = querySnapshot.docs;
 
       if (docs.isEmpty) {
@@ -706,6 +841,7 @@ class AuthService {
       // Firestore batches are limited to 500 operations: two per child,
       // the record and its drawings (see deleteStudent).
       const int batchLimit = 250;
+      final commits = <Future<void>>[];
       for (var i = 0; i < docs.length; i += batchLimit) {
         final batch = _db.batch();
         final end =
@@ -714,7 +850,14 @@ class AuthService {
           batch.delete(_creationsDoc(docs[j].id));
           batch.delete(docs[j].reference);
         }
-        await batch.commit().timeout(writeTimeout);
+        commits.add(batch.commit());
+      }
+      // All sent before any is waited on: a signal lost halfway no longer
+      // leaves half the class deleted and the rest never sent.
+      try {
+        await Future.wait(commits).timeout(writeTimeout);
+      } on TimeoutException {
+        return {..._finishesOnline, 'count': docs.length};
       }
 
       return {
@@ -809,16 +952,21 @@ class AuthService {
     }
   }
 
-  /// Reset student activity progress
-  Future<bool> resetStudentActivityProgress(String studentId) async {
+  /// Reset student activity progress.
+  ///
+  /// Answers like [deleteStudent]: 'Success', 'Pending' or 'Error'.
+  Future<Map<String, dynamic>> resetStudentActivityProgress(
+      String studentId) async {
+    if (studentId.trim().isEmpty) {
+      debugPrint(
+          'CRITICAL ERROR: resetStudentActivityProgress called with empty studentId!');
+      return _resetFailed;
+    }
+    if (!await canReachServer()) return _needsInternet;
+    var result = const <String, dynamic>{'status': 'Success'};
     try {
-      if (studentId.trim().isEmpty) {
-        debugPrint(
-            'CRITICAL ERROR: resetStudentActivityProgress called with empty studentId!');
-        return false;
-      }
-      if (studentId.isNotEmpty) {
-        await _db.collection('students').doc(studentId).update({
+      {
+        final write = _db.collection('students').doc(studentId).update({
           'progress': {
             'overallProgress': 0.0,
             'totalCompleted': 0,
@@ -852,8 +1000,15 @@ class AuthService {
           // certificates, none of which were reset in the cloud, so nothing
           // ever brought them back.
           'lastResetScope': 'all',
-        }).timeout(writeTimeout);
-        await _clearCloudCreations(studentId);
+        });
+        // Not waited on: offline it never answers, and the reset above is
+        // what the teacher is waiting to hear about.
+        unawaited(_clearCloudCreations(studentId));
+        try {
+          await write.timeout(writeTimeout);
+        } on TimeoutException {
+          result = _finishesOnline;
+        }
       }
       // Only when this *is* the child's device.
       //
@@ -863,7 +1018,7 @@ class AuthService {
       // learns of the reset through `lastResetAt` on their own device; this
       // is only the shortcut for the case where they are the same phone.
       final prefs = await SharedPreferences.getInstance();
-      if (prefs.getString('session_student_id') != studentId) return true;
+      if (prefs.getString('session_student_id') != studentId) return result;
 
       const keysToKeep = {
         'has_seen_onboarding',
@@ -872,7 +1027,7 @@ class AuthService {
         'music_enabled',
         'session_student_id',
         'session_role',
-        'language_code',
+        'language', // the key LanguageProvider saves under
       };
       final allKeys = prefs.getKeys();
       for (final k in allKeys) {
@@ -903,12 +1058,18 @@ class AuthService {
           }
         }
       }
-      return true;
+      return result;
     } catch (e) {
       debugPrint('Error resetting activity progress: $e');
-      return false;
+      return _resetFailed;
     }
   }
+
+  static const Map<String, dynamic> _resetFailed = {
+    'status': 'Error',
+    'code': 'resetProgressFailed',
+    'message': 'The activities could not be reset. Please try again.',
+  };
 
   /// The `rawProgress` keys that belong to [categories] (module names such
   /// as 'kulay' or 'matematika'), by the same prefixes the device uses.
@@ -928,12 +1089,35 @@ class AuthService {
     ];
   }
 
-  /// Reset specific activity categories for a student
-  Future<bool> resetStudentSpecificActivities(
-      String studentId, List<String> categories) async {
-    try {
-      if (studentId.trim().isEmpty || categories.isEmpty) return false;
+  /// The child's star total once [categories] are reset: the record's total,
+  /// less what each of those modules holds — `stars`, or `earnedStars` for
+  /// Matematika and Pamilya, the same figures the device sums.
+  @visibleForTesting
+  static int starsAfterModuleReset(
+      Map<String, dynamic>? data, List<String> categories) {
+    final total = ((data?['profile'] as Map?)?['stars'] as num?)?.toInt() ?? 0;
+    final progress = data?['progress'] as Map?;
+    var removed = 0;
+    for (final cat in categories) {
+      final m = progress?[cat.trim()];
+      if (m is! Map) continue;
+      final held = m['earnedStars'] ?? m['stars'];
+      if (held is num) removed += held.toInt();
+    }
+    final left = total - removed;
+    return left < 0 ? 0 : left;
+  }
 
+  /// Reset specific activity categories for a student. Answers like
+  /// [resetStudentActivityProgress].
+  Future<Map<String, dynamic>> resetStudentSpecificActivities(
+      String studentId, List<String> categories) async {
+    if (studentId.trim().isEmpty || categories.isEmpty) return _resetFailed;
+    // The read below already needs the server; asked first so that "no
+    // internet" is said as such rather than as a failed reset.
+    if (!await canReachServer()) return _needsInternet;
+    var result = const <String, dynamic>{'status': 'Success'};
+    try {
       final updates = <String, dynamic>{
         'lastResetAt': FieldValue.serverTimestamp(),
         // Exactly what the teacher chose, so the child's device clears these
@@ -952,6 +1136,16 @@ class AuthService {
           .timeout(writeTimeout);
       for (final key in moduleRawKeys(doc.data()?['rawProgress'], categories)) {
         updates['rawProgress.$key'] = FieldValue.delete();
+      }
+      // The teacher's card reads these, and kept the old total until the
+      // child's phone came round to recount it.
+      final stars = starsAfterModuleReset(doc.data(), categories);
+      updates['profile.stars'] = stars;
+      updates['progress.totalStars'] = stars;
+      final possible = (doc.data()?['progress'] as Map?)?['totalPossibleStars'];
+      if (possible is num && possible > 0) {
+        updates['progress.overallProgress'] =
+            (stars / possible).clamp(0.0, 1.0).toDouble();
       }
 
       for (final cat in categories) {
@@ -996,19 +1190,20 @@ class AuthService {
         }
       }
 
-      await _db
-          .collection('students')
-          .doc(studentId)
-          .update(updates)
-          .timeout(writeTimeout);
+      final write = _db.collection('students').doc(studentId).update(updates);
       if (updates.containsKey('creations')) {
-        await _clearCloudCreations(studentId);
+        unawaited(_clearCloudCreations(studentId));
+      }
+      try {
+        await write.timeout(writeTimeout);
+      } on TimeoutException {
+        result = _finishesOnline;
       }
 
       // Local prefs cleanup, for the same reason as above: only if the
       // device pressing the button is the one the child plays on.
       final prefs = await SharedPreferences.getInstance();
-      if (prefs.getString('session_student_id') != studentId) return true;
+      if (prefs.getString('session_student_id') != studentId) return result;
       final allKeys = prefs.getKeys();
 
       for (final k in allKeys) {
@@ -1040,10 +1235,10 @@ class AuthService {
           await prefs.remove(k);
         }
       }
-      return true;
+      return result;
     } catch (e) {
       debugPrint('Error resetting specific activities: $e');
-      return false;
+      return _resetFailed;
     }
   }
 }

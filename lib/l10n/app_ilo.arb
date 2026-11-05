@@ -56,9 +56,9 @@
   "counting": "Bilangen dagiti banag",
   "dragNumber": "Iyakar ti Numero",
   "lineMatch": "Isilpo Babaen ti Linya",
-  "popBalloon": "Bittaken ti palpalubo",
+  "popBalloon": "Bittaken ti lobo",
   "moreOrLess": "Ad-adu wenno bas-bassit?",
-  "numberPuzzle": "Palaisipan Dagiti Numero",
+  "numberPuzzle": "Puzzle Dagiti Numero",
   "numberSequence": "Panagsusurot ti Numero",
   "check": "Kitaen",
   "correct": "Kusto!",
@@ -86,7 +86,7 @@
   "congratulations": "Kablaawan!",
   "chooseFirst": "Umuna nga agpili iti sungbat!",
   "chooseLeftFirst": "Umuna nga italmeg ti grupo iti kannigid!",
-  "popAllBalloonsWith": "Bittaken amin a palpalubo a addaan",
+  "popAllBalloonsWith": "Bittaken amin a lobo nga addaan",
   "left": "Kannigid",
   "right": "Kannawan",
   "selected": "Napili",
@@ -107,16 +107,9 @@
     }
   },
   "whichIsMore": "Ania ti ad-adu, Kannigid wenno Kannawan?",
-  "whichIsLess": "Ania ti basbassit, Kannigid wenno Kannawan?",
+  "whichIsLess": "Ania ti basbassit ti bilangna, Kannigid wenno Kannawan?",
   "isSameNumber": "Agpada da kadi ti bilang?",
-  "arrange": "Urnosen dagiti kusto nga panagsasaruno ti numero: {sequence}",
-  "@arrange": {
-    "placeholders": {
-      "sequence": {
-        "type": "String"
-      }
-    }
-  },
+  "arrange": "Urnosen dagiti numero, manipud iti kabassitan",
   "selectCorrectAnswer": "Piliem ti kusto a sungbat:",
   "tapLeftTapRight": "Italmeg ti grupo (kannigid) → italmeg ti numero (kannawan)",
   "angAkingSariliTitle": "Maipapan kaniak",
@@ -375,7 +368,7 @@
       }
     }
   },
-  "resetAllStudents": "Isubli amin nga Agad-adal",
+  "resetAllStudents": "Ikkaten amin nga Agad-adal",
   "confirmResetAllStudents": "Sigurado kayo a kayatyo nga ikkaten amin dagiti nairehistro nga agad-adal? Saanen daytoy a mabalin nga isubli.",
   "confirm": "Pasingkedan",
   "rateYourArtwork": "Sukimatem ti Aramid",
@@ -392,7 +385,7 @@
   "tandaanSubtitle": "Ipares dagiti Agpapada",
   "round": "Nagbukel",
   "matchThePairs": "Sapulem dagiti agpapada a pares!",
-  "flipCardsToMatch": "Pindutem ti kard tapno maibaliktad. Sapulemti dua a agpada",
+  "flipCardsToMatch": "Italmegmo ti kard tapno maibaliktad. Sapulem ti dua nga agpada!",
   "traceItTitle": "Patugutan",
   "traceItSubtitle": "Sursuruen ti ABC!",
   "percentComplete": "{percent}% kompleto",
@@ -829,5 +822,9 @@
   "certEarnedBody": "Naalam ti\nSertipiko ti Pannakalpas!",
   "certEarnedView": "Kitaen ti Sertipiko",
   "lineMatched": "naipares",
-  "studentFallback": "Estudiante"
+  "studentFallback": "Estudiante",
+  "authNeedsInternet": "Awan ti internet. Awan ti nabaliwan — padasem manen no adda internet.",
+  "authFinishesOnline": "Napukaw ti koneksion. Kusa a malpas inton agsubli ti internet.",
+  "authRemoveFailed": "Saan a naikkat ti ubing. Padasen manen.",
+  "studentRemoved": "Naikkaten ti ubing."
 }

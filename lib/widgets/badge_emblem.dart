@@ -133,8 +133,8 @@ class BadgeEmblem extends StatelessWidget {
                       Transform.translate(
                         offset: Offset(0, 3 * s),
                         child: ImageFiltered(
-                          imageFilter:
-                              ImageFilter.blur(sigmaX: 2.4 * s, sigmaY: 2.4 * s),
+                          imageFilter: ImageFilter.blur(
+                              sigmaX: 2.4 * s, sigmaY: 2.4 * s),
                           child: ColorFiltered(
                             colorFilter: const ColorFilter.mode(
                                 Color(0x4D000000), BlendMode.srcIn),
@@ -287,10 +287,8 @@ class _CoinPainter extends CustomPainter {
 
   /// Darker by scaling toward black, lighter by mixing toward white.
   static Color _shade(Color c, double t) {
-    int f(int v) => (t < 0 ? v * (1 + t) : v + (255 - v) * t)
-        .round()
-        .clamp(0, 255)
-        .toInt();
+    int f(int v) =>
+        (t < 0 ? v * (1 + t) : v + (255 - v) * t).round().clamp(0, 255).toInt();
     return Color.fromARGB(255, f(c.red), f(c.green), f(c.blue));
   }
 
@@ -323,8 +321,8 @@ class _CoinPainter extends CustomPainter {
     final dashes = _stroke(const Color(0xFFFFF3B0).withOpacity(0.9), 2);
     const step = 7 / 51, dash = 2 / 51;
     for (var a = 0.0; a + dash < math.pi * 2; a += step) {
-      canvas.drawArc(Rect.fromCircle(center: center, radius: 51), a, dash,
-          false, dashes);
+      canvas.drawArc(
+          Rect.fromCircle(center: center, radius: 51), a, dash, false, dashes);
     }
 
     // The face, in the award's own colour, with a sunburst.
@@ -430,8 +428,8 @@ class _CoinPainter extends CustomPainter {
     canvas.drawPath(
       _starPath,
       Paint()
-        ..shader = _goldGradient.createShader(
-            const Rect.fromLTRB(-10.5, -10, 10.5, 9)),
+        ..shader = _goldGradient
+            .createShader(const Rect.fromLTRB(-10.5, -10, 10.5, 9)),
     );
     canvas.drawPath(
         _starPath, _stroke(_goldEdge, 1.6)..strokeJoin = StrokeJoin.round);
@@ -495,18 +493,17 @@ class _CoinMarksPainter extends CustomPainter {
   }
 
   /// A four-point twinkle whose top point is at (x, y).
-  static Path _twinkle(double x, double y, double a, double b) =>
-      Path()
-        ..addPolygon([
-          Offset(x, y),
-          Offset(x + a, y + b),
-          Offset(x + a + b, y + b + a),
-          Offset(x + a, y + b + 2 * a),
-          Offset(x, y + 2 * b + 2 * a),
-          Offset(x - a, y + b + 2 * a),
-          Offset(x - a - b, y + b + a),
-          Offset(x - a, y + b),
-        ], true);
+  static Path _twinkle(double x, double y, double a, double b) => Path()
+    ..addPolygon([
+      Offset(x, y),
+      Offset(x + a, y + b),
+      Offset(x + a + b, y + b + a),
+      Offset(x + a, y + b + 2 * a),
+      Offset(x, y + 2 * b + 2 * a),
+      Offset(x - a, y + b + 2 * a),
+      Offset(x - a - b, y + b + a),
+      Offset(x - a, y + b),
+    ], true);
 
   @override
   bool shouldRepaint(_CoinMarksPainter old) =>

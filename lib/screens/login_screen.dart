@@ -3,6 +3,7 @@ import 'privacy_notice_screen.dart';
 import '../services/parent_pin.dart';
 import 'choose_avatar_screen.dart';
 import 'setup_resume_screen.dart';
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:e_tarabay/l10n/app_localizations.dart';
@@ -92,6 +93,20 @@ class _LoginScreenState extends State<LoginScreen> {
     _usernameController.text = creds['username'] ?? '';
     _passwordController.text = creds['password'] ?? '';
     _loginStudent();
+  }
+
+  /// The fingerprint button belongs to a child the class no longer has: the
+  /// teacher removed them while this phone was away. It led only here.
+  Future<void> _forgetBiometricIfGone(String username) async {
+    final creds =
+        await BiometricService.getCredentials(BiometricService.studentKey);
+    if (creds == null || (creds['username'] ?? '').trim() != username) return;
+    await BiometricService.clearCredentials(BiometricService.studentKey);
+    if (!mounted) return;
+    setState(() {
+      _biometricEnabled = false;
+      _biometricName = '';
+    });
   }
 
   @override
@@ -237,6 +252,9 @@ class _LoginScreenState extends State<LoginScreen> {
           .catchError((e) => debugPrint('Background Firebase sync failed: $e'));
     } else {
       setState(() => _isLoading = false);
+      if (result['code'] == 'usernameNotFound') {
+        unawaited(_forgetBiometricIfGone(username));
+      }
       _showErrorDialog(authMessage(context, result).isNotEmpty
           ? authMessage(context, result)
           : AppLocalizations.of(context)!.loginError);
@@ -386,6 +404,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         _fieldBox(
                           child: TextField(
                             controller: _usernameController,
+                            // A username, not a word to correct.
+                            autocorrect: false,
+                            enableSuggestions: false,
                             decoration: _modernInputDecoration(
                               label: AppLocalizations.of(context)!.username,
                               iconAsset: 'assets/images/icon_username.webp',

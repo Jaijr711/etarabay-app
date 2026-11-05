@@ -333,7 +333,7 @@ class MagbasaContent {
         'Naduktalan ti dentista nga adu ti naperdi a ngipen ni Didi.',
         'Nanipud idin, saanen a mangmangan ni Didi iti kendi.',
       ],
-      'image': 'assets/images/kwento2.webp',
+      'image': 'assets/images/kwento4.webp',
       // _v2: cleaned up 2026-09-02, see the note on ni_marti's audioPath.
       'audioPath': 'audio/stories/Ni_didi_a_naayat_iti_kendi_v2.mp3',
       'lineTimestampsMs': [
@@ -370,7 +370,7 @@ class MagbasaContent {
         'Naragsak a nagawid ni Milio.',
         'Intultuloy ni Milio ti kanayon nga inna panagsepilio.',
       ],
-      'image': 'assets/images/kwento3.webp',
+      'image': 'assets/images/kwento2.webp',
       // _v2: cleaned up 2026-09-02, see the note on ni_marti's audioPath.
       'audioPath': 'audio/stories/Ni_milio_a_manag_sepelio_v2.mp3',
       'lineTimestampsMs': [0, 4366, 7853, 13053, 17104, 19703, 22128],
@@ -399,7 +399,7 @@ class MagbasaContent {
         'Imbaga ti doktor nga agsida ni Neneng iti nateng.',
         'Manipud idin, kanayonen nga agsidsida ni Neneng iti nateng.',
       ],
-      'image': 'assets/images/kwento4.webp',
+      'image': 'assets/images/kwento5.webp',
       // _v2: cleaned up 2026-09-02, see the note on ni_marti's audioPath.
       'audioPath':
           'audio/stories/Ni_Neneng_a_dina_kayat_ag_sida_iti_nateng_v2.mp3',
@@ -433,7 +433,7 @@ class MagbasaContent {
         'Manipud idin, kanayonen nga agsagsagaysay ni Kikay.',
         'Immadu dagiti gagayyemna ket kanayon payen a naragsak ni Kikay.',
       ],
-      'image': 'assets/images/kwento5.webp',
+      'image': 'assets/images/kwento3.webp',
       // _v2: cleaned up 2026-09-02, see the note on ni_marti's audioPath.
       'audioPath': 'audio/stories/Ni_kikay_a_di_ag_sagaysay_v2.mp3',
       'lineTimestampsMs': [
@@ -728,7 +728,7 @@ class MagbasaContent {
       },
     },
     'lima_a_tinapay': {
-      'title': 'Lima nga Tinapay ken dua nga Ikan',
+      'title': 'Lima a Tinapay ken dua nga Ikan',
       'tune': 'Audio Recording',
       'lyrics': [
         'Lima nga tinapay ken dua nga ikan (3x)',

@@ -26,8 +26,7 @@ void main() {
       await tester.pumpWidget(_app(Builder(
         builder: (context) => TextButton(
           onPressed: () async {
-            picked =
-                await showModalBottomSheet<({bool all, Set<String> keys})>(
+            picked = await showModalBottomSheet<({bool all, Set<String> keys})>(
               context: context,
               isScrollControlled: true,
               builder: (_) => ResetProgressSheet(
@@ -42,9 +41,8 @@ void main() {
       return picked;
     }
 
-    ElevatedButton button(WidgetTester tester) =>
-        tester.widget<ElevatedButton>(find.byWidgetPredicate(
-            (w) => w is ElevatedButton && w.child != null,
+    ElevatedButton button(WidgetTester tester) => tester.widget<ElevatedButton>(
+        find.byWidgetPredicate((w) => w is ElevatedButton && w.child != null,
             description: 'reset button'));
 
     testWidgets('does nothing until the warning is ticked', (tester) async {
@@ -79,8 +77,7 @@ void main() {
     });
   });
 
-  testWidgets('the login card shows the user and the password',
-      (tester) async {
+  testWidgets('the login card shows the user and the password', (tester) async {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);

@@ -108,8 +108,10 @@ void main() {
             await tester.tap(find.byType(ElevatedButton));
             await settle();
           }
-          await expectLater(find.byKey(const ValueKey('shot')),
-              matchesGoldenFile('../../build/onboarding_previews/${lang}_$page.png'));
+          await expectLater(
+              find.byKey(const ValueKey('shot')),
+              matchesGoldenFile(
+                  '../../build/onboarding_previews/${lang}_$page.png'));
         } finally {
           FlutterError.onError = original;
           // ignore: avoid_print

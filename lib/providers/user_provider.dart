@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +8,7 @@ import '../data/badge_catalog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_model.dart';
+import '../services/biometric_service.dart';
 import '../services/push_scheduler.dart';
 
 class UserProvider extends ChangeNotifier {
@@ -238,6 +240,16 @@ class UserProvider extends ChangeNotifier {
   /// locally (device only), so the certificate can display it. Not the
   /// password typed at login: that starts out as the same number but the
   /// parent can change it. Never synced back from this profile.
+  /// [mine] with whatever of [theirs] it lacks, mine first.
+  static List<String> unionIds(List<String> mine, List<String> theirs) =>
+      [...mine, ...theirs.where((id) => !mine.contains(id))];
+
+  /// [theirs] with [mine] laid over it: this phone's time wins for an id
+  /// both have.
+  static Map<String, int> unionTimes(
+          Map<String, int> mine, Map<String, int> theirs) =>
+      {...theirs, ...mine};
+
   /// The Student Number to keep after a profile arrives from the cloud: the
   /// record's own, else the one this phone already had.
   static String studentNumberFor({
@@ -342,8 +354,14 @@ class UserProvider extends ChangeNotifier {
                 // this same replacement had just loaded, and the badge
                 // reappeared unclaimed a moment after it was claimed.
                 _userProfile!.achievements = previous.achievements;
-                _userProfile!.claimedBadges = previous.claimedBadges;
-                _userProfile!.badgeClaimedAt = previous.badgeClaimedAt;
+                // This phone's claims, and any made on the child's other
+                // phone since: taking this phone's alone hid a badge claimed
+                // there until the next sign-in here. Claims are only added
+                // this way; a reset clears them through its own marker.
+                _userProfile!.claimedBadges = unionIds(
+                    previous.claimedBadges, _userProfile!.claimedBadges);
+                _userProfile!.badgeClaimedAt = unionTimes(
+                    previous.badgeClaimedAt, _userProfile!.badgeClaimedAt);
                 // The certificate has to travel with the badges it is made
                 // of. It was left out of this list, so a child who finished
                 // offline — claiming the twelfth badge, which awards the
@@ -353,9 +371,13 @@ class UserProvider extends ChangeNotifier {
                 // the cloud's older copy with no certificate in it, and this
                 // replacement took that copy's empty list. The badges beside
                 // it survived only because they are named here.
-                _userProfile!.certificates = previous.certificates;
-                _userProfile!.certificateAwardedAt =
-                    previous.certificateAwardedAt;
+                // Joined the same way, so a certificate won on the other
+                // phone is not awarded — and celebrated — here a second time.
+                _userProfile!.certificates =
+                    unionIds(previous.certificates, _userProfile!.certificates);
+                _userProfile!.certificateAwardedAt = unionTimes(
+                    previous.certificateAwardedAt,
+                    _userProfile!.certificateAwardedAt);
               } else if (_isInitialized) {
                 keepLocalClaims(_userProfile!, previous);
                 // Before the first pull lands, what arrives here can be
@@ -377,12 +399,56 @@ class UserProvider extends ChangeNotifier {
             }
           }
 
+          // Not `_prefs?`. If a snapshot arrived before initialisation had
+          // finished, the read gave null, the wipe below ran, and the write
+          // was silently skipped — so the next snapshot wiped again, and
+          // every one after it, for as long as the app stayed open. The child
+          // would have watched their stars vanish over and over.
+          final markerPrefs = _prefs ?? await SharedPreferences.getInstance();
+          _prefs ??= markerPrefs;
+          final freshKey = freshDeviceKeyFor(_currentStudentId);
+          final freshDevice = markerPrefs.getBool(freshKey) == true;
+
+          // Wipe local progress only for a NEW teacher-initiated reset.
+          //
+          // This used to also fire whenever the server reported zero progress,
+          // but "zero on the server" is indistinguishable from "this device
+          // hasn't uploaded yet" — so every snapshot wiped the stars the child
+          // had just earned. It also re-ran on every snapshot for the same
+          // `lastResetAt`, so one reset kept erasing progress forever. Both are
+          // fixed by keying off a reset marker we haven't applied yet.
+          //
+          // Before the merge below, which used to come first: the progress in
+          // this same snapshot can be this phone's own, sent before the reset
+          // and delivered after it (it was offline), and merging it kept it.
+          bool resetHere = false;
+          final resetMarker = data['lastResetAt']?.toString();
+          if (resetMarker != null && resetMarker.isNotEmpty) {
+            final appliedMarker = markerPrefs.getString(_appliedResetKey);
+            if (shouldApplyMarker(
+                marker: resetMarker,
+                applied: appliedMarker,
+                freshDevice: freshDevice)) {
+              final scope = data['lastResetScope']?.toString() ?? 'all';
+              // A teacher who reset one module did not ask for the child's
+              // stars, badges and certificates to go with it.
+              await _clearLocalStudentProgressKeys(scope: scope);
+              _reassertReset(scope, data['rawProgress']);
+              resetHere = true;
+            }
+            await markerPrefs.setString(_appliedResetKey, resetMarker);
+          }
+
           // A second device on this same account shows up here the moment
           // it pushes — not just the next time *this* device happens to
           // sync — so the dashboard picks up the other device's freshly
           // finished activities live, the same way its stars and badges
           // already do above.
-          if (data['rawProgress'] is Map) {
+          //
+          // Skipped on the snapshot that brought a reset: what it holds is
+          // being taken back out of the cloud (see [_reassertReset]), and the
+          // next snapshot, without it, merges the rest.
+          if (!resetHere && data['rawProgress'] is Map) {
             await _mergeRawProgressFromCloud(data);
             if (_userProfile != null) {
               _userProfile!.stars = recountStarsFromProgress();
@@ -445,11 +511,6 @@ class UserProvider extends ChangeNotifier {
           // reset marker below — a marker this device applies once, keyed
           // per student so a second child on this device isn't kicked by a
           // marker meant for the first.
-          final markerPrefs = _prefs ?? await SharedPreferences.getInstance();
-          _prefs ??= markerPrefs;
-          final freshKey = freshDeviceKeyFor(_currentStudentId);
-          final freshDevice = markerPrefs.getBool(freshKey) == true;
-
           final forceLogoutMarker = data['forceLogoutAt']?.toString();
           if (forceLogoutMarker != null && forceLogoutMarker.isNotEmpty) {
             final prefs = markerPrefs;
@@ -463,36 +524,6 @@ class UserProvider extends ChangeNotifier {
                 _forceLogoutPending = true;
               }
             }
-          }
-
-          // Wipe local progress only for a NEW teacher-initiated reset.
-          //
-          // This used to also fire whenever the server reported zero progress,
-          // but "zero on the server" is indistinguishable from "this device
-          // hasn't uploaded yet" — so every snapshot wiped the stars the child
-          // had just earned. It also re-ran on every snapshot for the same
-          // `lastResetAt`, so one reset kept erasing progress forever. Both are
-          // fixed by keying off a reset marker we haven't applied yet.
-          final resetMarker = data['lastResetAt']?.toString();
-          if (resetMarker != null && resetMarker.isNotEmpty) {
-            // Not `_prefs?`. If a snapshot arrived before initialisation had
-            // finished, the read gave null, the wipe ran, and the write was
-            // silently skipped — so the next snapshot wiped again, and every
-            // one after it, for as long as the app stayed open. The child
-            // would have watched their stars vanish over and over.
-            final prefs = _prefs ?? await SharedPreferences.getInstance();
-            _prefs ??= prefs;
-            final appliedMarker = prefs.getString(_appliedResetKey);
-            if (shouldApplyMarker(
-                marker: resetMarker,
-                applied: appliedMarker,
-                freshDevice: freshDevice)) {
-              // A teacher who reset one module did not ask for the child's
-              // stars, badges and certificates to go with it.
-              await _clearLocalStudentProgressKeys(
-                  scope: data['lastResetScope']?.toString() ?? 'all');
-            }
-            await prefs.setString(_appliedResetKey, resetMarker);
           }
 
           // The server has answered for this phone: from here a reset or a
@@ -531,6 +562,68 @@ class UserProvider extends ChangeNotifier {
       // local; the listener is only how the cloud half announces itself.
       debugPrint('Profile listener error: $e');
     });
+  }
+
+  /// A new phone has just been given the child's record: it now holds every
+  /// reset and sign-out that record names, and none after it.
+  ///
+  /// Until now a new phone waited for the server's first live answer to
+  /// stop treating markers as already applied. A phone that lost its signal
+  /// before that answer came took the first reset made after it for an old
+  /// one, kept the progress it had just restored, and sent it back up.
+  Future<void> _settleFreshDevice(Map<String, dynamic> record) async {
+    final prefs = _prefs ?? await SharedPreferences.getInstance();
+    _prefs ??= prefs;
+    final freshKey = freshDeviceKeyFor(_currentStudentId);
+    if (prefs.getBool(freshKey) != true) return;
+    final reset = record['lastResetAt']?.toString();
+    if (reset != null && reset.isNotEmpty) {
+      await prefs.setString(_appliedResetKey, reset);
+    }
+    final signOut = record['forceLogoutAt']?.toString();
+    if (signOut != null && signOut.isNotEmpty) {
+      await prefs.setString(_appliedForceLogoutKey, signOut);
+    }
+    await prefs.remove(freshKey);
+  }
+
+  /// Takes a reset this phone has just carried out back up to the cloud.
+  ///
+  /// The teacher's reset clears the cloud — but a phone that was offline at
+  /// the time still has its earlier pushes waiting, and they arrive after
+  /// the reset and put the progress back: the reset looked done on the
+  /// teacher's screen and undid itself. This phone's writes reach the server
+  /// in the order they were made, so clearing again from here lands after
+  /// its own old ones. [cloudRaw] is the `rawProgress` the snapshot showed.
+  void _reassertReset(String scope, Object? cloudRaw) {
+    final id = _currentStudentId;
+    if (id == null) return;
+    final Map<Object, Object?> updates;
+    if (scope.isEmpty || scope == 'all') {
+      updates = {'rawProgress': <String, dynamic>{}};
+    } else {
+      final prefixes = [
+        for (final m in scope.split(',')) ...?moduleKeyPrefixes[m.trim()],
+      ];
+      updates = {
+        if (cloudRaw is Map)
+          for (final k in cloudRaw.keys)
+            if (prefixes.any('$k'.startsWith))
+              FieldPath(['rawProgress', '$k']): FieldValue.delete(),
+      };
+    }
+    if (updates.isEmpty) return;
+    try {
+      unawaited(FirebaseFirestore.instance
+          .collection('students')
+          .doc(id)
+          .update(updates)
+          .catchError((Object e) => debugPrint('Reset not re-sent: $e')));
+    } catch (e) {
+      debugPrint('Reset not re-sent: $e');
+    }
+    // The totals and the profile follow with the usual push.
+    unawaited(_syncToFirebase());
   }
 
   /// Undo a teacher's reset on this device.
@@ -577,7 +670,7 @@ class UserProvider extends ChangeNotifier {
         'music_enabled',
         'session_student_id',
         'session_role',
-        'language_code',
+        'language', // the key LanguageProvider saves under
       };
 
       final allKeys = prefs.getKeys();
@@ -658,9 +751,13 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Public method to force reset all local student progress state instantly
-  Future<void> resetAllProgressLocally() async {
-    await _clearLocalStudentProgressKeys();
+  /// Public method to force reset local student progress state instantly.
+  ///
+  /// [scope] is the same as the reset sent to the cloud: `'all'`, or the
+  /// comma-separated modules chosen. Without it a teacher resetting only
+  /// Matematika on the child's own phone wiped every module there.
+  Future<void> resetAllProgressLocally({String scope = 'all'}) async {
+    await _clearLocalStudentProgressKeys(scope: scope);
   }
 
   void _stopProfileListener() {
@@ -1102,6 +1199,7 @@ class UserProvider extends ChangeNotifier {
         await pullCreationsFromCloud(
             legacy:
                 data['creations'] is List ? data['creations'] as List : null);
+        await _settleFreshDevice(data);
 
         _hasSyncedFromCloud = true;
         _syncRetryCount = 0;
@@ -1349,6 +1447,9 @@ class UserProvider extends ChangeNotifier {
     await _pushes.flush();
     final owner = _prefs?.getString(_localOwnerKey) ?? _currentStudentId;
     if (owner != null && !_isAccountDeleted) await _stashUnpushedWork(owner);
+    if (_isAccountDeleted && _currentStudentId != null) {
+      await _forgetRemovedChild(_currentStudentId!, _userProfile?.name ?? '');
+    }
     await clearLocalData();
     _currentStudentId = null;
     _currentRole = null;
@@ -1362,6 +1463,30 @@ class UserProvider extends ChangeNotifier {
       await _prefs!.remove('session_role');
     }
     notifyListeners();
+  }
+
+  /// A removed child is no longer offered on this phone: not among the
+  /// children the parent's report lists, and not on the fingerprint button
+  /// ("Sign in as …"), which led only to "username not found".
+  Future<void> _forgetRemovedChild(String id, String name) async {
+    try {
+      final prefs = _prefs ?? await SharedPreferences.getInstance();
+      final raw = prefs.getStringList('known_students') ?? const [];
+      await prefs.setStringList('known_students', [
+        for (final entry in raw)
+          if (jsonDecode(entry) case final Map m when m['id'] != id) entry
+      ]);
+      // One student slot per phone; it is theirs if it carries their name.
+      final creds =
+          await BiometricService.getCredentials(BiometricService.studentKey);
+      if (creds != null &&
+          name.trim().isNotEmpty &&
+          (creds['name'] ?? '').trim() == name.trim()) {
+        await BiometricService.clearCredentials(BiometricService.studentKey);
+      }
+    } catch (e) {
+      debugPrint('Could not forget removed child: $e');
+    }
   }
 
   /// Number of consecutive calendar days ending today that [lastPlayedIso]
@@ -2045,7 +2170,7 @@ class UserProvider extends ChangeNotifier {
       return {
         'completedLevels': 0,
         'threeStarLevels': 0,
-        'totalLevels': 5,
+        'totalLevels': pamilyaLevelCount,
         'totalStars': 0,
         'earnedStars': 0,
         'possibleStars': sariliStarCeiling + familyStarCeiling,
@@ -2116,7 +2241,7 @@ class UserProvider extends ChangeNotifier {
       ],
       'completedLevels': completedCount,
       'threeStarLevels': threeStarLevels,
-      'totalLevels': 5,
+      'totalLevels': pamilyaLevelCount,
       'totalStars': totalStars,
       'earnedStars': sariliStars + familyStars,
       'possibleStars': sariliStarCeiling + familyStarCeiling,
@@ -2902,7 +3027,7 @@ class UserProvider extends ChangeNotifier {
         },
         'pamilya': {
           'completedLevels': 0,
-          'totalLevels': 5,
+          'totalLevels': pamilyaLevelCount,
           'totalStars': 0,
           'totalScore': 0,
           'streak': 0,
@@ -3092,6 +3217,33 @@ class UserProvider extends ChangeNotifier {
     return out;
   }
 
+  /// The profile fields this phone does not own: the teacher edits them, and
+  /// the avatar picker writes `avatar` itself.
+  static const Set<String> _profileFieldsNotPushed = {
+    'name',
+    'middleName',
+    'gender',
+    'birthday',
+    'parentName',
+    'parentContact',
+    'avatar',
+    'lrn',
+  };
+
+  /// The `profile` fields one push writes, each on its own path.
+  ///
+  /// The whole map used to go. A phone that was offline while the teacher
+  /// fixed the child's name sent its old copy up when it came back, after
+  /// the edit, and the child's name, gender and picture went back to the
+  /// old ones.
+  @visibleForTesting
+  static Map<Object, Object?> profilePushFields(Map<String, dynamic> profile) =>
+      {
+        for (final e in profile.entries)
+          if (!_profileFieldsNotPushed.contains(e.key))
+            FieldPath(['profile', e.key]): e.value,
+      };
+
   /// Whether two stored values hold the same thing, looking inside lists
   /// and maps.
   @visibleForTesting
@@ -3129,6 +3281,7 @@ class UserProvider extends ChangeNotifier {
     final prefs = _prefs ?? await SharedPreferences.getInstance();
     _prefs ??= prefs;
 
+    var changed = false;
     for (final entry in rawProgress.entries) {
       final key = entry.key;
       final cloudVal = entry.value;
@@ -3143,6 +3296,7 @@ class UserProvider extends ChangeNotifier {
       final mergedHive = _mergeHiveValue(current, cloudVal);
       if (!sameStoredValue(current, mergedHive)) {
         await _progressBox.put(key, mergedHive);
+        changed = true;
       }
 
       final merged = _mergeHiveValue(prefs.get(key), cloudVal);
@@ -3158,7 +3312,15 @@ class UserProvider extends ChangeNotifier {
       // A merged List or Map never came from SharedPreferences (it can't
       // store either) — that result only ever belongs in Hive, put above.
     }
+    if (changed) _progressVersion++;
   }
+
+  /// Goes up whenever progress from the cloud changed what this phone holds.
+  /// Screens that read their counts once (Lessons, the module pickers) read
+  /// them again on it: opened in the first seconds after signing in, they
+  /// showed zeros until reopened.
+  int _progressVersion = 0;
+  int get progressVersion => _progressVersion;
 
   /// Asks for this child's record to go to the cloud — batched: see
   /// [PushScheduler]. Everything is already saved on the phone; this only
@@ -3184,6 +3346,10 @@ class UserProvider extends ChangeNotifier {
   Future<void> _pushToCloudNow() async {
     await _ensureInitialized();
     if (_currentStudentId == null || _userProfile == null) return;
+    // The teacher removed this child. The record's own update just fails,
+    // but the drawings' document is a `set`, and it put their pictures
+    // back under the record that was deleted.
+    if (_isAccountDeleted) return;
 
     // GUARD: If we have an ID but haven't synced from Cloud yet,
     // DO NOT push local empty state to prevent data wipe.
@@ -3292,7 +3458,7 @@ class UserProvider extends ChangeNotifier {
           .doc(_currentStudentId);
       unawaited(studentDoc.update(<Object, Object?>{
         'progress': progressData,
-        'profile': profileData,
+        ...profilePushFields(profileData),
         // Key by key, never the whole map: replacing it let a second phone
         // on the same account, pushing from an older copy, take back from
         // the cloud whatever this one had sent in between.
@@ -3403,6 +3569,11 @@ class UserProvider extends ChangeNotifier {
   /// star loop, the games table and the ceiling below — and a level added
   /// without touching all six is a level whose stars are never counted.
   static const int matematikaLevelCount = 7;
+
+  /// About Me and My Family levels: 4 of "Ang Aking Sarili" and 5 of the
+  /// family. It was written as 5, so the Lessons card read 9/5 and the
+  /// module counted as finished — towards the certificate — after any five.
+  static const int pamilyaLevelCount = 9;
 
   /// Every level at 3 stars.
   static const int matematikaStarCeiling = matematikaLevelCount * 3;

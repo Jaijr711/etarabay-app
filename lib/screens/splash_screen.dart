@@ -148,6 +148,15 @@ class _SplashScreenState extends State<SplashScreen> {
       controller.addListener(_onVideoTick);
       await controller.play();
       if (mounted) setState(() {});
+      // Its own end is what normally moves on. A video that stalls part
+      // way never reaches it, and kept the child here until they tapped:
+      // a little past its length, go on regardless.
+      final length = controller.value.duration;
+      unawaited(Future.delayed(
+          (length > Duration.zero ? length : const Duration(seconds: 10)) +
+              const Duration(seconds: 3), () {
+        if (mounted) _leave();
+      }));
     } catch (e) {
       debugPrint('Splash video unavailable, showing the logo: $e');
       if (!mounted) return;

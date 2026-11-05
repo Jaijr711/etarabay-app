@@ -56,7 +56,8 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider('en')),
-        ChangeNotifierProvider<AudioManager>.value(value: AudioManager.instance),
+        ChangeNotifierProvider<AudioManager>.value(
+            value: AudioManager.instance),
       ],
       child: const MaterialApp(
         localizationsDelegates: [

@@ -1,5 +1,5 @@
 import 'package:e_tarabay/data/pamilya_content.dart';
-import 'package:e_tarabay/screens/pamilya_screen.dart';
+import 'package:e_tarabay/utils/shuffled_choices.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// About Me and My Family wrote the right answer in the same place in nearly
@@ -33,8 +33,11 @@ void main() {
     });
 
     test('"All of the above" stays last, in every language', () {
-      for (final all in ['All of the above', 'Lahat ng nabanggit',
-          'Amin kadagitoy']) {
+      for (final all in [
+        'All of the above',
+        'Lahat ng nabanggit',
+        'Amin kadagitoy'
+      ]) {
         final (out, answer) =
             shuffledChoices(['A', 'B', 'C', all], 3, seed: 'x');
         expect(out.last, all);
@@ -52,5 +55,54 @@ void main() {
         expect(PamilyaContent.getPamilyaLevel5Games(lang), hasLength(7));
       });
     }
+  });
+
+  group('every board, each child their own order', () {
+    test('a list keeps every item, in a fixed order for one seed', () {
+      const items = [1, 2, 3, 4, 5];
+      final a = shuffledList(items, seed: 'mat|0|1|answers|Ana');
+      expect(a.toSet(), items.toSet());
+      expect(shuffledList(items, seed: 'mat|0|1|answers|Ana'), a);
+    });
+
+    test('children see the same question in different orders', () {
+      const items = [1, 2, 3];
+      final orders = {
+        for (final name in ['Ana', 'Ben', 'Cara', 'Dina', 'Ella', 'Juan'])
+          shuffledList(items, seed: 'mat|0|1|answers|$name').join()
+      };
+      expect(orders.length, greaterThan(1));
+    });
+
+    test('keepLast stays at the end', () {
+      for (final seed in ['a', 'b', 'c', 'd']) {
+        expect(shuffledOrder(4, seed: seed, keepLast: 3).last, 3);
+      }
+    });
+
+    test('a catch-all answer moves when asked to', () {
+      final ends = {
+        for (int i = 0; i < 20; i++)
+          shuffledChoices(['A', 'B', 'C', 'Lahat ng nabanggit'], 3,
+                  seed: 'role|$i', keepAllOfTheAboveLast: false)
+              .$2
+      };
+      expect(ends.length, greaterThan(1));
+    });
+
+    test('the Number Puzzle never starts solved', () {
+      for (final tray in const [
+        [3, 1, 2],
+        [4, 2, 3],
+        [5, 3, 4],
+      ]) {
+        for (var n = 0; n < 50; n++) {
+          final out = unsolvedTray(tray, seed: 'tray|$n');
+          final sorted = [...tray]..sort();
+          expect(out.toSet(), tray.toSet());
+          expect(out.join(), isNot(sorted.join()), reason: 'tray|$n');
+        }
+      }
+    });
   });
 }

@@ -154,7 +154,8 @@ void main() {
             }
             await tester.runAsync(() async {
               for (final img in tester.widgetList<Image>(find.byType(Image))) {
-                await precacheImage(img.image, tester.element(find.byWidget(img)),
+                await precacheImage(
+                    img.image, tester.element(find.byWidget(img)),
                     onError: (_, __) {});
               }
             });

@@ -372,11 +372,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // The reminders already booked carry the old language's words until
     // they are booked again, which otherwise waited for the next app start.
     if (_notificationsEnabled) {
-      final childName =
-          Provider.of<UserProvider>(context, listen: false).userProfile?.name ??
-              '';
+      final profile =
+          Provider.of<UserProvider>(context, listen: false).userProfile;
+      final childName = profile?.name ?? '';
       unawaited(ReminderService.instance
           .schedule(languageCode: code, childName: childName));
+      // The birthday greeting too: it was booked again only on the next
+      // visit to Home, in the meantime still in the old language.
+      final birthday = profile?.birthday;
+      if (birthday != null) {
+        unawaited(ReminderService.instance.scheduleBirthday(
+            birthday: birthday, childName: childName, languageCode: code));
+      }
     }
   }
 

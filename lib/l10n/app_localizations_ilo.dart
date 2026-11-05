@@ -120,13 +120,13 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get lineMatch => 'Isilpo Babaen ti Linya';
 
   @override
-  String get popBalloon => 'Bittaken ti palpalubo';
+  String get popBalloon => 'Bittaken ti lobo';
 
   @override
   String get moreOrLess => 'Ad-adu wenno bas-bassit?';
 
   @override
-  String get numberPuzzle => 'Palaisipan Dagiti Numero';
+  String get numberPuzzle => 'Puzzle Dagiti Numero';
 
   @override
   String get numberSequence => 'Panagsusurot ti Numero';
@@ -173,7 +173,7 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get chooseLeftFirst => 'Umuna nga italmeg ti grupo iti kannigid!';
 
   @override
-  String get popAllBalloonsWith => 'Bittaken amin a palpalubo a addaan';
+  String get popAllBalloonsWith => 'Bittaken amin a lobo nga addaan';
 
   @override
   String get left => 'Kannigid';
@@ -198,15 +198,14 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get whichIsMore => 'Ania ti ad-adu, Kannigid wenno Kannawan?';
 
   @override
-  String get whichIsLess => 'Ania ti basbassit, Kannigid wenno Kannawan?';
+  String get whichIsLess =>
+      'Ania ti basbassit ti bilangna, Kannigid wenno Kannawan?';
 
   @override
   String get isSameNumber => 'Agpada da kadi ti bilang?';
 
   @override
-  String arrange(String sequence) {
-    return 'Urnosen dagiti kusto nga panagsasaruno ti numero: $sequence';
-  }
+  String get arrange => 'Urnosen dagiti numero, manipud iti kabassitan';
 
   @override
   String get selectCorrectAnswer => 'Piliem ti kusto a sungbat:';
@@ -853,7 +852,7 @@ class AppLocalizationsIlo extends AppLocalizations {
   }
 
   @override
-  String get resetAllStudents => 'Isubli amin nga Agad-adal';
+  String get resetAllStudents => 'Ikkaten amin nga Agad-adal';
 
   @override
   String get confirmResetAllStudents =>
@@ -908,7 +907,7 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String get flipCardsToMatch =>
-      'Pindutem ti kard tapno maibaliktad. Sapulemti dua a agpada';
+      'Italmegmo ti kard tapno maibaliktad. Sapulem ti dua nga agpada!';
 
   @override
   String get traceItTitle => 'Patugutan';
@@ -2371,4 +2370,18 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String get studentFallback => 'Estudiante';
+
+  @override
+  String get authNeedsInternet =>
+      'Awan ti internet. Awan ti nabaliwan — padasem manen no adda internet.';
+
+  @override
+  String get authFinishesOnline =>
+      'Napukaw ti koneksion. Kusa a malpas inton agsubli ti internet.';
+
+  @override
+  String get authRemoveFailed => 'Saan a naikkat ti ubing. Padasen manen.';
+
+  @override
+  String get studentRemoved => 'Naikkaten ti ubing.';
 }

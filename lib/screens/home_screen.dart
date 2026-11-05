@@ -697,6 +697,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                         imagePath: 'assets/images/card1.webp',
                                         color: AppColors.numbers,
                                         badgeStars: matBadge,
+                                        locked: _isLocked('matematika'),
                                         onTap: () {
                                           if (_isLocked('matematika')) {
                                             return _showLockedMessage();
@@ -720,6 +721,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                         imagePath: 'assets/images/card2.webp',
                                         color: AppColors.family,
                                         badgeStars: pamilyaBadge,
+                                        locked: _isLocked('pamilya'),
                                         onTap: () {
                                           if (_isLocked('pamilya')) {
                                             return _showLockedMessage();
@@ -750,6 +752,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                         imagePath: 'assets/images/card3.webp',
                                         color: AppColors.colors,
                                         badgeStars: kulayBadge,
+                                        locked: _isLocked('kulay'),
                                         onTap: () {
                                           if (_isLocked('kulay')) {
                                             return _showLockedMessage();
@@ -773,6 +776,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                         imagePath: 'assets/images/card4.webp',
                                         color: AppColors.success,
                                         badgeStars: traceBadge,
+                                        locked: _isLocked('traceit'),
                                         onTap: () {
                                           if (_isLocked('traceit')) {
                                             return _showLockedMessage();
@@ -803,6 +807,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                         imagePath: 'assets/images/card5.webp',
                                         color: AppColors.alphabet,
                                         badgeStars: magbasaBadge,
+                                        locked: _isLocked('magbasa'),
                                         onTap: () {
                                           if (_isLocked('magbasa')) {
                                             return _showLockedMessage();
@@ -830,6 +835,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                                             'assets/images/tandaan/home.webp',
                                         color: AppColors.shapes,
                                         badgeStars: tandaanBadge,
+                                        locked: _isLocked('tandaan'),
                                         onTap: () {
                                           if (_isLocked('tandaan')) {
                                             return _showLockedMessage();
@@ -917,12 +923,50 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     String? imagePath,
     Widget? child,
     int badgeStars = 0,
+    bool locked = false,
   }) {
     assert(imagePath != null || child != null);
 
+    // A locked module looks locked here too, faded with a padlock, instead of
+    // only saying so after the tap.
+    final card = _cardBody(
+      title: title,
+      subtitle: subtitle,
+      color: color,
+      imagePath: imagePath,
+      child: child,
+      badgeStars: badgeStars,
+    );
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: !locked
+          ? card
+          : Stack(children: [
+              Positioned.fill(child: Opacity(opacity: 0.45, child: card)),
+              const Positioned(
+                top: 10,
+                right: 10,
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundColor: Color(0xFF6B7280),
+                  child:
+                      Icon(Icons.lock_rounded, size: 18, color: Colors.white),
+                ),
+              ),
+            ]),
+    );
+  }
+
+  Widget _cardBody({
+    required String title,
+    required String subtitle,
+    required Color color,
+    String? imagePath,
+    Widget? child,
+    int badgeStars = 0,
+  }) {
+    return Builder(
+      builder: (context) => Container(
         width: double.infinity,
         height: double.infinity,
         padding: const EdgeInsets.all(8),

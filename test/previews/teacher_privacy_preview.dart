@@ -34,8 +34,7 @@ void main() {
     'agreement': () => const TeacherAgreementScreen(),
     'lock': () => const _FakeClass(),
     'password': () => const _FakeClass(),
-    'create': () =>
-        TeacherPinFlow(start: PinFlowStart.create, onDone: () {}),
+    'create': () => TeacherPinFlow(start: PinFlowStart.create, onDone: () {}),
   };
 
   for (final lang in ['ilo', 'fil']) {
@@ -135,7 +134,12 @@ class _FakeClass extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 60, 16, 16),
         children: [
-          for (final n in ['Ana Reyes', 'Ben Cruz', 'Carlo Santos', 'Dina Lopez'])
+          for (final n in [
+            'Ana Reyes',
+            'Ben Cruz',
+            'Carlo Santos',
+            'Dina Lopez'
+          ])
             Card(child: ListTile(title: Text(n), subtitle: const Text('LRN'))),
         ],
       ),

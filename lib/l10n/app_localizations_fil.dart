@@ -198,15 +198,13 @@ class AppLocalizationsFil extends AppLocalizations {
   String get whichIsMore => 'Alin ang mas marami, kaliwa o kanan?';
 
   @override
-  String get whichIsLess => 'Alin ang mas kaunti?';
+  String get whichIsLess => 'Alin ang mas kaunti, kaliwa o kanan?';
 
   @override
   String get isSameNumber => 'Magkakaparehong bilang?';
 
   @override
-  String arrange(String sequence) {
-    return 'Iayos: $sequence';
-  }
+  String get arrange => 'Ayusin ang mga numero, mula sa pinakamaliit';
 
   @override
   String get selectCorrectAnswer => 'Piliin ang tamang sagot:';
@@ -246,7 +244,7 @@ class AppLocalizationsFil extends AppLocalizations {
   String get myHome => 'Ang Aking Tahanan';
 
   @override
-  String get whatIsYourName => 'Ano ang pangalan  mo?';
+  String get whatIsYourName => 'Ano ang pangalan mo?';
 
   @override
   String get howOldAreYou => 'Ilang taon ka na?';
@@ -2356,4 +2354,18 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get studentFallback => 'Mag-aaral';
+
+  @override
+  String get authNeedsInternet =>
+      'Walang internet. Walang nabago — subukan ulit kapag may internet na.';
+
+  @override
+  String get authFinishesOnline =>
+      'Naputol ang koneksyon. Kusa itong matatapos pagbalik ng internet.';
+
+  @override
+  String get authRemoveFailed => 'Hindi naalis ang bata. Subukan ulit.';
+
+  @override
+  String get studentRemoved => 'Naalis na ang bata.';
 }

@@ -161,7 +161,7 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
 
   // ── Pamilya progress (still from UserProvider) ────────────────────────────
   int _pamilyaDone = 0;
-  int _pamilyaTotal = 5;
+  int _pamilyaTotal = UserProvider.pamilyaLevelCount;
 
   @override
   void initState() {
@@ -250,7 +250,8 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
     final providerProgress = userProvider.getAllProgress();
     final pamilya = providerProgress['pamilya'] as Map? ?? {};
     final pamilyaDone = pamilya['completedLevels'] ?? 0;
-    final pamilyaTotal = pamilya['totalLevels'] ?? 5;
+    final pamilyaTotal =
+        pamilya['totalLevels'] ?? UserProvider.pamilyaLevelCount;
 
     setState(() {
       _traceItDone = traceItCount;
@@ -287,8 +288,22 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
   //  Build
   // ─────────────────────────────────────────────────────────────────────────
 
+  /// [UserProvider.progressVersion] when the counts were last read.
+  int? _seenProgressVersion;
+
   @override
   Widget build(BuildContext context) {
+    // Progress that arrives from the cloud after this screen opened, and a
+    // module locked or unlocked meanwhile, both show without reopening it.
+    final (version, _) = context.select<UserProvider, (int, int)>(
+        (p) => (p.progressVersion, p.lockedModules.length));
+    _seenProgressVersion ??= version;
+    if (version != _seenProgressVersion) {
+      _seenProgressVersion = version;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _loadProgress();
+      });
+    }
     // Render immediately (no full-screen spinner). Progress fields start at 0
     // and update silently once _loadProgress finishes, avoiding a jarring
     // spinner flash during page transitions.
@@ -710,7 +725,11 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
     }
 
     return GestureDetector(
-      onTap: isCompleted ? () => _showCompletedDialog(title, onTap) : onTap,
+      // Locked first: a finished module that is locked offered "Finished
+      // already! Repeat" and only then said it was locked.
+      onTap: locked
+          ? _showLockedMessage
+          : (isCompleted ? () => _showCompletedDialog(title, onTap) : onTap),
       child: Stack(
         clipBehavior: Clip.none,
         children: [

@@ -168,10 +168,29 @@ class AudioManager extends ChangeNotifier with WidgetsBindingObserver {
   // same module (or re-entering it) never restarts the music.
   static const String homeMusicAsset = 'audio/music/main_bg.m4a';
 
-  Future<void> playModuleMusic(String assetPath) =>
-      startBackgroundMusic(assetPath);
+  Future<void> playModuleMusic(String assetPath) {
+    _moduleMusicOwner = assetPath;
+    return startBackgroundMusic(assetPath);
+  }
 
   Future<void> resumeHomeMusic() => startBackgroundMusic(homeMusicAsset);
+
+  /// The module track asked for last, while a module is open.
+  String? _moduleMusicOwner;
+
+  /// Home music again as a module closes — unless another module has
+  /// already started its own track. The old module's close runs after the
+  /// new one opens when the child goes straight from one to the next, and
+  /// it used to put the Home music on inside the new module.
+  ///
+  /// [moduleAsset] is the closing module's own track, or null for one that
+  /// plays none of its own.
+  Future<void> resumeHomeMusicAfter(String? moduleAsset) async {
+    final owner = _moduleMusicOwner;
+    if (owner != null && owner != moduleAsset) return;
+    _moduleMusicOwner = null;
+    await resumeHomeMusic();
+  }
 
   Future<void> _playWithRetry(String assetPath) async {
     try {

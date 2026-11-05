@@ -27,6 +27,7 @@ import '../widgets/module_cards.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import '../widgets/replay_dialog.dart';
 import '../widgets/design_scale.dart';
+import '../utils/shuffled_choices.dart';
 
 // ─── The line board's lines: walking dots, one colour per pair ──────────────
 
@@ -341,7 +342,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       'question_tl': 'Ilang saging ang nabilang mo?',
       'question_il': 'Mano dagiti saba, mabalin kadi nga bilangem?',
       'item_name_en': 'bananas',
-      'item_name_il': 'saging',
+      'item_name_il': 'saba',
       'item_name_tl': 'saging',
       'objects': ['🍌', '🍌'],
       'answers': [1, 2, 3],
@@ -363,14 +364,14 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       'question_tl': 'Ilang isda ang nabilang mo?',
       'question_il': 'Mano dagiti ikan, mabalin kadi nga bilangem?',
       'item_name_en': 'fish',
-      'item_name_il': 'isda',
+      'item_name_il': 'ikan',
       'item_name_tl': 'isda',
       'objects': ['🐟', '🐟', '🐟', '🐟'],
       'answers': [2, 3, 4],
       'correct': 4,
     },
     {
-      'question_en': 'How many birds you count?',
+      'question_en': 'How many birds can you count?',
       'question_tl': 'Ilang ibon ang nabilang mo?',
       'question_il': 'Mano dagiti billit, mabalin kadi nga bilangem?',
       'item_name_en': 'birds',
@@ -485,12 +486,14 @@ class _MatematikaScreenState extends State<MatematikaScreen>
           'objects': ['🍌'],
           'count': 1
         },
+        // One fruit to a picture: a bunch of grapes or a pair of cherries
+        // made "how many?" a question of how you count them.
         {
-          'objects': ['🍇', '🍇'],
+          'objects': ['🍊', '🍊'],
           'count': 2
         },
         {
-          'objects': ['🍒', '🍒', '🍒'],
+          'objects': ['🍓', '🍓', '🍓'],
           'count': 3
         },
       ],
@@ -581,21 +584,21 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     },
   ];
 
+  // Runs of numbers that follow each other, and no answer printed above
+  // them: the instruction used to show "1 → 2 → 3", so the child copied it,
+  // and 2-4-6 and 1-3-5 asked for skip-counting before counting is sure.
   final List<Map<String, dynamic>> _game6Levels = const [
     {
-      'sequence': '1 → 2 → 3',
       'scrambled': [3, 1, 2],
       'correct': [1, 2, 3]
     },
     {
-      'sequence': '2 → 4 → 6',
-      'scrambled': [6, 2, 4],
-      'correct': [2, 4, 6]
+      'scrambled': [4, 2, 3],
+      'correct': [2, 3, 4]
     },
     {
-      'sequence': '1 → 3 → 5',
-      'scrambled': [5, 1, 3],
-      'correct': [1, 3, 5]
+      'scrambled': [5, 3, 4],
+      'correct': [3, 4, 5]
     },
   ];
 
@@ -817,7 +820,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
     _starBurstController.dispose();
     _shakeController.dispose();
     _marchController.dispose();
-    AudioManager.instance.resumeHomeMusic();
+    AudioManager.instance.resumeHomeMusicAfter(ModuleMusic.matematika);
     super.dispose();
   }
 
@@ -956,8 +959,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
 
   void _initLineMatching() {
     final count = (_currentGame['pairs'] as List<dynamic>).length;
-    _shuffledRightIndices = List<int>.generate(count, (i) => i)
-      ..shuffle(Random());
+    _shuffledRightIndices = shuffledOrder(count, seed: _seed('line'));
     _lineMatches.clear();
     _selectedLeftIndex = null;
     _wrongFlash.clear();
@@ -971,8 +973,29 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       ..addAll(List.generate(count, (_) => GlobalKey()));
   }
 
+  /// This question and this child: each child gets the answers in an order
+  /// of their own, and it holds still while they think.
+  String _seed(String what) {
+    final name =
+        Provider.of<UserProvider>(context, listen: false).userProfile?.name;
+    return 'mat|$_selectedLevel|$_currentGameIndex|$what|${name ?? ''}';
+  }
+
+  /// [items] in this child's order for this question. The data lists the
+  /// numbers counting upwards, so the right one sat in the same place for
+  /// every child — often the middle.
+  List<dynamic> _mixed(List<dynamic> items, String what) =>
+      shuffledList(items, seed: _seed(what));
+
+  /// The balloons as this child sees them — the board and the check for
+  /// the last right balloon read the same order.
+  List<dynamic> _balloonsFor(Map<String, dynamic> game) =>
+      _mixed(game['balloons'] as List<dynamic>, 'balloons');
+
   void _initPuzzle() {
-    _puzzleNumbers = List<int>.from(_currentGame['scrambled'] as List<dynamic>);
+    _puzzleNumbers = unsolvedTray(
+        List<int>.from(_currentGame['scrambled'] as List<dynamic>),
+        seed: _seed('tray'));
     _puzzleSlots = List<int?>.filled(_puzzleNumbers.length, null);
     _isPuzzleSolved = false;
   }
@@ -1441,7 +1464,9 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       HapticFeedback.lightImpact();
       // The bang, on the same tap as the buzz and the burst.
       Sfx.play(Sfx.pop);
-      final balloons = _currentGame['balloons'] as List<dynamic>;
+      // The same order the board drew them in: a balloon's index is its
+      // place on screen.
+      final balloons = _balloonsFor(_currentGame);
       final allCorrectIndices = <int>{};
       for (int i = 0; i < balloons.length; i++) {
         if (balloons[i] == target) allCorrectIndices.add(i);
@@ -2316,7 +2341,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   Widget _buildGame1() {
     final game = _game1Levels[_currentGameIndex % _game1Levels.length];
     final objects = game['objects'] as List<dynamic>;
-    final answers = game['answers'] as List<dynamic>;
+    final answers = _mixed(game['answers'] as List<dynamic>, 'answers');
 
     // Laid out to fit, never to scroll. A board a child can swipe away is a
     // board where the question can end up off-screen — and the question is the
@@ -2378,7 +2403,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   Widget _buildGame2() {
     final game = _game2Levels[_currentGameIndex % _game2Levels.length];
     final correct = game['correct'] as int;
-    final choices = game['choices'] as List<dynamic>;
+    final choices = _mixed(game['choices'] as List<dynamic>, 'chips');
     final emoji = game['emoji'] as String;
 
     // The three pieces of this board, named: the objects to count, the
@@ -2966,7 +2991,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   Widget _buildGame4() {
     final game = _game4Levels[_currentGameIndex % _game4Levels.length];
     final target = game['target'] as int;
-    final balloons = game['balloons'] as List<dynamic>;
+    final balloons = _balloonsFor(game);
 
     final totalCorrect = balloons.where((b) => b == target).length;
     final popped = _poppedBalloons.length;
@@ -3219,14 +3244,11 @@ class _MatematikaScreenState extends State<MatematikaScreen>
       _chunkyNumber(n, 74, 34);
 
   Widget _buildGame6() {
-    final game = _currentGame;
-
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
       child: Column(
         children: [
-          _questionText(AppLocalizations.of(context)!
-              .arrange(game['sequence'] as String)),
+          _questionText(AppLocalizations.of(context)!.arrange),
           const SizedBox(height: 6),
           Text(
             AppLocalizations.of(context)!.putNumbersInOrder,
@@ -3352,7 +3374,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   Widget _buildGame7() {
     final game = _game7Levels[_currentGameIndex % _game7Levels.length];
     final sequence = game['sequence'] as List<dynamic>;
-    final answers = game['answers'] as List<dynamic>;
+    final answers = _mixed(game['answers'] as List<dynamic>, 'answers');
     final correct = game['correct'] as int;
 
     return Padding(

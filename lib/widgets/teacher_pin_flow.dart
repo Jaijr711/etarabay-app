@@ -68,13 +68,14 @@ class _TeacherPinFlowState extends State<TeacherPinFlow> {
   final _password = TextEditingController();
   bool _obscure = true;
   bool _checkingPassword = false;
-  bool _wrongPassword = false;
+  /// What is wrong with the password typed: wrong, or no signal to check it.
+  String? _passwordError;
 
   @override
   void initState() {
     super.initState();
     _password.addListener(() {
-      if (_wrongPassword) setState(() => _wrongPassword = false);
+      if (_passwordError != null) setState(() => _passwordError = null);
     });
     if (widget.start != PinFlowStart.create) _load();
   }
@@ -220,18 +221,22 @@ class _TeacherPinFlowState extends State<TeacherPinFlow> {
     final password = _password.text;
     if (password.isEmpty || _checkingPassword) return;
     setState(() => _checkingPassword = true);
-    final ok = await AuthService().verifyTeacherPassword(password);
+    // Null when it could not be checked: offline, a right password was
+    // called wrong.
+    final ok = await AuthService().checkTeacherPassword(password);
     if (!mounted) return;
+    final loc = AppLocalizations.of(context)!;
     setState(() {
       _checkingPassword = false;
-      if (ok) {
+      if (ok == true) {
         _password.clear();
         _step = _Step.create;
         _entered = '';
         _message = null;
         _error = false;
       } else {
-        _wrongPassword = true;
+        _passwordError =
+            ok == null ? loc.authNeedsInternet : loc.passwordIncorrect;
       }
     });
   }
@@ -608,7 +613,7 @@ class _TeacherPinFlowState extends State<TeacherPinFlow> {
                 textInputAction: TextInputAction.done,
                 decoration: InputDecoration(
                   labelText: loc.teacherPasswordField,
-                  errorText: _wrongPassword ? loc.passwordIncorrect : null,
+                  errorText: _passwordError,
                   prefixIcon: const Icon(LucideIcons.lock, size: 18),
                   suffixIcon: IconButton(
                     tooltip: _obscure ? loc.showLabel : loc.hideLabel,

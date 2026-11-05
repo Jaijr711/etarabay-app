@@ -25,7 +25,11 @@ void main() {
     await tester.pumpWidget(MaterialApp(
       home: Row(
         children: [
-          for (final (locked, tier) in const [(true, 0), (false, 1), (false, 3)])
+          for (final (locked, tier) in const [
+            (true, 0),
+            (false, 1),
+            (false, 3)
+          ])
             BadgeEmblem(
               icon: def.icon,
               color: Color(def.color),

@@ -194,18 +194,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get whichIsMore => 'Which side have more, left or right?';
+  String get whichIsMore => 'Which side has more, left or right?';
 
   @override
-  String get whichIsLess => 'Which side have lesser, left or right?';
+  String get whichIsLess => 'Which side has fewer, left or right?';
 
   @override
   String get isSameNumber => 'Same number?';
 
   @override
-  String arrange(String sequence) {
-    return 'Arrange the numbers in the correct order/Sequence: $sequence';
-  }
+  String get arrange => 'Put the numbers in order, smallest first';
 
   @override
   String get selectCorrectAnswer => 'Select the correct answer:';
@@ -843,7 +841,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get resetAllStudents => 'Reset All Students';
+  String get resetAllStudents => 'Delete All Students';
 
   @override
   String get confirmResetAllStudents =>
@@ -2341,4 +2339,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get studentFallback => 'Student';
+
+  @override
+  String get authNeedsInternet =>
+      'No internet. Nothing was changed — try again once you are online.';
+
+  @override
+  String get authFinishesOnline =>
+      'The connection dropped. It will finish on its own once the internet is back.';
+
+  @override
+  String get authRemoveFailed =>
+      'Could not remove the child. Please try again.';
+
+  @override
+  String get studentRemoved => 'Child removed.';
 }

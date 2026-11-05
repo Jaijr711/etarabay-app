@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import '../widgets/biometric_setup.dart';
+import '../services/reminder_service.dart';
 import 'developer_login_screen.dart';
 import 'teacher_agreement_screen.dart';
 import 'teacher_login_screen.dart';
@@ -110,7 +113,47 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
   Future<void> _setLanguage(String code) async {
     final provider = Provider.of<LanguageProvider>(context, listen: false);
     await provider.setLanguage(code);
+    if (!mounted) return;
     setState(() {});
+    // The reminders already booked on this phone carry the old language's
+    // words until they are booked again — that waited for the next start.
+    if (_notificationsEnabled) {
+      unawaited(ReminderService.instance
+          .schedule(languageCode: code, childName: _childName));
+    }
+  }
+
+  String get _childName =>
+      Provider.of<UserProvider>(context, listen: false).userProfile?.name ?? '';
+
+  /// The same switch as the child's Settings: on asks the phone's
+  /// permission and books the reminders, off cancels them. Here it only
+  /// saved the choice, so reminders went on in whatever language they had
+  /// been booked in, and turning them on booked nothing until a restart.
+  Future<void> _toggleNotifications(bool value) async {
+    if (!value) {
+      setState(() => _notificationsEnabled = false);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('notifications_enabled', false);
+      await ReminderService.instance.cancel();
+      return;
+    }
+    final granted = await ReminderService.instance.requestPermission();
+    if (!mounted) return;
+    if (!granted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(AppLocalizations.of(context)!.notifPermissionDenied)));
+      return;
+    }
+    setState(() => _notificationsEnabled = true);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('notifications_enabled', true);
+    if (!mounted) return;
+    await ReminderService.instance.schedule(
+      languageCode: Provider.of<LanguageProvider>(context, listen: false)
+          .currentLanguageCode,
+      childName: _childName,
+    );
   }
 
   void _showSnack(String message, IconData icon, Color color) {
@@ -198,12 +241,14 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
                 error = null;
               });
 
-              final ok = await _authService.verifyTeacherPassword(current);
-              if (!ok) {
+              // Null is "could not tell": no signal, never a wrong password.
+              final ok = await _authService.checkTeacherPassword(current);
+              if (ok != true) {
                 setDialogState(() {
                   busy = false;
-                  error =
-                      AppLocalizations.of(context)!.currentPasswordIncorrect;
+                  error = ok == null
+                      ? AppLocalizations.of(context)!.authNeedsInternet
+                      : AppLocalizations.of(context)!.currentPasswordIncorrect;
                 });
                 return;
               }
@@ -212,8 +257,9 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
                 username: newUser,
                 newPassword: newPass,
               );
+              final pending = result['status'] == 'Pending';
 
-              if (result['status'] != 'Success') {
+              if (result['status'] != 'Success' && !pending) {
                 setDialogState(() {
                   busy = false;
                   error = authMessage(context, result).isNotEmpty
@@ -240,6 +286,11 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
               // The dialog closing says nothing about the screen behind it,
               // and the message is read from that one.
               if (!mounted) return;
+              if (pending) {
+                _showSnack(authMessage(context, result), LucideIcons.clock,
+                    Colors.orange.shade800);
+                return;
+              }
               _showSnack(AppLocalizations.of(context)!.credentialsUpdated,
                   LucideIcons.circle_check, AppColors.success);
             }
@@ -353,35 +404,108 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
     setState(() => _biometricEnabled = on);
   }
 
+  /// Deletes every child in the class, after the teacher's own password.
+  ///
+  /// It was one tap of OK under a button that said "Reset" — and it deletes
+  /// the whole class, records and drawings, with no way back.
   Future<void> _confirmResetAllStudents() async {
     final loc = AppLocalizations.of(context)!;
+    final passwordCtrl = TextEditingController();
+    String? error;
+    bool busy = false;
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            const Icon(LucideIcons.triangle_alert, color: Colors.red),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(loc.resetAllStudents,
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
+      barrierDismissible: false,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) {
+          Future<void> check() async {
+            final typed = passwordCtrl.text.trim();
+            if (typed.isEmpty) {
+              setDialogState(() => error = loc.enterCurrentPassword);
+              return;
+            }
+            setDialogState(() {
+              busy = true;
+              error = null;
+            });
+            final ok = await _authService.checkTeacherPassword(typed);
+            if (!dialogContext.mounted) return;
+            if (ok == true) {
+              Navigator.pop(dialogContext, true);
+              return;
+            }
+            setDialogState(() {
+              busy = false;
+              // Not reachable is not a wrong password.
+              error =
+                  ok == null ? loc.authNeedsInternet : loc.passwordIncorrect;
+            });
+          }
+
+          return AlertDialog(
+            title: Row(
+              children: [
+                const Icon(LucideIcons.triangle_alert, color: Colors.red),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(loc.resetAllStudents,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
             ),
-          ],
-        ),
-        content: Text(loc.confirmResetAllStudents),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(loc.cancel, style: const TextStyle(color: Colors.grey)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(loc.confirm,
-                style: const TextStyle(
-                    color: Colors.red, fontWeight: FontWeight.bold)),
-          ),
-        ],
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(loc.confirmResetAllStudents),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: passwordCtrl,
+                    obscureText: true,
+                    enabled: !busy,
+                    onSubmitted: (_) => check(),
+                    decoration: InputDecoration(
+                      labelText: loc.confirmYourPassword,
+                      prefixIcon: const Icon(LucideIcons.lock, size: 20),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      isDense: true,
+                    ),
+                  ),
+                  if (error != null) ...[
+                    const SizedBox(height: 10),
+                    Text(error!,
+                        style:
+                            const TextStyle(color: Colors.red, fontSize: 13)),
+                  ],
+                ],
+              ),
+            ),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            actions: [
+              TextButton(
+                onPressed:
+                    busy ? null : () => Navigator.pop(dialogContext, false),
+                child: Text(loc.cancel,
+                    style: const TextStyle(color: Colors.grey)),
+              ),
+              TextButton(
+                onPressed: busy ? null : check,
+                child: busy
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.red))
+                    : Text(loc.delete,
+                        style: const TextStyle(
+                            color: Colors.red, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          );
+        },
       ),
     );
 
@@ -389,10 +513,15 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
       final result = await _authService.deleteAllStudents();
       if (!mounted) return;
       final ok = result['status'] == 'Success';
+      final pending = result['status'] == 'Pending';
       _showSnack(
         authMessage(context, result),
         ok ? LucideIcons.circle_check : LucideIcons.circle_alert,
-        ok ? AppColors.success : Colors.red,
+        ok
+            ? AppColors.success
+            : pending
+                ? Colors.orange.shade800
+                : Colors.red,
       );
     }
   }
@@ -574,13 +703,7 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
                         secondary: const _IconBadge(icon: LucideIcons.bell),
                         title: Text(loc.notifications),
                         value: _notificationsEnabled,
-                        onChanged: (value) {
-                          setState(() => _notificationsEnabled = value);
-                          SharedPreferences.getInstance().then(
-                            (prefs) =>
-                                prefs.setBool('notifications_enabled', value),
-                          );
-                        },
+                        onChanged: _toggleNotifications,
                       ),
                     ),
                   ],

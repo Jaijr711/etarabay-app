@@ -547,6 +547,8 @@ class _CertificateDetailScreenState extends State<CertificateDetailScreen>
     );
     _controller.forward();
     Future.delayed(const Duration(milliseconds: 300), () {
+      // Closed within the moment: its controller is already gone.
+      if (!mounted) return;
       _confettiController.play();
     });
   }
@@ -734,8 +736,7 @@ class _CertificateDetailScreenState extends State<CertificateDetailScreen>
   }
 
   Widget _buildCertificateView(BuildContext context, dynamic profile) {
-    final name =
-        profile?.name ?? AppLocalizations.of(context)!.studentFallback;
+    final name = profile?.name ?? AppLocalizations.of(context)!.studentFallback;
     final studentNumber = profile?.lrn ?? '';
     final date = DateTime.now();
 

@@ -54,6 +54,14 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
   _ClassFilter _filter = _ClassFilter.none;
   String _searchQuery = '';
 
+  /// Children swiped off the list this session (see the Dismissible).
+  final Set<String> _removedIds = {};
+
+  /// Each child's record as the class stream last delivered it. The report
+  /// is opened with the record of that moment, and its edit button kept
+  /// showing it: a second edit there sent the first one's changes back.
+  final Map<String, Map<String, dynamic>> _latestRecords = {};
+
   /// Whether the children's Student Numbers are shown in full. Hidden by default, so
   /// the list can be on screen with someone looking over a shoulder.
   bool _showLrn = false;
@@ -281,6 +289,8 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
     // The parent's yes to keeping these details. Nothing is enrolled
     // without it.
     bool consented = false;
+    // While the record is being saved: one tap, one child.
+    bool enrolling = false;
     // The same words as the section header on each step, and translated —
     // these were three English literals reaching a Filipino teacher inside an
     // otherwise translated sentence.
@@ -499,7 +509,10 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
               );
               return;
             }
-            Navigator.pop(sheetContext);
+            // The form stays open until the child is saved. It used to close
+            // first, and a failure — no signal, a username taken — lost
+            // everything the teacher had typed.
+            setSheetState(() => enrolling = true);
             final mid = middleNameController.text.trim();
             final fullName = mid.isNotEmpty
                 ? '${firstNameController.text.trim()} $mid ${lastNameController.text.trim()}'
@@ -516,23 +529,32 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
               avatar: selectedAvatar,
               parentConsented: consented,
             );
-            if (!context.mounted) return;
-            if (result['status'] == 'Success') {
-              _showEnrollmentSuccess(
-                usernameController.text,
-                lrnController.text.trim(),
-                fullName,
-              );
-            } else {
-              // The form is already closed: say why nothing was added (no
-              // signal, a number taken) instead of nothing at all.
-              if (!mounted) return;
+            if (!mounted || !sheetContext.mounted) return;
+            if (result['status'] == 'Error') {
+              // Say why nothing was added (no signal, a number taken); the
+              // form is still there to fix and send again.
+              setSheetState(() => enrolling = false);
               _showStatusDialog(
                 authMessage(context, result),
                 LucideIcons.triangle_alert,
                 Colors.orange,
               );
+              return;
             }
+            Navigator.pop(sheetContext);
+            // Pending is a record sent and queued: the login card is good.
+            if (result['status'] == 'Pending') {
+              _showStatusDialog(
+                authMessage(context, result),
+                LucideIcons.clock,
+                Colors.orange.shade800,
+              );
+            }
+            _showEnrollmentSuccess(
+              usernameController.text,
+              lrnController.text.trim(),
+              fullName,
+            );
           }
 
           void goNext() {
@@ -672,7 +694,9 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                     height: 52,
                     child: ElevatedButton(
                       // Enrolling waits for the parent's consent.
-                      onPressed: isLast ? (consented ? submit : null) : goNext,
+                      onPressed: isLast
+                          ? (consented && !enrolling ? submit : null)
+                          : goNext,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
@@ -681,15 +705,22 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                       ),
-                      child: Text(
-                        isLast
-                            ? AppLocalizations.of(context)!.enroll
-                            : AppLocalizations.of(context)!.next,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
+                      child: isLast && enrolling
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2.5, color: Colors.white),
+                            )
+                          : Text(
+                              isLast
+                                  ? AppLocalizations.of(context)!.enroll
+                                  : AppLocalizations.of(context)!.next,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
                     ),
                   ),
                 ),
@@ -1127,13 +1158,33 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                           ),
                         );
                         if (!mounted || confirm != true) return;
-                        await _authService.deleteStudent(studentId);
+                        // The dashboard's own route: from the report, the
+                        // sheet and the report both go, and nothing past
+                        // the dashboard does.
+                        final dashboardRoute = ModalRoute.of(context);
+                        final result =
+                            await _authService.deleteStudent(studentId);
                         if (!mounted) return;
-                        Navigator.of(context).pop();
+                        // Offline nothing was sent: the sheet stays, so the
+                        // teacher can see the child is still there.
+                        if (result['status'] == 'Error') {
+                          _showStatusDialog(authMessage(context, result),
+                              LucideIcons.circle_alert, Colors.red);
+                          return;
+                        }
+                        setState(() => _removedIds.add(studentId));
+                        // Only the sheet used to close, leaving the teacher
+                        // on the report of a child who was gone.
+                        Navigator.of(context).popUntil(
+                            (r) => r == dashboardRoute || r.isFirst);
                         _showStatusDialog(
-                          loc.remove,
+                          result['status'] == 'Success'
+                              ? loc.studentRemoved
+                              : authMessage(context, result),
                           LucideIcons.trash_2,
-                          Colors.red,
+                          result['status'] == 'Success'
+                              ? Colors.red
+                              : Colors.orange.shade800,
                         );
                       },
                       icon: const Icon(LucideIcons.trash_2,
@@ -1443,32 +1494,41 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
               );
               return;
             }
-            try {
-              await _authService.updateStudent(
-                studentId: studentId,
-                name: nameController.text.trim(),
-                lrn: studentNumber,
-                gender: selectedGender,
-                birthday: selectedBirthday,
-                parentName: parentNameController.text.trim(),
-                parentContact: parentContactController.text.trim(),
-                avatar: selectedAvatar,
-              );
-              if (!mounted) return;
-              Navigator.of(context).pop();
+            final name = nameController.text.trim();
+            final result = await _authService.updateStudent(
+              studentId: studentId,
+              name: name,
+              middleName: AuthService.keptMiddleName(
+                  (studentData['middleName'] ?? '').toString(), name),
+              lrn: studentNumber,
+              gender: selectedGender,
+              birthday: selectedBirthday,
+              parentName: parentNameController.text.trim(),
+              parentContact: parentContactController.text.trim(),
+              avatar: selectedAvatar,
+            );
+            if (!mounted) return;
+            // Not saved: the sheet stays with what was typed.
+            if (result['status'] == 'Error') {
               _showStatusDialog(
-                loc.update,
-                LucideIcons.circle_check,
-                AppColors.success,
-              );
-            } catch (e) {
-              if (!mounted) return;
-              _showStatusDialog(
-                "${loc.error}: ${e.toString()}",
+                authMessage(context, result).isNotEmpty
+                    ? authMessage(context, result)
+                    : loc.authSaveFailed,
                 LucideIcons.circle_alert,
                 Colors.red,
               );
+              return;
             }
+            if (sheetContext.mounted) Navigator.of(sheetContext).pop();
+            _showStatusDialog(
+              result['status'] == 'Success'
+                  ? loc.update
+                  : authMessage(context, result),
+              LucideIcons.circle_check,
+              result['status'] == 'Success'
+                  ? AppColors.success
+                  : Colors.orange.shade800,
+            );
           }
 
           return Container(
@@ -2170,7 +2230,12 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
               return _buildEmptyState();
             }
 
-            final studentDocs = snapshot.data!.docs;
+            // Without the ones just swiped away: the list has to let go of a
+            // dismissed card at once, before the class stream catches up.
+            final studentDocs = [
+              for (final d in snapshot.data!.docs)
+                if (!_removedIds.contains(d.id)) d,
+            ];
 
             // Detect students celebrating their birthday today.
             final now = DateTime.now();
@@ -2178,6 +2243,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
             _takenIds.clear();
             for (final doc in studentDocs) {
               final data = doc.data();
+              _latestRecords[doc.id] = data;
               final held = data['lrn']?.toString();
               if (held != null && held.isNotEmpty) _takenIds.add(held);
               final bdayRaw = data['birthday'] ??
@@ -2411,8 +2477,16 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                               child: Dismissible(
                                 key: Key(studentId),
                                 direction: DismissDirection.endToStart,
+                                // The removal happens here, before the card
+                                // is let go. It was done after, in
+                                // onDismissed: offline nothing was removed,
+                                // the card was gone anyway, and Flutter
+                                // stopped on a dismissed card still in the
+                                // list. Now a removal that was not sent
+                                // springs the card back and says why.
                                 confirmDismiss: (direction) async {
-                                  return await showDialog<bool>(
+                                  final loc = AppLocalizations.of(context)!;
+                                  final sure = await showDialog<bool>(
                                     context: context,
                                     builder: (c) => AlertDialog(
                                       shape: RoundedRectangleBorder(
@@ -2441,18 +2515,28 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                                       ],
                                     ),
                                   );
-                                },
-                                onDismissed: (direction) async {
-                                  final removeMsg =
-                                      AppLocalizations.of(context)!.remove;
-                                  await _authService.deleteStudent(studentId);
-                                  if (!mounted) return;
+                                  if (sure != true || !mounted) return false;
+                                  final result = await _authService
+                                      .deleteStudent(studentId);
+                                  if (!mounted) return false;
+                                  final removed = result['status'] != 'Error';
                                   _showStatusDialog(
-                                    removeMsg,
-                                    LucideIcons.trash_2,
-                                    Colors.red,
+                                    result['status'] == 'Success'
+                                        ? loc.studentRemoved
+                                        : authMessage(this.context, result),
+                                    removed
+                                        ? LucideIcons.trash_2
+                                        : LucideIcons.circle_alert,
+                                    result['status'] == 'Success'
+                                        ? Colors.red
+                                        : removed
+                                            ? Colors.orange.shade800
+                                            : Colors.red,
                                   );
+                                  return removed;
                                 },
+                                onDismissed: (direction) =>
+                                    setState(() => _removedIds.add(studentId)),
                                 background: Container(
                                   margin: const EdgeInsets.only(bottom: 0),
                                   decoration: BoxDecoration(
@@ -2502,19 +2586,30 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                                       ForParentsScreen(
                                         viewStudentId: studentId,
                                         viewStudentName: name,
+                                        // The record as it is now, not as
+                                        // the report was opened.
                                         onEditInfo: () => _showStudentInfoSheet(
                                           studentId: studentId,
-                                          studentData: studentData,
+                                          studentData:
+                                              _latestRecords[studentId] ??
+                                                  studentData,
                                         ),
-                                        onShowLogin: () => _openLoginCard(
-                                          name: name,
-                                          avatar: resolvedAvatar,
-                                          username: username,
-                                          password: (studentData['password'] ??
-                                                  studentData['lrn'] ??
-                                                  '')
-                                              .toString(),
-                                        ),
+                                        onShowLogin: () {
+                                          final now =
+                                              _latestRecords[studentId] ??
+                                                  studentData;
+                                          _openLoginCard(
+                                            name: name,
+                                            avatar: resolvedAvatar,
+                                            username:
+                                                (now['username'] ?? username)
+                                                    .toString(),
+                                            password: (now['password'] ??
+                                                    now['lrn'] ??
+                                                    '')
+                                                .toString(),
+                                          );
+                                        },
                                         viewStudentData: {
                                           'id': studentId,
                                           'studentId': studentId,
@@ -2525,7 +2620,8 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                                   },
                                   onEdit: () => _showStudentInfoSheet(
                                     studentId: studentId,
-                                    studentData: studentData,
+                                    studentData: _latestRecords[studentId] ??
+                                        studentData,
                                   ),
                                 ),
                               ),

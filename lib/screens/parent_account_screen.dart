@@ -130,7 +130,10 @@ class _ParentAccountScreenState extends State<ParentAccountScreen> {
     if (!mounted) return;
     setState(() => _saving = false);
 
-    if (result['status'] != 'Success') {
+    // Pending is sent and finishing once the signal is back: it will be the
+    // password, so the fingerprint login has to follow it all the same.
+    final pending = result['status'] == 'Pending';
+    if (result['status'] != 'Success' && !pending) {
       // In the reader's language; the service's own sentence is English.
       final message = authMessage(context, result);
       _snack(
@@ -163,6 +166,11 @@ class _ParentAccountScreenState extends State<ParentAccountScreen> {
 
     _newPassCtrl.clear();
     _confirmCtrl.clear();
+    if (pending) {
+      _snack(authMessage(context, result), LucideIcons.clock,
+          Colors.orange.shade800);
+      return;
+    }
     _snack(AppLocalizations.of(context)!.credentialsUpdated,
         LucideIcons.circle_check, AppColors.success);
   }

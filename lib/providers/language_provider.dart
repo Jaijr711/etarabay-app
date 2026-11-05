@@ -8,22 +8,27 @@ class LanguageProvider extends ChangeNotifier {
   static const List<String> languages = ['English', 'Ilocano', 'Filipino'];
   static const List<String> languageCodes = ['en', 'ilo', 'fil'];
 
-  LanguageProvider(this._currentLanguage) {
-    if (_currentLanguage.isEmpty) {
-      _currentLanguage = 'en'; // Default to English
-    }
-  }
+  /// [code] if it is one of [languageCodes], else English.
+  ///
+  /// A saved value the app does not know (an older build's, a hand edit)
+  /// used to be taken as it was: the menus fell back to English on their
+  /// own while About Me fell back to Ilocano on its own, and the child got
+  /// an English screen with Ilocano questions.
+  static String validCode(String? code) =>
+      languageCodes.contains(code) ? code! : 'en';
 
-  String get currentLanguage =>
-      _currentLanguage.isNotEmpty ? _currentLanguage : 'en';
+  LanguageProvider(String language) : _currentLanguage = validCode(language);
+
+  String get currentLanguage => _currentLanguage;
   String get currentLanguageCode => currentLanguage;
 
   Future<void> setLanguage(String languageCode) async {
-    if (languageCode.isNotEmpty) {
-      _currentLanguage = languageCode;
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('language', languageCode);
-      notifyListeners();
-    }
+    if (!languageCodes.contains(languageCode)) return;
+    // The screen first, the disk after: waiting on the write held the
+    // switch back, and a write that failed left the screen unchanged.
+    _currentLanguage = languageCode;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('language', languageCode);
   }
 }

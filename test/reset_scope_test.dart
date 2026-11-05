@@ -43,8 +43,7 @@ void main() {
 
   // A new phone had applied no marker at all, so it restored the child's
   // progress and then carried out every reset ever made on them.
-  group('a reset is carried out once, and never an old one on a new phone',
-      () {
+  group('a reset is carried out once, and never an old one on a new phone', () {
     const apply = UserProvider.shouldApplyMarker;
 
     test('a reset this phone has not seen is carried out', () {
@@ -55,8 +54,7 @@ void main() {
       expect(apply(marker: 'r1', applied: 'r1', freshDevice: false), isFalse);
     });
 
-    test('an old reset found on a phone holding none of the child is not',
-        () {
+    test('an old reset found on a phone holding none of the child is not', () {
       expect(apply(marker: 'r1', applied: null, freshDevice: true), isFalse);
     });
 

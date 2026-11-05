@@ -25,6 +25,18 @@ class UpdateChecker {
   static const String _latestReleaseUrl =
       'https://api.github.com/repos/Jaijr711/etarabay-releases/releases/latest';
 
+  /// The download website (site/index.html, published from the releases
+  /// repo). The update button opens it rather than the bare APK: the parent
+  /// sees what is new and the install steps, and taps Update there — the
+  /// same page they first installed from.
+  static const String downloadPageUrl =
+      'https://jaijr711.github.io/etarabay-releases/';
+
+  /// The website for someone on [installedVersion]: with it, the page says
+  /// an update is waiting and its button reads Update.
+  static String updatePageUrl(String installedVersion) =>
+      '$downloadPageUrl?v=${Uri.encodeQueryComponent(installedVersion)}';
+
   /// Null on web (there is nothing to sideload there), on any network or
   /// parsing failure, or when the installed build is already current —
   /// callers do not need to tell "no update" apart from "couldn't check".
@@ -55,6 +67,7 @@ class UpdateChecker {
       return UpdateInfo(
         versionName: remoteVersion,
         apkUrl: apkUrl,
+        pageUrl: updatePageUrl(info.version),
         notes: (notes != null && notes.trim().isNotEmpty) ? notes : null,
       );
     } catch (e) {
@@ -103,16 +116,33 @@ class UpdateChecker {
   Future<void> openDownload(String apkUrl) {
     return launchUrl(Uri.parse(apkUrl), mode: LaunchMode.externalApplication);
   }
+
+  /// Opens the download website for [update], or the APK itself when the
+  /// browser will not take the page.
+  Future<void> openUpdatePage(UpdateInfo update) async {
+    try {
+      final opened = await launchUrl(Uri.parse(update.pageUrl),
+          mode: LaunchMode.externalApplication);
+      if (opened) return;
+    } catch (e) {
+      debugPrint('UpdateChecker: page not opened: $e');
+    }
+    await openDownload(update.apkUrl);
+  }
 }
 
 class UpdateInfo {
   final String versionName;
   final String apkUrl;
+
+  /// The download website, told which version is installed.
+  final String pageUrl;
   final String? notes;
 
   const UpdateInfo({
     required this.versionName,
     required this.apkUrl,
+    required this.pageUrl,
     this.notes,
   });
 }

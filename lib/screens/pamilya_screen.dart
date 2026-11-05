@@ -26,6 +26,7 @@ import 'dart:async';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import '../widgets/replay_dialog.dart';
 import '../widgets/design_scale.dart';
+import '../utils/shuffled_choices.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  BADGE MODEL
@@ -459,7 +460,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
     // Full volume again, now rather than next frame: the post-frame callback
     // this used only runs if another frame happens to be scheduled.
     AudioManager.instance.unduckMusic();
-    AudioManager.instance.resumeHomeMusic();
+    AudioManager.instance.resumeHomeMusicAfter(ModuleMusic.pamilya);
     super.dispose();
   }
 
@@ -606,6 +607,10 @@ class _PamilyaScreenState extends State<PamilyaScreen>
   /// Back to the wall of cards, without leaving the module.
   void _backToPicker() {
     _stopTimer();
+    // A family member's name still being said would go on over the cards,
+    // with the music held down until it ended.
+    unawaited(_audioPlayer.stop());
+    unawaited(AudioManager.instance.unduckMusic());
     setState(() {
       _playSession++;
       _playing = false;
@@ -788,6 +793,10 @@ class _PamilyaScreenState extends State<PamilyaScreen>
   /// Distractors are picked to be close, not obviously wrong: names of a
   /// similar shape, ages one either side. Picking out "Ana" from "Ana, Ani,
   /// Anna" is recognition; picking it from "Ana, Bartholomew, 7" is not.
+  /// An About Me answer index meaning every choice is right — the profile
+  /// has nothing to check the child's answer against.
+  static const int anyAnswer = -1;
+
   (List<String>, int) _aboutMeChoices(Map<String, dynamic> game) {
     final profile =
         Provider.of<UserProvider>(context, listen: false).userProfile;
@@ -839,7 +848,10 @@ class _PamilyaScreenState extends State<PamilyaScreen>
         // "Girl". The first version of this check also carried a third clause
         // reading `startsWith('b') == false`, which is true for "Male", so
         // every boy was told his own answer was wrong.
-        final g = (profile?.gender ?? '').toLowerCase();
+        final g = (profile?.gender ?? '').trim().toLowerCase();
+        // Nothing on the profile to check against: either answer is the
+        // child's own, rather than "Boy" being marked right for everyone.
+        if (g.isEmpty) return (raw, anyAnswer);
         final isGirl = g.startsWith('f') || g.startsWith('g');
         return (raw, isGirl ? 0 : 1);
 
@@ -861,7 +873,11 @@ class _PamilyaScreenState extends State<PamilyaScreen>
         // it used to have none, so every language got this English list
         // under a question that asked where the child lives.
         final raw = (game['options'] as List?)?.cast<String>() ??
-            const ['👨‍👩‍👧 With my family', '🐶 With a dog', '🧸 With my toys'];
+            const [
+              '👨‍👩‍👧 With my family',
+              '🐶 With a dog',
+              '🧸 With my toys'
+            ];
         return (raw, 0);
     }
   }
@@ -943,7 +959,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
   void _handleAboutMeAnswer(int index, int correct, String description) {
     if (_selectedAboutMeAnswer != null) return;
     setState(() => _selectedAboutMeAnswer = index);
-    if (index == correct) {
+    if (correct == anyAnswer || index == correct) {
       _correctThenTip(description);
     } else {
       _onWrong();
@@ -1520,8 +1536,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
             ),
             if (_playing && _showCorrectOverlay) _buildCorrectOverlay(),
             if (_playing && _showWrongOverlay) _buildWrongOverlay(),
-            if (_playing && _tipMessage != null)
-              _buildTipOverlay(_tipMessage!),
+            if (_playing && _tipMessage != null) _buildTipOverlay(_tipMessage!),
           ],
         ),
       ),
@@ -2117,7 +2132,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
         return _choiceTile(
           label: choices[i],
           isSelected: sel,
-          isCorrect: sel ? i == correct : null,
+          isCorrect: sel ? (correct == anyAnswer || i == correct) : null,
           onTap: () => _handleAboutMeAnswer(
               i, correct, _getGameString(game, 'description')),
         );
@@ -2131,19 +2146,19 @@ class _PamilyaScreenState extends State<PamilyaScreen>
 
   Widget _buildSariliGame2() {
     final game = _sariliLevel2Games[_currentGameIndex];
-    final choices = game['choices'] as List;
+    final (choices, answer) = _shuffled(game);
     return _gameBoard(
       question: game['question'],
-      labels: choices.map((e) => e.toString()).toList(),
+      labels: choices,
       choices: List.generate(choices.length, (i) {
         final sel = _selectedEmotionAnswer == i;
-        final correct = i == game['correct'];
+        final correct = i == answer;
         return _choiceTile(
           label: choices[i],
           isSelected: sel,
           isCorrect: sel ? correct : null,
           onTap: () => _handleEmotionAnswer(
-              i, game['correct'], game['explanation'], game['tip']),
+              i, answer, game['explanation'], game['tip']),
         );
       }),
     );
@@ -2166,8 +2181,8 @@ class _PamilyaScreenState extends State<PamilyaScreen>
           label: choices[i],
           isSelected: sel,
           isCorrect: sel ? correct : null,
-          onTap: () => _handleRoutineAnswer(
-              i, answer, game['explanation'], game['tip']),
+          onTap: () =>
+              _handleRoutineAnswer(i, answer, game['explanation'], game['tip']),
         );
       }),
     );
@@ -2179,8 +2194,12 @@ class _PamilyaScreenState extends State<PamilyaScreen>
 
   Widget _buildSariliGame4() {
     final game = _sariliLevel4Games[_currentGameIndex];
-    final options = game['options'] as List;
-    final emojis = game['emojis'] as List;
+    // One order for both lists, each child their own: the favourites have no
+    // right answer, but the same first tile for everyone drew the same taps.
+    final order = shuffledOrder((game['options'] as List).length,
+        seed: _seedFor(game));
+    final options = [for (final i in order) (game['options'] as List)[i]];
+    final emojis = [for (final i in order) (game['emojis'] as List)[i]];
     final type = game['id'].toString().replaceFirst('preference_', '');
 
     return Padding(
@@ -2299,18 +2318,18 @@ class _PamilyaScreenState extends State<PamilyaScreen>
 
   Widget _buildFamilyMembersGame() {
     final game = _pamilyaLevel1Games[_currentGameIndex];
-    final choices = game['choices'] as List;
+    final (choices, answer) = _shuffled(game);
     return _gameBoard(
       question: game['question'],
-      labels: choices.map((e) => e.toString()).toList(),
+      labels: choices,
       choices: List.generate(choices.length, (i) {
         final sel = _selectedFamilyAnswer == i;
-        final correct = i == game['correct'];
+        final correct = i == answer;
         return _choiceTile(
           label: choices[i],
           isSelected: sel,
           isCorrect: sel ? correct : null,
-          onTap: () => _handleFamilyAnswer(i, game['correct'], game),
+          onTap: () => _handleFamilyAnswer(i, answer, game),
         );
       }),
     );
@@ -2322,10 +2341,12 @@ class _PamilyaScreenState extends State<PamilyaScreen>
 
   Widget _buildFamilyRolesGame() {
     final game = _pamilyaLevel2Games[_currentGameIndex];
-    final choices = game['choices'] as List;
+    // Its catch-all answer ("Anyone can", "Kahit sino ay pwede") is a whole
+    // sentence, written last and right in most of these — so it moves too.
+    final (choices, answer) = _shuffled(game, keepAllOfTheAboveLast: false);
     return _gameBoard(
       question: game['question'],
-      labels: choices.map((e) => e.toString()).toList(),
+      labels: choices,
       choices: List.generate(choices.length, (i) {
         final sel = _selectedRoleAnswer == i;
         return _choiceTile(
@@ -2333,8 +2354,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
           isSelected: sel,
           // Every choice is right here — see _handleRoleAnswer.
           isCorrect: sel ? true : null,
-          onTap: () =>
-              _handleRoleAnswer(i, game['correct'], game['explanation']),
+          onTap: () => _handleRoleAnswer(i, answer, game['explanation']),
         );
       }),
     );
@@ -2388,16 +2408,23 @@ class _PamilyaScreenState extends State<PamilyaScreen>
 
   /// [game]'s choices in an order of their own, and where the right one
   /// went — see [shuffledChoices].
-  (List<String>, int) _shuffled(Map<String, dynamic> game) {
-    final name =
-        Provider.of<UserProvider>(context, listen: false).userProfile?.name;
+  (List<String>, int) _shuffled(Map<String, dynamic> game,
+      {bool keepAllOfTheAboveLast = true}) {
     return shuffledChoices(
       (game['choices'] as List).map((e) => e.toString()).toList(),
       game['correct'] as int,
-      seed: '${game['id']}|${name ?? ''}',
+      seed: _seedFor(game),
+      keepAllOfTheAboveLast: keepAllOfTheAboveLast,
     );
   }
 
+  /// The question and the child: each child gets the answers in an order
+  /// of their own.
+  String _seedFor(Map<String, dynamic> game) {
+    final name =
+        Provider.of<UserProvider>(context, listen: false).userProfile?.name;
+    return '${game['id']}|${name ?? ''}';
+  }
 
   // ─────────────────────────────────────────────────────────────────────────
   //  PAMILYA GAME 4: Family Tree (Interactive)
@@ -2472,7 +2499,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
                   : 'Pagpritoan ken kalan'),
           'roomIndex': 1, // Kitchen / Kusina
           'question': _currentLang == 'en'
-              ? 'Where does Nanang cook delicious meals?'
+              ? 'Where does Mom cook delicious meals?'
               : (_currentLang == 'fil'
                   ? 'Saan nagluluto si Nanay ng masarap na pagkain?'
                   : 'Sadinno ti paglutoan ni nanang kadagiti naimas a taraon?'),
@@ -2509,7 +2536,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
               ? 'Garden & Plants'
               : (_currentLang == 'fil'
                   ? 'Hardin at mga Halaman'
-                  : 'Minuyongan ken Muka'),
+                  : 'Minuyongan ken Mula'),
           'roomIndex': 4, // Yard / Bakuran
           'question': _currentLang == 'en'
               ? 'Where do we play outdoors and water the plants?'
@@ -2648,31 +2675,4 @@ class _PamilyaScreenState extends State<PamilyaScreen>
       ]),
     );
   }
-}
-
-/// Puts the right answer somewhere other than where it was written.
-///
-/// The content lists it first in nearly every Daily Routines, Our Home and
-/// Family Tree question, and last in most Family Activities ones, and
-/// nothing mixed them — "always tap the first one" passed a whole level.
-/// Seeded on the question and the child, like About Me's own answers, so the
-/// order holds still while they think instead of reshuffling on a
-/// rebuild. "All of the above" stays last, where it reads as meant.
-(List<String>, int) shuffledChoices(List<String> choices, int correct,
-    {required String seed}) {
-  const everything = {
-    'all of the above',
-    'lahat ng nabanggit',
-    'amin kadagitoy',
-  };
-  final last = choices.isNotEmpty &&
-          everything.contains(choices.last.trim().toLowerCase())
-      ? choices.length - 1
-      : null;
-  final order = [
-    for (int i = 0; i < choices.length; i++)
-      if (i != last) i
-  ]..shuffle(Random(seed.hashCode));
-  if (last != null) order.add(last);
-  return ([for (final i in order) choices[i]], order.indexOf(correct));
 }

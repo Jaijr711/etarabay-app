@@ -32,8 +32,8 @@ void main() {
       'stars': 146,
     });
     // Numbers: three levels done, the fourth begun. About Me: two done.
-    await progress.put('matematika_levels',
-        [true, true, true, false, false, false, false]);
+    await progress.put(
+        'matematika_levels', [true, true, true, false, false, false, false]);
     for (final (i, s) in const [(0, 3), (1, 3), (2, 3), (3, 2)]) {
       await progress.put('mat_level_${i}_stars', s);
     }
@@ -88,8 +88,8 @@ void main() {
               home: screen,
             ),
           ));
-          await tester.runAsync(
-              () => Future<void>.delayed(const Duration(seconds: 2)));
+          await tester
+              .runAsync(() => Future<void>.delayed(const Duration(seconds: 2)));
           await tester.pump(const Duration(seconds: 3));
           await tester.runAsync(() async {
             for (final img in tester.widgetList<Image>(find.byType(Image))) {

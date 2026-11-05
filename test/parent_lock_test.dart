@@ -49,7 +49,8 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider('en')),
-        ChangeNotifierProvider<AudioManager>.value(value: AudioManager.instance),
+        ChangeNotifierProvider<AudioManager>.value(
+            value: AudioManager.instance),
       ],
       child: MaterialApp(
         localizationsDelegates: const [
@@ -194,8 +195,8 @@ void main() {
 /// Lets the prefs reads finish (real async) and the frames that follow.
 Future<void> settle(WidgetTester tester) async {
   for (var i = 0; i < 3; i++) {
-    await tester.runAsync(
-        () => Future<void>.delayed(const Duration(milliseconds: 60)));
+    await tester
+        .runAsync(() => Future<void>.delayed(const Duration(milliseconds: 60)));
     await tester.pump(const Duration(milliseconds: 400));
   }
 }

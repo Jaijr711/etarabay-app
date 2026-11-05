@@ -368,6 +368,8 @@ class _TandaanScreenState extends State<TandaanScreen>
     );
 
     _loadCompletedCategories().then((_) {
+      // Left before the saved rounds were read: nothing to start.
+      if (!mounted) return;
       if (!_currentCategoryCompleted) {
         _initRound();
         _startTimer();
@@ -422,7 +424,7 @@ class _TandaanScreenState extends State<TandaanScreen>
     _previewTimer?.cancel();
     _starBurstController.dispose();
     _shakeController.dispose();
-    AudioManager.instance.resumeHomeMusic();
+    AudioManager.instance.resumeHomeMusicAfter(ModuleMusic.tandaan);
     super.dispose();
   }
 
@@ -927,8 +929,21 @@ class _TandaanScreenState extends State<TandaanScreen>
 
   // ─── Build ─────────────────────────────────────────────────────────────────
 
+  /// [UserProvider.progressVersion] when the rounds were last read.
+  int? _seenProgressVersion;
+
   @override
   Widget build(BuildContext context) {
+    // Rounds that arrive from the cloud after this screen opened show on the
+    // wall of categories — never under a round being played.
+    final version = context.select<UserProvider, int>((p) => p.progressVersion);
+    _seenProgressVersion ??= version;
+    if (version != _seenProgressVersion && !_playing) {
+      _seenProgressVersion = version;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_playing) _loadCompletedCategories();
+      });
+    }
     return PopScope(
       // The phone's own back button, and the browser's. Inside a level it
       // means "leave the level", not "leave the module" — a child who taps it

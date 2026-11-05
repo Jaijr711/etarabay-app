@@ -339,7 +339,7 @@ class _MagbasaScreenState extends State<MagbasaScreen>
   @override
   void dispose() {
     _tabController.dispose();
-    AudioManager.instance.resumeHomeMusic();
+    AudioManager.instance.resumeHomeMusicAfter(null);
     super.dispose();
   }
 
@@ -347,8 +347,21 @@ class _MagbasaScreenState extends State<MagbasaScreen>
   //  Build
   // ─────────────────────────────────────────────────────────────────────────
 
+  /// [UserProvider.progressVersion] when the ticks were last read.
+  int? _seenProgressVersion;
+
   @override
   Widget build(BuildContext context) {
+    // Ticks that arrive from the cloud after this list opened (the first
+    // seconds after signing in) show without reopening it.
+    final version = context.select<UserProvider, int>((p) => p.progressVersion);
+    _seenProgressVersion ??= version;
+    if (version != _seenProgressVersion) {
+      _seenProgressVersion = version;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _loadProgress();
+      });
+    }
     if (_isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }

@@ -305,7 +305,8 @@ class _ParentsLockScreenState extends State<ParentsLockScreen> {
         title = loc.confirmParentPin;
         subtitle = loc.parentPinConfirmSub;
       case _Mode.enterLrn:
-        bubble = _firstCode ? loc.parentPinBubbleFirst : loc.parentPinBubbleForgot;
+        bubble =
+            _firstCode ? loc.parentPinBubbleFirst : loc.parentPinBubbleForgot;
         title = loc.enterLRN;
         subtitle = _firstCode ? loc.parentPinFirstSub : loc.parentPinForgotSub;
     }

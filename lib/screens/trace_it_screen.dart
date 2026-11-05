@@ -700,7 +700,7 @@ class _TraceItScreenState extends State<TraceItScreen>
     _guideController.dispose();
     _rewindController.dispose();
     _starController.dispose();
-    AudioManager.instance.resumeHomeMusic();
+    AudioManager.instance.resumeHomeMusicAfter(ModuleMusic.traceIt);
     super.dispose();
   }
 
@@ -1079,7 +1079,9 @@ class _TraceItScreenState extends State<TraceItScreen>
           if (_selectedMode < 2) {
             _switchMode(_selectedMode + 1);
           } else {
-            Navigator.pop(context);
+            // Back to the wall, as every other module's last level does.
+            // This left Trace It altogether.
+            _backToWall();
           }
         },
         secondaryLabel: AppLocalizations.of(context)!.back,

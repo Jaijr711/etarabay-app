@@ -1,6 +1,7 @@
 import '../widgets/report_widgets.dart';
 import '../widgets/reset_progress_sheet.dart';
 import '../widgets/teacher_tools.dart';
+import 'dart:async';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_tarabay/l10n/app_localizations.dart';
@@ -280,6 +281,7 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
 
   @override
   void dispose() {
+    _siblingSub?.cancel();
     try {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.removeListener(_onUserProviderChanged);
@@ -500,8 +502,10 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
         const SizedBox(height: 16),
 
         // Last colored
+        // Saved as Color Fun's own English name for the page ("Apple"), so
+        // it is put into the parent's language here.
         _infoRow(LucideIcons.clock, AppLocalizations.of(context)!.recentColor,
-            _kulayLastColored),
+            _pageLabel(_kulayLastColored)),
         const SizedBox(height: 16),
 
         // Per-category breakdown
@@ -1394,36 +1398,64 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
     setState(() => _household = others);
   }
 
-  /// Reads one sibling's synced progress. Their record holds the same map
+  /// The record of the child shown, kept open while they are shown.
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _siblingSub;
+
+  /// Follows one sibling's synced progress. Their record holds the same map
   /// `getAllProgress()` produces, so the summary renders unchanged.
+  ///
+  /// Live: it was read once, so a teacher watching a child play saw the
+  /// report stand still until they closed it and opened it again.
   Future<void> _showSibling(Map<String, String> child) async {
+    final id = child['id'] ?? '';
     setState(() {
       _loadingSibling = true;
-      _siblingId = child['id'];
+      _siblingId = id;
       _siblingName = child['name'] ?? '';
     });
-    try {
-      final doc = await FirebaseFirestore.instance
-          .collection('students')
-          .doc(child['id'])
-          .get();
-      final data = doc.data();
-      if (!mounted) return;
-      setState(() {
-        _siblingProgress = (data?['progress'] as Map?)?.cast<String, dynamic>();
-        _loadingSibling = false;
-      });
-    } catch (e) {
+    await _siblingSub?.cancel();
+    void failed(Object e) {
       debugPrint('Could not load sibling progress: $e');
-      if (!mounted) return;
+      if (!mounted || _siblingId != id) return;
       setState(() {
         _siblingProgress = null;
         _loadingSibling = false;
       });
     }
+
+    try {
+      _siblingSub = FirebaseFirestore.instance
+          .collection('students')
+          .doc(id)
+          .snapshots()
+          .listen((doc) async {
+        // Another child was picked meanwhile.
+        if (!mounted || _siblingId != id) return;
+        // The server says this child is gone: the teacher removed them. Only
+        // the server: a phone that never cached them would say the same.
+        if (!doc.exists && !doc.metadata.isFromCache) {
+          await _dropKnownChild(id);
+          if (!mounted) return;
+          _showSignedInChild();
+          await _loadHousehold();
+          return;
+        }
+        setState(() {
+          _siblingProgress =
+              (doc.data()?['progress'] as Map?)?.cast<String, dynamic>();
+          _loadingSibling = false;
+        });
+        // A module page open on top follows too.
+        _rebuildOpenReport?.call(() {});
+      }, onError: failed);
+    } catch (e) {
+      failed(e);
+    }
   }
 
   void _showSignedInChild() {
+    _siblingSub?.cancel();
+    _siblingSub = null;
     setState(() {
       _siblingId = null;
       _siblingProgress = null;
@@ -1973,6 +2005,17 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
     return when;
   }
 
+  /// Takes [id] off this device's list of children.
+  static Future<void> _dropKnownChild(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getStringList('known_students') ?? const [];
+    final kept = <String>[
+      for (final entry in raw)
+        if (jsonDecode(entry) case final Map m when m['id'] != id) entry
+    ];
+    await prefs.setStringList('known_students', kept);
+  }
+
   /// Takes a child off this device, after asking.
   ///
   /// Only forgets them: their account and their work are in their own record,
@@ -2008,14 +2051,7 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
     );
     if (confirmed != true) return;
 
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getStringList('known_students') ?? const [];
-    final kept = <String>[
-      for (final entry in raw)
-        if (jsonDecode(entry) case final Map m when m['id'] != child['id'])
-          entry
-    ];
-    await prefs.setStringList('known_students', kept);
+    await _dropKnownChild(child['id'] ?? '');
 
     // The parent's code stays. It is theirs, not this child's — deleting
     // it here used to shut them out of their other child's report.
@@ -2678,20 +2714,27 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
   /// the parent had picked.
   String _pageLabel(String name) {
     final loc = AppLocalizations.of(context)!;
+    // Both spellings: the progress list's own, and the English name Color
+    // Fun saves as the last page colored.
     switch (name) {
       case 'Puppy':
         return loc.pagePuppy;
       case 'Kuting':
+      case 'Cat':
         return loc.pageKuting;
       case 'Elepante':
+      case 'Elephant':
         return loc.pageElepante;
       case 'Flower':
+      case 'Flower Basket':
         return loc.pageFlowerBasket;
       case 'Rose':
         return loc.pageRose;
       case 'Mansanas':
+      case 'Apple':
         return loc.pageMansanas;
       case 'Saging':
+      case 'Banana':
         return loc.pageSaging;
       case 'Teddy Bear':
         return loc.pageTeddyBear;

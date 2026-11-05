@@ -19,7 +19,8 @@ Widget _app(Widget home) => MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider('en')),
-        ChangeNotifierProvider<AudioManager>.value(value: AudioManager.instance),
+        ChangeNotifierProvider<AudioManager>.value(
+            value: AudioManager.instance),
       ],
       child: MaterialApp(
         localizationsDelegates: const [

@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Tarabay</title>
+  <meta name="description" content="Learning app para sa daycare (edad 3–5) sa Ilocano, Filipino at English. I-download ang Android app.">
+  <meta name="theme-color" content="#5C52E5">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <!-- The card a chat app shows when the link is shared. -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jaijr711.github.io/etarabay-releases/">
+  <meta property="og:title" content="E-Tarabay — I-download ang app">
+  <meta property="og:description" content="Learning app para sa daycare (edad 3–5) sa Ilocano, Filipino at English. Isang pindot lang para ma-install.">
+  <meta property="og:image" content="https://jaijr711.github.io/etarabay-releases/assets/share.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <!--
+    The page to hand out for E-Tarabay, and the page the app opens when an
+    update is out: it opens it as ?v=<installed version>, and the button
+    then says Update. Everything about the release (version, size, date,
+    notes) is read from the newest GitHub release, so publishing a release
+    is all it takes — nothing here changes per version. The button itself
+    is the fixed "latest" link, so it works even when that read fails.
+  -->
+  <style>
+    :root {
+      --brand: #5C52E5;
+      --brand-soft: #EEEDFF;
+      --green: #1A8F5A;
+      --green-dark: #136B43;
+      --ink: #1F2340;
+      --muted: #5E6380;
+      --line: #E4E5EE;
+      --page: #FFFFFF;
+      --tint: #F6F6FB;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+    a { color: var(--brand); }
+    img { max-width: 100%; }
+    [hidden] { display: none !important; }
+
+    .bar {
+      position: sticky; top: 0; z-index: 5;
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+    }
+    .bar img { width: 28px; height: 28px; border-radius: 8px; }
+    .bar strong { font-size: 16px; flex: 1; }
+    .lang { display: flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+    .lang button {
+      border: 0; background: none; padding: 6px 12px;
+      font: inherit; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer;
+    }
+    .lang button[aria-pressed="true"] { background: var(--brand); color: #fff; }
+
+    main { max-width: 760px; margin: 0 auto; padding: 0 16px 40px; }
+
+    .hero { display: flex; gap: 18px; align-items: center; padding: 24px 0 18px; }
+    .hero img { width: 88px; height: 88px; border-radius: 22px; box-shadow: 0 2px 10px rgba(31, 35, 64, 0.16); flex: none; }
+    .hero h1 { margin: 0; font-size: 26px; line-height: 1.15; }
+    .maker { margin: 4px 0 0; color: var(--green); font-weight: 700; font-size: 14px; }
+    .tags { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+
+    .stats {
+      display: flex; overflow-x: auto; scrollbar-width: none;
+      margin: 0 -16px; padding: 4px 16px 14px;
+    }
+    .stats::-webkit-scrollbar { display: none; }
+    .stat { flex: 1 0 auto; min-width: 84px; text-align: center; padding: 0 12px; }
+    .stat + .stat { border-left: 1px solid var(--line); }
+    .stat b { display: block; font-size: 15px; white-space: nowrap; }
+    .stat span { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+    .banner {
+      display: flex; gap: 10px; align-items: flex-start;
+      margin: 4px 0 12px; padding: 12px 14px;
+      border-radius: 14px; font-size: 14px; font-weight: 600;
+    }
+    .banner.update { background: #FFF4DC; color: #7A4B00; }
+    .banner.current { background: #E5F6EC; color: var(--green-dark); }
+    .banner .dot { font-size: 18px; line-height: 1.2; }
+
+    .get {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 14px 16px;
+      border-radius: 14px; background: var(--green); color: #fff;
+      font-size: 17px; font-weight: 800; text-decoration: none;
+      box-shadow: 0 4px 14px rgba(26, 143, 90, 0.28);
+      transition: transform 0.1s, background 0.15s;
+    }
+    .get:hover { background: var(--green-dark); }
+    .get:active { transform: scale(0.98); }
+    .get svg { width: 22px; height: 22px; flex: none; }
+    .under { margin: 8px 0 0; text-align: center; color: var(--muted); font-size: 12.5px; }
+    .started { margin: 10px 0 0; padding: 10px 14px; border-radius: 12px; background: var(--brand-soft); font-size: 13.5px; }
+
+    .ios {
+      padding: 16px; border-radius: 14px; background: #FFF4E5; color: #7A4B00;
+      font-size: 15px; line-height: 1.5;
+    }
+
+    .shots {
+      display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory;
+      margin: 22px -16px 0; padding: 0 16px 8px; scrollbar-width: thin;
+    }
+    .shots button {
+      flex: none; padding: 0; border: 0; background: none; cursor: zoom-in;
+      scroll-snap-align: start; border-radius: 14px; overflow: hidden;
+      box-shadow: 0 1px 6px rgba(31, 35, 64, 0.14);
+    }
+    .shots img { display: block; height: 300px; width: auto; }
+
+    section { margin-top: 26px; }
+    h2 { font-size: 18px; margin: 0 0 8px; }
+    p { margin: 0 0 10px; }
+
+    .mods { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 12px; }
+    .mod { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; background: var(--tint); font-size: 14px; font-weight: 600; }
+    .mod i { font-style: normal; font-size: 22px; }
+
+    .notes { position: relative; max-height: 230px; overflow: hidden; }
+    .notes.open { max-height: none; }
+    .notes:not(.open)::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 70px;
+      background: linear-gradient(rgba(255, 255, 255, 0), #fff);
+    }
+    .notes h3 { font-size: 14.5px; margin: 14px 0 4px; }
+    .notes ul { margin: 0 0 6px; padding-left: 20px; }
+    .notes li { margin: 2px 0; }
+    .when { color: var(--muted); font-size: 13px; margin-bottom: 6px; }
+    .more {
+      margin-top: 6px; border: 0; background: none; padding: 6px 0;
+      font: inherit; font-weight: 700; color: var(--brand); cursor: pointer;
+    }
+
+    ol.steps { margin: 0; padding: 0; list-style: none; counter-reset: s; }
+    ol.steps li { counter-increment: s; display: flex; gap: 12px; margin: 0 0 12px; }
+    ol.steps li::before {
+      content: counter(s); flex: none; width: 28px; height: 28px; border-radius: 50%;
+      background: var(--brand); color: #fff; font-weight: 800; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .tip { padding: 12px 14px; border-radius: 12px; background: var(--tint); font-size: 14px; }
+    .tip + .tip { margin-top: 8px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    td { padding: 9px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+    td:first-child { color: var(--muted); width: 42%; padding-right: 12px; }
+
+    footer { max-width: 760px; margin: 0 auto; padding: 20px 16px 36px; color: var(--muted); font-size: 13px; text-align: center; }
+
+    .zoom {
+      position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center;
+      background: rgba(15, 17, 32, 0.88); padding: 16px; cursor: zoom-out;
+    }
+    .zoom img { max-height: 92vh; max-width: 100%; border-radius: 16px; }
+
+    @media (min-width: 640px) {
+      .hero img { width: 112px; height: 112px; border-radius: 26px; }
+      .hero h1 { font-size: 32px; }
+      .get { width: auto; min-width: 280px; display: inline-flex; }
+      .cta { text-align: left; }
+      .under { text-align: left; }
+      .shots img { height: 380px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="bar">
+    <img src="assets/icon-192.png" alt="">
+    <strong>E-Tarabay</strong>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="fil" aria-pressed="true">FIL</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <img src="assets/icon-512.png" alt="E-Tarabay">
+      <div>
+        <h1>E-Tarabay</h1>
+        <p class="maker" data-t="tagline">Ang Kabataan ay Pag-asa ng Bayan</p>
+        <p class="tags" data-t="tags">Pang-edukasyon · Para sa daycare · Libre</p>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b id="stVersion">—</b><span data-t="stVersion">Bersyon</span></div>
+      <div class="stat"><b id="stSize">—</b><span data-t="stSize">Laki</span></div>
+      <div class="stat"><b data-t="ageVal">3–5</b><span data-t="stAge">Edad</span></div>
+      <div class="stat"><b>3</b><span data-t="stLang">Wika</span></div>
+      <div class="stat"><b>✓</b><span data-t="stOffline">Kahit offline</span></div>
+    </div>
+
+    <div id="bannerUpdate" class="banner update" hidden>
+      <span class="dot">⬆️</span><span id="bannerUpdateText"></span>
+    </div>
+    <div id="bannerCurrent" class="banner current" hidden>
+      <span class="dot">✅</span><span id="bannerCurrentText"></span>
+    </div>
+
+    <div id="android" class="cta">
+      <a id="get" class="get" href="https://github.com/Jaijr711/etarabay-releases/releases/latest/download/E-Tarabay.apk">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+        <span id="getLabel">I-install</span>
+      </a>
+      <p class="under" id="under" data-t="under">Para sa Android 5.0 pataas</p>
+      <p class="started" id="started" hidden data-t="started">Nagsimula na ang download. Kapag tapos na, buksan ang file para i-install — tingnan ang mga hakbang sa ibaba.</p>
+    </div>
+
+    <div id="ios" class="ios" hidden data-t="ios">
+      <strong>Para sa Android lamang ang E-Tarabay.</strong> Hindi ito magagamit sa iPhone o iPad.
+    </div>
+
+    <div class="shots" id="shots">
+      <button type="button"><img src="assets/shot1.jpg" alt="Mga Aralin" loading="lazy"></button>
+      <button type="button"><img src="assets/shot2.jpg" alt="Bilang" loading="lazy"></button>
+      <button type="button"><img src="assets/shot3.jpg" alt="Ang Aking Sarili" loading="lazy"></button>
+      <button type="button"><img src="assets/shot4.jpg" alt="Aklat Pangkulay" loading="lazy"></button>
+      <button type="button"><img src="assets/shot5.jpg" alt="Gantimpala" loading="lazy"></button>
+      <button type="button"><img src="assets/shot6.jpg" alt="Talaan ng Guro" loading="lazy"></button>
+    </div>
+
+    <section>
+      <h2 data-t="aboutH">Tungkol sa app</h2>
+      <p data-t="about1">Ang E-Tarabay ay learning app para sa mga batang nasa daycare, edad 3 hanggang 5. Natututo silang magbasa, magbilang, sumulat at magkulay sa Ilocano, Filipino at English — at gumagana ito kahit walang internet.</p>
+      <p data-t="about2">May bituin at medalya sa bawat natapos, at Sertipiko ng Pagtatapos kapag natapos ang lahat.</p>
+      <div class="mods">
+        <div class="mod"><i>📖</i><span data-t="m1">Magbasa Tayo</span></div>
+        <div class="mod"><i>🔢</i><span data-t="m2">Bilang</span></div>
+        <div class="mod"><i>👨‍👩‍👧</i><span data-t="m3">Ang Aking Sarili</span></div>
+        <div class="mod"><i>✏️</i><span data-t="m4">Sundan Mo</span></div>
+        <div class="mod"><i>🎨</i><span data-t="m5">Masayang Pagkukulay</span></div>
+        <div class="mod"><i>🧠</i><span data-t="m6">Tandaan!</span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2 data-t="forH">Para sa teacher at magulang</h2>
+      <p data-t="for1">May sariling Talaan ng Guro ang teacher: dito ini-enroll ang mga bata, nakikita ang progress ng bawat isa, at may login card para sa magulang. Protektado ito ng Privacy Agreement (RA 10173) at ng PIN.</p>
+      <p data-t="for2">Ang magulang ay nagla-login gamit ang username at Student Number ng anak, kaya nasusundan ang progress kahit lumipat ng phone.</p>
+    </section>
+
+    <section id="newSection" hidden>
+      <h2 data-t="newH">Ano ang bago</h2>
+      <div class="when" id="newWhen"></div>
+      <div class="notes" id="notes"></div>
+      <button type="button" class="more" id="more" data-t="more">Higit pa</button>
+    </section>
+
+    <section id="how">
+      <h2 data-t="howH">Paano i-install</h2>
+      <ol class="steps">
+        <li><span data-t="s1">Pindutin ang I-install sa itaas at hintaying matapos ang download.</span></li>
+        <li><span data-t="s2">Buksan ang na-download na file (E-Tarabay.apk) mula sa notification o sa Downloads.</span></li>
+        <li><span data-t="s3">Kapag itinanong, payagan ang "Install unknown apps" para sa browser mo, saka bumalik.</span></li>
+        <li><span data-t="s4">Pindutin ang Install. Tapos na — buksan ang E-Tarabay!</span></li>
+      </ol>
+      <p class="tip" data-t="tipUpdate"><strong>Pag-update:</strong> pareho lang ang mga hakbang. Hindi nawawala ang stars, awards at progress ng bata.</p>
+      <p class="tip" data-t="tipOld"><strong>Kung v1.2.48 o mas luma ang nasa phone:</strong> i-uninstall muna ang lumang E-Tarabay bago i-install ito. Babalik ang stars, awards at progress pagka-sign in ulit.</p>
+    </section>
+
+    <section>
+      <h2 data-t="infoH">Impormasyon</h2>
+      <table>
+        <tr><td data-t="iVersion">Bersyon</td><td id="iVersion">—</td></tr>
+        <tr><td data-t="iUpdated">Na-update</td><td id="iUpdated">—</td></tr>
+        <tr><td data-t="iSize">Laki ng download</td><td id="iSize">—</td></tr>
+        <tr><td data-t="iNeeds">Kailangan</td><td data-t="iNeedsVal">Android 5.0 pataas</td></tr>
+        <tr><td data-t="iLangs">Mga wika</td><td>Ilocano, Filipino, English</td></tr>
+        <tr><td data-t="iPrice">Presyo</td><td data-t="iPriceVal">Libre</td></tr>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <span data-t="foot">Lahat ng bersyon:</span>
+    <a href="https://github.com/Jaijr711/etarabay-releases/releases">github.com/Jaijr711/etarabay-releases</a>
+  </footer>
+
+  <div class="zoom" id="zoom" hidden><img alt=""></div>
+
+  <script>
+    (function () {
+      var REPO = 'Jaijr711/etarabay-releases';
+
+      var T = {
+        fil: {
+          tagline: 'Ang Kabataan ay Pag-asa ng Bayan',
+          tags: 'Pang-edukasyon · Para sa daycare · Libre',
+          stVersion: 'Bersyon', stSize: 'Laki', ageVal: '3–5', stAge: 'Edad',
+          stLang: 'Wika', stOffline: 'Kahit offline',
+          install: 'I-install', update: 'I-update sa {v}',
+          under: 'Para sa Android 5.0 pataas',
+          started: 'Nagsimula na ang download. Kapag tapos na, buksan ang file para i-install — tingnan ang mga hakbang sa ibaba.',
+          bannerUpdate: 'May bagong update: bersyon {new}. Ang nasa phone mo: {old}. Pindutin ang I-update.',
+          bannerCurrent: 'Pinakabago na ang app mo (bersyon {v}).',
+          ios: '<strong>Para sa Android lamang ang E-Tarabay.</strong> Hindi ito magagamit sa iPhone o iPad.',
+          aboutH: 'Tungkol sa app',
+          about1: 'Ang E-Tarabay ay learning app para sa mga batang nasa daycare, edad 3 hanggang 5. Natututo silang magbasa, magbilang, sumulat at magkulay sa Ilocano, Filipino at English — at gumagana ito kahit walang internet.',
+          about2: 'May bituin at medalya sa bawat natapos, at Sertipiko ng Pagtatapos kapag natapos ang lahat.',
+          m1: 'Magbasa Tayo', m2: 'Bilang', m3: 'Ang Aking Sarili', m4: 'Sundan Mo', m5: 'Masayang Pagkukulay', m6: 'Tandaan!',
+          forH: 'Para sa teacher at magulang',
+          for1: 'May sariling Talaan ng Guro ang teacher: dito ini-enroll ang mga bata, nakikita ang progress ng bawat isa, at may login card para sa magulang. Protektado ito ng Privacy Agreement (RA 10173) at ng PIN.',
+          for2: 'Ang magulang ay nagla-login gamit ang username at Student Number ng anak, kaya nasusundan ang progress kahit lumipat ng phone.',
+          newH: 'Ano ang bago', more: 'Higit pa', less: 'Mas kaunti',
+          released: 'Bersyon {v} · {d}',
+          howH: 'Paano i-install',
+          s1: 'Pindutin ang I-install sa itaas at hintaying matapos ang download.',
+          s2: 'Buksan ang na-download na file (E-Tarabay.apk) mula sa notification o sa Downloads.',
+          s3: 'Kapag itinanong, payagan ang "Install unknown apps" para sa browser mo, saka bumalik.',
+          s4: 'Pindutin ang Install. Tapos na — buksan ang E-Tarabay!',
+          tipUpdate: '<strong>Pag-update:</strong> pareho lang ang mga hakbang. Hindi nawawala ang stars, awards at progress ng bata.',
+          tipOld: '<strong>Kung v1.2.48 o mas luma ang nasa phone:</strong> i-uninstall muna ang lumang E-Tarabay bago i-install ito. Babalik ang stars, awards at progress pagka-sign in ulit.',
+          infoH: 'Impormasyon', iVersion: 'Bersyon', iUpdated: 'Na-update', iSize: 'Laki ng download',
+          iNeeds: 'Kailangan', iNeedsVal: 'Android 5.0 pataas', iLangs: 'Mga wika',
+          iPrice: 'Presyo', iPriceVal: 'Libre',
+          foot: 'Lahat ng bersyon:',
+          months: ['Ene', 'Peb', 'Mar', 'Abr', 'May', 'Hun', 'Hul', 'Ago', 'Set', 'Okt', 'Nob', 'Dis']
+        },
+        en: {
+          tagline: 'The youth is the hope of the nation',
+          tags: 'Education · For daycare · Free',
+          stVersion: 'Version', stSize: 'Size', ageVal: '3–5', stAge: 'Ages',
+          stLang: 'Languages', stOffline: 'Works offline',
+          install: 'Install', update: 'Update to {v}',
+          under: 'For Android 5.0 and up',
+          started: 'The download has started. When it is done, open the file to install it — see the steps below.',
+          bannerUpdate: 'A new update is out: version {new}. Your phone has {old}. Tap Update.',
+          bannerCurrent: 'Your app is up to date (version {v}).',
+          ios: '<strong>E-Tarabay is for Android only.</strong> It cannot be used on an iPhone or iPad.',
+          aboutH: 'About this app',
+          about1: 'E-Tarabay is a learning app for daycare children aged 3 to 5. They learn to read, count, write and colour in Ilocano, Filipino and English — and it works without internet.',
+          about2: 'Every finished activity earns stars and medals, and finishing everything earns a Certificate of Completion.',
+          m1: "Let's Read", m2: 'Numbers', m3: 'About Me', m4: 'Trace It', m5: 'Color Fun', m6: 'Remember It!',
+          forH: 'For teachers and parents',
+          for1: "The teacher has a class dashboard: enrol the children, see each child's progress, and print a login card for parents. It is protected by a Privacy Agreement (RA 10173) and a PIN.",
+          for2: "Parents sign in with their child's username and Student Number, so progress follows the child even on a new phone.",
+          newH: "What's new", more: 'More', less: 'Less',
+          released: 'Version {v} · {d}',
+          howH: 'How to install',
+          s1: 'Tap Install above and wait for the download to finish.',
+          s2: 'Open the downloaded file (E-Tarabay.apk) from the notification or your Downloads.',
+          s3: 'If asked, allow "Install unknown apps" for your browser, then go back.',
+          s4: 'Tap Install. Done — open E-Tarabay!',
+          tipUpdate: "<strong>Updating:</strong> the same steps. The child's stars, awards and progress stay.",
+          tipOld: '<strong>If the phone has v1.2.48 or older:</strong> uninstall the old E-Tarabay first, then install this one. Stars, awards and progress come back when you sign in.',
+          infoH: 'Information', iVersion: 'Version', iUpdated: 'Updated', iSize: 'Download size',
+          iNeeds: 'Requires', iNeedsVal: 'Android 5.0 and up', iLangs: 'Languages',
+          iPrice: 'Price', iPriceVal: 'Free',
+          foot: 'All versions:',
+          months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        }
+      };
+
+      var query = new URLSearchParams(location.search);
+      // The version the app says it has, from its update button.
+      var installed = (query.get('v') || '').replace(/^v/, '');
+      var release = null;
+      var lang = 'fil';
+      try {
+        var saved = localStorage.getItem('etarabay-site-lang');
+        if (saved === 'fil' || saved === 'en') lang = saved;
+      } catch (e) { /* private window: Filipino */ }
+      if (query.get('lang') === 'en' || query.get('lang') === 'fil') lang = query.get('lang');
+
+      function $(id) { return document.getElementById(id); }
+      function fill(s, vars) {
+        return s.replace(/\{(\w+)\}/g, function (_, k) { return vars[k] == null ? '' : vars[k]; });
+      }
+      function escapeHtml(s) {
+        return s.replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+
+      // Same rule as the app's UpdateChecker: part by part, each part read
+      // by its leading digits, the shorter side padded with zeros.
+      function compare(a, b) {
+        var pa = a.split('.'), pb = b.split('.');
+        for (var i = 0; i < Math.max(pa.length, pb.length); i++) {
+          var x = parseInt((pa[i] || '').match(/^\d*/)[0] || '0', 10);
+          var y = parseInt((pb[i] || '').match(/^\d*/)[0] || '0', 10);
+          if (x !== y) return x < y ? -1 : 1;
+        }
+        return 0;
+      }
+
+      function latestVersion() {
+        return release ? String(release.tag_name || '').replace(/^v/, '') : '';
+      }
+
+      function formatDate(iso) {
+        var d = new Date(iso);
+        if (isNaN(d)) return '';
+        return T[lang].months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+      }
+
+      function render() {
+        var t = T[lang];
+        document.documentElement.lang = lang;
+        document.querySelectorAll('[data-t]').forEach(function (el) {
+          var v = t[el.getAttribute('data-t')];
+          if (v != null) el.innerHTML = v;
+        });
+        document.querySelectorAll('.lang button').forEach(function (b) {
+          b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === lang));
+        });
+
+        var latest = latestVersion();
+        var needsUpdate = installed && latest && compare(latest, installed) > 0;
+        var upToDate = installed && latest && !needsUpdate;
+        $('getLabel').textContent = needsUpdate ? fill(t.update, { v: latest }) : t.install;
+        $('bannerUpdate').hidden = !needsUpdate;
+        $('bannerCurrent').hidden = !upToDate;
+        if (needsUpdate) $('bannerUpdateText').textContent = fill(t.bannerUpdate, { 'new': latest, old: installed });
+        if (upToDate) $('bannerCurrentText').textContent = fill(t.bannerCurrent, { v: installed });
+
+        if (release) {
+          var date = formatDate(release.published_at);
+          $('iUpdated').textContent = date || '—';
+          $('newWhen').textContent = fill(t.released, { v: latest, d: date });
+        }
+        $('more').textContent = $('notes').classList.contains('open') ? t.less : t.more;
+      }
+
+      // Release notes as plain lines: "- " starts a bullet, a short line
+      // just before bullets is their heading, "---" is dropped.
+      function renderNotes(body) {
+        var lines = String(body || '').replace(/\r/g, '').split('\n');
+        var html = '', inList = false;
+        for (var i = 0; i < lines.length; i++) {
+          var line = lines[i].trim();
+          if (!line || /^-{3,}$/.test(line)) {
+            if (inList) { html += '</ul>'; inList = false; }
+            continue;
+          }
+          var text = escapeHtml(line.replace(/^#+\s*/, '').replace(/\*\*/g, ''));
+          if (/^[-*•]\s+/.test(line)) {
+            if (!inList) { html += '<ul>'; inList = true; }
+            html += '<li>' + text.replace(/^[-*•]\s+/, '') + '</li>';
+            continue;
+          }
+          if (inList) { html += '</ul>'; inList = false; }
+          var next = '';
+          for (var j = i + 1; j < lines.length && !next; j++) next = lines[j].trim();
+          if (line.length <= 40 && /^[-*•]\s+/.test(next)) html += '<h3>' + text + '</h3>';
+          else html += '<p>' + text + '</p>';
+        }
+        if (inList) html += '</ul>';
+        return html;
+      }
+
+      document.querySelectorAll('.lang button').forEach(function (b) {
+        b.addEventListener('click', function () {
+          lang = b.getAttribute('data-lang');
+          try { localStorage.setItem('etarabay-site-lang', lang); } catch (e) { /* fine */ }
+          render();
+        });
+      });
+
+      $('more').addEventListener('click', function () {
+        $('notes').classList.toggle('open');
+        render();
+      });
+
+      $('get').addEventListener('click', function () {
+        $('started').hidden = false;
+      });
+
+      var zoom = $('zoom');
+      document.querySelectorAll('#shots img').forEach(function (img) {
+        img.parentNode.addEventListener('click', function () {
+          zoom.querySelector('img').src = img.src;
+          zoom.hidden = false;
+        });
+      });
+      zoom.addEventListener('click', function () { zoom.hidden = true; });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') zoom.hidden = true;
+      });
+
+      // iPadOS reports itself as a Mac; a Mac has no touch screen.
+      var ua = navigator.userAgent || '';
+      if (/iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) {
+        $('android').hidden = true;
+        $('ios').hidden = false;
+      }
+
+      render();
+
+      fetch('https://api.github.com/repos/' + REPO + '/releases/latest',
+            { headers: { Accept: 'application/vnd.github+json' } })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          if (!data || !data.tag_name) return;
+          release = data;
+          var assets = data.assets || [];
+          var apk = assets.filter(function (a) { return a.name === 'E-Tarabay.apk'; })[0] ||
+                    assets.filter(function (a) { return /\.apk$/i.test(a.name); })[0];
+          if (apk) {
+            $('get').href = apk.browser_download_url;
+            var mb = Math.round(apk.size / 1048576) + ' MB';
+            $('stSize').textContent = mb;
+            $('iSize').textContent = mb;
+          }
+          $('stVersion').textContent = latestVersion();
+          $('iVersion').textContent = latestVersion();
+          if (data.body && data.body.trim()) {
+            $('notes').innerHTML = renderNotes(data.body);
+            $('newSection').hidden = false;
+          }
+          render();
+          // Sent here by the app's update button: straight to the button.
+          if (installed && compare(latestVersion(), installed) > 0) {
+            $('bannerUpdate').scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        })
+        .catch(function () { /* the button still points at the newest APK */ });
+    })();
+  </script>
+</body>
+</html>

@@ -107,16 +107,9 @@
     }
   },
   "whichIsMore": "Alin ang mas marami, kaliwa o kanan?",
-  "whichIsLess": "Alin ang mas kaunti?",
+  "whichIsLess": "Alin ang mas kaunti, kaliwa o kanan?",
   "isSameNumber": "Magkakaparehong bilang?",
-  "arrange": "Iayos: {sequence}",
-  "@arrange": {
-    "placeholders": {
-      "sequence": {
-        "type": "String"
-      }
-    }
-  },
+  "arrange": "Ayusin ang mga numero, mula sa pinakamaliit",
   "selectCorrectAnswer": "Piliin ang tamang sagot:",
   "tapLeftTapRight": "Pindutin ang mga grupo (kaliwa) → Pindutin ang bilang (kanan)",
   "angAkingSariliTitle": "Ang Aking Sarili",
@@ -129,7 +122,7 @@
   "familyActivities": "Gawain ng Pamilya",
   "familyTree": "Talaan ng Pamilya",
   "myHome": "Ang Aking Tahanan",
-  "whatIsYourName": "Ano ang pangalan  mo?",
+  "whatIsYourName": "Ano ang pangalan mo?",
   "howOldAreYou": "Ilang taon ka na?",
   "areYouBoyOrGirl": "Ikaw ba ay lalaki o babae?",
   "whatIsYourNameDescription": "Ang iyong pangalan ay ang tawag sa iyo ng iyong pamilya at kaibigan. Mahalaga ito dahil bahagi ito ng kung sino ka!",
@@ -833,5 +826,9 @@
   "certEarnedBody": "Nakuha mo ang iyong\nSertipiko ng Pagtatapos!",
   "certEarnedView": "Tingnan ang Sertipiko",
   "lineMatched": "natugma",
-  "studentFallback": "Mag-aaral"
+  "studentFallback": "Mag-aaral",
+  "authNeedsInternet": "Walang internet. Walang nabago — subukan ulit kapag may internet na.",
+  "authFinishesOnline": "Naputol ang koneksyon. Kusa itong matatapos pagbalik ng internet.",
+  "authRemoveFailed": "Hindi naalis ang bata. Subukan ulit.",
+  "studentRemoved": "Naalis na ang bata."
 }

@@ -445,13 +445,13 @@ abstract class AppLocalizations {
   /// No description provided for @whichIsMore.
   ///
   /// In en, this message translates to:
-  /// **'Which side have more, left or right?'**
+  /// **'Which side has more, left or right?'**
   String get whichIsMore;
 
   /// No description provided for @whichIsLess.
   ///
   /// In en, this message translates to:
-  /// **'Which side have lesser, left or right?'**
+  /// **'Which side has fewer, left or right?'**
   String get whichIsLess;
 
   /// No description provided for @isSameNumber.
@@ -463,8 +463,8 @@ abstract class AppLocalizations {
   /// No description provided for @arrange.
   ///
   /// In en, this message translates to:
-  /// **'Arrange the numbers in the correct order/Sequence: {sequence}'**
-  String arrange(String sequence);
+  /// **'Put the numbers in order, smallest first'**
+  String get arrange;
 
   /// No description provided for @selectCorrectAnswer.
   ///
@@ -1664,7 +1664,7 @@ abstract class AppLocalizations {
   /// No description provided for @resetAllStudents.
   ///
   /// In en, this message translates to:
-  /// **'Reset All Students'**
+  /// **'Delete All Students'**
   String get resetAllStudents;
 
   /// No description provided for @confirmResetAllStudents.
@@ -4288,6 +4288,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Student'**
   String get studentFallback;
+
+  /// A removal or reset was not sent because the phone is offline
+  ///
+  /// In en, this message translates to:
+  /// **'No internet. Nothing was changed — try again once you are online.'**
+  String get authNeedsInternet;
+
+  /// A removal or reset was sent but the server has not confirmed it yet
+  ///
+  /// In en, this message translates to:
+  /// **'The connection dropped. It will finish on its own once the internet is back.'**
+  String get authFinishesOnline;
+
+  /// Removing one child failed
+  ///
+  /// In en, this message translates to:
+  /// **'Could not remove the child. Please try again.'**
+  String get authRemoveFailed;
+
+  /// Shown after the teacher removes a child
+  ///
+  /// In en, this message translates to:
+  /// **'Child removed.'**
+  String get studentRemoved;
 }
 
 class _AppLocalizationsDelegate

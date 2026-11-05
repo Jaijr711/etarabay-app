@@ -79,8 +79,8 @@ void main() {
           home: home,
         ),
       ));
-      await tester.runAsync(
-          () => Future<void>.delayed(const Duration(seconds: 2)));
+      await tester
+          .runAsync(() => Future<void>.delayed(const Duration(seconds: 2)));
       await tester.pump(const Duration(seconds: 3));
       await tester.runAsync(() async {
         for (final img in tester.widgetList<Image>(find.byType(Image))) {

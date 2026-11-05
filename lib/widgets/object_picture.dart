@@ -90,7 +90,6 @@ class ObjectPicture extends StatelessWidget {
     '👵': 'lola',
     '🧑': 'kuya',
     '👶': 'sanggol',
-    '👤': 'tao',
     // The whole family, as on the Family Members lesson card — it was the
     // one answer in About Me still drawn as a flat emoji.
     '👨‍👩‍👧': 'magulang',
@@ -147,9 +146,7 @@ class ObjectPicture extends StatelessWidget {
     '🎯': 'tumbang_preso',
     '🎮': 'laro',
     '🎁': 'regalo',
-    '🎉': 'salubong',
     '📚': 'aklat',
-    '📖': 'bukas_aklat',
 
     // Feelings, sky and garden
     '😴': 'tulog',

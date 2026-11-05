@@ -54,7 +54,8 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider('fil')),
-        ChangeNotifierProvider<AudioManager>.value(value: AudioManager.instance),
+        ChangeNotifierProvider<AudioManager>.value(
+            value: AudioManager.instance),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -73,7 +74,8 @@ void main() {
     await tester.runAsync(() async {
       for (final img in tester.widgetList<Image>(find.byType(Image))) {
         try {
-          await precacheImage(img.image, tester.element(find.byWidget(img).first));
+          await precacheImage(
+              img.image, tester.element(find.byWidget(img).first));
         } catch (_) {}
       }
     });
@@ -118,8 +120,8 @@ void main() {
     };
     try {
       await show(tester, const LessonsScreen());
-      await tester.scrollUntilVisible(
-          find.text('Tandaan!'), 200, scrollable: find.byType(Scrollable).first);
+      await tester.scrollUntilVisible(find.text('Tandaan!'), 200,
+          scrollable: find.byType(Scrollable).first);
       for (int i = 0; i < 6; i++) {
         await tester.pump(const Duration(milliseconds: 200));
       }

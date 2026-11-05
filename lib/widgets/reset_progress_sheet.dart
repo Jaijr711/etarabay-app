@@ -38,18 +38,30 @@ Future<bool> showResetProgressSheet(
   if (choice == null) return false;
 
   final auth = AuthService();
-  final success = choice.all
+  final result = choice.all
       ? await auth.resetStudentActivityProgress(studentId)
       : await auth.resetStudentSpecificActivities(
           studentId, choice.keys.toList());
+  // Sent but not yet confirmed counts: it finishes on its own, and saying
+  // "failed" had teachers press it again.
+  final success = result['status'] != 'Error';
   messenger.showSnackBar(SnackBar(
-    content:
-        Text(success ? loc.resetActivitiesDone : loc.resetActivitiesFailed),
-    backgroundColor: success ? Colors.green : Colors.red,
+    content: Text(switch (result['code']) {
+      _ when result['status'] == 'Success' => loc.resetActivitiesDone,
+      'needsInternet' => loc.authNeedsInternet,
+      'finishesOnline' => loc.authFinishesOnline,
+      _ => loc.resetActivitiesFailed,
+    }),
+    backgroundColor: result['status'] == 'Success'
+        ? Colors.green
+        : success
+            ? Colors.orange.shade800
+            : Colors.red,
   ));
   if (success && userProvider.currentStudentId == studentId) {
     try {
-      await userProvider.resetAllProgressLocally();
+      await userProvider.resetAllProgressLocally(
+          scope: choice.all ? 'all' : choice.keys.join(','));
     } catch (_) {}
   }
   return success;

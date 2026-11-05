@@ -61,7 +61,8 @@ void main() {
       'avatar': 'animal_bunny',
       'stars': 140,
     });
-    final sdkFonts = '${Platform.environment['FLUTTER_ROOT'] ?? r'C:\develop\flutter'}'
+    final sdkFonts =
+        '${Platform.environment['FLUTTER_ROOT'] ?? r'C:\develop\flutter'}'
         r'\bin\cache\artifacts\material_fonts';
     final pubCache = '${Platform.environment['LOCALAPPDATA']}'
         r'\Pub\Cache\hosted\pub.dev';
@@ -123,7 +124,8 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider('en')),
-        ChangeNotifierProvider<AudioManager>.value(value: AudioManager.instance),
+        ChangeNotifierProvider<AudioManager>.value(
+            value: AudioManager.instance),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -273,8 +275,8 @@ void main() {
     await shot(t, 'p07b_trace_board');
   });
 
-  plate('08_stories', () => const MagbasaScreen(),
-      (t) => shot(t, 'p08_stories'));
+  plate(
+      '08_stories', () => const MagbasaScreen(), (t) => shot(t, 'p08_stories'));
   plate('08_story', () {
     final d = MagbasaContent.getStoryData()['ni_marti']!;
     return StoryScreen(storyTitle: d['title'], storyData: d);
@@ -294,8 +296,8 @@ void main() {
     await shot(t, 'p09b_cards');
   });
 
-  plate('10_lessons', () => const LessonsScreen(),
-      (t) => shot(t, 'p10_lessons'));
+  plate(
+      '10_lessons', () => const LessonsScreen(), (t) => shot(t, 'p10_lessons'));
   plate('11_awards', () => const AwardsScreen(), (t) => shot(t, 'p11_awards'),
       prefs: played);
   plate('11_certificates', () => const CertificatesScreen(),

@@ -666,7 +666,9 @@ class _KulayScreenState extends State<KulayScreen>
       _loadInProgressPreviews();
       // The sign-in read may have missed; this is another go at it.
       final provider = Provider.of<UserProvider>(context, listen: false);
-      if (!provider.creationsPulled) unawaited(provider.pullCreationsFromCloud());
+      if (!provider.creationsPulled) {
+        unawaited(provider.pullCreationsFromCloud());
+      }
     });
 
     _audioPlayer = AudioPlayer();
@@ -706,7 +708,7 @@ class _KulayScreenState extends State<KulayScreen>
     _transformationController.removeListener(_onTransformChanged);
     _transformationController.dispose();
     _bakedStrokes?.dispose();
-    AudioManager.instance.resumeHomeMusic();
+    AudioManager.instance.resumeHomeMusicAfter(ModuleMusic.kulay);
     super.dispose();
   }
 
@@ -1040,9 +1042,12 @@ class _KulayScreenState extends State<KulayScreen>
   // ─────────────────────────────────────────────────────────────────────────
 
   Future<void> _loadPageImage() async {
-    if (_selectedPage == null) return;
-    final art = await _pageArt(_selectedPage!.imagePath);
-    if (art == null) return;
+    final page = _selectedPage;
+    if (page == null) return;
+    final art = await _pageArt(page.imagePath);
+    // Opened, left, and another page opened while this one was still
+    // decoding: its picture must not land on the new page.
+    if (art == null || !identical(_selectedPage, page)) return;
     _baseImage = art.image;
     _baseRgba = art.rgba;
     // A copy to color on: the decoded picture stays clean in the cache.
@@ -1337,8 +1342,9 @@ class _KulayScreenState extends State<KulayScreen>
   }
 
   Future<void> _loadAutoSave() async {
-    if (_selectedPage == null) return;
-    final pageName = _selectedPage!.name;
+    final page = _selectedPage;
+    if (page == null) return;
+    final pageName = page.name;
     final key = _autoSaveKey(pageName);
     final prefs = await SharedPreferences.getInstance();
 
@@ -1391,7 +1397,9 @@ class _KulayScreenState extends State<KulayScreen>
       }
     }
 
-    if (!mounted) return;
+    // Another page opened while this one's colors were loading: they
+    // belong to this one, not to that.
+    if (!mounted || !identical(_selectedPage, page)) return;
     final oldBaked = _bakedStrokes;
     setState(() {
       if (loadedStrokes != null) {
@@ -3246,9 +3254,11 @@ class _KulayScreenState extends State<KulayScreen>
     });
     oldBaked?.dispose();
     _maskCache.clear();
-    _loadPageImage()
-        .then((_) => _loadAutoSave())
-        .then((_) => _rebuildStrokeMasks());
+    _loadPageImage().then((_) async {
+      if (!identical(_selectedPage, page)) return;
+      await _loadAutoSave();
+      if (identical(_selectedPage, page)) await _rebuildStrokeMasks();
+    });
   }
 
   Widget _pageCard(ColoringPage page, ColoringCategory cat) {

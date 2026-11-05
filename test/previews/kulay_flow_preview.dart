@@ -109,7 +109,8 @@ void main() {
       final board = tester.getRect(find.byType(InteractiveViewer));
       for (final dy in [0.45, 0.55, 0.65]) {
         await tester.dragFrom(
-            Offset(board.left + board.width * 0.3, board.top + board.height * dy),
+            Offset(
+                board.left + board.width * 0.3, board.top + board.height * dy),
             Offset(board.width * 0.4, 0));
         await settle();
       }

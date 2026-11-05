@@ -38,7 +38,13 @@ void main() {
         'bookworm': 1,
       },
       // 'numbers' earned but not yet taken: it shows the claim sparkle.
-      'claimedBadges': ['firstSteps', 'alphabet', 'colors', 'shapes', 'bookworm'],
+      'claimedBadges': [
+        'firstSteps',
+        'alphabet',
+        'colors',
+        'shapes',
+        'bookworm'
+      ],
     });
     for (final (family, file) in const [
       ('Roboto', r'C:\Windows\Fonts\arialbd.ttf'),
@@ -79,8 +85,8 @@ void main() {
             home: const AwardsScreen(),
           ),
         ));
-        await tester.runAsync(
-            () => Future<void>.delayed(const Duration(seconds: 2)));
+        await tester
+            .runAsync(() => Future<void>.delayed(const Duration(seconds: 2)));
         await tester.pump(const Duration(seconds: 3));
         await tester.runAsync(() async {
           for (final img in tester.widgetList<Image>(find.byType(Image))) {
@@ -93,8 +99,10 @@ void main() {
         for (int i = 0; i < 6; i++) {
           await tester.pump(const Duration(milliseconds: 300));
         }
-        await expectLater(find.byType(MaterialApp),
-            matchesGoldenFile('../../build/size_audit/awards_medals_$lang.png'));
+        await expectLater(
+            find.byType(MaterialApp),
+            matchesGoldenFile(
+                '../../build/size_audit/awards_medals_$lang.png'));
         await tester.pump(const Duration(seconds: 5));
       } finally {
         FlutterError.onError = original;

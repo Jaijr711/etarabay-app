@@ -106,17 +106,10 @@
       }
     }
   },
-  "whichIsMore": "Which side have more, left or right?",
-  "whichIsLess": "Which side have lesser, left or right?",
+  "whichIsMore": "Which side has more, left or right?",
+  "whichIsLess": "Which side has fewer, left or right?",
   "isSameNumber": "Same number?",
-  "arrange": "Arrange the numbers in the correct order/Sequence: {sequence}",
-  "@arrange": {
-    "placeholders": {
-      "sequence": {
-        "type": "String"
-      }
-    }
-  },
+  "arrange": "Put the numbers in order, smallest first",
   "selectCorrectAnswer": "Select the correct answer:",
   "tapLeftTapRight": "Tap the group (left) → tap the number (right)",
   "angAkingSariliTitle": "About Me",
@@ -402,7 +395,7 @@
       }
     }
   },
-  "resetAllStudents": "Reset All Students",
+  "resetAllStudents": "Delete All Students",
   "confirmResetAllStudents": "Are you sure you want to delete all enrolled students? This cannot be undone.",
   "confirm": "Confirm",
   "rateYourArtwork": "Rate Artwork",
@@ -1751,5 +1744,21 @@
   "studentFallback": "Student",
   "@studentFallback": {
     "description": "Shown in place of the child's name when the profile has none"
+  },
+  "authNeedsInternet": "No internet. Nothing was changed — try again once you are online.",
+  "@authNeedsInternet": {
+    "description": "A removal or reset was not sent because the phone is offline"
+  },
+  "authFinishesOnline": "The connection dropped. It will finish on its own once the internet is back.",
+  "@authFinishesOnline": {
+    "description": "A removal or reset was sent but the server has not confirmed it yet"
+  },
+  "authRemoveFailed": "Could not remove the child. Please try again.",
+  "@authRemoveFailed": {
+    "description": "Removing one child failed"
+  },
+  "studentRemoved": "Child removed.",
+  "@studentRemoved": {
+    "description": "Shown after the teacher removes a child"
   }
 }

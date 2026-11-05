@@ -54,6 +54,14 @@ String authMessage(BuildContext context, Map<String, dynamic> result) {
       return loc.authPasswordTooShort;
     case 'resetFailed':
       return loc.authResetFailed;
+    case 'resetProgressFailed':
+      return loc.resetActivitiesFailed;
+    case 'removeFailed':
+      return loc.authRemoveFailed;
+    case 'needsInternet':
+      return loc.authNeedsInternet;
+    case 'finishesOnline':
+      return loc.authFinishesOnline;
     default:
       return fallback;
   }

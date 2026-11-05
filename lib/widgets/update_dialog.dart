@@ -51,7 +51,7 @@ Future<void> showUpdateAvailableDialog(
             colors: FunColors.green,
             onTap: () {
               Navigator.pop(dialogContext);
-              UpdateChecker.instance.openDownload(update.apkUrl);
+              UpdateChecker.instance.openUpdatePage(update);
             },
           ),
         ],

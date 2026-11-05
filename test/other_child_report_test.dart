@@ -65,7 +65,8 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider('en')),
-        ChangeNotifierProvider<AudioManager>.value(value: AudioManager.instance),
+        ChangeNotifierProvider<AudioManager>.value(
+            value: AudioManager.instance),
       ],
       child: const MaterialApp(
         localizationsDelegates: [
@@ -98,8 +99,7 @@ void main() {
     final filled = tester
         .widgetList<Icon>(find.byIcon(Icons.star_rounded))
         .where((i) => i.color == const Color(0xFFF5A623));
-    expect(filled, isEmpty,
-        reason: 'stars from the last child on this device');
+    expect(filled, isEmpty, reason: 'stars from the last child on this device');
   });
 
   testWidgets("a record without its star totals still says what's possible",
@@ -125,7 +125,8 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider('en')),
-        ChangeNotifierProvider<AudioManager>.value(value: AudioManager.instance),
+        ChangeNotifierProvider<AudioManager>.value(
+            value: AudioManager.instance),
       ],
       child: const MaterialApp(
         localizationsDelegates: [
