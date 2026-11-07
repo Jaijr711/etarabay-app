@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import '../widgets/custom_back_button.dart';
 import '../widgets/fun_dialog.dart';
+import '../widgets/how_to_video.dart';
 import 'package:e_tarabay/l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
@@ -375,6 +376,17 @@ int? kulayNextUnfinished(List<bool> finished, int current) {
   return null;
 }
 
+/// The picture enlarged [scale] times with [focal] (a point on the
+/// [side]-wide picture) moved to the middle, as far as the picture's edges
+/// allow — it never slides off, leaving grey showing.
+@visibleForTesting
+Matrix4 kulayZoomToward(Offset focal, double side, double scale) {
+  double place(double f) =>
+      (side / 2 - scale * f).clamp(side * (1 - scale), 0.0);
+  return Matrix4.diagonal3Values(scale, scale, 1)
+    ..setTranslationRaw(place(focal.dx), place(focal.dy), 0);
+}
+
 class KulayScreen extends StatefulWidget {
   const KulayScreen({super.key});
 
@@ -669,6 +681,9 @@ class _KulayScreenState extends State<KulayScreen>
       if (!provider.creationsPulled) {
         unawaited(provider.pullCreationsFromCloud());
       }
+      // The video starts from the shelf of books, where the child is now.
+      unawaited(HowToVideo.showOnce(
+          context, 'kulay', HowToVideo.assetFor(context, 'kulay')));
     });
 
     _audioPlayer = AudioPlayer();
@@ -732,13 +747,30 @@ class _KulayScreenState extends State<KulayScreen>
   ///
   /// A child who has pinched the drawing off to one corner has no way back on
   /// their own, so one big button always returns the whole picture.
-  void _resetZoom() {
+  void _resetZoom() => _animateZoomTo(Matrix4.identity());
+
+  void _animateZoomTo(Matrix4 end) {
     _zoomResetAnim = Matrix4Tween(
       begin: _transformationController.value,
-      end: Matrix4.identity(),
+      end: end,
     ).animate(CurvedAnimation(
         parent: _zoomResetController, curve: Curves.easeOutCubic));
     _zoomResetController.forward(from: 0);
+  }
+
+  /// How much Palakihin enlarges the picture.
+  static const double zoomInScale = 2.2;
+
+  /// A pinch is two fingers, which a three-year-old does not know; this is
+  /// one button. It closes in on where the child last colored, or on the
+  /// middle of the picture before anything has been colored.
+  void _zoomIn() {
+    final side = _lastSide;
+    if (side <= 0) return;
+    final focal = _strokes.isNotEmpty && _strokes.last.points.isNotEmpty
+        ? _strokes.last.points.last
+        : Offset(side / 2, side / 2);
+    _animateZoomTo(kulayZoomToward(focal, side, zoomInScale));
   }
 
   /// Drops any magnification without animating — used when a new picture is
@@ -2812,6 +2844,12 @@ class _KulayScreenState extends State<KulayScreen>
               color: AppColors.textDark,
               fontSize: 20,
               fontWeight: FontWeight.bold)),
+      actions: [
+        PanoorinPill(
+            onTap: () => HowToVideo.show(
+                context, HowToVideo.assetFor(context, 'kulay'))),
+        const SizedBox(width: 6),
+      ],
       // Inside a category the title already says where the child is; the
       // tabs come back with the categories.
       bottom: colouring || inCategory
@@ -3366,11 +3404,45 @@ class _KulayScreenState extends State<KulayScreen>
   // ─────────────────────────────────────────────────────────────────────────
 
   Widget _canvas() {
+    final loc = AppLocalizations.of(context)!;
     return Column(children: [
       Expanded(
         child: Stack(
           children: [
             _drawingArea(),
+            // With the eraser on, the finger takes color away. Said on the
+            // picture itself, where the child is looking.
+            if (_isEraser)
+              Positioned(
+                top: 10,
+                left: 0,
+                right: 0,
+                child: IgnorePointer(
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 7),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFCE4F1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                            color: const Color(0xFFE76FB0), width: 2),
+                      ),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        const Icon(LucideIcons.eraser,
+                            size: 20, color: Color(0xFFB03A7C)),
+                        const SizedBox(width: 6),
+                        Text(loc.eraser,
+                            style: const TextStyle(
+                                fontFamily: 'Fredoka',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFFB03A7C))),
+                      ]),
+                    ),
+                  ),
+                ),
+              ),
             if (_pendingClear != null)
               Positioned(
                 left: 16,
@@ -3850,13 +3922,22 @@ class _KulayScreenState extends State<KulayScreen>
         // pinched — until then it does nothing, and a button that does
         // nothing is one a child presses and learns to distrust.
         Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-          if (_isZoomed)
-            _tBtn(
-              icon: LucideIcons.minimize,
-              label: AppLocalizations.of(context)!.fitPicture,
-              active: true,
-              onTap: _resetZoom,
-            ),
+          // One button for size: Palakihin closes in, Iangkop goes back.
+          _isZoomed
+              ? _tBtn(
+                  icon: LucideIcons.minimize,
+                  label: AppLocalizations.of(context)!.fitPicture,
+                  tint: const Color(0xFF2F7FD6),
+                  active: true,
+                  onTap: _resetZoom,
+                )
+              : _tBtn(
+                  icon: LucideIcons.zoom_in,
+                  label: AppLocalizations.of(context)!.zoomIn,
+                  tint: const Color(0xFF2F7FD6),
+                  active: false,
+                  onTap: _zoomIn,
+                ),
           _tBtn(
             icon: LucideIcons.eraser,
             label: AppLocalizations.of(context)!.eraser,

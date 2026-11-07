@@ -8,6 +8,7 @@ import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/user_provider.dart' show UserProvider;
+import 'test_account.dart';
 
 /// Password/credential verification for both gated areas of the app: the
 /// teacher dashboard and the hidden developer dashboard. Every password
@@ -20,7 +21,9 @@ class AuthService {
   /// save reports the connection instead.
   static const Duration writeTimeout = Duration(seconds: 10);
 
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  // Late: the service can be made — handed to a widget — with no Firebase
+  // behind it, as in a preview; only a call reaches the database.
+  late final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   /// Whether the server answers right now.
   ///
@@ -52,6 +55,17 @@ class AuthService {
   /// Sent, but the server had not answered in time. Firestore still holds
   /// the write and finishes it once the signal is back — so this is not a
   /// failure, and must not be reported as one.
+  /// The child's record is gone: the developer or the teacher removed them
+  /// while this was open. Said as that, not as a failed save to try again.
+  static const Map<String, dynamic> _childRemoved = {
+    'status': 'Error',
+    'code': 'childRemoved',
+    'message': 'This child has been removed.',
+  };
+
+  static bool _recordGone(Object e) =>
+      e is FirebaseException && e.code == 'not-found';
+
   static const Map<String, dynamic> _finishesOnline = {
     'status': 'Pending',
     'code': 'finishesOnline',
@@ -125,6 +139,28 @@ class AuthService {
       debugPrint('verifyTeacherPassword error: $e');
       return null;
     }
+  }
+
+  /// The teacher login's own check of [username] and [password]: null when
+  /// no teacher account has been set up yet. Throws when it could not be
+  /// checked at all — no signal, a timeout — which says nothing about the
+  /// password. Uses serverAndCache, so it works offline after the first
+  /// online login.
+  Future<bool?> checkTeacherLogin(String username, String password) async {
+    await ensureAuthenticated();
+    final snap = await _db
+        .collection('config')
+        .doc('teacher')
+        .get(const GetOptions(source: Source.serverAndCache))
+        .timeout(const Duration(seconds: 15));
+    final data = snap.data();
+    if (data == null) return null;
+    final storedUsername = (data['username'] ?? '').toString();
+    final storedHash = (data['passwordHash'] ?? '').toString();
+    return username.toLowerCase().trim() ==
+            storedUsername.toLowerCase().trim() &&
+        storedHash.isNotEmpty &&
+        storedHash == hashLrn(password);
   }
 
   // ── Developer credentials (config/developer) ──────────────────────────────
@@ -311,6 +347,7 @@ class AuthService {
       return _finishesOnline;
     } catch (e) {
       debugPrint('updateStudentCredentials error: $e');
+      if (_recordGone(e)) return _childRemoved;
       return {
         'status': 'Error',
         'message': 'Could not save changes. Please check your connection.',
@@ -769,6 +806,7 @@ class AuthService {
       return _finishesOnline;
     } catch (e) {
       debugPrint('Error updating student: $e');
+      if (_recordGone(e)) return _childRemoved;
       return {'status': 'Error', 'code': 'saveFailed'};
     }
   }
@@ -982,6 +1020,8 @@ class AuthService {
             'pamilya': {'gamesCompleted': 0, 'totalGames': 25, 'totalScore': 0},
           },
           'rawProgress': {},
+          // Back to a real child's record: nothing in it is the developer's.
+          TestAccount.field: FieldValue.delete(),
           'profile.stars': 0,
           'profile.lessonsCompleted': 0,
           'profile.achievements': {},
@@ -1061,6 +1101,7 @@ class AuthService {
       return result;
     } catch (e) {
       debugPrint('Error resetting activity progress: $e');
+      if (_recordGone(e)) return _childRemoved;
       return _resetFailed;
     }
   }
@@ -1134,6 +1175,9 @@ class AuthService {
           .doc(studentId)
           .get(const GetOptions(source: Source.server))
           .timeout(writeTimeout);
+      // Removed while the sheet was open: the update below would only fail,
+      // and be told as a reset to try again.
+      if (!doc.exists) return _childRemoved;
       for (final key in moduleRawKeys(doc.data()?['rawProgress'], categories)) {
         updates['rawProgress.$key'] = FieldValue.delete();
       }
@@ -1238,6 +1282,7 @@ class AuthService {
       return result;
     } catch (e) {
       debugPrint('Error resetting specific activities: $e');
+      if (_recordGone(e)) return _childRemoved;
       return _resetFailed;
     }
   }

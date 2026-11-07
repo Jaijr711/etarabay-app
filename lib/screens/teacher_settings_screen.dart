@@ -2,7 +2,6 @@ import 'dart:async';
 
 import '../widgets/biometric_setup.dart';
 import '../services/reminder_service.dart';
-import 'developer_login_screen.dart';
 import 'teacher_agreement_screen.dart';
 import 'teacher_login_screen.dart';
 import 'package:e_tarabay/l10n/app_localizations.dart';
@@ -21,6 +20,7 @@ import '../main.dart';
 import '../utils/page_transitions.dart';
 import '../utils/constants.dart';
 import '../widgets/custom_header_app_bar.dart';
+import '../widgets/how_to_video.dart';
 import '../widgets/staggered_entrance.dart';
 import '../widgets/teacher_pin_flow.dart';
 import '../widgets/soft_backdrop.dart';
@@ -33,7 +33,9 @@ class TeacherSettingsScreen extends StatefulWidget {
 }
 
 class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
-  final AuthService _authService = AuthService();
+  // Late: made on the first button press, so the screen itself opens
+  // without Firebase (the teacher how-to video is recorded from it).
+  late final AuthService _authService = AuthService();
   bool _soundEnabled = true;
   bool _musicEnabled = true;
   bool _notificationsEnabled = true;
@@ -43,31 +45,6 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
   // Read from the installed package itself — see the matching note in
   // settings_screen.dart.
   String _appVersion = '';
-
-  // The hidden developer dashboard's entry point — see the matching note
-  // in settings_screen.dart. This is the teacher-side settings screen, a
-  // separate widget from the student one, so it needs its own copy of the
-  // tap counter to reach the same DeveloperLoginScreen.
-  int _versionTapCount = 0;
-  DateTime? _versionTapWindowStart;
-
-  void _onVersionTapped() {
-    final now = DateTime.now();
-    if (_versionTapWindowStart == null ||
-        now.difference(_versionTapWindowStart!) > const Duration(seconds: 3)) {
-      _versionTapWindowStart = now;
-      _versionTapCount = 1;
-      return;
-    }
-    _versionTapCount++;
-    if (_versionTapCount >= 7) {
-      _versionTapCount = 0;
-      _versionTapWindowStart = null;
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const DeveloperLoginScreen()),
-      );
-    }
-  }
 
   @override
   void initState() {
@@ -822,18 +799,33 @@ class _TeacherSettingsScreenState extends State<TeacherSettingsScreen> {
                     _sectionHeader(AppLocalizations.of(context)!.about),
                     Card.filled(
                       clipBehavior: Clip.antiAlias,
-                      child: ListTile(
-                        onTap: _onVersionTapped,
-                        leading: const _IconBadge(icon: LucideIcons.info),
-                        title: Text(loc.version),
-                        trailing: Text(
-                          _appVersion,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primary,
+                      child: Column(
+                        children: [
+                          ListTile(
+                            leading:
+                                const _IconBadge(icon: LucideIcons.circle_play),
+                            title: Text(loc.teacherHowToUse),
+                            trailing: Icon(LucideIcons.chevron_right,
+                                color: Colors.grey.shade400, size: 18),
+                            onTap: () => HowToVideo.show(
+                                context, HowToVideo.teacherGuide,
+                                pausable: true,
+                                parts: HowToVideo.teacherGuideParts),
                           ),
-                        ),
+                          const Divider(height: 0, indent: 72),
+                          ListTile(
+                                                        leading: const _IconBadge(icon: LucideIcons.info),
+                            title: Text(loc.version),
+                            trailing: Text(
+                              _appVersion,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

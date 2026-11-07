@@ -488,6 +488,8 @@ final _kids = <Map<String, dynamic>>[
     'lrn': 'DC-2026-9012',
     'avatar': 'animal_lion',
     'progress': {'overallProgress': 0.12},
+    // Finished by the developer: the card's "Pang-test" tag.
+    'testAccount': true,
     'profile': {'stars': 5},
   },
   {

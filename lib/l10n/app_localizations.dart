@@ -256,6 +256,66 @@ abstract class AppLocalizations {
   /// **'Home'**
   String get home;
 
+  /// Button in the teacher guide video player that lists its parts to jump to.
+  ///
+  /// In en, this message translates to:
+  /// **'Parts'**
+  String get videoParts;
+
+  /// Over the whole app when the developers require a newer version than the one installed.
+  ///
+  /// In en, this message translates to:
+  /// **'To use E-Tarabay, first update to version {version}.'**
+  String updateRequiredBody(String version);
+
+  /// Over a child's app while the developers have switched on maintenance mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Just a moment!'**
+  String get maintenanceTitle;
+
+  /// No description provided for @maintenanceNote.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'re fixing the app. It will open again by itself when we\'re done.'**
+  String get maintenanceNote;
+
+  /// Label over the installed version on the update-required cover.
+  ///
+  /// In en, this message translates to:
+  /// **'On this phone'**
+  String get updateThisPhone;
+
+  /// No description provided for @updateNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Needed'**
+  String get updateNeeded;
+
+  /// Shown when a child's record was deleted while their report or edit form was open.
+  ///
+  /// In en, this message translates to:
+  /// **'This child has been removed.'**
+  String get childRemovedNotice;
+
+  /// Tag on a student card the developer finished for testing.
+  ///
+  /// In en, this message translates to:
+  /// **'Test'**
+  String get testAccountTag;
+
+  /// No description provided for @testAccountNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Finished by the developer for testing. Not real progress.'**
+  String get testAccountNote;
+
+  /// Opens the silent video that walks a teacher through the app; the video itself is in Filipino for every language.
+  ///
+  /// In en, this message translates to:
+  /// **'How to use the app'**
+  String get teacherHowToUse;
+
   /// No description provided for @settingsTitle.
   ///
   /// In en, this message translates to:
@@ -2996,14 +3056,32 @@ abstract class AppLocalizations {
   /// No description provided for @updateAvailableBody.
   ///
   /// In en, this message translates to:
-  /// **'Version {version} is ready to download.'**
+  /// **'Version {version} is ready. Updates are installed from the E-Tarabay website.'**
   String updateAvailableBody(String version);
 
   /// No description provided for @updateDownloadNow.
   ///
   /// In en, this message translates to:
-  /// **'Download Now'**
+  /// **'Update'**
   String get updateDownloadNow;
+
+  /// No description provided for @updateOpenWebsite.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in your browser: {url}'**
+  String updateOpenWebsite(String url);
+
+  /// No description provided for @watchHowToPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch'**
+  String get watchHowToPlay;
+
+  /// No description provided for @zoomIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom in'**
+  String get zoomIn;
 
   /// No description provided for @updateLater.
   ///

@@ -17,6 +17,7 @@ import '../widgets/question_cloud.dart' show DoodleBackground;
 import '../widgets/success_modal.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import '../widgets/design_scale.dart';
+import '../widgets/how_to_video.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  HIDDEN-GUIDE TRACING PAINTER
@@ -27,6 +28,9 @@ import '../widgets/design_scale.dart';
 /// Shared between the layout maths and the painter so the two can never
 /// disagree about how much room the ink actually needs.
 const double _kTrackWidth = 26.0;
+
+/// How far down the canvas the corner buttons reach: 14 in, 52 across.
+const double _kCornerClear = 14.0 + 52.0 + 4.0;
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  POLYLINE MATH (shared by the drag-to-fill painter and gesture logic)
@@ -307,7 +311,10 @@ class _StrokeFillPainter extends CustomPainter {
     final tp = TextPainter(
       text: TextSpan(
         text: '$number',
+        // Named, not left to the default: a canvas inherits no theme, so
+        // without it the number fell to whatever face the platform had.
         style: const TextStyle(
+          fontFamily: 'Roboto',
           color: Colors.white,
           fontSize: 13,
           fontWeight: FontWeight.bold,
@@ -823,7 +830,13 @@ class _TraceItScreenState extends State<TraceItScreen>
     final scaleY = (canvasSize.height - padding * 2) *
         comfort /
         (2 * (_glyphHalfHeight * _letterMagnify + inkHalf));
-    _canvasScale = scaleX < scaleY ? scaleX : scaleY;
+    // The start-again button and the done tick sit in the canvas's top
+    // corners; on a short phone the glyph box would reach up under them, so
+    // its top is kept below them. Everywhere else the width already sets the
+    // scale and this changes nothing.
+    final scaleUnderCorners = (canvasSize.height / 2 - _kCornerClear) /
+        (_glyphHalfHeight * _letterMagnify + inkHalf + 2);
+    _canvasScale = math.min(math.min(scaleX, scaleY), scaleUnderCorners);
 
     // Put the design-space centre on the canvas centre. The extra two units
     // upward keep the traced guide sitting on the painted glyph, which is
@@ -1167,6 +1180,7 @@ class _TraceItScreenState extends State<TraceItScreen>
                   fontWeight: FontWeight.bold)),
         ),
         actions: [
+          if (!_showWall) PanoorinPill(onTap: _watchHowTo),
           Container(
             margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -1329,6 +1343,36 @@ class _TraceItScreenState extends State<TraceItScreen>
                                             : kAlwaysDismissedAnimation,
                                       ),
                                     ),
+                                    // Start this character again, from the
+                                    // paper's own corner.
+                                    //
+                                    // It was a full-width bar under the
+                                    // canvas, and it went away once the
+                                    // character was done — taking its row
+                                    // with it, so the paper jumped taller
+                                    // the moment the child finished. Floating
+                                    // here it holds no room of its own, and
+                                    // fading out moves nothing. It still goes
+                                    // once the character is finished: there
+                                    // is nothing left to clear, and it only
+                                    // invited wiping out work just completed.
+                                    if (_selectedIndex == index)
+                                      Positioned(
+                                        top: 14,
+                                        left: 14,
+                                        child: IgnorePointer(
+                                          ignoring: _isCompleted,
+                                          child: AnimatedOpacity(
+                                            opacity: _isCompleted ? 0 : 1,
+                                            duration: const Duration(
+                                                milliseconds: 250),
+                                            child: _StartAgainButton(
+                                              label: loc.clear,
+                                              onTap: _resetTracing,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                     // Completion mark, tucked into the corner.
                                     //
                                     // This used to be a wide "Good Job!" banner across
@@ -1371,29 +1415,7 @@ class _TraceItScreenState extends State<TraceItScreen>
                 ),
               ),
 
-              // Start this character again.
-              //
-              // The only other control here was a "Suriin" button guarded by
-              // `if (!_useDragFill)`. Every character in all three alphabets has
-              // drag-fill strokes, so that guard has never once been true and the
-              // button has never been drawn — leaving a lone grey outline in the
-              // smallest type on the screen as the child's only way back.
-              //
-              // Shown only while the character is still being traced: once it is
-              // finished there is nothing to clear, and the button only invited
-              // a child to wipe out work they had just completed.
-              if (!_isCompleted)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
-                  child: _ChunkyPill(
-                    label: loc.clear,
-                    icon: LucideIcons.rotate_ccw,
-                    top: const Color(0xFF45DCCB),
-                    bottom: const Color(0xFF18A8B6),
-                    edge: const Color(0xFF0F7A85),
-                    onTap: _resetTracing,
-                  ),
-                ),
+              const SizedBox(height: 6),
             ],
           ]),
         ),
@@ -1419,7 +1441,14 @@ class _TraceItScreenState extends State<TraceItScreen>
       _showWall = false;
     });
     old.dispose();
+    // The first letter ever opened comes with the film of one being traced:
+    // where to put the finger and that the strokes go in order.
+    unawaited(HowToVideo.showOnce(
+        context, 'trace', HowToVideo.assetFor(context, 'trace')));
   }
+
+  void _watchHowTo() =>
+      HowToVideo.show(context, HowToVideo.assetFor(context, 'trace'));
 
   void _backToWall() {
     if (_showWall) return;
@@ -2139,48 +2168,40 @@ class _SpecklePainter extends BoxPainter {
   }
 }
 
-/// A full-width rounded button with a solid 3D edge — "Clear".
-class _ChunkyPill extends StatelessWidget {
+/// "Start again", as a round button in the paper's corner: the old Clear
+/// bar's teal and solid edge, at the size of a fingertip.
+class _StartAgainButton extends StatelessWidget {
+  const _StartAgainButton({required this.label, required this.onTap});
+
   final String label;
-  final IconData icon;
-  final Color top, bottom, edge;
   final VoidCallback onTap;
 
-  const _ChunkyPill({
-    required this.label,
-    required this.icon,
-    required this.top,
-    required this.bottom,
-    required this.edge,
-    required this.onTap,
-  });
+  static const _edge = Color(0xFF0F7A85);
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 54,
-        margin: const EdgeInsets.only(bottom: 5),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [top, bottom],
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 52,
+          height: 52,
+          margin: const EdgeInsets.only(bottom: 4),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF45DCCB), Color(0xFF18A8B6)],
+            ),
+            border: Border.all(color: _edge, width: 3),
+            boxShadow: const [BoxShadow(color: _edge, offset: Offset(0, 4))],
           ),
-          borderRadius: BorderRadius.circular(27),
-          border: Border.all(color: edge, width: 3),
-          boxShadow: [BoxShadow(color: edge, offset: const Offset(0, 5))],
+          child:
+              const Icon(LucideIcons.rotate_ccw, color: Colors.white, size: 26),
         ),
-        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Icon(icon, color: Colors.white, size: 24),
-          const SizedBox(width: 8),
-          Text(label,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900)),
-        ]),
       ),
     );
   }

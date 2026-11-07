@@ -11,6 +11,7 @@ import '../services/update_checker.dart';
 Future<void> showUpdateAvailableDialog(
     BuildContext context, UpdateInfo update) {
   final loc = AppLocalizations.of(context)!;
+  final messenger = ScaffoldMessenger.maybeOf(context);
   return showDialog<void>(
     context: context,
     barrierDismissible: true,
@@ -47,11 +48,21 @@ Future<void> showUpdateAvailableDialog(
           ),
           FunPillButton(
             label: loc.updateDownloadNow,
-            icon: Icons.download_rounded,
+            icon: Icons.system_update_rounded,
             colors: FunColors.green,
-            onTap: () {
+            onTap: () async {
               Navigator.pop(dialogContext);
-              UpdateChecker.instance.openUpdatePage(update);
+              final opened =
+                  await UpdateChecker.instance.openUpdatePage(update);
+              // Updates come only from the website, so when the browser
+              // will not open it the address is shown to type in.
+              if (!opened) {
+                messenger?.showSnackBar(SnackBar(
+                  content: Text(
+                      loc.updateOpenWebsite(UpdateChecker.downloadPageUrl)),
+                  duration: const Duration(seconds: 10),
+                ));
+              }
             },
           ),
         ],

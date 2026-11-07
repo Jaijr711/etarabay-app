@@ -93,6 +93,40 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get home => 'Umuna a Panid';
 
   @override
+  String get videoParts => 'Dagiti paset';
+
+  @override
+  String updateRequiredBody(String version) {
+    return 'Tapno mausar ti E-Tarabay, i-update pay nga umuna iti bersion $version.';
+  }
+
+  @override
+  String get maintenanceTitle => 'Urayem bassit!';
+
+  @override
+  String get maintenanceNote =>
+      'Ar-arunusenmi ti app. Aglukat daytoy manen no malpasmi.';
+
+  @override
+  String get updateThisPhone => 'Adda iti telepono';
+
+  @override
+  String get updateNeeded => 'Masapul';
+
+  @override
+  String get childRemovedNotice => 'Naikkaten daytoy nga ubing.';
+
+  @override
+  String get testAccountTag => 'Pannubok';
+
+  @override
+  String get testAccountNote =>
+      'Inleppas ti developer tapno masubok. Saan a pudno a progreso.';
+
+  @override
+  String get teacherHowToUse => 'Kasano nga usaren ti app';
+
+  @override
   String get settingsTitle => 'Urnos';
 
   @override
@@ -1608,11 +1642,22 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String updateAvailableBody(String version) {
-    return 'Nakasagana nga ma-download ti bersion $version.';
+    return 'Nakasagana ti bersion $version. Iti website ti E-Tarabay ti pang-update-an.';
   }
 
   @override
-  String get updateDownloadNow => 'I-download tattan';
+  String get updateDownloadNow => 'I-update';
+
+  @override
+  String updateOpenWebsite(String url) {
+    return 'Lukatan iti browser: $url';
+  }
+
+  @override
+  String get watchHowToPlay => 'Buyaen';
+
+  @override
+  String get zoomIn => 'Padakkelen';
 
   @override
   String get updateLater => 'Damdama';

@@ -380,6 +380,11 @@ class AnswerTile extends StatelessWidget {
                 ? FontWeight.w900
                 : (selected ? FontWeight.bold : FontWeight.w600),
             height: 1.1,
+            // As [fitFontSize] measures it. The theme's body text carries
+            // Material 3's 0.25 px between letters, which made "Nanang
+            // laeng" 3 px wider than measured: it wrapped, and that one
+            // answer came out at half the size of the rest of its board.
+            letterSpacing: 0,
           );
           // And never a word broken in two, whatever the board worked out.
           // Measured in the font the text inherits, as it will be drawn.

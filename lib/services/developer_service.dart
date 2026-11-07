@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 
+import '../providers/user_provider.dart';
+import 'test_account.dart';
+
 /// The kinds of note a developer-dashboard message can be sent as — stored
 /// alongside the text itself so a child (and AccountWatcher, which draws
 /// the popup) can tell a friendly reminder from an urgent one at a glance,
@@ -33,7 +36,8 @@ class AdminMessageCategory {
 /// Kept separate from [AuthService] — that file is the password gate this
 /// screen sits behind; this one is what the screen does once it's in.
 class DeveloperService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  // Late, as in AuthService: made without Firebase, used only on a call.
+  late final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   /// Every student record, live. The dashboard's own read of `lastActive`
   /// is what "online" is judged against — there is no separate presence
@@ -106,10 +110,50 @@ class DeveloperService {
     });
   }
 
+  /// Finishes every lesson on a test account, leaving the child only the
+  /// claiming (see [TestAccount]). Key by key into `rawProgress`, so what
+  /// the account already holds stays; the totals are for the teacher's
+  /// list until the child's phone recounts them.
+  Future<void> completeAllForTesting(String studentId) {
+    return _db.collection('students').doc(studentId).update(<Object, Object?>{
+      for (final e in TestAccount.fullProgress().entries)
+        FieldPath(['rawProgress', e.key]): e.value,
+      TestAccount.field: true,
+      'progress.overallProgress': 1.0,
+      'progress.totalStars': UserProvider.totalPossibleStars,
+      'profile.stars': UserProvider.totalPossibleStars,
+    });
+  }
+
   /// The shared developer config doc — currently just the password hash
   /// (see AuthService) and the global module-lock list below.
   Stream<DocumentSnapshot<Map<String, dynamic>>> watchConfig() {
     return _db.collection('config').doc('developer').snapshots();
+  }
+
+  /// Covers the app of every child signed in with [message] while [on], for
+  /// when something is being fixed; the teacher's side stays open. Read on
+  /// each phone by UserProvider's config listener, and lifted there the
+  /// moment this is set back off.
+  Future<void> setMaintenance(bool on, String message) {
+    return _db.collection('config').doc('developer').set(
+      {
+        'maintenanceOn': on,
+        'maintenanceMessage': message,
+        if (on) 'maintenanceSince': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
+  }
+
+  /// The oldest version still allowed to open the app; a phone older than
+  /// this is covered with "update first", teacher's included. Null lifts
+  /// it.
+  Future<void> setMinVersion(String? version) {
+    return _db.collection('config').doc('developer').set(
+      {'minVersion': version ?? FieldValue.delete()},
+      SetOptions(merge: true),
+    );
   }
 
   /// Locks or unlocks one module app-wide, for every student. Kept as one

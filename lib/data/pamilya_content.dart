@@ -1170,10 +1170,10 @@ class PamilyaContent {
         'id': 'role_cook',
         'question': 'Who usually cooks at home?',
         'choices': [
-          'Mother only',
-          'Father only',
-          'Grandmother only',
-          'Anyone can'
+          '👩 Mother only',
+          '👨 Father only',
+          '👵 Grandmother only',
+          '👨‍👩‍👧 Anyone can'
         ],
         'correct': 3,
         'explanation': 'Correct! Anyone in the family can cook.'
@@ -1182,10 +1182,10 @@ class PamilyaContent {
         'id': 'role_work',
         'question': 'Who works to help support the family?',
         'choices': [
-          'Father only',
-          'Mother only',
-          'Grandfather only',
-          'Many can'
+          '👨 Father only',
+          '👩 Mother only',
+          '👴 Grandfather only',
+          '👨‍👩‍👧 Many can'
         ],
         'correct': 3,
         'explanation': 'Correct! Many family members can work.'
@@ -1193,14 +1193,14 @@ class PamilyaContent {
       {
         'id': 'role_story',
         'question': 'Who usually tells stories?',
-        'choices': ['Older Brother', 'Older Sister', 'Grandparents', 'Father'],
+        'choices': ['🧑 Older Brother', '👧 Older Sister', '🧓 Grandparents', '👨 Father'],
         'correct': 2,
         'explanation': 'Correct! Grandparents are the best storytellers.'
       },
       {
         'id': 'role_care',
         'question': 'Who takes care of you when you are sick?',
-        'choices': ['Mother', 'Father', 'Grandmother', 'All of them'],
+        'choices': ['👩 Mother', '👨 Father', '👵 Grandmother', '👨‍👩‍👧 All of them'],
         'correct': 3,
         'explanation': 'Correct! All family members take care of each other.'
       },
@@ -1208,10 +1208,10 @@ class PamilyaContent {
         'id': 'role_play',
         'question': 'Who do you play with at home?',
         'choices': [
-          'Older Brother',
-          'Older Sister',
-          'Youngest Sibling',
-          'Any sibling'
+          '🧑 Older Brother',
+          '👧 Older Sister',
+          '👶 Youngest Sibling',
+          '👫 Any sibling'
         ],
         'correct': 3,
         'explanation': 'Correct! You can play with anyone.'
@@ -1222,10 +1222,10 @@ class PamilyaContent {
         'id': 'role_cook',
         'question': 'Sino ang karaniwang nagluluto sa bahay?',
         'choices': [
-          'Ina lamang',
-          'Ama lamang',
-          'Lola lamang',
-          'Kahit sino ay pwede'
+          '👩 Ina lamang',
+          '👨 Ama lamang',
+          '👵 Lola lamang',
+          '👨‍👩‍👧 Kahit sino ay pwede'
         ],
         'correct': 3,
         'explanation': 'Tama! Kahit sino sa pamilya ay pwedeng magluto.'
@@ -1234,10 +1234,10 @@ class PamilyaContent {
         'id': 'role_work',
         'question': 'Sino ang nagtatrabaho para sa pamilya?',
         'choices': [
-          'Ama lamang',
-          'Ina lamang',
-          'Lolo lamang',
-          'Marami ang pwedeng magtrabaho.'
+          '👨 Ama lamang',
+          '👩 Ina lamang',
+          '👴 Lolo lamang',
+          '👨‍👩‍👧 Marami ang pwedeng magtrabaho.'
         ],
         'correct': 3,
         'explanation':
@@ -1246,7 +1246,7 @@ class PamilyaContent {
       {
         'id': 'role_story',
         'question': 'Sino ang karaniwang nagkukwento?',
-        'choices': ['Kuya', 'Ate', 'Lolo at Lola', 'Ama'],
+        'choices': ['🧑 Kuya', '👧 Ate', '🧓 Lolo at Lola', '👨 Ama'],
         'correct': 2,
         'explanation':
             'Tama! Ang mga Lolo at Lola ang pinakamagaling magkuwento.'
@@ -1254,7 +1254,7 @@ class PamilyaContent {
       {
         'id': 'role_care',
         'question': 'Sino ang nag-aalaga sa iyo sa tuwing nilalagnat ka?',
-        'choices': ['Ina', 'Ama', 'Lola', 'Lahat ng nabanggit'],
+        'choices': ['👩 Ina', '👨 Ama', '👵 Lola', '👨‍👩‍👧 Lahat ng nabanggit'],
         'correct': 3,
         'explanation':
             'Tama! Bawat kasapi ng pamilya ay nag-aalaga sa isa\'t isa.'
@@ -1262,7 +1262,7 @@ class PamilyaContent {
       {
         'id': 'role_play',
         'question': 'Sino ang kalaro mo sa bahay?',
-        'choices': ['Kuya', 'Ate', 'Bunso', 'Kahit sinong kapatid'],
+        'choices': ['🧑 Kuya', '👧 Ate', '👶 Bunso', '👫 Kahit sinong kapatid'],
         'correct': 3,
         'explanation': 'Tama! Maaari kang makipaglaro sa kahit kanino.'
       },
@@ -1272,10 +1272,10 @@ class PamilyaContent {
         'id': 'role_cook',
         'question': 'Sinno ti kanayon nga agluto iti balay?',
         'choices': [
-          'Nanang laeng',
-          'Tatang laeng',
-          'Lilang laeng',
-          'Siasinoman'
+          '👩 Nanang laeng',
+          '👨 Tatang laeng',
+          '👵 Lilang laeng',
+          '👨‍👩‍👧 Siasinoman'
         ],
         'correct': 3,
         'explanation': 'Kusto! Siasinoman iti pamilia ket mabalin nga agluto'
@@ -1285,10 +1285,10 @@ class PamilyaContent {
         'question':
             'Siasino ti agtartrabaho a tumulong a mangsuporta iti pamilia?',
         'choices': [
-          'Tatang laeng',
-          'Nanang laeng',
-          'Lilong laeng',
-          'Adu ti mabalin'
+          '👨 Tatang laeng',
+          '👩 Nanang laeng',
+          '👴 Lilong laeng',
+          '👨‍👩‍👧 Adu ti mabalin'
         ],
         'correct': 3,
         'explanation':
@@ -1297,21 +1297,21 @@ class PamilyaContent {
       {
         'id': 'role_story',
         'question': 'Sinno ti kanayon nga agisalsalaysay?',
-        'choices': ['Manong', 'Manang', 'Lilong ken Lilang', 'Tatang'],
+        'choices': ['🧑 Manong', '👧 Manang', '🧓 Lilong ken Lilang', '👨 Tatang'],
         'correct': 2,
         'explanation': 'Kusto! Dagiti apong ti kasasayaatan a mangisalsalaysay.'
       },
       {
         'id': 'role_care',
         'question': 'Sinno ti mangaywan kenka no masakit ka?',
-        'choices': ['Nanang', 'Tatang', 'Lilang', 'Amin kadakuada'],
+        'choices': ['👩 Nanang', '👨 Tatang', '👵 Lilang', '👨‍👩‍👧 Amin kadakuada'],
         'correct': 3,
         'explanation': 'Kusto! Amin a kameng ti pamilia ket agiinnaywanda.'
       },
       {
         'id': 'role_play',
         'question': 'Sinno ti kaay-ayammo iti balay?',
-        'choices': ['Manong', 'Manang', 'Inaudi', 'Aniaman a kabsat'],
+        'choices': ['🧑 Manong', '👧 Manang', '👶 Inaudi', '👫 Aniaman a kabsat'],
         'correct': 3,
         'explanation': 'Kusto! Mabalinmo nga kaay-ayam ti siasinoman'
       },
@@ -1329,10 +1329,10 @@ class PamilyaContent {
         'id': 'activity_dinner',
         'question': 'What can you do together during meals?',
         'choices': [
-          'Eat and talk together',
-          'Watch TV',
-          'Sleep',
-          'Use cellphone'
+          '🍲 Eat and talk together',
+          '📺 Watch TV',
+          '😴 Sleep',
+          '📱 Use cellphone'
         ],
         'correct': 0,
         'explanation': 'Correct! Eating together and talking is wonderful.'
@@ -1341,10 +1341,10 @@ class PamilyaContent {
         'id': 'activity_weekend',
         'question': 'What can the family do on weekends?',
         'choices': [
-          'Relax at the park',
-          'Shop at the grocery',
-          'Clean together',
-          'All of the above'
+          '🏞️ Relax at the park',
+          '🛒 Shop at the grocery',
+          '🧹 Clean together',
+          '👨‍👩‍👧 All of the above'
         ],
         'correct': 3,
         'explanation': 'Correct! All activities done together are wonderful.'
@@ -1353,10 +1353,10 @@ class PamilyaContent {
         'id': 'activity_celebration',
         'question': 'What does the family do during birthdays?',
         'choices': [
-          'Celebrate together with cake',
-          'Sleep all day',
-          'Watch TV alone',
-          'Stay in your room'
+          '🎂 Celebrate together with cake',
+          '😴 Sleep all day',
+          '📼 Watch TV alone',
+          '🚪 Stay in your room'
         ],
         'correct': 0,
         'explanation':
@@ -1366,10 +1366,10 @@ class PamilyaContent {
         'id': 'activity_help',
         'question': 'How can you help your family?',
         'choices': [
-          'Put your toys away',
-          'Leave your toys on the floor',
-          'Spill water on the floor',
-          'Hide when it is time to clean'
+          '🧺 Put your toys away',
+          '🧱 Leave your toys on the floor',
+          '💦 Spill water on the floor',
+          '🙈 Hide when it is time to clean'
         ],
         'correct': 0,
         'explanation': 'Correct! Helping at home shows love for your family.'
@@ -1380,10 +1380,10 @@ class PamilyaContent {
         'id': 'activity_dinner',
         'question': 'Ano ang magandang gawin nang sama-sama habang kumakain?',
         'choices': [
-          'Kumain at mag-usap nang sama-sama',
-          'Manood ng TV',
-          'Matulog',
-          'Gumamit ng cellphone'
+          '🍲 Kumain at mag-usap nang sama-sama',
+          '📺 Manood ng TV',
+          '😴 Matulog',
+          '📱 Gumamit ng cellphone'
         ],
         'correct': 0,
         'explanation': 'Tama! Napakagandang kumain at mag-usap nang sama-sama.'
@@ -1392,10 +1392,10 @@ class PamilyaContent {
         'id': 'activity_weekend',
         'question': 'Ano ang pwedeng gawin ng pamilya tuwing Sabado at Linggo?',
         'choices': [
-          'Magpahinga sa parke',
-          'Mag-grocery sa pamilihan',
-          'Maglinis nang sama-sama',
-          'Lahat ng nabanggit'
+          '🏞️ Magpahinga sa parke',
+          '🛒 Mag-grocery sa pamilihan',
+          '🧹 Maglinis nang sama-sama',
+          '👨‍👩‍👧 Lahat ng nabanggit'
         ],
         'correct': 3,
         'explanation': 'Tama! Napakasayang gawin ang lahat nang sama-sama.'
@@ -1404,10 +1404,10 @@ class PamilyaContent {
         'id': 'activity_celebration',
         'question': 'Ano ang ginagawa ng pamilya tuwing kaarawan?',
         'choices': [
-          'Magdiwang nang sama-sama at kumain ng keyk',
-          'Matulog buong araw',
-          'Manood ng TV nang mag-isa',
-          'Magkulong sa kuwarto'
+          '🎂 Magdiwang nang sama-sama at kumain ng keyk',
+          '😴 Matulog buong araw',
+          '📼 Manood ng TV nang mag-isa',
+          '🚪 Magkulong sa kuwarto'
         ],
         'correct': 0,
         'explanation': 'Tama! Ang mga kaarawan ay pagdiriwang ng buong pamilya!'
@@ -1416,10 +1416,10 @@ class PamilyaContent {
         'id': 'activity_help',
         'question': 'Paano ka makakatulong sa iyong pamilya?',
         'choices': [
-          'Iligpit ang mga laruan',
-          'Iwanang nakakalat ang mga laruan',
-          'Magtapon ng tubig sa sahig',
-          'Magtago kapag oras ng paglilinis'
+          '🧺 Iligpit ang mga laruan',
+          '🧱 Iwanang nakakalat ang mga laruan',
+          '💦 Magtapon ng tubig sa sahig',
+          '🙈 Magtago kapag oras ng paglilinis'
         ],
         'correct': 0,
         'explanation':
@@ -1432,10 +1432,10 @@ class PamilyaContent {
         'question':
             'Ania ti mabalinyo nga aramiden a sangsangkamaysa bayat ti pannangan?',
         'choices': [
-          'Mangan ken agsarita nga agkakadua',
-          'Agbuya ti TV',
-          'Maturog',
-          'Agusar ti cellphone'
+          '🍲 Mangan ken agsarita nga agkakadua',
+          '📺 Agbuya ti TV',
+          '😴 Maturog',
+          '📱 Agusar ti cellphone'
         ],
         'correct': 0,
         'explanation': 'Kusto! Nasayaat ti mangan ken agsarita nga agkakadua.'
@@ -1445,10 +1445,10 @@ class PamilyaContent {
         'question':
             'Ania ti mabalin nga aramiden ti pamilia kadagiti Sabado ken Domingo?',
         'choices': [
-          'Aginana iti parke',
-          'Aggatang idiay tiendaan',
-          'Agdalus a agkakadua',
-          'Amin kadagitoy'
+          '🏞️ Aginana iti parke',
+          '🛒 Aggatang idiay tiendaan',
+          '🧹 Agdalus a agkakadua',
+          '👨‍👩‍👧 Amin kadagitoy'
         ],
         'correct': 3,
         'explanation':
@@ -1458,10 +1458,10 @@ class PamilyaContent {
         'id': 'activity_celebration',
         'question': 'Ania ti ar-aramiden ti pamilia kadagiti panagkasangay?',
         'choices': [
-          'Agrambak nga agkakadua ken mangan ti kek',
-          'Maturog iti intero nga aldaw',
-          'Agbuya iti TV nga agmaymaysa',
-          'Agtalinaed laeng iti kuarto'
+          '🎂 Agrambak nga agkakadua ken mangan ti kek',
+          '😴 Maturog iti intero nga aldaw',
+          '📼 Agbuya iti TV nga agmaymaysa',
+          '🚪 Agtalinaed laeng iti kuarto'
         ],
         'correct': 0,
         'explanation':
@@ -1471,10 +1471,10 @@ class PamilyaContent {
         'id': 'activity_help',
         'question': 'Kasano a matulongam ti pamiliam?',
         'choices': [
-          'Urnosen dagiti ay-ayam',
-          'Baybay-an a naiwarawara dagiti ay-ayam',
-          'Ibuyat ti danum iti datar',
-          'Aglemmeng no oras ti panagdalus'
+          '🧺 Urnosen dagiti ay-ayam',
+          '🧱 Baybay-an a naiwarawara dagiti ay-ayam',
+          '💦 Ibuyat ti danum iti datar',
+          '🙈 Aglemmeng no oras ti panagdalus'
         ],
         'correct': 0,
         'explanation':
@@ -1705,10 +1705,10 @@ class PamilyaContent {
         'id': 'tree_1',
         'question': 'Who are the parents of your Father or Mother?',
         'choices': [
-          'Grandfather and Grandmother',
-          'Uncles and Aunts',
-          'Siblings',
-          'Cousins'
+          '🧓 Grandfather and Grandmother',
+          '🧔 Uncles and Aunts',
+          '👫 Siblings',
+          '🧒 Cousins'
         ],
         'correct': 0,
         'explanation': 'Correct! Grandparents are the parents of our parents.'
@@ -1717,10 +1717,10 @@ class PamilyaContent {
         'id': 'tree_2',
         'question': 'Who is the youngest sibling in the family?',
         'choices': [
-          'Older Brother',
-          'Older Sister',
-          'Baby / Youngest',
-          'Grandmother'
+          '🧑 Older Brother',
+          '👧 Older Sister',
+          '👶 Baby / Youngest',
+          '👵 Grandmother'
         ],
         'correct': 2,
         'explanation':
@@ -1729,21 +1729,21 @@ class PamilyaContent {
       {
         'id': 'tree_3',
         'question': 'What do you call an older brother in Tagalog/Filipino?',
-        'choices': ['Ate', 'Kuya', 'Bunso', 'Lolo'],
+        'choices': ['👧 Ate', '🧑 Kuya', '👶 Bunso', '👴 Lolo'],
         'correct': 1,
         'explanation': 'Correct! Kuya is the term for an older brother.'
       },
       {
         'id': 'tree_4',
         'question': 'What do you call an older sister in Tagalog/Filipino?',
-        'choices': ['Kuya', 'Ate', 'Bunso', 'Lola'],
+        'choices': ['🧑 Kuya', '👧 Ate', '👶 Bunso', '👵 Lola'],
         'correct': 1,
         'explanation': 'Correct! Ate is the term for an older sister.'
       },
       {
         'id': 'tree_5',
         'question': 'Who guides and takes care of children at home?',
-        'choices': ['Father and Mother', 'Neighbors', 'Strangers', 'Only pets'],
+        'choices': ['👨‍👩‍👧 Father and Mother', '🏘️ Neighbors', '👥 Strangers', '🐶 Only pets'],
         'correct': 0,
         'explanation':
             'Parents guide and care for you everyday. Show your love by listening , helping and saying "Thank you!"'
@@ -1753,10 +1753,10 @@ class PamilyaContent {
         'question':
             'What chart shows the relationships between family members across generations?',
         'choices': [
-          'Family Tree',
-          'Shopping List',
-          'Calendar',
-          'Weather Chart'
+          '🌳 Family Tree',
+          '📝 Shopping List',
+          '📅 Calendar',
+          '⛅ Weather Chart'
         ],
         'correct': 0,
         'explanation':
@@ -1766,10 +1766,10 @@ class PamilyaContent {
         'id': 'tree_7',
         'question': 'How should family members treat each other?',
         'choices': [
-          'With love and respect',
-          'With fighting',
-          'By ignoring each other',
-          'Shouting'
+          '💕 With love and respect',
+          '🤼 With fighting',
+          '🙄 By ignoring each other',
+          '😡 Shouting'
         ],
         'correct': 0,
         'explanation':
@@ -1781,10 +1781,10 @@ class PamilyaContent {
         'id': 'tree_1',
         'question': 'Sino ang mga magulang ng iyong Ama o Ina?',
         'choices': [
-          'Lolo at Lola',
-          'Tiyo at Tiya',
-          'Mga kapatid',
-          'Mga Pinsan'
+          '🧓 Lolo at Lola',
+          '🧔 Tiyo at Tiya',
+          '👫 Mga kapatid',
+          '🧒 Mga Pinsan'
         ],
         'correct': 0,
         'explanation':
@@ -1793,7 +1793,7 @@ class PamilyaContent {
       {
         'id': 'tree_2',
         'question': 'Sino ang pinakabata sa pamilya?',
-        'choices': ['Kuya', 'Ate', 'Bunso', 'Lola'],
+        'choices': ['🧑 Kuya', '👧 Ate', '👶 Bunso', '👵 Lola'],
         'correct': 2,
         'explanation':
             'Tama! Ang bunso ang pinakabatang kasapi ng pamilya sa lahat ng magkakapatid.'
@@ -1802,7 +1802,7 @@ class PamilyaContent {
         'id': 'tree_3',
         'question':
             'Ano ang tawag sa nakakatandang kapatid na lalaki sa Filipino?',
-        'choices': ['Ate', 'Kuya', 'Bunso', 'Lolo'],
+        'choices': ['👧 Ate', '🧑 Kuya', '👶 Bunso', '👴 Lolo'],
         'correct': 1,
         'explanation':
             'Tama! Kuya ang tawag sa nakatatandang kapatid na lalaki.'
@@ -1811,7 +1811,7 @@ class PamilyaContent {
         'id': 'tree_4',
         'question':
             'Ano ang tawag sa nakakatandang kapatid na babae sa Filipino?',
-        'choices': ['Kuya', 'Ate', 'Bunso', 'Lola'],
+        'choices': ['🧑 Kuya', '👧 Ate', '👶 Bunso', '👵 Lola'],
         'correct': 1,
         'explanation': 'Tama! Ate ang tawag sa nakatatandang kapatid na babae.'
       },
@@ -1820,10 +1820,10 @@ class PamilyaContent {
         'question':
             'Sino ang gumagabay at nag-aalaga sa mga anak sa loob ng tahanan?',
         'choices': [
-          'Ama at Ina',
-          'Mga kapitbahay',
-          'Mga hindi kakilala',
-          'Mga Alagang Hayop lamang'
+          '👨‍👩‍👧 Ama at Ina',
+          '🏘️ Mga kapitbahay',
+          '👥 Mga hindi kakilala',
+          '🐶 Mga Alagang Hayop lamang'
         ],
         'correct': 0,
         'explanation':
@@ -1834,10 +1834,10 @@ class PamilyaContent {
         'question':
             'Anong tsart ang nagpapakita ng ugnayan ng pamilya sa iba\'t-ibang henerasyon?',
         'choices': [
-          'Puno ng Pamilya (Family Tree)',
-          'Listahan ng Bilihin',
-          'Kalendaryo',
-          'Talaan ng Panahon'
+          '🌳 Puno ng Pamilya (Family Tree)',
+          '📝 Listahan ng Bilihin',
+          '📅 Kalendaryo',
+          '⛅ Talaan ng Panahon'
         ],
         'correct': 0,
         'explanation':
@@ -1847,10 +1847,10 @@ class PamilyaContent {
         'id': 'tree_7',
         'question': 'Paano dapat tratuhin ang bawat kasapi ng pamilya?',
         'choices': [
-          'Magmahalan at magrespetuhan',
-          'Mag-away araw-araw',
-          'Magdedmahan',
-          'Magsigawan'
+          '💕 Magmahalan at magrespetuhan',
+          '🤼 Mag-away araw-araw',
+          '🙄 Magdedmahan',
+          '😡 Magsigawan'
         ],
         'correct': 0,
         'explanation':
@@ -1862,10 +1862,10 @@ class PamilyaContent {
         'id': 'tree_1',
         'question': 'Sinno dagiti nagannak ni Tatang wenno ni Nanang mo?',
         'choices': [
-          'Lilong ken Lilang',
-          'Uliteg ken Ikit',
-          'Kakabsat',
-          'Kasinsin'
+          '🧓 Lilong ken Lilang',
+          '🧔 Uliteg ken Ikit',
+          '👫 Kakabsat',
+          '🧒 Kasinsin'
         ],
         'correct': 0,
         'explanation':
@@ -1874,7 +1874,7 @@ class PamilyaContent {
       {
         'id': 'tree_2',
         'question': 'Sinno ti kaudian a kabsat iti pamilia?',
-        'choices': ['Manong', 'Manang', 'Ubing / Inaudi', 'Lilang'],
+        'choices': ['🧑 Manong', '👧 Manang', '👶 Ubing / Inaudi', '👵 Lilang'],
         'correct': 2,
         'explanation':
             'Kusto! Ti maladaga wenno kaubingan a kameng kadagiti kakabsat.'
@@ -1885,7 +1885,7 @@ class PamilyaContent {
             'Ania ti awagmo iti in-inauna a kabsat a lalaki iti Tagalog/Filipino?',
         // The question asks for the Tagalog word, so the Tagalog word is the
         // answer: it offered only Ilokano ones and marked "Manong" right.
-        'choices': ['Manang', 'Kuya', 'Inaudi', 'Lilong'],
+        'choices': ['👧 Manang', '🧑 Kuya', '👶 Inaudi', '👴 Lilong'],
         'correct': 1,
         'explanation': 'Kusto! Kuya ti awag ti Tagalog iti manong.'
       },
@@ -1893,7 +1893,7 @@ class PamilyaContent {
         'id': 'tree_4',
         'question':
             'Ania ti awagmo iti in-inauna a kabsat a babai iti Tagalog/Filipino?',
-        'choices': ['Manong', 'Ate', 'Inaudi', 'Lilang'],
+        'choices': ['🧑 Manong', '👧 Ate', '👶 Inaudi', '👵 Lilang'],
         'correct': 1,
         'explanation': 'Kusto! Ate ti awag ti Tagalog iti manang.'
       },
@@ -1902,10 +1902,10 @@ class PamilyaContent {
         'question':
             'Sinno ti mangiturong ken mangaywan kadagiti annak iti balay?',
         'choices': [
-          'Tatang ken Nanang',
-          'Karruba',
-          'Ganggannaet',
-          'Ay-ayup laeng'
+          '👨‍👩‍👧 Tatang ken Nanang',
+          '🏘️ Karruba',
+          '👥 Ganggannaet',
+          '🐶 Ay-ayup laeng'
         ],
         'correct': 0,
         'explanation':
@@ -1916,10 +1916,10 @@ class PamilyaContent {
         'question':
             'Ania ti tsart ti mangipakita iti relasion iti sumaganad a henerasion?',
         'choices': [
-          'Puon ti Pamilya',
-          'Listaan ti batangan',
-          'Kalendario',
-          'Tsart ti Panawen'
+          '🌳 Puon ti Pamilya',
+          '📝 Listaan ti batangan',
+          '📅 Kalendario',
+          '⛅ Tsart ti Panawen'
         ],
         'correct': 0,
         'explanation':
@@ -1929,10 +1929,10 @@ class PamilyaContent {
         'id': 'tree_7',
         'question': 'Kasano koma ti panagtitinnulong dagiti kameng ti pamilia?',
         'choices': [
-          'Ti ayat ken respeto',
-          'Aga-apa',
-          'Babaen ti saan a panag pipinnansin',
-          'Agpukkaw'
+          '💕 Ti ayat ken respeto',
+          '🤼 Aga-apa',
+          '🙄 Babaen ti saan a panag pipinnansin',
+          '😡 Agpukkaw'
         ],
         'correct': 0,
         'explanation':
@@ -1951,7 +1951,7 @@ class PamilyaContent {
       {
         'id': 'home_1',
         'question': 'In which part of the house do we cook and prepare food?',
-        'choices': ['Kitchen', 'Bedroom', 'Bathroom', 'Garage'],
+        'choices': ['🥘 Kitchen', '🛌 Bedroom', '🛁 Bathroom', '🚙 Garage'],
         'correct': 0,
         'explanation':
             'Correct! The kitchen is where delicious meals are prepared.'
@@ -1959,7 +1959,7 @@ class PamilyaContent {
       {
         'id': 'home_2',
         'question': 'In which part of the house do we sleep and rest?',
-        'choices': ['Bedroom', 'Kitchen', 'Yard', 'Dining room'],
+        'choices': ['🛌 Bedroom', '🥘 Kitchen', '🌻 Yard', '🍽️ Dining room'],
         'correct': 0,
         'explanation': 'Correct! Bedrooms provide rest and peaceful sleep.'
       },
@@ -1967,10 +1967,10 @@ class PamilyaContent {
         'id': 'home_3',
         'question': 'Where does the family gather to talk and watch TV?',
         'choices': [
-          'Living Room (Sala)',
-          'Bathroom',
-          'Storage room',
-          'Kitchen'
+          '🖼️ Living Room (Sala)',
+          '🛁 Bathroom',
+          '📦 Storage room',
+          '🥘 Kitchen'
         ],
         'correct': 0,
         'explanation':
@@ -1979,14 +1979,14 @@ class PamilyaContent {
       {
         'id': 'home_4',
         'question': 'Where do we take a bath and wash up?',
-        'choices': ['Bathroom', 'Living Room', 'Garden', 'Bedroom'],
+        'choices': ['🛁 Bathroom', '🖼️ Living Room', '🌻 Garden', '🛌 Bedroom'],
         'correct': 0,
         'explanation': 'Correct! We maintain hygiene in the bathroom.'
       },
       {
         'id': 'home_5',
         'question': 'Where can children safely play outdoors near home?',
-        'choices': ['Yard / Garden', 'Busy road', 'Kitchen stove', 'Roof'],
+        'choices': ['🌻 Yard / Garden', '🛣️ Busy road', '🔥 Kitchen stove', '🛖 Roof'],
         'correct': 0,
         'explanation': 'Correct! The yard or garden is safe for outdoor fun.'
       },
@@ -1994,10 +1994,10 @@ class PamilyaContent {
         'id': 'home_6',
         'question': 'Why is our home very important to us?',
         'choices': [
-          'It protects and shelters our family with love',
-          'It is just a store',
-          'It is noisy',
-          'No reason'
+          '🏡 It protects and shelters our family with love',
+          '🏪 It is just a store',
+          '📢 It is noisy',
+          '🤷 No reason'
         ],
         'correct': 0,
         'explanation':
@@ -2007,10 +2007,10 @@ class PamilyaContent {
         'id': 'home_7',
         'question': 'How can we help keep our home clean and neat?',
         'choices': [
-          'Help sweep and organize toys',
-          'Throw trash anywhere',
-          'Break things',
-          'Make a mess'
+          '🧹 Help sweep and organize toys',
+          '🗑️ Throw trash anywhere',
+          '💥 Break things',
+          '🧱 Make a mess'
         ],
         'correct': 0,
         'explanation':
@@ -2022,7 +2022,7 @@ class PamilyaContent {
         'id': 'home_1',
         'question':
             'Saang bahagi ng tahanan tayo nagluluto at naghahanda ng pagkain?',
-        'choices': ['Kusina', 'Kuwarto', 'Banyo', 'Garahe'],
+        'choices': ['🥘 Kusina', '🛌 Kuwarto', '🛁 Banyo', '🚙 Garahe'],
         'correct': 0,
         'explanation':
             'Tama! Sa Kusina tayo naghahanda ng mga masasarap na pagkain.'
@@ -2030,7 +2030,7 @@ class PamilyaContent {
       {
         'id': 'home_2',
         'question': 'Saang bahagi ng tahanan tayo natutulog at nagpapahinga?',
-        'choices': ['Kuwarto', 'Kusina', 'Bakuran', 'Silid-kainan'],
+        'choices': ['🛌 Kuwarto', '🥘 Kusina', '🌻 Bakuran', '🍽️ Silid-kainan'],
         'correct': 0,
         'explanation':
             'Tama! Sa Kuwarto tayo nakakapagpahinga at nakakatulog nang mahimbing.'
@@ -2039,14 +2039,14 @@ class PamilyaContent {
         'id': 'home_3',
         'question':
             'Saan nagtitipon ang pamilya upang magkuwentuhan at manood ng telebisyon?',
-        'choices': ['Sala', 'Banyo', 'Silid-imbakan', 'Kusina'],
+        'choices': ['🖼️ Sala', '🛁 Banyo', '📦 Silid-imbakan', '🥘 Kusina'],
         'correct': 0,
         'explanation': 'Tama! Sa Sala nagpapahinga at nagtitipon ang pamilya.'
       },
       {
         'id': 'home_4',
         'question': 'Saan tayo naliligo at naghuhugas ng katawan?',
-        'choices': ['Banyo', 'Sala', 'Hardin', 'Kuwarto'],
+        'choices': ['🛁 Banyo', '🖼️ Sala', '🌻 Hardin', '🛌 Kuwarto'],
         'correct': 0,
         'explanation': 'Tama! Sa banyo tayo naliligo para maging malinis.'
       },
@@ -2054,7 +2054,7 @@ class PamilyaContent {
         'id': 'home_5',
         'question':
             'Saan maaaring ligtas na maglaro ang mga bata sa labas ng bahay?',
-        'choices': ['Bakuran', 'Mataong daan', 'Kalan sa kusina', 'Bubong'],
+        'choices': ['🌻 Bakuran', '🛣️ Mataong daan', '🔥 Kalan sa kusina', '🛖 Bubong'],
         'correct': 0,
         'explanation': 'Tama! Ligtas maglaro at magsaya sa bakuran o hardin.'
       },
@@ -2062,10 +2062,10 @@ class PamilyaContent {
         'id': 'home_6',
         'question': 'Bakit napakahalaga sa atin ang ating tahanan?',
         'choices': [
-          'Pinoprotektahan at inaalagaan nito ang aming pamilya nang may pagmamahal',
-          'Isa lamang itong tindahan',
-          'Maingay',
-          'Walang dahilan'
+          '🏡 Dito tayo ligtas at minamahal',
+          '🏪 Isa lamang itong tindahan',
+          '📢 Maingay',
+          '🤷 Walang dahilan'
         ],
         'correct': 0,
         'explanation':
@@ -2075,10 +2075,10 @@ class PamilyaContent {
         'id': 'home_7',
         'question': 'Paano natin mapapanatiling malinis at maayos ang tahanan?',
         'choices': [
-          'Magtulong sa pag-aayos at pagwawalis',
-          'Magkalat sa sahig',
-          'Manira ng gamit',
-          'Iwanan ang laruan sa daan'
+          '🧹 Magtulong sa pag-aayos at pagwawalis',
+          '🗑️ Magkalat sa sahig',
+          '💥 Manira ng gamit',
+          '🧱 Iwanan ang laruan sa daan'
         ],
         'correct': 0,
         'explanation':
@@ -2090,7 +2090,7 @@ class PamilyaContent {
         'id': 'home_1',
         'question':
             'Iti ania a paset ti balay ti paglutuan ken pangisaganaan iti taraon?',
-        'choices': ['Kusina', 'Kuarto', 'Banio', 'Garahe'],
+        'choices': ['🥘 Kusina', '🛌 Kuarto', '🛁 Banio', '🚙 Garahe'],
         'correct': 0,
         'explanation':
             'Kusto! Ti kusina ti pangisaganaan kadagiti naimas a taraon.'
@@ -2099,7 +2099,7 @@ class PamilyaContent {
         'id': 'home_2',
         'question':
             'Iti ania a paset ti balay ti pagturogan ken paginanaan tayo?',
-        'choices': ['Kuarto', 'Kusina', 'Paraangan', 'Panganan'],
+        'choices': ['🛌 Kuarto', '🥘 Kusina', '🌻 Paraangan', '🍽️ Panganan'],
         'correct': 0,
         'explanation':
             'Kusto! Ti kwarto ket mangmangted iti inana ken natalna a panag-turog'
@@ -2108,7 +2108,7 @@ class PamilyaContent {
         'id': 'home_3',
         'question':
             'Sadino ti pagu-umongan ti pamilia tapno agsasarita ken agbuya iti TV?',
-        'choices': ['Salas', 'Banio', 'Bodega', 'Kusina'],
+        'choices': ['🖼️ Salas', '🛁 Banio', '📦 Bodega', '🥘 Kusina'],
         'correct': 0,
         'explanation':
             'Salas: Aginana ken agbuya iti TV a agkakadua ti pamilia.'
@@ -2116,7 +2116,7 @@ class PamilyaContent {
       {
         'id': 'home_4',
         'question': 'Sadinno ti pag-digosantayo ken pagbugguan tayo?',
-        'choices': ['Banio', 'Salas', 'Hardin', 'Kuarto'],
+        'choices': ['🛁 Banio', '🖼️ Salas', '🌻 Hardin', '🛌 Kuarto'],
         'correct': 0,
         'explanation':
             'Kusto! Iti Banio ti panagsalimet-mettayo iti kinadalus ti bagi.'
@@ -2126,10 +2126,10 @@ class PamilyaContent {
         'question':
             'Sadinno a natalged a pagay-ayaman dagiti ubbing iti ruar nga asideg iti balay?',
         'choices': [
-          'Paraangan',
-          'Kalsada nga adu lumablabas',
-          'Kalan ti kusina',
-          'Atep'
+          '🌻 Paraangan',
+          '🛣️ Kalsada nga adu lumablabas',
+          '🔥 Kalan ti kusina',
+          '🛖 Atep'
         ],
         'correct': 0,
         'explanation':
@@ -2139,10 +2139,10 @@ class PamilyaContent {
         'id': 'home_6',
         'question': 'Apay a napateg unay kadatayo ti balay tayo?',
         'choices': [
-          'Sal-salaknibanna ken lin-linongan ti pamilia tayo babaen iti ayat.',
-          'Maysa laeng a tiendaan',
-          'Naariwawa daytoy',
-          'Awan gapuna'
+          '🏡 Sal-salaknibanna ken lin-linongan ti pamilia tayo babaen iti ayat.',
+          '🏪 Maysa laeng a tiendaan',
+          '📢 Naariwawa daytoy',
+          '🤷 Awan gapuna'
         ],
         'correct': 0,
         'explanation':
@@ -2153,10 +2153,10 @@ class PamilyaContent {
         'question':
             'Kasano tayo a makatulong tapno nadalus ken nasayaat ti pagtaengantayo?',
         'choices': [
-          'Tumulong nga agsagad ken mangurnos kadagiti ay-ayam.',
-          'Ibelleng ti basura iti sadinoman',
-          'Buraken dagiti bambanag',
-          'Baybay-an dagiti ay-ayam'
+          '🧹 Tumulong nga agsagad ken mangurnos kadagiti ay-ayam.',
+          '🗑️ Ibelleng ti basura iti sadinoman',
+          '💥 Buraken dagiti bambanag',
+          '🧱 Baybay-an dagiti ay-ayam'
         ],
         'correct': 0,
         'explanation':

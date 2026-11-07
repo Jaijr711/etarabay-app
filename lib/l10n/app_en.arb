@@ -47,6 +47,40 @@
   "magbasaTitle": "Stories and Songs",
   "alpabetoAtMgaSalita": "Read & Sing!",
   "home": "Home",
+  "videoParts": "Parts",
+  "@videoParts": {
+    "description": "Button in the teacher guide video player that lists its parts to jump to."
+  },
+  "updateRequiredBody": "To use E-Tarabay, first update to version {version}.",
+  "@updateRequiredBody": {
+    "description": "Over the whole app when the developers require a newer version than the one installed.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "maintenanceTitle": "Just a moment!",
+  "@maintenanceTitle": {
+    "description": "Over a child's app while the developers have switched on maintenance mode."
+  },
+  "maintenanceNote": "We're fixing the app. It will open again by itself when we're done.",
+  "updateThisPhone": "On this phone",
+  "updateNeeded": "Needed",
+  "@updateThisPhone": {
+    "description": "Label over the installed version on the update-required cover."
+  },
+  "childRemovedNotice": "This child has been removed.",
+  "testAccountTag": "Test",
+  "testAccountNote": "Finished by the developer for testing. Not real progress.",
+  "@testAccountTag": {"description": "Tag on a student card the developer finished for testing."},
+  "@childRemovedNotice": {
+    "description": "Shown when a child's record was deleted while their report or edit form was open."
+  },
+  "teacherHowToUse": "How to use the app",
+  "@teacherHowToUse": {
+    "description": "Opens the silent video that walks a teacher through the app; the video itself is in Filipino for every language."
+  },
   "settingsTitle": "Settings",
   "poems": "Poetry",
   "stories": "Stories",
@@ -1113,7 +1147,7 @@
   "greetAfternoon": "Good Afternoon!",
   "greetEvening": "Good Evening!",
   "updateAvailableTitle": "A new version is available!",
-  "updateAvailableBody": "Version {version} is ready to download.",
+  "updateAvailableBody": "Version {version} is ready. Updates are installed from the E-Tarabay website.",
   "@updateAvailableBody": {
     "placeholders": {
       "version": {
@@ -1121,7 +1155,17 @@
       }
     }
   },
-  "updateDownloadNow": "Download Now",
+  "updateDownloadNow": "Update",
+  "updateOpenWebsite": "Open in your browser: {url}",
+  "watchHowToPlay": "Watch",
+  "zoomIn": "Zoom in",
+  "@updateOpenWebsite": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
   "updateLater": "Later",
   "bgPermissionTitle": "Tell Mom or Dad!",
   "bgPermissionBody": "For the reminders to work, ask them to allow E-Tarabay in the phone's Battery and Autostart settings.",

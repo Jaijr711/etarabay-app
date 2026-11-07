@@ -50,6 +50,7 @@ Future<bool> showResetProgressSheet(
       _ when result['status'] == 'Success' => loc.resetActivitiesDone,
       'needsInternet' => loc.authNeedsInternet,
       'finishesOnline' => loc.authFinishesOnline,
+      'childRemoved' => loc.childRemovedNotice,
       _ => loc.resetActivitiesFailed,
     }),
     backgroundColor: result['status'] == 'Success'

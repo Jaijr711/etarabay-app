@@ -71,6 +71,11 @@ class ForParentsScreen extends StatefulWidget {
   /// Whether this is somebody looking in, rather than the parent at home.
   bool get isVisiting => viewStudentId != null;
 
+  /// A child's record to show instead of the one in Firestore, for the
+  /// teacher how-to video, which records this report without Firebase.
+  static Stream<DocumentSnapshot<Map<String, dynamic>>> Function(String id)?
+      debugStudentDoc;
+
   @override
   State<ForParentsScreen> createState() => _ForParentsScreenState();
 }
@@ -1424,16 +1429,31 @@ class _ForParentsScreenState extends State<ForParentsScreen> {
     }
 
     try {
-      _siblingSub = FirebaseFirestore.instance
-          .collection('students')
-          .doc(id)
-          .snapshots()
+      _siblingSub = (ForParentsScreen.debugStudentDoc?.call(id) ??
+              FirebaseFirestore.instance
+                  .collection('students')
+                  .doc(id)
+                  .snapshots())
           .listen((doc) async {
         // Another child was picked meanwhile.
         if (!mounted || _siblingId != id) return;
         // The server says this child is gone: the teacher removed them. Only
         // the server: a phone that never cached them would say the same.
         if (!doc.exists && !doc.metadata.isFromCache) {
+          // The teacher's view of one child: there is nobody else to show,
+          // and left open it went blank under whatever name and stars this
+          // phone last had. Closed, with the reason.
+          if (widget.isVisiting) {
+            final messenger = ScaffoldMessenger.maybeOf(context);
+            final notice = AppLocalizations.of(context)!.childRemovedNotice;
+            final nav = Navigator.of(context);
+            final report = ModalRoute.of(context);
+            // A module page open over the report goes with it.
+            nav.popUntil((r) => r == report || r.isFirst);
+            nav.maybePop();
+            messenger?.showSnackBar(SnackBar(content: Text(notice)));
+            return;
+          }
           await _dropKnownChild(id);
           if (!mounted) return;
           _showSignedInChild();

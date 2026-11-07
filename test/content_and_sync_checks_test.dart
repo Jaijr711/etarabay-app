@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:e_tarabay/data/pamilya_content.dart';
 import 'package:e_tarabay/providers/language_provider.dart';
 import 'package:e_tarabay/providers/user_provider.dart';
+import 'package:e_tarabay/widgets/answer_tile.dart';
+import 'package:e_tarabay/widgets/object_picture.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Checks on things the reviews found wrong, each once easy to get wrong
@@ -39,9 +43,55 @@ void main() {
             'All of the above',
             'Lahat ng nabanggit',
             'Amin kadagitoy'
-          }.contains(c[g['correct'] as int]);
+          }.contains(
+              AnswerTile.withoutLeadingEmoji(c[g['correct'] as int]));
         });
         expect(all, hasLength(1), reason: lang);
+      }
+    });
+
+    // The quiz answers in Ang Aking Sarili were once words only, which a
+    // child of three cannot read; each now leads with its picture, and a new
+    // or translated answer must too.
+    test('every quiz answer in Ang Aking Sarili starts with a picture', () {
+      final levels = [
+        PamilyaContent.getPamilyaLevel2Games,
+        PamilyaContent.getPamilyaLevel3Games,
+        PamilyaContent.getPamilyaLevel4Games,
+        PamilyaContent.getPamilyaLevel5Games,
+      ];
+      for (final lang in ['en', 'fil', 'ilo']) {
+        for (final games in levels) {
+          for (final g in games(lang)) {
+            final choices = (g['choices'] as List?)?.cast<String>();
+            if (choices == null) continue;
+            for (final c in choices) {
+              expect(AnswerTile.leadingEmoji(c), isNotNull,
+                  reason: '$lang ${g['id']}: "$c"');
+            }
+          }
+        }
+      }
+    });
+
+    test('every picture an answer leads with has artwork', () {
+      for (final lang in ['en', 'fil', 'ilo']) {
+        for (final games in [
+          PamilyaContent.getPamilyaLevel2Games,
+          PamilyaContent.getPamilyaLevel3Games,
+          PamilyaContent.getPamilyaLevel4Games,
+          PamilyaContent.getPamilyaLevel5Games,
+        ]) {
+          for (final g in games(lang)) {
+            for (final c in (g['choices'] as List?)?.cast<String>() ?? []) {
+              final emoji = AnswerTile.leadingEmoji(c);
+              if (emoji == null) continue;
+              final path = ObjectPicture.assetFor(emoji);
+              expect(path, isNotNull, reason: '$lang ${g['id']}: "$c"');
+              expect(File(path!).existsSync(), isTrue, reason: path);
+            }
+          }
+        }
       }
     });
 

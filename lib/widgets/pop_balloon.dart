@@ -345,7 +345,10 @@ class BalloonPainter extends CustomPainter {
     final tp = TextPainter(
       text: TextSpan(
         text: '$value',
+        // Named, not left to the default: a canvas inherits no theme, so
+        // without it the number fell to whatever face the platform had.
         style: TextStyle(
+          fontFamily: 'Roboto',
           fontSize: fontSize * scale,
           fontWeight: FontWeight.w900,
           color: Colors.white.withOpacity(fade),

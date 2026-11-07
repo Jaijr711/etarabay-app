@@ -93,6 +93,40 @@ class AppLocalizationsFil extends AppLocalizations {
   String get home => 'Pangunahing Pahina';
 
   @override
+  String get videoParts => 'Mga bahagi';
+
+  @override
+  String updateRequiredBody(String version) {
+    return 'Para magamit ang E-Tarabay, i-update muna sa bersyon $version.';
+  }
+
+  @override
+  String get maintenanceTitle => 'Sandali lang!';
+
+  @override
+  String get maintenanceNote =>
+      'Inaayos namin ang app. Kusa itong babalik kapag tapos na kami.';
+
+  @override
+  String get updateThisPhone => 'Nasa phone';
+
+  @override
+  String get updateNeeded => 'Kailangan';
+
+  @override
+  String get childRemovedNotice => 'Inalis na ang batang ito.';
+
+  @override
+  String get testAccountTag => 'Pang-test';
+
+  @override
+  String get testAccountNote =>
+      'Tinapos ng developer para i-test. Hindi ito totoong progress.';
+
+  @override
+  String get teacherHowToUse => 'Paano gamitin ang app';
+
+  @override
   String get settingsTitle => 'Pag-aayos';
 
   @override
@@ -1595,11 +1629,22 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String updateAvailableBody(String version) {
-    return 'Handa nang i-download ang bersyon $version.';
+    return 'Handa na ang bersyon $version. Sa website ng E-Tarabay ito ina-update.';
   }
 
   @override
-  String get updateDownloadNow => 'I-download Ngayon';
+  String get updateDownloadNow => 'I-update';
+
+  @override
+  String updateOpenWebsite(String url) {
+    return 'Buksan sa browser: $url';
+  }
+
+  @override
+  String get watchHowToPlay => 'Panoorin';
+
+  @override
+  String get zoomIn => 'Palakihin';
 
   @override
   String get updateLater => 'Mamaya na Lang';

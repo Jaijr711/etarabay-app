@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'app_version.dart';
+
 /// Checks for a newer build outside the Play Store — GitHub's own "latest
 /// release" API, read against the repo the APK is published to.
 ///
@@ -12,9 +14,9 @@ import 'package:url_launcher/url_launcher.dart';
 /// store to push through, so the app has to ask on its own. A release is
 /// offered as an update when its tag names a version newer than the one
 /// installed — publishing a release tagged `vX.Y.Z` (matching
-/// `pubspec.yaml`'s `version: X.Y.Z+<build>`) with the APK attached as its
-/// one asset is the whole publishing step; nothing else needs configuring
-/// here.
+/// `pubspec.yaml`'s `version: X.Y.Z+<build>`) with the APK attached is the
+/// whole publishing step; nothing else needs configuring here. The update
+/// itself is installed from the download website, never from the app.
 class UpdateChecker {
   UpdateChecker._();
   static final UpdateChecker instance = UpdateChecker._();
@@ -54,19 +56,12 @@ class UpdateChecker {
       if (remoteVersion.isEmpty) return null;
 
       final info = await PackageInfo.fromPlatform();
-      if (_compareVersions(remoteVersion, info.version) <= 0) return null;
-
-      final assets = json['assets'] as List<dynamic>? ?? [];
-      if (assets.isEmpty) return null;
-      final apkUrl = (assets.first
-          as Map<String, dynamic>)['browser_download_url'] as String?;
-      if (apkUrl == null || apkUrl.isEmpty) return null;
+      if (AppVersion.compare(remoteVersion, info.version) <= 0) return null;
 
       final notes = json['body'] as String?;
 
       return UpdateInfo(
         versionName: remoteVersion,
-        apkUrl: apkUrl,
         pageUrl: updatePageUrl(info.version),
         notes: (notes != null && notes.trim().isNotEmpty) ? notes : null,
       );
@@ -76,64 +71,23 @@ class UpdateChecker {
     }
   }
 
-  /// -1, 0 or 1 the way [Comparable] expects. Each side is compared
-  /// part-by-part with the shorter one padded with zeros, so "1.2" and
-  /// "1.2.0" compare equal instead of one side running out of parts —
-  /// a plain string compare would also get "1.10.0" wrong against "1.9.0".
-  ///
-  /// Each part is read by its leading digits, not parsed whole — a release
-  /// tag left over from testing (say "v1.2.17-g") once silently fell back
-  /// to 0 on its last part, and that made the app think the newest real
-  /// release was older than everything already installed, so nobody was
-  /// ever offered an update at all.
-  int _compareVersions(String a, String b) {
-    final partsA = a.split('.').map(_leadingInt).toList();
-    final partsB = b.split('.').map(_leadingInt).toList();
-    final len = partsA.length > partsB.length ? partsA.length : partsB.length;
-    for (var i = 0; i < len; i++) {
-      final va = i < partsA.length ? partsA[i] : 0;
-      final vb = i < partsB.length ? partsB[i] : 0;
-      if (va != vb) return va.compareTo(vb);
-    }
-    return 0;
-  }
-
-  /// The digits a version part starts with, as a number — "17-g" reads as
-  /// 17, "17" reads as 17, "-g" (nothing before the suffix) reads as 0.
-  int _leadingInt(String part) {
-    final match = RegExp(r'^\d+').firstMatch(part);
-    return match == null ? 0 : int.parse(match.group(0)!);
-  }
-
-  /// Hands the download to the device's own browser rather than fetching
-  /// the APK here and installing it directly. Android takes it from
-  /// there: downloads the file, then offers its own "install unknown app"
-  /// flow — the same one every sideloaded app already goes through, well
-  /// tested and already familiar to anyone who has installed one before.
-  /// Fetching the bytes and driving a FileProvider/install-intent by hand
-  /// would need its own storage and install permissions for no real gain
-  /// over a flow Android already owns end to end.
-  Future<void> openDownload(String apkUrl) {
-    return launchUrl(Uri.parse(apkUrl), mode: LaunchMode.externalApplication);
-  }
-
-  /// Opens the download website for [update], or the APK itself when the
-  /// browser will not take the page.
-  Future<void> openUpdatePage(UpdateInfo update) async {
+  /// Opens the download website for [update] in the device's own browser.
+  /// Updates are installed only from there — the app never fetches the
+  /// APK itself, not even when the page will not open. False then, so the
+  /// caller can show the address to type in by hand.
+  Future<bool> openUpdatePage(UpdateInfo update) async {
     try {
-      final opened = await launchUrl(Uri.parse(update.pageUrl),
+      return await launchUrl(Uri.parse(update.pageUrl),
           mode: LaunchMode.externalApplication);
-      if (opened) return;
     } catch (e) {
       debugPrint('UpdateChecker: page not opened: $e');
+      return false;
     }
-    await openDownload(update.apkUrl);
   }
 }
 
 class UpdateInfo {
   final String versionName;
-  final String apkUrl;
 
   /// The download website, told which version is installed.
   final String pageUrl;
@@ -141,7 +95,6 @@ class UpdateInfo {
 
   const UpdateInfo({
     required this.versionName,
-    required this.apkUrl,
     required this.pageUrl,
     this.notes,
   });

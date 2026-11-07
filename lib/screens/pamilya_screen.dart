@@ -26,6 +26,7 @@ import 'dart:async';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import '../widgets/replay_dialog.dart';
 import '../widgets/design_scale.dart';
+import '../widgets/how_to_video.dart';
 import '../utils/shuffled_choices.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -538,10 +539,43 @@ class _PamilyaScreenState extends State<PamilyaScreen>
     // they have already done. It saves a child who was struggling from being
     // skipped past the very questions they needed.
     _currentGameIndex = 0;
+    _filmOffered = null;
     _levelStars = 0;
     _levelScore = 0;
     _wrongAttempts = 0;
     _resetQuestionState();
+  }
+
+  /// The film for the board on screen — `tree` or `home` — or null on a
+  /// question with answers to pick, which needs none.
+  String? get _boardFilm {
+    if (!_playing || _selectedMainCategory != 1) return null;
+    if (_selectedLevel == 3 &&
+        _currentGameIndex == _pamilyaLevel4Games.length - 1) {
+      return 'tree';
+    }
+    if (_selectedLevel == 4 &&
+        _currentGameIndex == _pamilyaLevel5Games.length - 1) {
+      return 'home';
+    }
+    return null;
+  }
+
+  /// The board whose film has been offered this visit, so a rebuild does
+  /// not offer it again.
+  String? _filmOffered;
+
+  /// Each board's film plays by itself the first time a child reaches it:
+  /// tapping people or rooms is not what every other question asks.
+  void _offerBoardFilm() {
+    final film = _boardFilm;
+    if (film == null || film == _filmOffered) return;
+    _filmOffered = film;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _boardFilm != film) return;
+      unawaited(HowToVideo.showOnce(
+          context, film, HowToVideo.assetFor(context, film)));
+    });
   }
 
   void _resetQuestionState() {
@@ -1403,11 +1437,17 @@ class _PamilyaScreenState extends State<PamilyaScreen>
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(_getMainCategoryTitle(_selectedMainCategory),
-              style: const TextStyle(
-                  color: AppColors.textDark,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold)),
+          // Smaller rather than cut off when the Panoorin pill shares the bar.
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(_getMainCategoryTitle(_selectedMainCategory),
+                maxLines: 1,
+                style: const TextStyle(
+                    color: AppColors.textDark,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold)),
+          ),
           Text(AppLocalizations.of(context)!.level(_selectedLevel + 1),
               style: TextStyle(
                   color: Colors.grey.shade500,
@@ -1417,6 +1457,10 @@ class _PamilyaScreenState extends State<PamilyaScreen>
         ],
       ),
       actions: [
+        if (_boardFilm case final film?)
+          PanoorinPill(
+              onTap: () =>
+                  HowToVideo.show(context, HowToVideo.assetFor(context, film))),
         _buildAppBarPill(
           icon: '⭐',
           label: '${Provider.of<UserProvider>(context).displayStars}',
@@ -1985,10 +2029,25 @@ class _PamilyaScreenState extends State<PamilyaScreen>
     // "Girl" and "Boy" each came out as a tile half the screen tall with one
     // word floating in it. Splitting short answers across two columns gives
     // them a sensible size and still puts them all in view at once.
+    //
+    // Measured on the words alone: the picture in front of an answer is not
+    // more to read, and counting it sent "🛁 Banyo" to a row of its own.
     final short = labels != null &&
         labels.isNotEmpty &&
-        labels.every((l) => l.trim().length <= _twoColumnLabelLimit);
-    final cols = (short && choices.length >= 2) ? 2 : 1;
+        labels.every((l) =>
+            AnswerTile.withoutLeadingEmoji(l).trim().length <=
+            _twoColumnLabelLimit);
+    final baseCols = (short && choices.length >= 2) ? 2 : 1;
+    // Sentences that each come with a picture get two by two as well, the
+    // picture on top, when the words still read at that size. In a row of
+    // its own a picture is only as tall as the row — about 45 px with four
+    // answers, too small to make out a scene of a child tidying up, and the
+    // picture is what a child who cannot read yet answers by.
+    final pictured = !short &&
+        choices.length >= 2 &&
+        labels != null &&
+        labels.isNotEmpty &&
+        labels.every((l) => AnswerTile.leadingEmoji(l) != null);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
@@ -2019,9 +2078,9 @@ class _PamilyaScreenState extends State<PamilyaScreen>
                     Expanded(
                       child: LayoutBuilder(builder: (_, inner) {
                         const gap = 10.0;
-                        final rows = (choices.length / cols).ceil();
-                        final cellW =
-                            (inner.maxWidth - gap * (cols - 1)) / cols;
+                        final textScaler = MediaQuery.textScalerOf(context);
+                        final fontFamily =
+                            DefaultTextStyle.of(context).style.fontFamily;
 
                         // A tile is as tall as it needs to be, not as tall as
                         // the space allows.
@@ -2033,16 +2092,42 @@ class _PamilyaScreenState extends State<PamilyaScreen>
                         // what is left turns that dead space into margin
                         // above and below, which reads as room to breathe
                         // instead of a mistake.
-                        final available =
-                            (inner.maxHeight - gap * (rows - 1)) / rows;
+                        //
                         // Raised from 92 and 80. Those caps were chosen when
                         // two pinned strips held about 136 pixels above this
                         // board; with the strips gone the same caps left the
                         // extra room as blank card. At this height a short
                         // answer stands its picture above its word instead of
                         // beside it — see [AnswerTile].
-                        final cap = short ? 132.0 : 108.0;
-                        final cellH = available < cap ? available : cap;
+                        (double, double) cell(int cols, double cap) {
+                          final rows = (choices.length / cols).ceil();
+                          final available =
+                              (inner.maxHeight - gap * (rows - 1)) / rows;
+                          return (
+                            (inner.maxWidth - gap * (cols - 1)) / cols,
+                            available < cap ? available : cap,
+                          );
+                        }
+
+                        double fontFor(double cellW, double cellH) =>
+                            AnswerTile.fitFontSize(labels!,
+                                cellW: cellW,
+                                cellH: cellH,
+                                textScaler: textScaler,
+                                fontFamily: fontFamily);
+
+                        var cols = baseCols;
+                        var (cellW, cellH) =
+                            cell(cols, short ? 132.0 : 108.0);
+                        if (pictured) {
+                          final (w, h) = cell(2, 170.0);
+                          // Below this a sentence is small print; keep the
+                          // row of its own then.
+                          if (fontFor(w, h) >= 15) {
+                            cols = 2;
+                            (cellW, cellH) = (w, h);
+                          }
+                        }
 
                         final grid = GridView.count(
                           shrinkWrap: true,
@@ -2060,16 +2145,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
                               : AnswerTileGroup(
                                   // Chunky 3D buttons, white until answered.
                                   labels: labels,
-                                  fontSize: AnswerTile.fitFontSize(
-                                    labels,
-                                    cellW: cellW,
-                                    cellH: cellH,
-                                    textScaler:
-                                        MediaQuery.textScalerOf(context),
-                                    fontFamily: DefaultTextStyle.of(context)
-                                        .style
-                                        .fontFamily,
-                                  ),
+                                  fontSize: fontFor(cellW, cellH),
                                   child: grid,
                                 ),
                         );
@@ -2157,8 +2233,8 @@ class _PamilyaScreenState extends State<PamilyaScreen>
           label: choices[i],
           isSelected: sel,
           isCorrect: sel ? correct : null,
-          onTap: () => _handleEmotionAnswer(
-              i, answer, game['explanation'], game['tip']),
+          onTap: () =>
+              _handleEmotionAnswer(i, answer, game['explanation'], game['tip']),
         );
       }),
     );
@@ -2196,8 +2272,8 @@ class _PamilyaScreenState extends State<PamilyaScreen>
     final game = _sariliLevel4Games[_currentGameIndex];
     // One order for both lists, each child their own: the favourites have no
     // right answer, but the same first tile for everyone drew the same taps.
-    final order = shuffledOrder((game['options'] as List).length,
-        seed: _seedFor(game));
+    final order =
+        shuffledOrder((game['options'] as List).length, seed: _seedFor(game));
     final options = [for (final i in order) (game['options'] as List)[i]];
     final emojis = [for (final i in order) (game['emojis'] as List)[i]];
     final type = game['id'].toString().replaceFirst('preference_', '');
@@ -2431,6 +2507,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
   // ─────────────────────────────────────────────────────────────────────────
 
   Widget _buildFamilyTreeGame() {
+    _offerBoardFilm();
     final generations = _familyTreeData['generations'] as List;
 
     // The tree is a picture — see FamilyTreePicture — with no heading over
@@ -2559,6 +2636,7 @@ class _PamilyaScreenState extends State<PamilyaScreen>
   }
 
   Widget _buildMyHomeGame() {
+    _offerBoardFilm();
     final challenges = _homeItemChallenges;
     final isFinished = _matchedHomeItems.length >= challenges.length;
     final safeIndex = _homeChallengeIndex.clamp(0, challenges.length - 1);

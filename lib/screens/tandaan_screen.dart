@@ -23,6 +23,7 @@ import '../widgets/module_cards.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import '../widgets/replay_dialog.dart';
 import '../widgets/design_scale.dart';
+import '../widgets/how_to_video.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  TANDAAN MO! — Memory / Matching Game
@@ -589,6 +590,23 @@ class _TandaanScreenState extends State<TandaanScreen>
     // _backToPicker for where it actually gets cleared.
     if (_currentCategoryCompleted && !_replayingCategory) return;
     _initRound();
+    // The first round ever played opens with the film of one.
+    HowToVideo.claimFirstTime('tandaan', child: HowToVideo.childOf(context))
+        .then((first) {
+      if (first && mounted) _watchHowTo();
+    });
+  }
+
+  /// Plays the film of a round, then lets the child look at the cards
+  /// again: a look that ran out behind the video helped no one.
+  Future<void> _watchHowTo() async {
+    final session = _playSession;
+    _previewTimer?.cancel();
+    await HowToVideo.show(context, HowToVideo.assetFor(context, 'tandaan'));
+    if (!mounted || !_playing || session != _playSession) return;
+    if (_cards.every((c) => c.isMatched)) return;
+    _firstFlippedIndex = null;
+    _startPreview();
   }
 
   /// Back to the wall of cards, without leaving the module.
@@ -1016,6 +1034,7 @@ class _TandaanScreenState extends State<TandaanScreen>
         ),
       ),
       actions: [
+        if (_playing) PanoorinPill(onTap: _watchHowTo),
         Container(
           margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),

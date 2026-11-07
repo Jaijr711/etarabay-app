@@ -159,6 +159,57 @@ class ObjectPicture extends StatelessWidget {
     '⚡': 'kidlat',
     '🌿': 'dahon',
     '🌷': 'bulaklak_tulip',
+
+    // Ang Aking Sarili's answers that were words only. Each picture is the
+    // answer itself — the kitchen for Kusina, not an egg — so a child who
+    // cannot read yet can still answer. The emoji is only the key; these
+    // are scenes no emoji could show.
+    //
+    // The rooms of the house
+    '🥘': 'kusina',
+    '🛌': 'kuwarto',
+    '🛁': 'banyo',
+    '🚙': 'garahe',
+    '🖼': 'sala',
+    '🌻': 'bakuran',
+    '🍽': 'silid_kainan',
+    '📦': 'imbakan',
+    '🛖': 'bubong',
+    '🛣': 'mataong_daan',
+    '🔥': 'kalan',
+    // What a family does
+    '🍲': 'kumain_sama',
+    '🏞': 'parke',
+    '🧹': 'linis_sama',
+    '📼': 'tv_mag_isa',
+    '🚪': 'kulong_kuwarto',
+    '🧺': 'ligpit_laruan',
+    '🧱': 'kalat_laruan',
+    '💦': 'tubig_sahig',
+    '🙈': 'magtago',
+    '🗑': 'kalat_basura',
+    '💥': 'sirang_gamit',
+    // Family and the people around it
+    '🧓': 'lolo_lola',
+    '🧔': 'tiyo_tiya',
+    '👫': 'magkapatid',
+    '🧒': 'pinsan',
+    '🏘': 'kapitbahay',
+    '💕': 'magmahalan',
+    '🤼': 'away',
+    '🙄': 'dedma',
+    '😡': 'sigawan',
+    // Things, from Microsoft's Fluent 3D emoji (MIT), the set the house, bed
+    // and water drops come from
+    '🛒': 'grocery',
+    '👥': 'estranghero',
+    '📝': 'listahan',
+    '📅': 'kalendaryo',
+    '⛅': 'panahon',
+    '🌳': 'family_tree',
+    '🏪': 'tindahan',
+    '📢': 'maingay',
+    '🤷': 'ewan',
   };
 
   /// The names to give the files, for anyone adding artwork.

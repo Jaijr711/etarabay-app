@@ -33,6 +33,10 @@ void main() {
     for (final (family, file) in const [
       ('Roboto', r'C:\Windows\Fonts\arialbd.ttf'),
       ('Fredoka', 'assets/fonts/Fredoka.ttf'),
+      (
+        'MaterialIcons',
+        r'C:\develop\flutter\bin\cache\artifacts\material_fonts\materialicons-regular.otf'
+      ),
     ]) {
       final f = File(file);
       if (!f.existsSync()) continue;

@@ -62,6 +62,8 @@ String authMessage(BuildContext context, Map<String, dynamic> result) {
       return loc.authNeedsInternet;
     case 'finishesOnline':
       return loc.authFinishesOnline;
+    case 'childRemoved':
+      return loc.childRemovedNotice;
     default:
       return fallback;
   }

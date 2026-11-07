@@ -11,10 +11,12 @@ import '../services/auth_service.dart';
 import '../services/auth_messages.dart';
 import '../services/teacher_pin.dart';
 import '../services/teacher_privacy.dart';
+import '../services/test_account.dart';
 import '../services/update_checker.dart';
 import '../utils/constants.dart';
 import '../widgets/staggered_entrance.dart';
 import '../widgets/cached_avatar.dart';
+import '../widgets/how_to_video.dart';
 import '../widgets/teacher_pin_flow.dart';
 import '../widgets/update_dialog.dart';
 import 'login_screen.dart';
@@ -83,7 +85,16 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
         _authService.getStudentsStream();
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _checkAgreement().then((agreed) async {
-              if (agreed) await _checkPin();
+              if (agreed) {
+                await _checkPin();
+                // The guide once on each phone, once there is a class to
+                // look at; the header's ▶ plays it again.
+                if (mounted) {
+                  await HowToVideo.showOnce(
+                      context, 'teacher', HowToVideo.teacherGuide,
+                      pausable: true, parts: HowToVideo.teacherGuideParts);
+                }
+              }
               await _checkForUpdate();
             }));
     _loadSeenCertificates();
@@ -1175,8 +1186,8 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                         setState(() => _removedIds.add(studentId));
                         // Only the sheet used to close, leaving the teacher
                         // on the report of a child who was gone.
-                        Navigator.of(context).popUntil(
-                            (r) => r == dashboardRoute || r.isFirst);
+                        Navigator.of(context)
+                            .popUntil((r) => r == dashboardRoute || r.isFirst);
                         _showStatusDialog(
                           result['status'] == 'Success'
                               ? loc.studentRemoved
@@ -1508,6 +1519,14 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
               avatar: selectedAvatar,
             );
             if (!mounted) return;
+            // Removed meanwhile: there is nothing left to edit, and the sheet
+            // stayed open on a child who was gone.
+            if (result['code'] == 'childRemoved') {
+              if (sheetContext.mounted) Navigator.of(sheetContext).pop();
+              _showStatusDialog(authMessage(context, result),
+                  LucideIcons.user_x, Colors.orange.shade800);
+              return;
+            }
             // Not saved: the sheet stays with what was typed.
             if (result['status'] == 'Error') {
               _showStatusDialog(
@@ -2181,6 +2200,14 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                       ),
                     ),
                     _HeaderIconButton(
+                      icon: LucideIcons.circle_play,
+                      tooltip: AppLocalizations.of(context)!.teacherHowToUse,
+                      onTap: () => HowToVideo.show(
+                          context, HowToVideo.teacherGuide,
+                          pausable: true, parts: HowToVideo.teacherGuideParts),
+                    ),
+                    const SizedBox(width: 8),
+                    _HeaderIconButton(
                       icon: LucideIcons.settings,
                       tooltip: AppLocalizations.of(context)!.settingsTitle,
                       onTap: () => context.pushPremium(
@@ -2575,6 +2602,8 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                                   stars: stars,
                                   avatar: resolvedAvatar,
                                   hasNewCertificate: hasNewCertificate,
+                                  testAccount:
+                                      studentData[TestAccount.field] == true,
                                   // The card is the report. It is what a
                                   // teacher opens twenty times a day.
                                   onTap: () {
@@ -2907,6 +2936,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
     required bool hasNewCertificate,
     required VoidCallback onTap,
     required VoidCallback onEdit,
+    bool testAccount = false,
   }) {
     final loc = AppLocalizations.of(context)!;
     final barColor = overallProgress >= 0.7
@@ -3011,6 +3041,38 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                                             fontSize: 11,
                                             fontWeight: FontWeight.w800,
                                             color: Color(0xFF9A6200),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              // The developer finished this one for testing:
+                              // not to be read as the child's own work.
+                              if (testAccount) ...[
+                                const SizedBox(width: 6),
+                                Tooltip(
+                                  message: loc.testAccountNote,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 7, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFEEEDFD),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(LucideIcons.flask_conical,
+                                            size: 12, color: Color(0xFF5C52E5)),
+                                        const SizedBox(width: 3),
+                                        Text(
+                                          loc.testAccountTag,
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w800,
+                                            color: Color(0xFF5C52E5),
                                           ),
                                         ),
                                       ],

@@ -6,12 +6,14 @@ import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
 
 import '../l10n/app_localizations.dart';
+import '../main.dart' show AudioManager;
 import '../models/certificate_model.dart';
 import '../providers/language_provider.dart';
 import '../providers/user_provider.dart';
 import '../screens/certificates_screen.dart';
 import '../services/developer_service.dart';
 import '../utils/page_transitions.dart';
+import 'app_covers.dart';
 import 'certificate_earned_popup.dart';
 
 /// Tells the child, wherever they are, that their account is gone.
@@ -46,9 +48,43 @@ class _AccountWatcherState extends State<AccountWatcher> {
   bool _showingAdminMessage = false;
   bool _showingCertificate = false;
 
+  /// Whether the music is quietened for a cover (see [_coverMusic]).
+  bool _musicDucked = false;
+
+  /// Quiet under a cover, back once it lifts.
+  void _coverMusic(bool covered) {
+    if (covered == _musicDucked) return;
+    _musicDucked = covered;
+    final music = AudioManager.instance;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      (covered ? music.duckMusic() : music.unduckMusic())
+          .catchError((Object e) => debugPrint('Cover music: $e'));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
+
+    // Covers over the whole app — an update it can no longer do without,
+    // first, then the developers' maintenance. Nothing else is announced
+    // under one: it would only be waiting there when the cover lifts.
+    final Widget? cover = userProvider.mustUpdate
+        ? UpdateRequiredCover(
+            minVersion: userProvider.minVersion!,
+            installedVersion: userProvider.installedVersion!)
+        : userProvider.blockedByMaintenance
+            ? MaintenanceCover(message: userProvider.maintenanceMessage)
+            : null;
+    _coverMusic(cover != null);
+    // Always this Stack, the app first in it: a cover coming or going must
+    // never move the app in the tree, or every screen would be rebuilt
+    // from nothing and the child's place lost.
+    final covered = Stack(children: [
+      widget.child,
+      if (cover != null) Positioned.fill(child: cover),
+    ]);
+    if (cover != null) return covered;
 
     if ((userProvider.isAccountDeleted ||
             userProvider.isDisabledByDev ||
@@ -83,7 +119,7 @@ class _AccountWatcherState extends State<AccountWatcher> {
           .addPostFrameCallback((_) => _celebrateCertificate());
     }
 
-    return widget.child;
+    return covered;
   }
 
   Future<void> _celebrateCertificate() async {

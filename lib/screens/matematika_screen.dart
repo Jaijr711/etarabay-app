@@ -27,6 +27,7 @@ import '../widgets/module_cards.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import '../widgets/replay_dialog.dart';
 import '../widgets/design_scale.dart';
+import '../widgets/how_to_video.dart';
 import '../utils/shuffled_choices.dart';
 
 // ─── The line board's lines: walking dots, one colour per pair ──────────────
@@ -1034,6 +1035,27 @@ class _MatematikaScreenState extends State<MatematikaScreen>
   void _openLevel(int level) {
     setState(() => _playing = true);
     _switchLevel(level);
+    _howToFirstTime(level);
+  }
+
+  /// The level's how-to-play video, the first time this phone opens it.
+  Future<void> _howToFirstTime(int level) async {
+    if (!await HowToVideo.claimFirstTime('math$level',
+            child: HowToVideo.childOf(context)) ||
+        !mounted) {
+      return;
+    }
+    await _watchHowTo();
+  }
+
+  /// Plays the level's video. The question's clock waits for it, and starts
+  /// afresh after: watching is never time lost.
+  Future<void> _watchHowTo() async {
+    final timed = _playing;
+    _stopTimer();
+    await HowToVideo.show(
+        context, HowToVideo.assetFor(context, 'level${_selectedLevel + 1}'));
+    if (mounted && timed && _playing && !_feedbackShowing) _startTimer();
   }
 
   /// Back to the wall of cards, without leaving Matematika.
@@ -1630,7 +1652,11 @@ class _MatematikaScreenState extends State<MatematikaScreen>
         onPrimaryTap: () {
           Navigator.pop(context);
           if (_selectedLevel < _levelTitles.length - 1) {
-            _switchLevel(_selectedLevel + 1);
+            final next = _selectedLevel + 1;
+            _switchLevel(next);
+            // Each level is a different game: its film the first time, as
+            // when it is opened from the cards.
+            _howToFirstTime(next);
           } else {
             // The last level: back to the cards, where the star that was
             // just earned is now sitting on one of them. This used to pop
@@ -1733,6 +1759,7 @@ class _MatematikaScreenState extends State<MatematikaScreen>
             fontWeight: FontWeight.bold),
       ),
       actions: [
+        if (_playing) PanoorinPill(onTap: _watchHowTo),
         Container(
           margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -2615,8 +2642,10 @@ class _MatematikaScreenState extends State<MatematikaScreen>
               color: AppColors.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: RichText(
-              text: TextSpan(
+            // Text.rich, not RichText: it takes the app's face like every
+            // other line here, where RichText was left with the platform's.
+            child: Text.rich(
+              TextSpan(
                 style:
                     const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 children: [

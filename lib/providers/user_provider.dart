@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,6 +9,7 @@ import '../data/badge_catalog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_model.dart';
+import '../services/app_version.dart';
 import '../services/biometric_service.dart';
 import '../services/push_scheduler.dart';
 
@@ -69,6 +71,15 @@ class UserProvider extends ChangeNotifier {
   /// student, and watched independently of any student session (see
   /// [_startConfigListener]) so a lock applies even before anyone signs in.
   Set<String> _lockedModules = {};
+
+  /// The developer dashboard's maintenance switch and its message, and the
+  /// oldest version it still lets open the app (see [_applyConfig]).
+  bool _maintenanceOn = false;
+  String _maintenanceMessage = '';
+  String? _minVersion;
+
+  /// This copy of the app's version, once read.
+  String? _installedVersion;
   StreamSubscription<DocumentSnapshot>? _configSubscription;
 
   Box get _profileBox => _pb!;
@@ -206,6 +217,26 @@ class UserProvider extends ChangeNotifier {
   /// The modules currently locked app-wide by the developer dashboard —
   /// see [moduleKeyPrefixes] for the keys this checks against.
   Set<String> get lockedModules => _lockedModules;
+  bool get maintenanceOn => _maintenanceOn;
+  String get maintenanceMessage => _maintenanceMessage;
+  String? get minVersion => _minVersion;
+  String? get installedVersion => _installedVersion;
+
+  /// A child's app, covered while the developers fix something. The
+  /// teacher's side stays open, and so does the login screen — the way in
+  /// for the teacher and the developer both.
+  bool get blockedByMaintenance => _maintenanceOn && _currentRole == 'student';
+
+  /// This copy is older than the developers still allow: covered with
+  /// "update first", for everyone, until it is updated. Never on the web,
+  /// which has nothing to install and is always the newest build.
+  bool get mustUpdate {
+    final min = _minVersion, have = _installedVersion;
+    return !kIsWeb &&
+        min != null &&
+        have != null &&
+        AppVersion.compare(have, min) < 0;
+  }
 
   /// Set the current student ID (from RTDB login result) for syncing.
   void setCurrentStudentId(String? id) {
@@ -449,21 +480,7 @@ class UserProvider extends ChangeNotifier {
           // being taken back out of the cloud (see [_reassertReset]), and the
           // next snapshot, without it, merges the rest.
           if (!resetHere && data['rawProgress'] is Map) {
-            await _mergeRawProgressFromCloud(data);
-            if (_userProfile != null) {
-              _userProfile!.stars = recountStarsFromProgress();
-              await _profileBox.put('currentUser', _userProfile!.toJson());
-              // The merge can be what completes the last lesson — the other
-              // device finished it, or this one finished it offline and is
-              // only now getting the cloud's side of the story. Since the
-              // certificate asks for every lesson finished as well as every
-              // badge claimed, it has to be re-settled here; otherwise it
-              // waited for the child to happen to do something else before
-              // the app noticed they had already earned it. Cheap when
-              // nothing changed: the check only writes if it awards or
-              // withdraws something.
-              await checkAndAwardCertificates();
-            }
+            await _takeCloudProgress(data);
           }
 
           // The developer dashboard's kill switch. Checked on every snapshot,
@@ -563,6 +580,37 @@ class UserProvider extends ChangeNotifier {
       debugPrint('Profile listener error: $e');
     });
   }
+
+  /// Work that arrived from the cloud while this child is signed in — their
+  /// other phone, or the developer finishing a test account — taken in, and
+  /// what it earns raised.
+  Future<void> _takeCloudProgress(Map<String, dynamic> data) async {
+    await _mergeRawProgressFromCloud(data);
+    if (_userProfile != null) {
+      _userProfile!.stars = recountStarsFromProgress();
+      await _profileBox.put('currentUser', _userProfile!.toJson());
+      // The merge can be what completes the last lesson — the other
+      // device finished it, or this one finished it offline and is
+      // only now getting the cloud's side of the story. Since the
+      // certificate asks for every lesson finished as well as every
+      // badge claimed, it has to be re-settled here; otherwise it
+      // waited for the child to happen to do something else before
+      // the app noticed they had already earned it. Cheap when
+      // nothing changed: the check only writes if it awards or
+      // withdraws something.
+      //
+      // Badges first, for the same reason: they were raised only at
+      // sign-in, so work that arrived during a session (the
+      // developer finishing a test account) left every badge
+      // unclaimable until the child signed in again.
+      await checkAndAwardBadges(allowRevoke: false);
+      await checkAndAwardCertificates();
+    }
+  }
+
+  @visibleForTesting
+  Future<void> debugTakeCloudProgress(Map<String, dynamic> data) =>
+      _takeCloudProgress(data);
 
   /// A new phone has just been given the child's record: it now holds every
   /// reset and sign-out that record names, and none after it.
@@ -774,14 +822,29 @@ class UserProvider extends ChangeNotifier {
         .collection('config')
         .doc('developer')
         .snapshots()
-        .listen((snapshot) {
-      final locked = snapshot.data()?['lockedModules'];
-      _lockedModules =
-          locked is List ? locked.map((e) => e.toString()).toSet() : <String>{};
-      notifyListeners();
-    }, onError: (Object e) {
+        .listen((snapshot) => _applyConfig(snapshot.data()),
+            onError: (Object e) {
       debugPrint('Config listener error: $e');
     });
+  }
+
+  void _applyConfig(Map<String, dynamic>? data) {
+    final locked = data?['lockedModules'];
+    _lockedModules =
+        locked is List ? locked.map((e) => e.toString()).toSet() : <String>{};
+    _maintenanceOn = data?['maintenanceOn'] == true;
+    _maintenanceMessage = (data?['maintenanceMessage'] ?? '').toString();
+    final min = (data?['minVersion'] ?? '').toString().trim();
+    _minVersion = min.isEmpty ? null : min;
+    notifyListeners();
+  }
+
+  /// The developer config as if it had just arrived, and the version this
+  /// copy is, for tests. Never called in the app.
+  @visibleForTesting
+  void debugSetConfig(Map<String, dynamic>? data, {String? installedVersion}) {
+    if (installedVersion != null) _installedVersion = installedVersion;
+    _applyConfig(data);
   }
 
   UserProvider() {
@@ -793,6 +856,10 @@ class UserProvider extends ChangeNotifier {
       await _ensureInitialized();
       await _initializeBoxes();
       _startConfigListener();
+      unawaited(AppVersion.current().then((v) {
+        _installedVersion = v;
+        notifyListeners();
+      }));
       _watchSignIn();
       // Hidden or closed: send what is waiting, so nothing sits on the
       // phone until the child plays again.
@@ -3468,6 +3535,9 @@ class UserProvider extends ChangeNotifier {
         // teacher's phone each time.
         'creations': FieldValue.delete(),
         'lastActive': FieldValue.serverTimestamp(),
+        // Which version this phone is, for the developer dashboard: who is
+        // still on an old one. Part of the same write, never one of its own.
+        if (_installedVersion != null) 'appVersion': _installedVersion,
       }).catchError((Object e) => debugPrint('Deferred sync failed: $e')));
       await _prefs?.setBool(_unpushedKey, false);
 

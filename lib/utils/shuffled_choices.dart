@@ -35,6 +35,15 @@ const _everything = {
   'amin kadagitoy',
 };
 
+/// The picture an answer can start with ('👨‍👩‍👧 Lahat ng nabanggit'): a
+/// first word with no letters or digits in it. Matched here rather than
+/// through AnswerTile so this file stays free of widgets.
+final _leadingPicture = RegExp(r'^[^\p{L}\p{N}\s]+\s+', unicode: true);
+
+/// An answer's words alone, for comparing against [_everything].
+String _words(String label) =>
+    label.trim().replaceFirst(_leadingPicture, '').toLowerCase();
+
 /// [choices] in a seeded order, and where the right one ([correct]) went.
 ///
 /// "All of the above" stays last, where it reads as meant — unless
@@ -45,7 +54,7 @@ const _everything = {
   final last = choices.isNotEmpty &&
           keepAllOfTheAboveLast &&
           choices.last is String &&
-          _everything.contains((choices.last as String).trim().toLowerCase())
+          _everything.contains(_words(choices.last as String))
       ? choices.length - 1
       : null;
   final order = shuffledOrder(choices.length, seed: seed, keepLast: last);

@@ -93,6 +93,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home => 'Home';
 
   @override
+  String get videoParts => 'Parts';
+
+  @override
+  String updateRequiredBody(String version) {
+    return 'To use E-Tarabay, first update to version $version.';
+  }
+
+  @override
+  String get maintenanceTitle => 'Just a moment!';
+
+  @override
+  String get maintenanceNote =>
+      'We\'re fixing the app. It will open again by itself when we\'re done.';
+
+  @override
+  String get updateThisPhone => 'On this phone';
+
+  @override
+  String get updateNeeded => 'Needed';
+
+  @override
+  String get childRemovedNotice => 'This child has been removed.';
+
+  @override
+  String get testAccountTag => 'Test';
+
+  @override
+  String get testAccountNote =>
+      'Finished by the developer for testing. Not real progress.';
+
+  @override
+  String get teacherHowToUse => 'How to use the app';
+
+  @override
   String get settingsTitle => 'Settings';
 
   @override
@@ -1579,11 +1613,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String updateAvailableBody(String version) {
-    return 'Version $version is ready to download.';
+    return 'Version $version is ready. Updates are installed from the E-Tarabay website.';
   }
 
   @override
-  String get updateDownloadNow => 'Download Now';
+  String get updateDownloadNow => 'Update';
+
+  @override
+  String updateOpenWebsite(String url) {
+    return 'Open in your browser: $url';
+  }
+
+  @override
+  String get watchHowToPlay => 'Watch';
+
+  @override
+  String get zoomIn => 'Zoom in';
 
   @override
   String get updateLater => 'Later';

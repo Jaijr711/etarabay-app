@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/auth_messages.dart';
 import 'package:e_tarabay/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +8,7 @@ import '../services/biometric_service.dart';
 import '../utils/constants.dart';
 import '../utils/page_transitions.dart';
 import '../widgets/custom_back_button.dart';
+import 'developer_dashboard_screen.dart';
 import 'teacher_dashboard_screen.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 
@@ -22,6 +22,11 @@ class TeacherCredentials {
 class TeacherLoginScreen extends StatefulWidget {
   const TeacherLoginScreen({super.key});
 
+  /// The checks to make instead of Firestore's, for tests. Never set in
+  /// the app.
+  @visibleForTesting
+  static AuthService? debugAuthService;
+
   @override
   State<TeacherLoginScreen> createState() => _TeacherLoginScreenState();
 }
@@ -30,7 +35,10 @@ class _TeacherLoginScreenState extends State<TeacherLoginScreen> {
   final TextEditingController _usernameController =
       TextEditingController(text: TeacherCredentials.username);
   final TextEditingController _passwordController = TextEditingController();
-  final AuthService _authService = AuthService();
+  // Late: made on the first button press, so the screen itself opens
+  // without Firebase (the teacher how-to video is recorded from it).
+  late final AuthService _authService =
+      TeacherLoginScreen.debugAuthService ?? AuthService();
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _biometricEnabled = false;
@@ -114,37 +122,31 @@ class _TeacherLoginScreenState extends State<TeacherLoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await _authService.ensureAuthenticated();
-
-      // Fetch the teacher credentials from Firestore. Uses serverAndCache so it
-      // works offline AFTER the first successful online load (smart caching).
-      final snap = await FirebaseFirestore.instance
-          .collection('config')
-          .doc('teacher')
-          .get(const GetOptions(source: Source.serverAndCache))
-          .timeout(const Duration(seconds: 15));
-
+      final teacher = await _authService.checkTeacherLogin(username, password);
       if (!mounted) return;
-
-      final data = snap.data();
-      if (data == null) {
+      if (teacher == true) {
         setState(() => _isLoading = false);
-        _showErrorDialog(AppLocalizations.of(context)!.teacherNotSetUp);
+        _enterDashboard();
         return;
       }
 
-      final storedUsername = (data['username'] ?? '').toString();
-      final storedHash = (data['passwordHash'] ?? '').toString();
-
-      final usernameOk =
-          username.toLowerCase().trim() == storedUsername.toLowerCase().trim();
-      final passwordOk =
-          storedHash.isNotEmpty && storedHash == AuthService.hashLrn(password);
-
+      // The developer's own password, typed in here: the developer
+      // dashboard has no other door. Asked only once the teacher's check
+      // has failed, so a teacher's login never waits on it; and a wrong
+      // guess gets the teacher's usual answer, so nothing on this screen
+      // says a second password exists.
+      final developer = await _authService.verifyDeveloperPassword(password);
+      if (!mounted) return;
       setState(() => _isLoading = false);
-
-      if (usernameOk && passwordOk) {
-        _enterDashboard();
+      if (developer) {
+        _passwordController.clear();
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+              builder: (_) => const DeveloperDashboardScreen()),
+        );
+      } else if (teacher == null) {
+        _showErrorDialog(AppLocalizations.of(context)!.teacherNotSetUp);
       } else {
         _showErrorDialog(
             AppLocalizations.of(context)!.invalidTeacherCredentials);

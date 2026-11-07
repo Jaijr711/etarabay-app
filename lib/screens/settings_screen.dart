@@ -17,7 +17,6 @@ import '../widgets/background_permission_dialog.dart';
 import '../utils/constants.dart';
 import 'lessons_screen.dart';
 import 'awards_screen.dart';
-import 'developer_login_screen.dart';
 import 'home_screen.dart';
 import '../widgets/design_scale.dart';
 import '../widgets/soft_backdrop.dart';
@@ -40,31 +39,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // wrong by forgetting to edit it is the only kind worth showing a
   // teacher trying to tell two APKs apart.
   String _appVersion = '';
-
-  // The hidden developer dashboard's entry point — no visible menu item
-  // anywhere, on purpose (see DeveloperLoginScreen). Seven taps on the
-  // version row within three seconds of the first tap; a pause resets the
-  // count, so absent-minded taps elsewhere on the page never accumulate.
-  int _versionTapCount = 0;
-  DateTime? _versionTapWindowStart;
-
-  void _onVersionTapped() {
-    final now = DateTime.now();
-    if (_versionTapWindowStart == null ||
-        now.difference(_versionTapWindowStart!) > const Duration(seconds: 3)) {
-      _versionTapWindowStart = now;
-      _versionTapCount = 1;
-      return;
-    }
-    _versionTapCount++;
-    if (_versionTapCount >= 7) {
-      _versionTapCount = 0;
-      _versionTapWindowStart = null;
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const DeveloperLoginScreen()),
-      );
-    }
-  }
 
   @override
   void initState() {
@@ -297,8 +271,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   index: 2,
                   child: _SettingsCard(
                     child: InkWell(
-                      onTap: _onVersionTapped,
-                      child: Padding(
+                                            child: Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 12),
                         child: Row(
