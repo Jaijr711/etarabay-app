@@ -170,8 +170,8 @@ void main() {
     await logIn(tester, 'hulaan-lang');
     expect(find.byType(TeacherLoginScreen), findsOneWidget);
     expect(find.byType(DeveloperDashboardScreen), findsNothing);
-    expect(find.text('Maling teacher credentials. Pakisubukang muli.'),
-        findsOneWidget);
+    // The usual sheet, the same as any wrong teacher password.
+    expect(find.text('Mali ang password'), findsOneWidget);
     await close(tester);
   });
 

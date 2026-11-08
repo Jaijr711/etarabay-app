@@ -616,7 +616,7 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String get enterUsernamePassword =>
-      'Pangngaasim, isuratmo ti nagan ti agus-usar ken ti sikreto a pammagbalin.';
+      'Pangngaasim, isuratmo ti Username ken ti password.';
 
   @override
   String get loginError =>
@@ -632,7 +632,7 @@ class AppLocalizationsIlo extends AppLocalizations {
   }
 
   @override
-  String get username => 'Agus-usar';
+  String get username => 'Username';
 
   @override
   String get teacherLoginTitle => 'Panagserrek ti Mannursuro';
@@ -2133,7 +2133,7 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get removeStudentAction => 'Ikkaten ti agad-adal';
 
   @override
-  String get loginUser => 'User';
+  String get loginUser => 'Username';
 
   @override
   String get loginCardTitle => 'Login card';
@@ -2429,4 +2429,177 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String get studentRemoved => 'Naikkaten ti ubing.';
+
+  @override
+  String get loginProblemTryThis => 'Padasen daytoy:';
+
+  @override
+  String get loginProblemRetry => 'Padasen manen';
+
+  @override
+  String get loginProblemOk => 'Wen';
+
+  @override
+  String loginProblemCode(String code) {
+    return 'Code: $code';
+  }
+
+  @override
+  String get loginProblemConnectionTitle => 'Saan a makakonekta';
+
+  @override
+  String get loginProblemConnectionBody =>
+      'Saan a madanon ti telepono ti E-Tarabay ita. Saan a gapu iti naisuratmo.';
+
+  @override
+  String get loginProblemConnectionStep1 =>
+      'Kitaen no adda WiFi wenno load ti telepono.';
+
+  @override
+  String get loginProblemConnectionStep2 =>
+      'Iti Settings ti telepono, aramiden a \"Automatic\" ti petsa ken oras.';
+
+  @override
+  String get loginProblemConnectionStep3 =>
+      'Padasen ti sabali a WiFi, wenno ti mobile data.';
+
+  @override
+  String get loginProblemConnectionStep4 =>
+      'I-update ti \"Google Play services\" iti Play Store.';
+
+  @override
+  String get loginProblemUsernameTitle => 'Saan a masarakan ti username';
+
+  @override
+  String get loginProblemUsernameBody =>
+      'Awan ti ubing nga addaan iti kastoy a username. Saan a daytoy ti nagan ti ubing.';
+
+  @override
+  String get loginProblemUsernameStep1 =>
+      'Kopiaen ti Username iti login card manipud iti mannursuro, kas. ana1234.';
+
+  @override
+  String get loginProblemUsernameStep2 =>
+      'Awan pay ti login card? Dawaten iti mannursuro. Ti mannursuro ti agaramid iti account.';
+
+  @override
+  String get loginProblemNumberTitle => 'Biddut ti Student Number';
+
+  @override
+  String get loginProblemNumberBody =>
+      'Husto ti username, ngem saan a mayannatup ti Student Number.';
+
+  @override
+  String get loginProblemNumberStep1 =>
+      'Daytoy ti Password iti login card, kas. DC-2026-0001. Mairaman dagiti gitling (-).';
+
+  @override
+  String get loginProblemNumberStep2 =>
+      'No sinukatan ti nagannak ti password, usaren ti baro.';
+
+  @override
+  String get loginProblemNumberStep3 => 'Nalipatam? Saludsoden iti mannursuro.';
+
+  @override
+  String get loginProblemTeacherHereTitle => 'Daytoy ti login ti ubing';
+
+  @override
+  String get loginProblemTeacherHereBody =>
+      'Para iti mannursuro ti \"Daycare Teacher\". Adda bukod a username ti tunggal ubing, adda iti login card-na.';
+
+  @override
+  String loginProblemTeacherHereStep1(String button) {
+    return 'Pinduten ti \"$button\" iti baba ti screen.';
+  }
+
+  @override
+  String get loginProblemEmptyTitle => 'Adda kurang';
+
+  @override
+  String get loginProblemEmptyBody =>
+      'Masapul ti dua: ti Username ken ti Student Number.';
+
+  @override
+  String loginProblemEmptyStep1(String button) {
+    return 'Agpada nga adda iti login card manipud iti mannursuro. Isurat, sa pinduten ti \"$button\".';
+  }
+
+  @override
+  String get loginProblemTeacherWrongTitle => 'Biddut ti password';
+
+  @override
+  String get loginProblemTeacherWrongBody =>
+      'Saan a mayannatup ti username wenno password ti mannursuro.';
+
+  @override
+  String get loginProblemTeacherWrongStep1 =>
+      'Imutektekan dagiti dadakkel ken babassit a letra.';
+
+  @override
+  String get loginProblemTeacherWrongStep2 =>
+      'Pinduten ti mata tapno makita ti naisurat.';
+
+  @override
+  String get loginProblemNeedsInternetTitle => 'Masapul ti internet';
+
+  @override
+  String get loginProblemNeedsInternetBody =>
+      'Iti umuna a login iti daytoy a telepono, masapul nga online.';
+
+  @override
+  String get loginProblemNeedsInternetStep1 =>
+      'Kumonekta iti WiFi wenno mobile data, sa padasen manen.';
+
+  @override
+  String get loginProblemPasswordChangedTitle => 'Nagbaliw ti password';
+
+  @override
+  String get loginProblemPasswordChangedBody =>
+      'Sinukatan ti password ti mannursuro iti sabali a telepono.';
+
+  @override
+  String get loginProblemPasswordChangedStep1 =>
+      'Ag-log in babaen ti baro a password. Mabalin a maisaad manen ti fingerprint kalpasanna.';
+
+  @override
+  String get loginUsernameHint => 'kas. ana1234';
+
+  @override
+  String get loginNumberHint => 'kas. DC-2026-0001';
+
+  @override
+  String get loginHelpLink => 'Baro ka? Kasano ti ag-log in';
+
+  @override
+  String get loginProblemHowToTitle => 'Kasano ti ag-log in';
+
+  @override
+  String get loginProblemHowToBody =>
+      'Ti mannursuro ti agaramid iti account ti tunggal ubing. Awan ti masapul nga i-sign up ditoy.';
+
+  @override
+  String get loginProblemHowToStep1 =>
+      'Dawaten iti mannursuro ti login card ti ubing.';
+
+  @override
+  String get loginProblemHowToStep2 =>
+      'Isurat ti adda iti card iti dua a kahon, kas iti ngato.';
+
+  @override
+  String loginProblemHowToStep3(String button) {
+    return 'Pinduten ti \"$button\".';
+  }
+
+  @override
+  String get loginHowToFirstBox => 'umuna a kahon';
+
+  @override
+  String get loginHowToSecondBox => 'maikadua a kahon';
+
+  @override
+  String get loginProblemEmptyStep2 =>
+      'Awan pay ti login card? Dawaten iti mannursuro. Ti mannursuro ti agaramid iti account.';
+
+  @override
+  String get loginProblemSteps => 'Kastoy:';
 }

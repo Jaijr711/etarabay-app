@@ -1,4 +1,3 @@
-import '../services/auth_messages.dart';
 import 'package:e_tarabay/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +7,7 @@ import '../services/biometric_service.dart';
 import '../utils/constants.dart';
 import '../utils/page_transitions.dart';
 import '../widgets/custom_back_button.dart';
+import '../widgets/login_problem_sheet.dart';
 import 'developer_dashboard_screen.dart';
 import 'teacher_dashboard_screen.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
@@ -98,7 +98,8 @@ class _TeacherLoginScreenState extends State<TeacherLoginScreen> {
       // nothing about the password, so the fingerprint stays set up; it used
       // to be wiped here, as if the password had been changed.
       setState(() => _isLoading = false);
-      _showErrorDialog(authMessage(context, const {'code': 'connectionError'}));
+      LoginProblemSheet.show(context, LoginProblem.connection,
+          onRetry: _biometricLogin);
     } else {
       await BiometricService.clearCredentials(BiometricService.teacherKey);
       if (!mounted) return;
@@ -106,7 +107,7 @@ class _TeacherLoginScreenState extends State<TeacherLoginScreen> {
         _isLoading = false;
         _biometricEnabled = false;
       });
-      _showErrorDialog(AppLocalizations.of(context)!.teacherPasswordChanged);
+      LoginProblemSheet.show(context, LoginProblem.passwordChanged);
     }
   }
 
@@ -146,15 +147,16 @@ class _TeacherLoginScreenState extends State<TeacherLoginScreen> {
               builder: (_) => const DeveloperDashboardScreen()),
         );
       } else if (teacher == null) {
-        _showErrorDialog(AppLocalizations.of(context)!.teacherNotSetUp);
+        LoginProblemSheet.show(context, LoginProblem.needsInternet,
+            onRetry: _loginTeacher);
       } else {
-        _showErrorDialog(
-            AppLocalizations.of(context)!.invalidTeacherCredentials);
+        LoginProblemSheet.show(context, LoginProblem.wrongTeacherPassword);
       }
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
-      _showErrorDialog(AppLocalizations.of(context)!.teacherCannotVerify);
+      LoginProblemSheet.show(context, LoginProblem.needsInternet,
+          onRetry: _loginTeacher);
     }
   }
 

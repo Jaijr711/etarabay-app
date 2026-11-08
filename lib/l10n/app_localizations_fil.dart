@@ -612,8 +612,7 @@ class AppLocalizationsFil extends AppLocalizations {
   String get teacherLoginButton => 'Ipagpatuloy bilang Guro';
 
   @override
-  String get enterUsernamePassword =>
-      'Pakilagay ang parehong pangalan ng gumagamit at password';
+  String get enterUsernamePassword => 'Pakilagay ang Username at ang password.';
 
   @override
   String get loginError => 'Hindi matagumpay ang pag-log in. Subukan muli.';
@@ -628,7 +627,7 @@ class AppLocalizationsFil extends AppLocalizations {
   }
 
   @override
-  String get username => 'Pangalan ng gumagamit';
+  String get username => 'Username';
 
   @override
   String get teacherLoginTitle => 'Pagpasok ng Guro';
@@ -2118,7 +2117,7 @@ class AppLocalizationsFil extends AppLocalizations {
   String get removeStudentAction => 'Alisin ang mag-aaral';
 
   @override
-  String get loginUser => 'User';
+  String get loginUser => 'Username';
 
   @override
   String get loginCardTitle => 'Login card';
@@ -2413,4 +2412,177 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get studentRemoved => 'Naalis na ang bata.';
+
+  @override
+  String get loginProblemTryThis => 'Subukan ito:';
+
+  @override
+  String get loginProblemRetry => 'Subukan ulit';
+
+  @override
+  String get loginProblemOk => 'Sige';
+
+  @override
+  String loginProblemCode(String code) {
+    return 'Code: $code';
+  }
+
+  @override
+  String get loginProblemConnectionTitle => 'Hindi makakonekta';
+
+  @override
+  String get loginProblemConnectionBody =>
+      'Hindi maabot ng phone ang E-Tarabay ngayon. Hindi ito dahil sa mali ang na-type mo.';
+
+  @override
+  String get loginProblemConnectionStep1 =>
+      'Tingnan kung may WiFi o load ang phone.';
+
+  @override
+  String get loginProblemConnectionStep2 =>
+      'Sa Settings ng phone, gawing \"Automatic\" ang petsa at oras.';
+
+  @override
+  String get loginProblemConnectionStep3 =>
+      'Subukan ang ibang WiFi, o ang mobile data.';
+
+  @override
+  String get loginProblemConnectionStep4 =>
+      'I-update ang \"Google Play services\" sa Play Store.';
+
+  @override
+  String get loginProblemUsernameTitle => 'Hindi makita ang username';
+
+  @override
+  String get loginProblemUsernameBody =>
+      'Walang batang may ganitong username. Hindi ito ang pangalan ng bata.';
+
+  @override
+  String get loginProblemUsernameStep1 =>
+      'Kopyahin ang Username na nasa login card mula sa teacher, hal. ana1234.';
+
+  @override
+  String get loginProblemUsernameStep2 =>
+      'Wala pang login card? Hingin ito sa teacher. Ang teacher ang gumagawa ng account.';
+
+  @override
+  String get loginProblemNumberTitle => 'Mali ang Student Number';
+
+  @override
+  String get loginProblemNumberBody =>
+      'Tama ang username, pero hindi tugma ang Student Number.';
+
+  @override
+  String get loginProblemNumberStep1 =>
+      'Ito ang Password sa login card, hal. DC-2026-0001. Kasama ang mga gitling (-).';
+
+  @override
+  String get loginProblemNumberStep2 =>
+      'Kung pinalitan ng magulang ang password, gamitin ang bago.';
+
+  @override
+  String get loginProblemNumberStep3 => 'Nakalimutan? Itanong sa teacher.';
+
+  @override
+  String get loginProblemTeacherHereTitle => 'Login ito ng bata';
+
+  @override
+  String get loginProblemTeacherHereBody =>
+      'Para sa teacher ang \"Daycare Teacher\". May sariling username ang bawat bata, nasa login card niya.';
+
+  @override
+  String loginProblemTeacherHereStep1(String button) {
+    return 'Pindutin ang \"$button\" sa ibaba ng screen.';
+  }
+
+  @override
+  String get loginProblemEmptyTitle => 'May kulang';
+
+  @override
+  String get loginProblemEmptyBody =>
+      'Kailangan ang dalawa: ang Username at ang Student Number.';
+
+  @override
+  String loginProblemEmptyStep1(String button) {
+    return 'Pareho silang nasa login card mula sa teacher. I-type, saka pindutin ang \"$button\".';
+  }
+
+  @override
+  String get loginProblemTeacherWrongTitle => 'Mali ang password';
+
+  @override
+  String get loginProblemTeacherWrongBody =>
+      'Hindi tugma ang username o password ng teacher.';
+
+  @override
+  String get loginProblemTeacherWrongStep1 =>
+      'Pansinin ang malaki at maliit na titik.';
+
+  @override
+  String get loginProblemTeacherWrongStep2 =>
+      'Pindutin ang mata para makita ang na-type.';
+
+  @override
+  String get loginProblemNeedsInternetTitle => 'Kailangan ng internet';
+
+  @override
+  String get loginProblemNeedsInternetBody =>
+      'Sa unang login sa phone na ito, kailangang online.';
+
+  @override
+  String get loginProblemNeedsInternetStep1 =>
+      'Kumonekta sa WiFi o mobile data, saka subukan ulit.';
+
+  @override
+  String get loginProblemPasswordChangedTitle => 'Nagbago ang password';
+
+  @override
+  String get loginProblemPasswordChangedBody =>
+      'Pinalitan ang password ng teacher sa ibang phone.';
+
+  @override
+  String get loginProblemPasswordChangedStep1 =>
+      'Mag-log in gamit ang bagong password. Maise-set up ulit ang fingerprint pagkatapos.';
+
+  @override
+  String get loginUsernameHint => 'hal. ana1234';
+
+  @override
+  String get loginNumberHint => 'hal. DC-2026-0001';
+
+  @override
+  String get loginHelpLink => 'Bago ka lang? Paano mag-log in';
+
+  @override
+  String get loginProblemHowToTitle => 'Paano mag-log in';
+
+  @override
+  String get loginProblemHowToBody =>
+      'Ang teacher ang gumagawa ng account ng bawat bata. Walang kailangang i-sign up dito.';
+
+  @override
+  String get loginProblemHowToStep1 =>
+      'Hingin sa teacher ang login card ng bata.';
+
+  @override
+  String get loginProblemHowToStep2 =>
+      'I-type ang nasa card sa dalawang kahon, gaya ng nasa itaas.';
+
+  @override
+  String loginProblemHowToStep3(String button) {
+    return 'Pindutin ang \"$button\".';
+  }
+
+  @override
+  String get loginHowToFirstBox => 'unang kahon';
+
+  @override
+  String get loginHowToSecondBox => 'pangalawang kahon';
+
+  @override
+  String get loginProblemEmptyStep2 =>
+      'Wala pang login card? Hingin ito sa teacher. Ang teacher ang gumagawa ng account.';
+
+  @override
+  String get loginProblemSteps => 'Ganito:';
 }

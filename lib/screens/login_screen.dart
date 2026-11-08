@@ -11,8 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 import '../services/auth_service.dart';
-import '../services/auth_messages.dart';
 import '../services/biometric_service.dart';
+import '../widgets/login_problem_sheet.dart';
 import 'home_screen.dart';
 import 'teacher_login_screen.dart';
 import '../utils/constants.dart';
@@ -121,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _passwordController.text.trim();
 
     if (username.isEmpty || password.isEmpty) {
-      _showErrorDialog(AppLocalizations.of(context)!.enterUsernamePassword);
+      LoginProblemSheet.show(context, LoginProblem.emptyFields);
       return;
     }
 
@@ -255,42 +255,33 @@ class _LoginScreenState extends State<LoginScreen> {
       if (result['code'] == 'usernameNotFound') {
         unawaited(_forgetBiometricIfGone(username));
       }
-      _showErrorDialog(authMessage(context, result).isNotEmpty
-          ? authMessage(context, result)
-          : AppLocalizations.of(context)!.loginError);
+      LoginProblemSheet.show(
+        context,
+        switch (result['code']) {
+          'usernameNotFound' => LoginProblem.usernameNotFound,
+          'wrongStudentNumber' => LoginProblem.wrongStudentNumber,
+          'useTeacherButton' => LoginProblem.teacherOnChildLogin,
+          _ => LoginProblem.connection,
+        },
+        code: result['step'] as String?,
+        detail: AuthService.lastLoginError,
+        onRetry: _loginStudent,
+      );
     }
-  }
-
-  void _showErrorDialog(String message) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(LucideIcons.circle_alert, color: Colors.white),
-            const SizedBox(width: 8),
-            Expanded(
-                child: Text(message,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white))),
-          ],
-        ),
-        backgroundColor: Colors.red.shade600,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 3),
-      ),
-    );
   }
 
   InputDecoration _modernInputDecoration({
     required String label,
     required String iconAsset,
+    String? hint,
     Widget? suffix,
   }) {
     return InputDecoration(
       labelText: label,
+      // What goes in, shown once the box is tapped: a newcomer holding the
+      // teacher's login card matches the shape.
+      hintText: hint,
+      hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 16),
       labelStyle: TextStyle(color: Colors.grey.shade500, fontSize: 15),
       // A drawn icon rather than a line glyph — the children recognise the
       // picture before they can read the label beside it.
@@ -409,6 +400,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             enableSuggestions: false,
                             decoration: _modernInputDecoration(
                               label: AppLocalizations.of(context)!.username,
+                              hint: AppLocalizations.of(context)!
+                                  .loginUsernameHint,
                               iconAsset: 'assets/images/icon_username.webp',
                               suffix: Padding(
                                 padding: const EdgeInsets.only(right: 14),
@@ -435,6 +428,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             decoration: _modernInputDecoration(
                               label: AppLocalizations.of(context)!
                                   .studentNumberField,
+                              hint: AppLocalizations.of(context)!
+                                  .loginNumberHint,
                               iconAsset:
                                   'assets/images/icon_student_number.webp',
                               suffix: IconButton(
@@ -511,17 +506,64 @@ class _LoginScreenState extends State<LoginScreen> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           _buttonStar(),
-                                          Text(
-                                            AppLocalizations.of(context)!
-                                                .loginButton,
-                                            style: const TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
+                                          // "Mag-log in" is wider than the
+                                          // pill leaves; it shrinks a little
+                                          // rather than spill past the star.
+                                          Flexible(
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Text(
+                                                AppLocalizations.of(context)!
+                                                    .loginButton,
+                                                style: const TextStyle(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                           _buttonStar(),
                                         ],
                                       ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // For a parent who has never seen the app: the
+                        // teacher makes the account, and the login card
+                        // holds what goes in each box.
+                        const SizedBox(height: 14),
+                        Center(
+                          child: Material(
+                            color: Colors.white.withOpacity(0.92),
+                            borderRadius: BorderRadius.circular(18),
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(18),
+                              onTap: () => LoginProblemSheet.show(
+                                  context, LoginProblem.howTo),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 8),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(LucideIcons.book_open,
+                                        size: 17, color: AppColors.primary),
+                                    const SizedBox(width: 7),
+                                    Flexible(
+                                      child: Text(
+                                        AppLocalizations.of(context)!
+                                            .loginHelpLink,
+                                        style: const TextStyle(
+                                          color: AppColors.primary,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),

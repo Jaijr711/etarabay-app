@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'dart:math';
@@ -89,6 +91,157 @@ class AuthService {
         .timeout(const Duration(seconds: 15));
   }
 
+  /// Runs [read] against the server, and once more if it fails, after
+  /// [reconnect] has made the database open a fresh connection.
+  ///
+  /// A phone that started without a signal, or while its WiFi was still
+  /// joining, has the database marking itself offline; every read after
+  /// that failed at once for up to a minute. A new phone, with nothing
+  /// kept from before, then said "could not reach the server" at every
+  /// press of Log In, the right password or not.
+  ///
+  /// A refusal by the rules is not a connection problem and is not tried
+  /// again.
+  static Future<T> withReconnect<T>(
+    Future<T> Function(Duration timeout) read, {
+    required Future<void> Function() reconnect,
+    Duration first = const Duration(seconds: 10),
+    Duration second = const Duration(seconds: 20),
+  }) async {
+    try {
+      return await read(first);
+    } catch (e) {
+      if (e is FirebaseException && e.code == 'permission-denied') rethrow;
+      debugPrint('Read failed, connecting again: $e');
+    }
+    try {
+      await reconnect().timeout(const Duration(seconds: 5));
+    } catch (e) {
+      debugPrint('Reconnect: $e');
+    }
+    return read(second);
+  }
+
+  Future<void> _reconnect() async {
+    await _db.disableNetwork();
+    await _db.enableNetwork();
+  }
+
+  /// Where a login's connection failed, as the short code on the "Can't
+  /// connect" sheet: N1 the sign-in, N2 the server, N3 a timeout. A
+  /// parent's screenshot then says which.
+  static String connectionStep(Object error, {bool signIn = false}) =>
+      signIn ? 'N1' : (error is TimeoutException ? 'N3' : 'N2');
+
+  /// What went wrong at the last child login that could not connect, in a
+  /// line short enough for a parent's screenshot. Shown under the code on
+  /// the "Can't connect" sheet.
+  static String? lastLoginError;
+
+  static String describeError(Object e) {
+    final text = e is FirebaseException
+        ? '${e.plugin}/${e.code}: ${e.message ?? ''}'
+        : e is TimeoutException
+            ? 'timeout'
+            : '$e';
+    final line = text.replaceAll(RegExp(r'\s+'), ' ').trim();
+    return line.length > 140 ? '${line.substring(0, 140)}…' : line;
+  }
+
+  /// The children with one of [usernames], read over Firestore's web API.
+  Future<List<({String id, Map<String, dynamic> data})>> _findStudentsOverWeb(
+      List<String> usernames) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) throw StateError('not signed in');
+    final token = await user.getIdToken();
+    final project = Firebase.app().options.projectId;
+    final response = await http
+        .post(
+          Uri.parse('https://firestore.googleapis.com/v1/projects/$project'
+              '/databases/(default)/documents:runQuery'),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'structuredQuery': {
+              'from': [
+                {'collectionId': 'students'}
+              ],
+              'where': {
+                'fieldFilter': {
+                  'field': {'fieldPath': 'username'},
+                  'op': 'IN',
+                  'value': {
+                    'arrayValue': {
+                      'values': [
+                        for (final u in usernames) {'stringValue': u}
+                      ]
+                    }
+                  },
+                }
+              },
+            }
+          }),
+        )
+        .timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw StateError('HTTP ${response.statusCode}');
+    }
+    return studentsFromRunQuery(jsonDecode(response.body));
+  }
+
+  /// The documents in a `runQuery` answer, as the SDK would give them.
+  static List<({String id, Map<String, dynamic> data})> studentsFromRunQuery(
+      Object? body) {
+    final out = <({String id, Map<String, dynamic> data})>[];
+    if (body is! List) return out;
+    for (final row in body) {
+      final doc = row is Map ? row['document'] : null;
+      if (doc is! Map) continue;
+      final name = '${doc['name'] ?? ''}';
+      out.add((
+        id: name.substring(name.lastIndexOf('/') + 1),
+        data: firestoreRestFields(doc['fields']),
+      ));
+    }
+    return out;
+  }
+
+  static Map<String, dynamic> firestoreRestFields(Object? fields) => {
+        if (fields is Map)
+          for (final e in fields.entries)
+            '${e.key}': firestoreRestValue(e.value),
+      };
+
+  /// One value of Firestore's web API, as the SDK would hand it over.
+  static dynamic firestoreRestValue(Object? v) {
+    if (v is! Map || v.isEmpty) return null;
+    final MapEntry(:key, :value) = v.entries.first;
+    return switch (key) {
+      'stringValue' => '$value',
+      'booleanValue' => value == true,
+      'integerValue' => int.tryParse('$value') ?? 0,
+      'doubleValue' => (value as num).toDouble(),
+      'timestampValue' =>
+        Timestamp.fromDate(DateTime.parse('$value')),
+      'mapValue' => firestoreRestFields(value is Map ? value['fields'] : null),
+      'arrayValue' => [
+          for (final x in (value is Map ? value['values'] as List? : null) ??
+              const [])
+            firestoreRestValue(x)
+        ],
+      _ => null,
+    };
+  }
+
+  static Map<String, dynamic> _connectionError(String step) => {
+        'status': 'Error',
+        'code': 'connectionError',
+        'step': step,
+        'message': 'A connection error occurred. Please check your internet.',
+      };
+
   // Application "pepper" mixed into the LRN before hashing. The LRN (password)
   // is never stored in plaintext — only this one-way SHA-256 hash is saved,
   // so the raw password can't be read straight out of the database.
@@ -148,11 +301,12 @@ class AuthService {
   /// online login.
   Future<bool?> checkTeacherLogin(String username, String password) async {
     await ensureAuthenticated();
-    final snap = await _db
-        .collection('config')
-        .doc('teacher')
-        .get(const GetOptions(source: Source.serverAndCache))
-        .timeout(const Duration(seconds: 15));
+    final doc = _db.collection('config').doc('teacher');
+    final snap = await withReconnect(
+      (t) => doc.get(const GetOptions(source: Source.serverAndCache)).timeout(t),
+      reconnect: _reconnect,
+      first: const Duration(seconds: 15),
+    );
     final data = snap.data();
     if (data == null) return null;
     final storedUsername = (data['username'] ?? '').toString();
@@ -408,7 +562,13 @@ class AuthService {
   Future<Map<String, dynamic>> loginStudent(
       String username, String password) async {
     try {
-      await ensureAuthenticated();
+      try {
+        await ensureAuthenticated();
+      } catch (e) {
+        debugPrint('Login sign-in: $e');
+        lastLoginError = 'sign-in: ${describeError(e)}';
+        return _connectionError(connectionStep(e, signIn: true));
+      }
 
       final query = _db
           .collection('students')
@@ -421,18 +581,39 @@ class AuthService {
       // copy is whatever it last saw: a child the teacher had removed still
       // signed in on it, and a password a parent had changed went on
       // working while the new one was refused.
-      QuerySnapshot<Map<String, dynamic>> querySnapshot;
+      List<({String id, Map<String, dynamic> data})> found;
+      lastLoginError = null;
       try {
-        querySnapshot = await query
-            .get(const GetOptions(source: Source.server))
-            .timeout(const Duration(seconds: 8));
+        final snap = await withReconnect(
+          (t) => query.get(const GetOptions(source: Source.server)).timeout(t),
+          reconnect: _reconnect,
+        );
+        found = [for (final d in snap.docs) (id: d.id, data: d.data())];
       } catch (e) {
         debugPrint('Login from the cached class: $e');
-        querySnapshot = await query.get(const GetOptions(source: Source.cache));
-        if (querySnapshot.docs.isEmpty) rethrow;
+        final sdkError = describeError(e);
+        QuerySnapshot<Map<String, dynamic>>? cached;
+        try {
+          cached = await query.get(const GetOptions(source: Source.cache));
+        } catch (_) {}
+        if (cached != null && cached.docs.isNotEmpty) {
+          found = [for (final d in cached.docs) (id: d.id, data: d.data())];
+        } else {
+          // The database's own connection would not come up on this phone,
+          // while plain web requests went through: the teacher signed in
+          // (from the phone's copy) and every child was told "can't
+          // connect". The same question, asked as an ordinary web request.
+          try {
+            found = await _findStudentsOverWeb(usernameVariants(username));
+          } catch (e2) {
+            debugPrint('Login over the web: $e2');
+            lastLoginError = '$sdkError · web: ${describeError(e2)}';
+            return _connectionError(connectionStep(e));
+          }
+        }
       }
 
-      if (querySnapshot.docs.isEmpty) {
+      if (found.isEmpty) {
         // Check if they are trying to login as teacher on student screen
         if (username.toLowerCase().trim() == 'daycare teacher') {
           return {
@@ -452,10 +633,9 @@ class AuthService {
 
       // The spelling typed, when it is one of several that matched.
       final typed = username.trim();
-      final doc = querySnapshot.docs.firstWhere(
-          (d) => d.data()['username'] == typed,
-          orElse: () => querySnapshot.docs.first);
-      final studentData = doc.data();
+      final doc = found.firstWhere((d) => d.data['username'] == typed,
+          orElse: () => found.first);
+      final studentData = doc.data;
       final storedHash = (studentData['lrnHash'] ?? '').toString();
       final legacyLrn = (studentData['lrn'] ?? '').toString().trim();
 
@@ -471,7 +651,7 @@ class AuthService {
           // Not waited on: offline it never answers, and the sign-in waited
           // with it for good.
           try {
-            unawaited(doc.reference.update({
+            unawaited(_db.collection('students').doc(doc.id).update({
               'lrnHash': hashLrn(password),
             }).catchError((Object e) => debugPrint('Hash not added: $e')));
           } catch (_) {}
@@ -494,11 +674,8 @@ class AuthService {
       };
     } catch (e) {
       debugPrint('Login error: $e');
-      return {
-        'status': 'Error',
-        'code': 'connectionError',
-        'message': 'A connection error occurred. Please check your internet.',
-      };
+      lastLoginError = describeError(e);
+      return _connectionError(connectionStep(e));
     }
   }
 

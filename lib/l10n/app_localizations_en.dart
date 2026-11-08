@@ -2103,7 +2103,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get removeStudentAction => 'Remove student';
 
   @override
-  String get loginUser => 'User';
+  String get loginUser => 'Username';
 
   @override
   String get loginCardTitle => 'Login card';
@@ -2399,4 +2399,177 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get studentRemoved => 'Child removed.';
+
+  @override
+  String get loginProblemTryThis => 'Try this:';
+
+  @override
+  String get loginProblemRetry => 'Try again';
+
+  @override
+  String get loginProblemOk => 'OK';
+
+  @override
+  String loginProblemCode(String code) {
+    return 'Code: $code';
+  }
+
+  @override
+  String get loginProblemConnectionTitle => 'Can\'t connect';
+
+  @override
+  String get loginProblemConnectionBody =>
+      'The phone can\'t reach E-Tarabay right now. It is not because of what you typed.';
+
+  @override
+  String get loginProblemConnectionStep1 =>
+      'Check that the phone has WiFi or mobile data.';
+
+  @override
+  String get loginProblemConnectionStep2 =>
+      'In the phone\'s Settings, set the date and time to \"Automatic\".';
+
+  @override
+  String get loginProblemConnectionStep3 =>
+      'Try a different WiFi, or mobile data.';
+
+  @override
+  String get loginProblemConnectionStep4 =>
+      'Update \"Google Play services\" in the Play Store.';
+
+  @override
+  String get loginProblemUsernameTitle => 'Username not found';
+
+  @override
+  String get loginProblemUsernameBody =>
+      'No child has this username. The username is not the child\'s name.';
+
+  @override
+  String get loginProblemUsernameStep1 =>
+      'Copy the Username on the login card from the teacher, e.g. ana1234.';
+
+  @override
+  String get loginProblemUsernameStep2 =>
+      'No login card yet? Ask the teacher for one. The teacher makes the account.';
+
+  @override
+  String get loginProblemNumberTitle => 'Wrong Student Number';
+
+  @override
+  String get loginProblemNumberBody =>
+      'The username is right, but the Student Number doesn\'t match.';
+
+  @override
+  String get loginProblemNumberStep1 =>
+      'It is the Password on the login card, e.g. DC-2026-0001, dashes (-) included.';
+
+  @override
+  String get loginProblemNumberStep2 =>
+      'If a parent changed the password, use the new one.';
+
+  @override
+  String get loginProblemNumberStep3 => 'Forgot it? Ask the teacher.';
+
+  @override
+  String get loginProblemTeacherHereTitle => 'This is the child\'s login';
+
+  @override
+  String get loginProblemTeacherHereBody =>
+      '\"Daycare Teacher\" is the teacher\'s. Each child has their own username, on their login card.';
+
+  @override
+  String loginProblemTeacherHereStep1(String button) {
+    return 'Tap \"$button\" at the bottom of the screen.';
+  }
+
+  @override
+  String get loginProblemEmptyTitle => 'Something is missing';
+
+  @override
+  String get loginProblemEmptyBody =>
+      'Both are needed: the Username and the Student Number.';
+
+  @override
+  String loginProblemEmptyStep1(String button) {
+    return 'Both are on the login card from the teacher. Type them in, then tap \"$button\".';
+  }
+
+  @override
+  String get loginProblemTeacherWrongTitle => 'Wrong password';
+
+  @override
+  String get loginProblemTeacherWrongBody =>
+      'The teacher\'s username or password doesn\'t match.';
+
+  @override
+  String get loginProblemTeacherWrongStep1 =>
+      'Mind the capital and small letters.';
+
+  @override
+  String get loginProblemTeacherWrongStep2 =>
+      'Tap the eye to see what you typed.';
+
+  @override
+  String get loginProblemNeedsInternetTitle => 'Needs the internet';
+
+  @override
+  String get loginProblemNeedsInternetBody =>
+      'The first login on this phone has to be online.';
+
+  @override
+  String get loginProblemNeedsInternetStep1 =>
+      'Connect to WiFi or mobile data, then try again.';
+
+  @override
+  String get loginProblemPasswordChangedTitle => 'The password changed';
+
+  @override
+  String get loginProblemPasswordChangedBody =>
+      'The teacher password was changed on another phone.';
+
+  @override
+  String get loginProblemPasswordChangedStep1 =>
+      'Log in with the new password. The fingerprint can be set up again after.';
+
+  @override
+  String get loginUsernameHint => 'e.g. ana1234';
+
+  @override
+  String get loginNumberHint => 'e.g. DC-2026-0001';
+
+  @override
+  String get loginHelpLink => 'New here? How to log in';
+
+  @override
+  String get loginProblemHowToTitle => 'How to log in';
+
+  @override
+  String get loginProblemHowToBody =>
+      'The teacher makes each child\'s account. There is nothing to sign up for here.';
+
+  @override
+  String get loginProblemHowToStep1 =>
+      'Ask the teacher for the child\'s login card.';
+
+  @override
+  String get loginProblemHowToStep2 =>
+      'Type what is on the card into the two boxes, as shown above.';
+
+  @override
+  String loginProblemHowToStep3(String button) {
+    return 'Tap \"$button\".';
+  }
+
+  @override
+  String get loginHowToFirstBox => 'first box';
+
+  @override
+  String get loginHowToSecondBox => 'second box';
+
+  @override
+  String get loginProblemEmptyStep2 =>
+      'No login card yet? Ask the teacher for one. The teacher makes the account.';
+
+  @override
+  String get loginProblemSteps => 'Here\'s how:';
 }

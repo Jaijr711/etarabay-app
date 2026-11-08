@@ -3896,7 +3896,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginUser.
   ///
   /// In en, this message translates to:
-  /// **'User'**
+  /// **'Username'**
   String get loginUser;
 
   /// No description provided for @loginCardTitle.
@@ -4390,6 +4390,288 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Child removed.'**
   String get studentRemoved;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Try this:'**
+  String get loginProblemTryThis;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get loginProblemRetry;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get loginProblemOk;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Code: {code}'**
+  String loginProblemCode(String code);
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t connect'**
+  String get loginProblemConnectionTitle;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'The phone can\'t reach E-Tarabay right now. It is not because of what you typed.'**
+  String get loginProblemConnectionBody;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Check that the phone has WiFi or mobile data.'**
+  String get loginProblemConnectionStep1;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'In the phone\'s Settings, set the date and time to \"Automatic\".'**
+  String get loginProblemConnectionStep2;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different WiFi, or mobile data.'**
+  String get loginProblemConnectionStep3;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Update \"Google Play services\" in the Play Store.'**
+  String get loginProblemConnectionStep4;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Username not found'**
+  String get loginProblemUsernameTitle;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'No child has this username. The username is not the child\'s name.'**
+  String get loginProblemUsernameBody;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Copy the Username on the login card from the teacher, e.g. ana1234.'**
+  String get loginProblemUsernameStep1;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'No login card yet? Ask the teacher for one. The teacher makes the account.'**
+  String get loginProblemUsernameStep2;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong Student Number'**
+  String get loginProblemNumberTitle;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'The username is right, but the Student Number doesn\'t match.'**
+  String get loginProblemNumberBody;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'It is the Password on the login card, e.g. DC-2026-0001, dashes (-) included.'**
+  String get loginProblemNumberStep1;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'If a parent changed the password, use the new one.'**
+  String get loginProblemNumberStep2;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot it? Ask the teacher.'**
+  String get loginProblemNumberStep3;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'This is the child\'s login'**
+  String get loginProblemTeacherHereTitle;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'\"Daycare Teacher\" is the teacher\'s. Each child has their own username, on their login card.'**
+  String get loginProblemTeacherHereBody;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Tap \"{button}\" at the bottom of the screen.'**
+  String loginProblemTeacherHereStep1(String button);
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Something is missing'**
+  String get loginProblemEmptyTitle;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Both are needed: the Username and the Student Number.'**
+  String get loginProblemEmptyBody;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Both are on the login card from the teacher. Type them in, then tap \"{button}\".'**
+  String loginProblemEmptyStep1(String button);
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong password'**
+  String get loginProblemTeacherWrongTitle;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'The teacher\'s username or password doesn\'t match.'**
+  String get loginProblemTeacherWrongBody;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Mind the capital and small letters.'**
+  String get loginProblemTeacherWrongStep1;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the eye to see what you typed.'**
+  String get loginProblemTeacherWrongStep2;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Needs the internet'**
+  String get loginProblemNeedsInternetTitle;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'The first login on this phone has to be online.'**
+  String get loginProblemNeedsInternetBody;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Connect to WiFi or mobile data, then try again.'**
+  String get loginProblemNeedsInternetStep1;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'The password changed'**
+  String get loginProblemPasswordChangedTitle;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'The teacher password was changed on another phone.'**
+  String get loginProblemPasswordChangedBody;
+
+  /// Login problem sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Log in with the new password. The fingerprint can be set up again after.'**
+  String get loginProblemPasswordChangedStep1;
+
+  /// Login help
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. ana1234'**
+  String get loginUsernameHint;
+
+  /// Login help
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. DC-2026-0001'**
+  String get loginNumberHint;
+
+  /// Login help
+  ///
+  /// In en, this message translates to:
+  /// **'New here? How to log in'**
+  String get loginHelpLink;
+
+  /// Login help
+  ///
+  /// In en, this message translates to:
+  /// **'How to log in'**
+  String get loginProblemHowToTitle;
+
+  /// Login help
+  ///
+  /// In en, this message translates to:
+  /// **'The teacher makes each child\'s account. There is nothing to sign up for here.'**
+  String get loginProblemHowToBody;
+
+  /// Login help
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the teacher for the child\'s login card.'**
+  String get loginProblemHowToStep1;
+
+  /// Login help
+  ///
+  /// In en, this message translates to:
+  /// **'Type what is on the card into the two boxes, as shown above.'**
+  String get loginProblemHowToStep2;
+
+  /// Login help
+  ///
+  /// In en, this message translates to:
+  /// **'Tap \"{button}\".'**
+  String loginProblemHowToStep3(String button);
+
+  /// Login help
+  ///
+  /// In en, this message translates to:
+  /// **'first box'**
+  String get loginHowToFirstBox;
+
+  /// Login help
+  ///
+  /// In en, this message translates to:
+  /// **'second box'**
+  String get loginHowToSecondBox;
+
+  /// Login help
+  ///
+  /// In en, this message translates to:
+  /// **'No login card yet? Ask the teacher for one. The teacher makes the account.'**
+  String get loginProblemEmptyStep2;
+
+  /// Login help
+  ///
+  /// In en, this message translates to:
+  /// **'Here\'s how:'**
+  String get loginProblemSteps;
 }
 
 class _AppLocalizationsDelegate
