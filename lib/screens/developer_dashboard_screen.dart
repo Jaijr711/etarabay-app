@@ -48,15 +48,6 @@ const _filterLabels = {
   DevFilter.outdated: 'Luma ang app',
 };
 
-const _filterIcons = {
-  DevFilter.all: LucideIcons.users,
-  DevFilter.online: LucideIcons.wifi,
-  DevFilter.today: LucideIcons.calendar_check,
-  DevFilter.away: LucideIcons.moon,
-  DevFilter.paused: LucideIcons.circle_pause,
-  DevFilter.outdated: LucideIcons.smartphone,
-};
-
 const _filterTones = {
   DevFilter.all: _violet,
   DevFilter.online: _green,
@@ -67,7 +58,7 @@ const _filterTones = {
 };
 
 const _emptyLabels = {
-  DevFilter.all: 'Walang student record.',
+  DevFilter.all: 'Wala pang batang naka-enroll.',
   DevFilter.online: 'Walang online ngayon.',
   DevFilter.today: 'Wala pang naglaro ngayong araw.',
   DevFilter.away: 'Walang 7+ araw na wala.',
@@ -189,6 +180,8 @@ class DeveloperDashboardScreen extends StatelessWidget {
   static DateTime Function()? debugNow;
   @visibleForTesting
   static AuthService? debugAuthService;
+  @visibleForTesting
+  static Stream<Map<String, dynamic>?>? debugNotifications;
 
   // The theme goes round the whole panel, so every sheet and dialog opened
   // from inside it is drawn in it too.
@@ -220,6 +213,10 @@ class _PanelState extends State<_Panel> {
   late final Stream<List<DevRecord>> _students;
   late final StreamSubscription<Map<String, dynamic>?> _configSub;
   Map<String, dynamic>? _config;
+
+  /// The same config, for the settings page: a route of its own, outside
+  /// this state's rebuilds.
+  final _configView = ValueNotifier<Map<String, dynamic>?>(null);
   List<DevRecord> _latest = const [];
 
   /// This phone's own version: the highest minimum it may set, so the
@@ -239,6 +236,7 @@ class _PanelState extends State<_Panel> {
     _configSub = (DeveloperDashboardScreen.debugConfig ??
             _service.watchConfig().map((s) => s.data()))
         .listen((data) {
+      _configView.value = data;
       if (mounted) setState(() => _config = data);
     });
     final own = DeveloperDashboardScreen.debugOwnVersion;
@@ -254,6 +252,7 @@ class _PanelState extends State<_Panel> {
   @override
   void dispose() {
     _configSub.cancel();
+    _configView.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -284,20 +283,19 @@ class _PanelState extends State<_Panel> {
           ],
         ),
         actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(LucideIcons.ellipsis_vertical, color: _ink),
-            onSelected: (_) => _showChangePassword(),
-            itemBuilder: (_) => const [
-              PopupMenuItem(
-                value: 'password',
-                child: Row(children: [
-                  Icon(LucideIcons.key_round, size: 18, color: _soft),
-                  SizedBox(width: 10),
-                  Flexible(child: Text('Palitan ang developer password')),
-                ]),
-              ),
-            ],
+          _BarButton(
+            icon: LucideIcons.send,
+            label: 'Ipadala',
+            tooltip: 'Ipadala',
+            onTap: _showSend,
           ),
+          _BarButton(
+            icon: LucideIcons.settings,
+            label: 'Setting',
+            tooltip: 'Mga setting ng app',
+            onTap: _openSettings,
+          ),
+          const SizedBox(width: 6),
         ],
         bottom: const PreferredSize(
             preferredSize: Size.fromHeight(1),
@@ -310,7 +308,7 @@ class _PanelState extends State<_Panel> {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text('Error: ${snapshot.error}',
+                child: Text('May mali: ${snapshot.error}',
                     style: const TextStyle(color: _red)),
               ),
             );
@@ -334,13 +332,9 @@ class _PanelState extends State<_Panel> {
                   _maintenanceBanner(),
                   const SizedBox(height: 12),
                 ],
-                _controls(),
-                const SizedBox(height: 22),
-                const _SectionTitle('Mga mag-aaral'),
-                const SizedBox(height: 10),
-                _stats(counts),
-                const SizedBox(height: 12),
                 _search(),
+                const SizedBox(height: 10),
+                _filterChips(counts),
                 _sortRow(shown.length),
               ]),
             ),
@@ -374,85 +368,35 @@ class _PanelState extends State<_Panel> {
 
   // ── The panel's top ────────────────────────────────────────────────────
 
-  Widget _controls() {
-    final locked = _locked;
-    return Row(children: [
-      Expanded(
-        child: _ControlTile(
-          icon: LucideIcons.wrench,
-          label: 'Maintenance',
-          tooltip: 'Maintenance mode',
-          status: _maintenanceOn ? 'Naka-on' : 'Naka-off',
-          tone: _maintenanceOn ? _amber : _violet,
-          onTap: _showMaintenance,
-        ),
-      ),
-      const SizedBox(width: 8),
-      Expanded(
-        child: _ControlTile(
-          icon: LucideIcons.smartphone,
-          label: 'Bersyon',
-          tooltip: 'Bersyon ng app',
-          status: _minVersion == null ? 'Malaya' : '≥ $_minVersion',
-          tone: _minVersion == null ? _violet : _red,
-          onTap: _showVersions,
-        ),
-      ),
-      const SizedBox(width: 8),
-      Expanded(
-        child: _ControlTile(
-          icon: LucideIcons.lock,
-          label: 'Module',
-          tooltip: 'Module locks',
-          status: locked.isEmpty ? 'Lahat bukas' : '${locked.length} sarado',
-          tone: locked.isEmpty ? _violet : _red,
-          onTap: _showModuleLocks,
-        ),
-      ),
-      const SizedBox(width: 8),
-      Expanded(
-        child: _ControlTile(
-          icon: LucideIcons.megaphone,
-          label: 'Broadcast',
-          tooltip: 'Broadcast to everyone',
-          status: 'Sa lahat',
-          tone: _violet,
-          onTap: _showBroadcastDialog,
-        ),
-      ),
-    ]);
-  }
-
-  Widget _stats(DevRosterCounts counts) {
-    Widget card(DevFilter f) => Expanded(
-          child: _StatCard(
+  /// Who to show, with how many each: one row the thumb can slide, where
+  /// six big cards used to push the list off the first screen.
+  Widget _filterChips(DevRosterCounts counts) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(children: [
+        for (final f in DevFilter.values) ...[
+          _FilterChip(
             label: _filterLabels[f]!,
-            icon: _filterIcons[f]!,
-            tone: _filterTones[f]!,
             count: counts.of(f),
+            tone: _filterTones[f]!,
             selected: _filter == f,
             // The one picked, tapped again, goes back to everyone.
             onTap: () => setState(() => _filter =
                 _filter == f && f != DevFilter.all ? DevFilter.all : f),
           ),
-        );
-    return Column(children: [
-      Row(children: [
-        card(DevFilter.all),
-        const SizedBox(width: 8),
-        card(DevFilter.online),
-        const SizedBox(width: 8),
-        card(DevFilter.today),
+          const SizedBox(width: 8),
+        ],
       ]),
-      const SizedBox(height: 8),
-      Row(children: [
-        card(DevFilter.away),
-        const SizedBox(width: 8),
-        card(DevFilter.paused),
-        const SizedBox(width: 8),
-        card(DevFilter.outdated),
-      ]),
-    ]);
+    );
+  }
+
+  /// Maintenance, the minimum version, the module locks and the password:
+  /// set now and then, so on a page of their own rather than above the list.
+  void _openSettings() {
+    final theme = Theme.of(context);
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => Theme(data: theme, child: _AppSettingsPage(panel: this)),
+    ));
   }
 
   Widget _search() {
@@ -461,7 +405,7 @@ class _PanelState extends State<_Panel> {
       style: const TextStyle(color: _ink),
       onChanged: (v) => setState(() => _query = v.trim()),
       decoration: InputDecoration(
-        hintText: 'Maghanap ng pangalan o Student Number',
+        hintText: 'Pangalan o Student Number',
         prefixIcon: const Icon(LucideIcons.search, color: _soft, size: 19),
         suffixIcon: _query.isEmpty
             ? null
@@ -589,7 +533,7 @@ class _PanelState extends State<_Panel> {
       isScrollControlled: true,
       builder: (sheetContext) => StatefulBuilder(
         builder: (sheetContext, setSheet) => _SheetBody(
-          title: 'Maintenance mode',
+          title: 'Maintenance (inaayos ang app)',
           subtitle: 'Matatakpan ang app ng lahat ng batang naka-login, saan '
               'man sila, hanggang i-off mo. Bukas pa rin ang Talaan ng Guro. '
               'Walang mabubura sa progreso.',
@@ -805,8 +749,8 @@ class _PanelState extends State<_Panel> {
         child: _LiveConfig(
           panel: this,
           builder: (locked) => _SheetBody(
-            title: 'Module locks',
-            subtitle: 'Isasara ang modyul na ito para sa LAHAT ng students, '
+            title: 'Mga module',
+            subtitle: 'Isasara ang aralin na ito para sa lahat ng bata, '
                 'saan man sila.',
             children: [
               for (final entry in _moduleLabels.entries)
@@ -830,7 +774,59 @@ class _PanelState extends State<_Panel> {
     );
   }
 
-  // ── Broadcast ──────────────────────────────────────────────────────────
+  // ── Send ───────────────────────────────────────────────────────────────
+
+  /// A message inside every child's app, or a notification on the
+  /// teachers' phones.
+  void _showSend() {
+    final notifications = DeveloperDashboardScreen.debugNotifications ??
+        _service.watchNotifications();
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => _SheetBody(
+        title: 'Ipadala',
+        subtitle: 'Para sa isang bata lang: pindutin ang tatlong tuldok sa '
+            'tabi ng pangalan niya sa listahan.',
+        children: [
+          _ChoiceCard(
+            icon: LucideIcons.megaphone,
+            title: 'Mensahe sa lahat ng bata',
+            subtitle: 'Lalabas sa loob ng app ng bawat bata.',
+            onTap: () {
+              Navigator.of(sheetContext).pop();
+              _showBroadcastDialog();
+            },
+          ),
+          const SizedBox(height: 8),
+          StreamBuilder<Map<String, dynamic>?>(
+            stream: notifications,
+            builder: (context, snap) {
+              final sent = (snap.data?['teacher'] as Map?)?['sentAt'];
+              return _ChoiceCard(
+                icon: LucideIcons.bell_ring,
+                title: 'Notif sa mga teacher',
+                subtitle: sent is Timestamp
+                    ? 'Huling naipadala: ${_when(sent.toDate())}'
+                    : 'Sa notification bar ng phone ng bawat teacher.',
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _showNotifDialog(
+                    context,
+                    heading: 'Notif sa mga teacher',
+                    note: 'Lalabas sa notification bar ng bawat phone na '
+                        'naka-sign in ang teacher, kahit sarado ang app.',
+                    send: _service.sendTeacherNotif,
+                    done: 'Naipadala ang notif sa mga teacher.',
+                  );
+                },
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
   void _showBroadcastDialog() {
     final controller = TextEditingController();
@@ -839,12 +835,12 @@ class _PanelState extends State<_Panel> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setDialogState) => AlertDialog(
-          title: const Text('Broadcast sa lahat'),
+          title: const Text('Mensahe sa lahat ng bata'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Makikita ng LAHAT ng students ang mensaheng ito.'),
+              const Text('Makikita ito ng lahat ng bata sa loob ng app.'),
               const SizedBox(height: 14),
               _CategoryPicker(
                 selected: category,
@@ -863,7 +859,7 @@ class _PanelState extends State<_Panel> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
+              child: const Text('Kanselahin'),
             ),
             FilledButton(
               onPressed: () {
@@ -872,7 +868,7 @@ class _PanelState extends State<_Panel> {
                 _service.broadcastMessage(text, category: category);
                 Navigator.of(dialogContext).pop();
               },
-              child: const Text('I-broadcast'),
+              child: const Text('Ipadala'),
             ),
           ],
         ),
@@ -895,7 +891,7 @@ class _PanelState extends State<_Panel> {
           Future<void> save() async {
             final n = next.text.trim();
             if (n.length < 6) {
-              setDialog(() => error = 'Kailangan ng 6+ characters.');
+              setDialog(() => error = 'Kailangan ng 6 o higit pang letra.');
               return;
             }
             if (n != again.text.trim()) {
@@ -969,7 +965,7 @@ class _PanelState extends State<_Panel> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext),
-                child: const Text('Cancel'),
+                child: const Text('Kanselahin'),
               ),
               FilledButton(
                 onPressed: busy ? null : save,
@@ -1026,6 +1022,119 @@ class _LiveConfigState extends State<_LiveConfig> {
 }
 
 /// A yes-or-no before something that reaches many phones at once.
+/// Does [work] and says how it went. Each of these reaches a child's
+/// phone, and it used to be fired and forgotten: offline, or refused,
+/// nothing said so, and a "deleted" child was still there.
+Future<void> _report(
+    BuildContext context, Future<Object?> Function() work, String done) async {
+  final messenger = ScaffoldMessenger.of(context);
+  const later = 'Naipadala na; matatapos ito pagbalik ng internet.';
+  String say;
+  try {
+    final result = await work().timeout(const Duration(seconds: 12));
+    if (result is Map && result['status'] != 'Success') {
+      say = switch (result['code']) {
+        'needsInternet' => 'Walang internet. Walang nabago.',
+        'finishesOnline' => later,
+        'childRemoved' => 'Wala na ang record ng batang ito.',
+        _ => 'Hindi natuloy. Subukan ulit.',
+      };
+    } else {
+      say = done;
+    }
+  } on TimeoutException {
+    say = later;
+  } catch (e) {
+    debugPrint('Developer action failed: $e');
+    say = 'Hindi natuloy. Subukan ulit.';
+  }
+  messenger.showSnackBar(SnackBar(content: Text(say)));
+}
+
+/// Writes a phone notification: an optional title, the message, and when
+/// it arrives. Each phone looks for it in the background, so it is not
+/// instant, and says so.
+void _showNotifDialog(BuildContext context,
+    {required String heading,
+    required String note,
+    required Future<void> Function(String title, String body) send,
+    required String done}) {
+  final title = TextEditingController();
+  final body = TextEditingController();
+  showDialog<void>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: Text(heading),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(note),
+            const SizedBox(height: 14),
+            TextField(
+              controller: title,
+              maxLength: 40,
+              style: const TextStyle(color: _ink),
+              decoration: const InputDecoration(
+                  labelText: 'Pamagat', hintText: 'E-Tarabay'),
+            ),
+            const SizedBox(height: 6),
+            TextField(
+              controller: body,
+              autofocus: true,
+              maxLines: 3,
+              maxLength: 120,
+              style: const TextStyle(color: _ink),
+              decoration: const InputDecoration(hintText: 'Mensahe...'),
+            ),
+            const Row(children: [
+              Icon(LucideIcons.clock, size: 14, color: _soft),
+              SizedBox(width: 6),
+              Expanded(
+                child: Text('Darating ito sa loob ng mga 15–30 minuto.',
+                    style: TextStyle(color: _soft, fontSize: 12.5)),
+              ),
+            ]),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(),
+          child: const Text('Kanselahin'),
+        ),
+        FilledButton(
+          onPressed: () {
+            final text = body.text.trim();
+            if (text.isEmpty) return;
+            final heading = title.text.trim();
+            Navigator.of(dialogContext).pop();
+            _report(
+                context,
+                () => send(heading.isEmpty ? 'E-Tarabay' : heading, text),
+                done);
+          },
+          child: const Text('Ipadala'),
+        ),
+      ],
+    ),
+  );
+}
+
+/// "8 Nob, 3:42 PM".
+String _when(DateTime at) {
+  const months = [
+    'Ene', 'Peb', 'Mar', 'Abr', 'May', 'Hun', //
+    'Hul', 'Ago', 'Set', 'Okt', 'Nob', 'Dis',
+  ];
+  final t = at.toLocal();
+  final hour = t.hour % 12 == 0 ? 12 : t.hour % 12;
+  final minute = t.minute.toString().padLeft(2, '0');
+  return '${t.day} ${months[t.month - 1]}, $hour:$minute '
+      '${t.hour < 12 ? 'AM' : 'PM'}';
+}
+
 Future<bool?> _confirm(BuildContext context,
     {required String title,
     required String body,
@@ -1039,7 +1148,7 @@ Future<bool?> _confirm(BuildContext context,
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(dialogContext, false),
-          child: const Text('Cancel'),
+          child: const Text('Kanselahin'),
         ),
         FilledButton(
           style: FilledButton.styleFrom(backgroundColor: color),
@@ -1052,17 +1161,6 @@ Future<bool?> _confirm(BuildContext context,
 }
 
 // ── Pieces ───────────────────────────────────────────────────────────────
-
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Text(text,
-      style: const TextStyle(
-          color: _ink, fontSize: 15, fontWeight: FontWeight.w800));
-}
 
 class _FieldLabel extends StatelessWidget {
   const _FieldLabel(this.text);
@@ -1131,134 +1229,236 @@ class _Pill extends StatelessWidget {
   }
 }
 
-/// One of the four controls at the top: what it is and where it stands.
-class _ControlTile extends StatelessWidget {
-  const _ControlTile({
+/// An app-bar action with its name under it: the two at the top are the
+/// panel's way to everything that is not one child.
+class _BarButton extends StatelessWidget {
+  const _BarButton({
     required this.icon,
     required this.label,
     required this.tooltip,
-    required this.status,
-    required this.tone,
     required this.onTap,
   });
 
   final IconData icon;
   final String label;
   final String tooltip;
-  final String status;
-  final Color tone;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Tooltip(
       message: tooltip,
-      child: Material(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: const BorderSide(color: _line),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(4, 12, 4, 10),
-            child: Column(children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: tone.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(11),
-                ),
-                child: Icon(icon, size: 19, color: tone),
-              ),
-              const SizedBox(height: 8),
-              // Shrunk to fit rather than cut: "Maintenance" is the longest.
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(label,
-                    maxLines: 1,
-                    style: const TextStyle(
-                        color: _ink,
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w700)),
-              ),
-              const SizedBox(height: 1),
-              Text(status,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      color: tone == _violet ? _soft : tone,
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w600)),
-            ]),
-          ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Icon(icon, size: 20, color: _violet),
+            const SizedBox(height: 3),
+            Text(label,
+                style: const TextStyle(
+                    color: _ink, fontSize: 11.5, fontWeight: FontWeight.w700)),
+          ]),
         ),
       ),
     );
   }
 }
 
-/// One count; tapped, the list shows just those.
-class _StatCard extends StatelessWidget {
-  const _StatCard({
+/// One filter: a name and how many it holds. Filled when chosen.
+class _FilterChip extends StatelessWidget {
+  const _FilterChip({
     required this.label,
-    required this.icon,
-    required this.tone,
     required this.count,
+    required this.tone,
     required this.selected,
     required this.onTap,
   });
 
   final String label;
-  final IconData icon;
-  final Color tone;
   final int count;
+  final Color tone;
   final bool selected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final empty = count == 0 && !selected;
     return Material(
-      color: selected ? tone.withOpacity(0.07) : Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(
-            color: selected ? tone : _line, width: selected ? 1.6 : 1),
-      ),
+      color: selected ? _violet : Colors.white,
+      shape: StadiumBorder(side: BorderSide(color: selected ? _violet : _line)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(children: [
-                Icon(icon, size: 15, color: tone),
-                const Spacer(),
-                if (selected) Icon(LucideIcons.check, size: 14, color: tone),
-              ]),
-              const SizedBox(height: 6),
-              Text('$count',
-                  style: TextStyle(
-                      color: count == 0 ? _faint : _ink,
-                      fontSize: 22,
-                      height: 1.1,
-                      fontWeight: FontWeight.w800)),
-              const SizedBox(height: 2),
-              Text(label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                      color: _soft,
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w600)),
-            ],
-          ),
+          padding: const EdgeInsets.fromLTRB(14, 8, 12, 8),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text(label,
+                style: TextStyle(
+                    color: selected
+                        ? Colors.white
+                        : empty
+                            ? _faint
+                            : _ink,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700)),
+            const SizedBox(width: 6),
+            Text('$count',
+                style: TextStyle(
+                    color: selected
+                        ? Colors.white.withOpacity(0.85)
+                        : empty
+                            ? _faint
+                            : tone,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800)),
+          ]),
         ),
+      ),
+    );
+  }
+}
+
+/// The settings the developer changes now and then, each with where it
+/// stands. Live: a change made in its sheet shows here at once.
+class _AppSettingsPage extends StatelessWidget {
+  const _AppSettingsPage({required this.panel});
+
+  final _PanelState panel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Mga setting ng app',
+            style: TextStyle(
+                color: _ink, fontSize: 18, fontWeight: FontWeight.w800)),
+        bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(1),
+            child: Divider(height: 1, thickness: 1)),
+      ),
+      body: ValueListenableBuilder<Map<String, dynamic>?>(
+        valueListenable: panel._configView,
+        builder: (context, _, __) {
+          final locked = panel._locked;
+          final min = panel._minVersion;
+          final on = panel._maintenanceOn;
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: _line),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Column(children: [
+                  _SettingsRow(
+                    icon: LucideIcons.wrench,
+                    title: 'Maintenance',
+                    subtitle: 'Takpan ang app ng mga bata habang may inaayos.',
+                    status: on ? 'Naka-on' : 'Naka-off',
+                    tone: on ? _amber : _soft,
+                    onTap: panel._showMaintenance,
+                  ),
+                  const Divider(height: 1),
+                  _SettingsRow(
+                    icon: LucideIcons.smartphone,
+                    title: 'Pinakamababang bersyon',
+                    subtitle: 'Pilitin mag-update ang mga lumang app.',
+                    status: min == null ? 'Malaya' : '≥ $min',
+                    tone: min == null ? _soft : _red,
+                    onTap: panel._showVersions,
+                  ),
+                  const Divider(height: 1),
+                  _SettingsRow(
+                    icon: LucideIcons.lock,
+                    title: 'Mga module',
+                    subtitle: 'Isara ang isang aralin para sa lahat.',
+                    status: locked.isEmpty
+                        ? 'Lahat bukas'
+                        : '${locked.length} sarado',
+                    tone: locked.isEmpty ? _soft : _red,
+                    onTap: panel._showModuleLocks,
+                  ),
+                  const Divider(height: 1),
+                  _SettingsRow(
+                    icon: LucideIcons.key_round,
+                    title: 'Developer password',
+                    subtitle: 'Ang tina-type mo sa teacher login.',
+                    status: 'Palitan',
+                    tone: _violet,
+                    onTap: panel._showChangePassword,
+                  ),
+                ]),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// One setting: what it is, what it does, and where it stands now.
+class _SettingsRow extends StatelessWidget {
+  const _SettingsRow({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.status,
+    required this.tone,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String status;
+  final Color tone;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 14, 10, 14),
+        child: Row(children: [
+          Container(
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: _violet.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, size: 19, color: _violet),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: const TextStyle(
+                        color: _ink,
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w700)),
+                Text(subtitle,
+                    style: const TextStyle(color: _soft, fontSize: 12.5)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(status,
+              style: TextStyle(
+                  color: tone, fontSize: 13, fontWeight: FontWeight.w700)),
+          const SizedBox(width: 2),
+          const Icon(LucideIcons.chevron_right, size: 18, color: _faint),
+        ]),
       ),
     );
   }
@@ -1315,6 +1515,67 @@ class _SwitchCard extends StatelessWidget {
           onChanged: onChanged,
         ),
       ]),
+    );
+  }
+}
+
+/// One thing a sheet offers to do, tapped as a whole.
+class _ChoiceCard extends StatelessWidget {
+  const _ChoiceCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: _line),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+          child: Row(children: [
+            Container(
+              width: 38,
+              height: 38,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: _violet.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, size: 19, color: _violet),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: const TextStyle(
+                          color: _ink,
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w700)),
+                  Text(subtitle,
+                      style: const TextStyle(color: _soft, fontSize: 12.5)),
+                ],
+              ),
+            ),
+            const Icon(LucideIcons.chevron_right, size: 18, color: _faint),
+          ]),
+        ),
+      ),
     );
   }
 }
@@ -1458,163 +1719,165 @@ class _StudentRow extends StatelessWidget {
     final old = record.isOutdated(newestVersion);
     final tone = _avatarTones[name.hashCode.abs() % _avatarTones.length];
     return Container(
-      padding: const EdgeInsets.fromLTRB(14, 12, 4, 14),
+      padding: const EdgeInsets.fromLTRB(14, 12, 4, 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: disabled ? _red.withOpacity(0.35) : _line),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
-            Stack(clipBehavior: Clip.none, children: [
-              Container(
-                width: 42,
-                height: 42,
-                alignment: Alignment.center,
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Stack(clipBehavior: Clip.none, children: [
+          Container(
+            width: 42,
+            height: 42,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                color: tone.withOpacity(0.12), shape: BoxShape.circle),
+            child: Text(_initials,
+                style: TextStyle(
+                    color: tone, fontSize: 15, fontWeight: FontWeight.w800)),
+          ),
+          if (online)
+            Positioned(
+              right: -1,
+              bottom: -1,
+              child: Container(
+                width: 13,
+                height: 13,
                 decoration: BoxDecoration(
-                    color: tone.withOpacity(0.12), shape: BoxShape.circle),
-                child: Text(_initials,
-                    style: TextStyle(
-                        color: tone,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800)),
-              ),
-              if (online)
-                Positioned(
-                  right: -1,
-                  bottom: -1,
-                  child: Container(
-                    width: 13,
-                    height: 13,
-                    decoration: BoxDecoration(
-                      color: _green,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                    ),
-                  ),
+                  color: _green,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
                 ),
-            ]),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          color: _ink,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700)),
-                  if (record.lrn.isNotEmpty)
-                    Text(record.lrn,
-                        style: const TextStyle(color: _soft, fontSize: 12)),
-                ],
               ),
             ),
-            PopupMenuButton<String>(
-              tooltip: 'Mga aksyon',
-              icon: const Icon(LucideIcons.ellipsis_vertical,
-                  color: _soft, size: 20),
-              onSelected: (value) {
-                switch (value) {
-                  case 'message':
-                    _showSendMessage(context);
-                  case 'pause':
-                    _confirmToggleDisabled(context);
-                  case 'kick':
-                    _confirmForceLogout(context);
-                  case 'complete':
-                    _confirmCompleteAll(context);
-                  case 'reset':
-                    _confirmResetProgress(context);
-                  case 'delete':
-                    _confirmDelete(context);
-                }
-              },
-              itemBuilder: (context) => [
-                _item('message', LucideIcons.send, 'Mag-message'),
-                _item('pause', disabled ? LucideIcons.play : LucideIcons.pause,
-                    disabled ? 'I-resume ang account' : 'I-pause ang account'),
-                _item('kick', LucideIcons.log_out, 'Force logout'),
-                _item('complete', LucideIcons.flask_conical,
-                    'Tapusin lahat (pang-test)'),
-                const PopupMenuDivider(),
-                _item('reset', LucideIcons.rotate_ccw, 'Reset progress',
-                    danger: true),
-                _item('delete', LucideIcons.trash_2, 'Delete account',
-                    danger: true),
-              ],
-            ),
-          ]),
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: Wrap(spacing: 6, runSpacing: 6, children: [
-              online
-                  ? const _Pill(
-                      text: 'Online ngayon',
-                      tone: _green,
-                      icon: LucideIcons.wifi)
-                  : _Pill(
-                      text: _lastActiveLabel,
-                      tone: _soft,
-                      icon: LucideIcons.clock),
-              if (disabled)
-                const _Pill(
-                    text: 'Naka-pause',
-                    tone: _red,
-                    icon: LucideIcons.circle_pause),
-              if (record.testAccount)
-                const _Pill(
-                    text: 'Pang-test',
-                    tone: _violet,
-                    icon: LucideIcons.flask_conical),
-              _Pill(
-                text: version == null
-                    ? 'v —'
-                    : old
-                        ? 'v$version · luma'
-                        : 'v$version',
-                tone: version == null
-                    ? _faint
-                    : old
-                        ? _amber
-                        : _soft,
-                icon: LucideIcons.smartphone,
-              ),
-            ]),
-          ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: progress == null
-                ? const Text('Wala pang progreso',
-                    style: TextStyle(color: _faint, fontSize: 12))
-                : Row(children: [
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(3),
-                        child: LinearProgressIndicator(
-                          value: progress.clamp(0.0, 1.0),
-                          minHeight: 6,
-                          color: _violet,
-                          backgroundColor: const Color(0xFFEEEDFD),
-                        ),
-                      ),
+        ]),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                      color: _ink, fontSize: 15, fontWeight: FontWeight.w700)),
+              if (record.lrn.isNotEmpty)
+                Text(record.lrn,
+                    style: const TextStyle(color: _faint, fontSize: 12)),
+              const SizedBox(height: 4),
+              // Where the child stands, in one line: seen when, how far,
+              // which version.
+              Text.rich(
+                TextSpan(
+                  style: const TextStyle(color: _soft, fontSize: 12.5),
+                  children: [
+                    TextSpan(
+                      text: online ? 'Online ngayon' : _lastActiveLabel,
+                      style: TextStyle(
+                          color: online ? _green : _soft,
+                          fontWeight: online ? FontWeight.w700 : null),
                     ),
-                    const SizedBox(width: 10),
-                    Text('${(progress * 100).clamp(0, 100).round()}%',
-                        style: const TextStyle(
-                            color: _ink,
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w700)),
+                    const TextSpan(text: ' · '),
+                    TextSpan(
+                      text: progress == null
+                          ? 'Walang progreso'
+                          : '${(progress * 100).clamp(0, 100).round()}%',
+                      style: TextStyle(
+                          color: progress == null ? _faint : _ink,
+                          fontWeight: FontWeight.w700),
+                    ),
+                    const TextSpan(text: ' · '),
+                    TextSpan(
+                      text: version == null ? 'v —' : 'v$version',
+                      style: TextStyle(
+                          color: version == null
+                              ? _faint
+                              : old
+                                  ? _amber
+                                  : _soft,
+                          fontWeight: old ? FontWeight.w700 : null),
+                    ),
+                  ],
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (disabled || record.testAccount || old)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Wrap(spacing: 6, runSpacing: 6, children: [
+                    if (disabled)
+                      const _Pill(
+                          text: 'Naka-pause',
+                          tone: _red,
+                          icon: LucideIcons.circle_pause),
+                    if (record.testAccount)
+                      const _Pill(
+                          text: 'Pang-test',
+                          tone: _violet,
+                          icon: LucideIcons.flask_conical),
+                    if (old)
+                      const _Pill(
+                          text: 'Luma ang app',
+                          tone: _amber,
+                          icon: LucideIcons.smartphone),
                   ]),
+                ),
+            ],
           ),
-        ],
-      ),
+        ),
+        PopupMenuButton<String>(
+          tooltip: 'Mga aksyon',
+          icon:
+              const Icon(LucideIcons.ellipsis_vertical, color: _soft, size: 20),
+          onSelected: (value) {
+            switch (value) {
+              case 'message':
+                _showSendMessage(context);
+              case 'notif':
+                _showNotifDialog(
+                  context,
+                  heading: 'Notif kay $name',
+                  note: 'Lalabas sa notification bar ng phone ng bata, '
+                      'kahit sarado ang app. Kailangang naka-on ang '
+                      'Notifications sa Settings ng bata.',
+                  send: (title, body) =>
+                      service.sendChildNotif(studentId, title, body),
+                  done: 'Naipadala ang notif kay $name.',
+                );
+              case 'pause':
+                _confirmToggleDisabled(context);
+              case 'kick':
+                _confirmForceLogout(context);
+              case 'complete':
+                _confirmCompleteAll(context);
+              case 'reset':
+                _confirmResetProgress(context);
+              case 'delete':
+                _confirmDelete(context);
+            }
+          },
+          // Grouped by what they do: talk to the child, their account,
+          // testing, and what cannot be undone.
+          itemBuilder: (context) => [
+            _item('message', LucideIcons.message_circle, 'Mensahe sa app'),
+            _item('notif', LucideIcons.bell_ring, 'Notif sa phone'),
+            const PopupMenuDivider(),
+            _item('pause', disabled ? LucideIcons.play : LucideIcons.pause,
+                disabled ? 'I-resume ang account' : 'I-pause ang account'),
+            _item('kick', LucideIcons.log_out, 'I-logout'),
+            const PopupMenuDivider(),
+            _item('complete', LucideIcons.flask_conical,
+                'Tapusin lahat (pang-test)'),
+            const PopupMenuDivider(),
+            _item('reset', LucideIcons.rotate_ccw, 'I-reset ang progress',
+                danger: true),
+            _item('delete', LucideIcons.trash_2, 'Burahin ang account',
+                danger: true),
+          ],
+        ),
+      ]),
     );
   }
 
@@ -1638,7 +1901,7 @@ class _StudentRow extends StatelessWidget {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setDialogState) => AlertDialog(
-          title: Text('Message kay $name'),
+          title: Text('Mensahe kay $name'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1660,7 +1923,7 @@ class _StudentRow extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
+              child: const Text('Kanselahin'),
             ),
             FilledButton(
               onPressed: () {
@@ -1673,41 +1936,12 @@ class _StudentRow extends StatelessWidget {
                         category: category),
                     'Naipadala ang mensahe kay $name.');
               },
-              child: const Text('I-send'),
+              child: const Text('Ipadala'),
             ),
           ],
         ),
       ),
     );
-  }
-
-  /// Does [work] and says how it went. Each of these reaches a child's
-  /// phone, and it used to be fired and forgotten: offline, or refused,
-  /// nothing said so, and a "deleted" child was still there.
-  Future<void> _report(BuildContext context, Future<Object?> Function() work,
-      String done) async {
-    final messenger = ScaffoldMessenger.of(context);
-    const later = 'Naipadala na; matatapos ito pagbalik ng internet.';
-    String say;
-    try {
-      final result = await work().timeout(const Duration(seconds: 12));
-      if (result is Map && result['status'] != 'Success') {
-        say = switch (result['code']) {
-          'needsInternet' => 'Walang internet. Walang nabago.',
-          'finishesOnline' => later,
-          'childRemoved' => 'Wala na ang record ng batang ito.',
-          _ => 'Hindi natuloy. Subukan ulit.',
-        };
-      } else {
-        say = done;
-      }
-    } on TimeoutException {
-      say = later;
-    } catch (e) {
-      debugPrint('Developer action failed: $e');
-      say = 'Hindi natuloy. Subukan ulit.';
-    }
-    messenger.showSnackBar(SnackBar(content: Text(say)));
   }
 
   Future<void> _ask(BuildContext context,
@@ -1743,7 +1977,7 @@ class _StudentRow extends StatelessWidget {
   void _confirmForceLogout(BuildContext context) {
     _ask(
       context,
-      title: 'Force logout?',
+      title: 'I-logout si $name?',
       body: '$name ay ma-si-sign-out sa susunod na sync. Puwede silang '
           'mag-login ulit agad — hindi ito pause.',
       action: 'I-logout',
@@ -1773,7 +2007,7 @@ class _StudentRow extends StatelessWidget {
   void _confirmResetProgress(BuildContext context) {
     _ask(
       context,
-      title: 'Reset progress?',
+      title: 'I-reset ang progress ni $name?',
       body: 'Buburahin ang LAHAT ng progress, stars, at badges ni $name. '
           'Hindi na ito maibabalik.',
       action: 'I-reset',
@@ -1788,10 +2022,10 @@ class _StudentRow extends StatelessWidget {
   void _confirmDelete(BuildContext context) {
     _ask(
       context,
-      title: 'Delete account?',
+      title: 'Burahin ang account ni $name?',
       body: 'Buburahin nang tuluyan ang account ni $name. Hindi na ito '
           'maibabalik.',
-      action: 'I-delete',
+      action: 'Burahin',
       color: _red,
       onYes: () => _report(context, () => authService.deleteStudent(studentId),
           'Na-delete na si $name.'),

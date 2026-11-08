@@ -3,6 +3,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import 'update_checker.dart';
+
 /// The notifications the app raises while it is not open: a handful of
 /// daily nudges spread across the evening, each about a different everyday
 /// moment rather than one repeated "come back and play."
@@ -150,6 +152,8 @@ class ReminderService {
       );
       await _plugin.initialize(
         const InitializationSettings(android: androidInit, iOS: iosInit),
+        onDidReceiveNotificationResponse: (response) =>
+            _onTap(response.payload),
       );
       _ready = true;
     } catch (e) {
@@ -330,6 +334,64 @@ class ReminderService {
     } catch (e) {
       debugPrint('ReminderService.scheduleBirthday: $e');
     }
+  }
+
+  /// Shows one notification now: one the developer sent, or word of a new
+  /// version ([update]), which opens the download page when tapped. Each
+  /// has a fixed [id], so the same one shown twice replaces itself.
+  Future<void> showNow(int id, String title, String body,
+      {required bool update}) async {
+    if (kIsWeb) return;
+    await init();
+    if (!_ready) return;
+    try {
+      await _plugin.show(
+        id,
+        title,
+        body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            update ? 'app_update' : 'from_etarabay',
+            update ? 'Update' : 'Mula sa E-Tarabay',
+            channelDescription: update
+                ? 'Kapag may bagong bersyon ng E-Tarabay'
+                : 'Mga paalala mula sa gumawa ng E-Tarabay',
+            importance: Importance.high,
+            priority: Priority.high,
+            styleInformation: BigTextStyleInformation(body),
+          ),
+          iOS: const DarwinNotificationDetails(),
+        ),
+        payload: update ? _updatePayload : null,
+      );
+    } catch (e) {
+      debugPrint('ReminderService.showNow($id): $e');
+    }
+  }
+
+  static const _updatePayload = 'update';
+
+  /// The app opened from a tap on the update notification: the download
+  /// page. Called once at start, for a tap that launched the app.
+  Future<void> handleLaunchTap() async {
+    if (kIsWeb) return;
+    await init();
+    if (!_ready) return;
+    try {
+      final details = await _plugin.getNotificationAppLaunchDetails();
+      if (details?.didNotificationLaunchApp == true) {
+        await _onTap(details!.notificationResponse?.payload);
+      }
+    } catch (e) {
+      debugPrint('ReminderService.handleLaunchTap: $e');
+    }
+  }
+
+  Future<void> _onTap(String? payload) async {
+    if (payload != _updatePayload) return;
+    final update = await UpdateChecker.instance.checkForUpdate();
+    // Already current by now, or no signal: the app simply opens.
+    if (update != null) await UpdateChecker.instance.openUpdatePage(update);
   }
 
   /// The name and description Android shows for each kind of notification

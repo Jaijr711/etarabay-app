@@ -188,9 +188,9 @@ void main() {
       await tester.ensureVisible(find.byTooltip('Mga aksyon'));
       await tester.tap(find.byTooltip('Mga aksyon'));
       await settle(tester);
-      await tester.tap(find.text('Delete account'));
+      await tester.tap(find.text('Burahin ang account'));
       await settle(tester);
-      await tester.tap(find.text('I-delete'));
+      await tester.tap(find.text('Burahin'));
       await settle(tester);
     }
 

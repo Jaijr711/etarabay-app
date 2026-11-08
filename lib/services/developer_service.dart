@@ -110,6 +110,38 @@ class DeveloperService {
     });
   }
 
+  /// A notification for one child's phone, in its notification bar even
+  /// with the app closed: the phone looks for it in the background.
+  Future<void> sendChildNotif(String studentId, String title, String body) {
+    return _db
+        .collection('students')
+        .doc(studentId)
+        .update({'devNotif': _notif(title, body)});
+  }
+
+  /// The same, for every phone a teacher is signed in on.
+  Future<void> sendTeacherNotif(String title, String body) {
+    return _db.collection('config').doc('notifications').set(
+      {'teacher': _notif(title, body)},
+      SetOptions(merge: true),
+    );
+  }
+
+  /// The notifications doc, live: when the last one went to the teachers.
+  Stream<Map<String, dynamic>?> watchNotifications() => _db
+      .collection('config')
+      .doc('notifications')
+      .snapshots()
+      .map((s) => s.data());
+
+  /// A fresh id each time, so the same words sent twice still show twice.
+  Map<String, Object> _notif(String title, String body) => {
+        'id': _db.collection('config').doc().id,
+        'title': title,
+        'body': body,
+        'sentAt': FieldValue.serverTimestamp(),
+      };
+
   /// Finishes every lesson on a test account, leaving the child only the
   /// claiming (see [TestAccount]). Key by key into `rawProgress`, so what
   /// the account already holds stays; the totals are for the teacher's

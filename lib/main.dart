@@ -1,6 +1,7 @@
 import 'data/third_party_licenses.dart';
 import 'services/audio_source.dart';
 import 'services/device_performance.dart';
+import 'services/dev_notifications.dart';
 import 'services/reminder_service.dart';
 import 'widgets/account_watcher.dart';
 import 'widgets/system_bars_guard.dart';
@@ -414,6 +415,10 @@ class _AndroidOnly extends StatelessWidget {
   }
 }
 
+/// Kept for the life of the app: a listener that is not held is dropped.
+// ignore: unused_element
+AppLifecycleListener? _lookOnResume;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   registerThirdPartyLicenses();
@@ -549,6 +554,16 @@ void main() async {
     unawaited(ReminderService.instance
         .schedule(languageCode: savedLanguage, childName: childName));
   }
+
+  // The developer's notifications and word of a new version: looked for
+  // every 15 minutes with the app closed, and now, and each time the app
+  // comes back. A tap on the update one that opened the app goes on to
+  // the download page.
+  unawaited(DevNotifications.register());
+  unawaited(DevNotifications.runNow());
+  unawaited(ReminderService.instance.handleLaunchTap());
+  _lookOnResume = AppLifecycleListener(
+      onResume: () => unawaited(DevNotifications.runNow()));
 
   runApp(
     MultiProvider(

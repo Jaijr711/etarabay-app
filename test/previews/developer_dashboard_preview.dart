@@ -152,11 +152,20 @@ void main() {
     DeveloperDashboardScreen.debugConfig = config.stream;
     DeveloperDashboardScreen.debugOwnVersion = '1.2.57';
     DeveloperDashboardScreen.debugNow = () => _now;
+    DeveloperDashboardScreen.debugNotifications = Stream.value({
+      'teacher': {
+        'id': 'n1',
+        'title': 'E-Tarabay',
+        'body': 'May bagong video ng gabay sa Talaan ng Guro.',
+        'sentAt': Timestamp.fromDate(_now.subtract(const Duration(days: 1))),
+      },
+    });
     addTearDown(() {
       DeveloperDashboardScreen.debugStudents = null;
       DeveloperDashboardScreen.debugConfig = null;
       DeveloperDashboardScreen.debugOwnVersion = null;
       DeveloperDashboardScreen.debugNow = null;
+      DeveloperDashboardScreen.debugNotifications = null;
       config.close();
     });
     final key = GlobalKey();
@@ -191,18 +200,26 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
     await shot(tester, key, '4_banner');
 
-    await tester.tap(find.byTooltip('Maintenance mode'));
+    // The app's settings, on a page of their own.
+    await tester.tap(find.byTooltip('Mga setting ng app'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    await shot(tester, key, '5_settings');
+    await tester.tap(find.text('Maintenance'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
     await shot(tester, key, '5_maintenance');
     await tester.tapAt(const Offset(180, 60));
     await tester.pump(const Duration(milliseconds: 500));
 
-    await tester.tap(find.byTooltip('Bersyon ng app'));
+    await tester.tap(find.text('Pinakamababang bersyon'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
     await shot(tester, key, '6_versions');
     await tester.tapAt(const Offset(180, 60));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pageBack();
+    await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
     // A test account: its tag, the row's menu, and what is asked first.
@@ -218,6 +235,48 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
     await shot(tester, key, '9_test_confirm');
+    await tester.tap(find.text('Kanselahin'));
+    await tester.pump(const Duration(milliseconds: 500));
+
+    // What cannot be undone, asked in Tagalog.
+    await tester.tap(menu);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.tap(find.text('Burahin ang account'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    await shot(tester, key, '9_delete');
+    await tester.tap(find.text('Kanselahin'));
+    await tester.pump(const Duration(milliseconds: 500));
+
+    // A notification to one child, from the row's menu.
+    await tester.tap(menu);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.tap(find.text('Notif sa phone'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.enterText(find.byType(TextField).last,
+        'Benjamin, may bago kang badge na makukuha!');
+    await tester.pump(const Duration(milliseconds: 300));
+    await shot(tester, key, '10_notif_child');
+    await tester.tap(find.text('Kanselahin'));
+    await tester.pump(const Duration(milliseconds: 500));
+
+    // To the teachers, from the app bar's Ipadala.
+    await tester.enterText(find.byType(TextField).first, '');
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.byTooltip('Ipadala'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    await shot(tester, key, '11_send_sheet');
+    await tester.tap(find.text('Notif sa mga teacher'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.enterText(find.byType(TextField).last,
+        'Paalala: may pulong ang mga teacher bukas, 3:00 PM.');
+    await tester.pump(const Duration(milliseconds: 300));
+    await shot(tester, key, '12_notif_teacher');
   });
 
   for (final lang in ['fil', 'en', 'ilo']) {
@@ -236,6 +295,84 @@ void main() {
       await tester.pumpWidget(const SizedBox());
     });
   }
+
+  testWidgets('notification bar', (tester) async {
+    phone(tester);
+    final key = GlobalKey();
+    Widget card(String title, String body, String when) => Container(
+          margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF3F1F8),
+            borderRadius: BorderRadius.circular(22),
+          ),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            ClipOval(
+              child: Image.asset('assets/images/app_logo.jpg',
+                  width: 36, height: 36, fit: BoxFit.cover),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('E-Tarabay · $when',
+                      style: const TextStyle(
+                          fontSize: 12, color: Color(0xFF5F5B6E))),
+                  const SizedBox(height: 2),
+                  Text(title,
+                      style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1C1B1F))),
+                  Text(body,
+                      style: const TextStyle(
+                          fontSize: 14, color: Color(0xFF3B3847))),
+                ],
+              ),
+            ),
+          ]),
+        );
+    await tester.pumpWidget(app(
+      key,
+      Scaffold(
+        backgroundColor: const Color(0xFFE6E1EE),
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(24, 18, 24, 6),
+                child: Text('3:42',
+                    style: TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF1C1B1F))),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(24, 0, 24, 18),
+                child: Text('Sab, Nobyembre 8',
+                    style: TextStyle(fontSize: 14, color: Color(0xFF5F5B6E))),
+              ),
+              card('E-Tarabay',
+                  'Benjamin, may bago kang badge na makukuha!', 'ngayon'),
+              card('E-Tarabay',
+                  'Paalala: may pulong ang mga teacher bukas, 3:00 PM.',
+                  '12m'),
+              card('May bagong E-Tarabay!',
+                  'Bersyon 1.2.58 — pindutin para i-update.', '1h'),
+            ],
+          ),
+        ),
+      ),
+    ));
+    await tester.runAsync(() async {
+      await precacheImage(const AssetImage('assets/images/app_logo.jpg'),
+          tester.element(find.byType(Scaffold)));
+    });
+    await tester.pump(const Duration(milliseconds: 300));
+    await shot(tester, key, '13_notification_bar');
+  });
 
   testWidgets('update cover', (tester) async {
     phone(tester);

@@ -1,7 +1,7 @@
 name: e_tarabay
 description: "Ang Kabataan ay Pagasa ng Bayan"
 publish_to: 'none'
-version: 1.2.57+69
+version: 1.2.58+70
 
 environment:
   sdk: ^3.5.4
@@ -51,6 +51,7 @@ dependencies:
   http: ^1.2.2
   url_launcher: ^6.3.1
   video_player: ^2.11.1
+  workmanager: ^0.10.10
 dev_dependencies:
   flutter_test:
     sdk: flutter

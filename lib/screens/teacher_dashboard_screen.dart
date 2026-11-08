@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/user_provider.dart';
 import '../services/auth_service.dart';
 import '../services/auth_messages.dart';
+import '../services/reminder_service.dart';
 import '../services/teacher_pin.dart';
 import '../services/teacher_privacy.dart';
 import '../services/test_account.dart';
@@ -94,6 +95,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                       context, 'teacher', HowToVideo.teacherGuide,
                       pausable: true, parts: HowToVideo.teacherGuideParts);
                 }
+                await _askNotificationsOnce();
               }
               await _checkForUpdate();
             }));
@@ -130,6 +132,17 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
         ),
       ),
     );
+  }
+
+  /// The phone's own "allow notifications?", once on each phone: the
+  /// developer's notices to teachers and word of a new version arrive as
+  /// notifications, and a teacher's phone was never asked (only the
+  /// parents' switch in the child's settings asks).
+  Future<void> _askNotificationsOnce() async {
+    final prefs = _prefs ?? await SharedPreferences.getInstance();
+    if (prefs.getBool('teacher_notifications_asked') == true) return;
+    await prefs.setBool('teacher_notifications_asked', true);
+    await ReminderService.instance.requestPermission();
   }
 
   Future<void> _loadSeenCertificates() async {

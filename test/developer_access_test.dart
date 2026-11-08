@@ -14,7 +14,6 @@ import 'package:e_tarabay/services/auth_service.dart';
 import 'package:e_tarabay/services/developer_roster.dart';
 import 'package:e_tarabay/services/teacher_pin.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -196,9 +195,10 @@ void main() {
     await open(tester, const DeveloperDashboardScreen());
     config.add({});
     await tester.pump();
-    await tester.tap(find.byIcon(LucideIcons.ellipsis_vertical).first);
+    // On the settings page now, with the app's other settings.
+    await tester.tap(find.byTooltip('Mga setting ng app'));
     await settle(tester);
-    await tester.tap(find.text('Palitan ang developer password'));
+    await tester.tap(find.text('Developer password'));
     await settle(tester);
     final fields = find.descendant(
         of: find.byType(AlertDialog), matching: find.byType(TextField));
@@ -226,7 +226,9 @@ void main() {
     await open(tester, const DeveloperDashboardScreen());
     config.add({});
     await tester.pump();
-    await tester.tap(find.byTooltip('Bersyon ng app'));
+    await tester.tap(find.byTooltip('Mga setting ng app'));
+    await settle(tester);
+    await tester.tap(find.text('Pinakamababang bersyon'));
     await settle(tester);
     await tester.enterText(find.byType(TextField).last, '1.3.0');
     await tester.tap(find.text('I-save'));
