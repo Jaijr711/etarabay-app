@@ -105,6 +105,9 @@
     .under { margin: 10px 0 0; color: var(--muted); font-size: 12px; text-align: center; }
     .started { margin: 12px 0 0; padding: 10px 14px; border-radius: 12px; background: #E6F4EA; font-size: 13.5px; }
     .ios { padding: 14px 16px; border-radius: 12px; background: #FEF7E0; color: #7A4B00; font-size: 14px; }
+    .inapp { margin: 0 0 12px; }
+    .account { margin: 12px 0 0; padding: 10px 14px; border-radius: 12px; background: var(--soft); color: var(--muted); font-size: 13px; text-align: center; }
+    .account strong { color: var(--ink); font-weight: 600; }
 
     /* ── Trailer and screenshots ── */
     .media { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 22px -20px 0; padding: 0 20px 6px; scroll-padding: 0 20px; scrollbar-width: none; }
@@ -216,7 +219,7 @@
       }
       .cta { max-width: 320px; }
       .get { height: 40px; border-radius: 8px; font-size: 14px; }
-      .under { text-align: left; }
+      .under, .account { text-align: left; }
       .media { margin: 32px 0 0; padding: 0 0 8px; scroll-padding: 0; }
       .trailer { height: 300px; }
       .shot img { height: 300px; }
@@ -266,12 +269,14 @@
         <div id="bannerUpdate" class="banner update" hidden><span class="dot">⬆️</span><span id="bannerUpdateText"></span></div>
         <div id="bannerCurrent" class="banner current" hidden><span class="dot">✅</span><span id="bannerCurrentText"></span></div>
 
+        <div id="inapp" class="ios inapp" hidden data-t="inapp"><strong>Nasa loob ka ng Messenger/Facebook.</strong> Pindutin ang &#8942; sa itaas, saka ang "Buksan sa Chrome", para tuloy-tuloy ang download.</div>
         <div id="android" class="cta">
           <a id="get" class="get" href="https://github.com/Jaijr711/etarabay-releases/releases/latest/download/E-Tarabay.apk">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
             <span id="getLabel">I-install</span>
           </a>
-          <p class="under" id="under" data-t="under">Para sa Android 5.0 pataas</p>
+          <p class="under" id="under" data-t="under">Para sa Android 7.0 pataas</p>
+          <p class="account" data-t="account">Para sa mga batang naka-enroll sa daycare. <strong>Ang teacher ang gagawa ng account</strong> at magbibigay ng login card.</p>
           <p class="started" id="started" hidden data-t="started">Nagsimula na ang download. Kapag tapos na, buksan ang file para i-install — tingnan ang mga hakbang sa ibaba.</p>
         </div>
         <div id="ios" class="ios" hidden data-t="ios"><strong>Para sa Android lamang ang E-Tarabay.</strong> Hindi ito magagamit sa iPhone o iPad.</div>
@@ -318,15 +323,15 @@
           <div class="safety">
             <div class="safety-row">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 9h10M7 13h6M7 17h4"/></svg>
-              <div><b data-t="forT">Talaan ng Guro</b><span data-t="for1">May sariling Talaan ng Guro ang teacher: dito ini-enroll ang mga bata, nakikita ang progress ng bawat isa, at may login card para sa magulang. Protektado ito ng Privacy Agreement (RA 10173) at ng PIN.</span></div>
+              <div><b data-t="forT">Talaan ng Guro</b><span data-t="for1">May sariling Talaan ng Guro ang teacher: dito ini-enroll ang mga bata, nakikita ang progress ng bawat isa, at may login card para sa magulang.</span></div>
             </div>
             <div class="safety-row">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg>
-              <div><b data-t="forP">Para sa magulang</b><span data-t="for2">Ang magulang ay nagla-login gamit ang username at Student Number ng anak, kaya nasusundan ang progress kahit lumipat ng phone.</span></div>
+              <div><b data-t="forP">Para sa magulang</b><span data-t="for2">Ang teacher ang gumagawa ng account ng bata at nagbibigay ng login card. Gamit ang Username at password na nasa card, nasusundan ang progress kahit lumipat ng phone.</span></div>
             </div>
             <div class="safety-row">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
-              <div><b data-t="safeT">Protektado ang impormasyon</b><span data-t="safeD">Privacy Agreement (RA 10173), PIN ng guro, at kusang pag-lock kapag umalis sa app.</span></div>
+              <div><b data-t="safeT">Privacy at kaligtasan</b><span data-t="safeD">Privacy Agreement (RA 10173), PIN ng guro, at kusang pag-lock kapag umalis sa app.</span></div>
             </div>
           </div>
         </section>
@@ -354,9 +359,11 @@
             <li><span data-t="s1">Pindutin ang I-install sa itaas at hintaying matapos ang download.</span></li>
             <li><span data-t="s2">Buksan ang na-download na file (E-Tarabay.apk) mula sa notification o sa Downloads.</span></li>
             <li><span data-t="s3">Kapag itinanong, payagan ang "Install unknown apps" para sa browser mo, saka bumalik.</span></li>
-            <li><span data-t="s4">Pindutin ang Install. Tapos na — buksan ang E-Tarabay!</span></li>
+            <li><span data-t="s4">Pindutin ang Install, saka buksan ang E-Tarabay.</span></li>
+            <li><span data-t="s5">Mag-login gamit ang <strong>Username</strong> at <strong>password</strong> na nasa login card mula sa teacher. Wala pang card? Hingin ito sa teacher.</span></li>
           </ol>
           <button type="button" class="watch" id="tutAgain" data-t="tutLink">▶ Panoorin ang video tutorial</button>
+          <p class="tip" data-t="tipTeacher"><strong>Teacher ka?</strong> Sa login ng app, pindutin ang "Ipagpatuloy bilang Guro" sa ibaba.</p>
           <p class="tip" data-t="tipUpdate"><strong>Pag-update:</strong> pareho lang ang mga hakbang. Hindi nawawala ang stars, awards at progress ng bata.</p>
           <p class="tip" data-t="tipOld"><strong>Kung v1.2.48 o mas luma ang nasa phone:</strong> i-uninstall muna ang lumang E-Tarabay bago i-install ito. Babalik ang stars, awards at progress pagka-sign in ulit.</p>
         </section>
@@ -367,7 +374,7 @@
             <div><b data-t="iVersion">Bersyon</b><span id="iVersion">—</span></div>
             <div><b data-t="iUpdated">Na-update</b><span id="iUpdated">—</span></div>
             <div><b data-t="iSize">Laki ng download</b><span id="iSize">—</span></div>
-            <div><b data-t="iNeeds">Kailangan</b><span data-t="iNeedsVal">Android 5.0 pataas</span></div>
+            <div><b data-t="iNeeds">Kailangan</b><span data-t="iNeedsVal">Android 7.0 pataas</span></div>
             <div><b data-t="iLangs">Mga wika</b><span>Ilocano, Filipino, English</span></div>
             <div><b data-t="iPrice">Presyo</b><span data-t="iPriceVal">Libre</span></div>
           </div>
@@ -413,7 +420,7 @@
           stVersion: 'Bersyon', stSize: 'Laki', ageVal: '3–5', stAge: 'Edad',
           stLang: 'Wika', stOffline: 'Kahit offline',
           install: 'I-install', update: 'I-update sa {v}',
-          under: 'Para sa Android 5.0 pataas',
+          under: 'Para sa Android 7.0 pataas',
           started: 'Nagsimula na ang download. Kapag tapos na, buksan ang file para i-install — tingnan ang mga hakbang sa ibaba.',
           bannerUpdate: 'May bagong update: bersyon {new}. Ang nasa phone mo: {old}. Pindutin ang I-update.',
           bannerCurrent: 'Pinakabago na ang app mo (bersyon {v}).',
@@ -426,26 +433,30 @@
           m4d: 'Matuto ng iyong ABC!', m5d: 'Kulayan ang mga larawan', m6d: 'Pag-ugnayin ang mga Pares',
           ageLabel: 'Edad 3–5', chipEdu: 'Pang-edukasyon', chipKids: 'Para sa bata', chipDaycare: 'Daycare',
           chipOffline: 'Kahit offline', forT: 'Talaan ng Guro', forP: 'Para sa magulang',
-          safeT: 'Protektado ang impormasyon',
+          safeT: 'Privacy at kaligtasan',
           safeD: 'Privacy Agreement (RA 10173), PIN ng guro, at kusang pag-lock kapag umalis sa app.',
           close: 'Isara',
           forH: 'Para sa teacher at magulang',
-          for1: 'May sariling Talaan ng Guro ang teacher: dito ini-enroll ang mga bata, nakikita ang progress ng bawat isa, at may login card para sa magulang. Protektado ito ng Privacy Agreement (RA 10173) at ng PIN.',
-          for2: 'Ang magulang ay nagla-login gamit ang username at Student Number ng anak, kaya nasusundan ang progress kahit lumipat ng phone.',
+          for1: 'May sariling Talaan ng Guro ang teacher: dito ini-enroll ang mga bata, nakikita ang progress ng bawat isa, at may login card para sa magulang.',
+          for2: 'Ang teacher ang gumagawa ng account ng bata at nagbibigay ng login card. Gamit ang Username at password na nasa card, nasusundan ang progress kahit lumipat ng phone.',
           newH: 'Ano ang bago', more: 'Higit pa', less: 'Mas kaunti',
           released: 'Bersyon {v} · {d}',
           howH: 'Paano i-install',
           s1: 'Pindutin ang I-install sa itaas at hintaying matapos ang download.',
           s2: 'Buksan ang na-download na file (E-Tarabay.apk) mula sa notification o sa Downloads.',
           s3: 'Kapag itinanong, payagan ang "Install unknown apps" para sa browser mo, saka bumalik.',
-          s4: 'Pindutin ang Install. Tapos na — buksan ang E-Tarabay!',
+          s4: 'Pindutin ang Install, saka buksan ang E-Tarabay.',
+          s5: 'Mag-login gamit ang <strong>Username</strong> at <strong>password</strong> na nasa login card mula sa teacher. Wala pang card? Hingin ito sa teacher.',
+          tipTeacher: '<strong>Teacher ka?</strong> Sa login ng app, pindutin ang "Ipagpatuloy bilang Guro" sa ibaba.',
+          account: 'Para sa mga batang naka-enroll sa daycare. <strong>Ang teacher ang gagawa ng account</strong> at magbibigay ng login card.',
+          inapp: '<strong>Nasa loob ka ng Messenger/Facebook.</strong> Pindutin ang &#8942; sa itaas, saka ang "Buksan sa Chrome", para tuloy-tuloy ang download.',
           tipUpdate: '<strong>Pag-update:</strong> pareho lang ang mga hakbang. Hindi nawawala ang stars, awards at progress ng bata.',
           tutTitle: 'Panoorin kung paano i‑install at i‑update',
           tutLen: 'Wala pang 1 minuto · may boses',
           tutWatch: '▶ Panoorin', tutSkip: 'Laktawan', tutLink: '▶ Panoorin ang video tutorial',
           tipOld: '<strong>Kung v1.2.48 o mas luma ang nasa phone:</strong> i-uninstall muna ang lumang E-Tarabay bago i-install ito. Babalik ang stars, awards at progress pagka-sign in ulit.',
           infoH: 'Impormasyon', iVersion: 'Bersyon', iUpdated: 'Na-update', iSize: 'Laki ng download',
-          iNeeds: 'Kailangan', iNeedsVal: 'Android 5.0 pataas', iLangs: 'Mga wika',
+          iNeeds: 'Kailangan', iNeedsVal: 'Android 7.0 pataas', iLangs: 'Mga wika',
           iPrice: 'Presyo', iPriceVal: 'Libre',
           foot: 'Lahat ng bersyon:',
           months: ['Ene', 'Peb', 'Mar', 'Abr', 'May', 'Hun', 'Hul', 'Ago', 'Set', 'Okt', 'Nob', 'Dis']
@@ -456,7 +467,7 @@
           stVersion: 'Version', stSize: 'Size', ageVal: '3–5', stAge: 'Ages',
           stLang: 'Languages', stOffline: 'Works offline',
           install: 'Install', update: 'Update to {v}',
-          under: 'For Android 5.0 and up',
+          under: 'For Android 7.0 and up',
           started: 'The download has started. When it is done, open the file to install it — see the steps below.',
           bannerUpdate: 'A new update is out: version {new}. Your phone has {old}. Tap Update.',
           bannerCurrent: 'Your app is up to date (version {v}).',
@@ -469,26 +480,30 @@
           m4d: 'Learn your ABC!', m5d: 'Colour the pictures', m6d: 'Match the pairs',
           ageLabel: 'Ages 3–5', chipEdu: 'Education', chipKids: 'For kids', chipDaycare: 'Daycare',
           chipOffline: 'Works offline', forT: 'Class dashboard', forP: 'For parents',
-          safeT: 'Information kept safe',
+          safeT: 'Privacy and safety',
           safeD: "Privacy Agreement (RA 10173), the teacher's PIN, and a lock when the app is left.",
           close: 'Close',
           forH: 'For teachers and parents',
-          for1: "The teacher has a class dashboard: enrol the children, see each child's progress, and print a login card for parents. It is protected by a Privacy Agreement (RA 10173) and a PIN.",
-          for2: "Parents sign in with their child's username and Student Number, so progress follows the child even on a new phone.",
+          for1: "The teacher has a class dashboard: enrol the children, see each child's progress, and print a login card for parents.",
+          for2: "The teacher makes the child's account and gives a login card. With the Username and password on the card, progress follows the child even on a new phone.",
           newH: "What's new", more: 'More', less: 'Less',
           released: 'Version {v} · {d}',
           howH: 'How to install',
           s1: 'Tap Install above and wait for the download to finish.',
           s2: 'Open the downloaded file (E-Tarabay.apk) from the notification or your Downloads.',
           s3: 'If asked, allow "Install unknown apps" for your browser, then go back.',
-          s4: 'Tap Install. Done — open E-Tarabay!',
+          s4: 'Tap Install, then open E-Tarabay.',
+          s5: 'Log in with the <strong>Username</strong> and <strong>password</strong> on the login card from the teacher. No card yet? Ask the teacher for one.',
+          tipTeacher: '<strong>A teacher?</strong> On the app\'s login, tap "Continue as Teacher" at the bottom.',
+          account: 'For children enrolled in the daycare. <strong>The teacher makes the account</strong> and gives a login card.',
+          inapp: '<strong>You are inside Messenger/Facebook.</strong> Tap &#8942; at the top, then "Open in Chrome", so the download is not cut off.',
           tipUpdate: "<strong>Updating:</strong> the same steps. The child's stars, awards and progress stay.",
           tutTitle: 'Watch how to install and update',
           tutLen: 'Under 1 minute · narrated in Filipino',
           tutWatch: '▶ Watch', tutSkip: 'Skip', tutLink: '▶ Watch the video tutorial',
           tipOld: '<strong>If the phone has v1.2.48 or older:</strong> uninstall the old E-Tarabay first, then install this one. Stars, awards and progress come back when you sign in.',
           infoH: 'Information', iVersion: 'Version', iUpdated: 'Updated', iSize: 'Download size',
-          iNeeds: 'Requires', iNeedsVal: 'Android 5.0 and up', iLangs: 'Languages',
+          iNeeds: 'Requires', iNeedsVal: 'Android 7.0 and up', iLangs: 'Languages',
           iPrice: 'Price', iPriceVal: 'Free',
           foot: 'All versions:',
           months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -716,15 +731,30 @@
       if (/iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) {
         $('android').hidden = true;
         $('ios').hidden = false;
+      } else if (/FBAN|FBAV|FB_IAB|Messenger|Instagram/i.test(ua)) {
+        // Links from the teacher mostly come through Messenger, whose own
+        // browser often cuts a 120 MB download off or never starts it.
+        $('inapp').hidden = false;
       }
 
       render();
 
-      fetch('https://api.github.com/repos/' + REPO + '/releases/latest',
-            { headers: { Accept: 'application/vnd.github+json' } })
-        .then(function (r) { return r.ok ? r.json() : null; })
+      // This page's own copy of the newest release, written at each release
+      // in the shape GitHub's API gives. GitHub answers only 60 times an hour
+      // for one address, and a daycare's phones share one: past that the
+      // version, size and date showed a dash.
+      function getJson(url, opts) {
+        return fetch(url, opts).then(function (r) { return r.ok ? r.json() : null; });
+      }
+      getJson('latest.json', { cache: 'no-store' })
+        .catch(function () { return null; })
         .then(function (data) {
-          if (!data || !data.tag_name) return;
+          if (data && data.tag_name) return data;
+          return getJson('https://api.github.com/repos/' + REPO + '/releases/latest',
+                         { headers: { Accept: 'application/vnd.github+json' } });
+        })
+        .then(function (data) {
+          if (!data || !data.tag_name) { hideUnknown(); return; }
           release = data;
           var assets = data.assets || [];
           var apk = assets.filter(function (a) { return a.name === 'E-Tarabay.apk'; })[0] ||
@@ -748,7 +778,15 @@
             $('bannerUpdate').scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         })
-        .catch(function () { /* the button still points at the newest APK */ });
+        .catch(function () { hideUnknown(); /* the button still points at the newest APK */ });
+
+      // Nothing could say the version: no dashes, the rows simply go.
+      function hideUnknown() {
+        ['stVersion', 'stSize', 'iVersion', 'iUpdated', 'iSize'].forEach(function (id) {
+          var el = $(id);
+          if (el && el.textContent === '\u2014') el.parentNode.style.display = 'none';
+        });
+      }
     })();
   </script>
 
