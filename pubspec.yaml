@@ -1,7 +1,7 @@
 name: e_tarabay
 description: "Ang Kabataan ay Pagasa ng Bayan"
 publish_to: 'none'
-version: 1.2.60+72
+version: 1.2.61+74
 
 environment:
   sdk: ^3.5.4
@@ -36,6 +36,8 @@ dependencies:
   gal: ^2.3.2
   flutter_lucide: ^1.11.0
   crypto: ^3.0.7
+  # ChunkedStreamReader, for applying update patches (apk_patch.dart).
+  async: ^2.11.0
   # Imported directly by the browser half of the certificate save. It
   # arrived transitively before; an import needs it declared.
   web: ^1.1.0

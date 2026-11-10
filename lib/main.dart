@@ -2,6 +2,7 @@ import 'data/third_party_licenses.dart';
 import 'services/audio_source.dart';
 import 'services/device_performance.dart';
 import 'services/dev_notifications.dart';
+import 'services/update_checker.dart';
 import 'services/reminder_service.dart';
 import 'widgets/account_watcher.dart';
 import 'widgets/system_bars_guard.dart';
@@ -560,6 +561,8 @@ void main() async {
   // comes back. A tap on the update one that opened the app goes on to
   // the download page.
   unawaited(DevNotifications.register());
+  // An update downloaded last time is installed by now, or was given up on.
+  unawaited(UpdateChecker.cleanUpDownloads());
   unawaited(DevNotifications.runNow());
   unawaited(ReminderService.instance.handleLaunchTap());
   _lookOnResume = AppLifecycleListener(

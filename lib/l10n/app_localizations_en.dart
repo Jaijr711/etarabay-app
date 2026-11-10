@@ -1613,7 +1613,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String updateAvailableBody(String version) {
-    return 'Version $version is ready. Updates are installed from the E-Tarabay website.';
+    return 'Version $version is ready.';
   }
 
   @override
@@ -2572,4 +2572,72 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginProblemSteps => 'Here\'s how:';
+
+  @override
+  String updateSizeNote(String size) {
+    return '$size · Best on WiFi.';
+  }
+
+  @override
+  String get updateDownloadingTitle => 'Downloading the update';
+
+  @override
+  String get updateDownloadingBody => 'Keep the app open for now.';
+
+  @override
+  String updateProgress(String percent, String done, String total) {
+    return '$percent% · $done of $total';
+  }
+
+  @override
+  String get updateCancel => 'Cancel';
+
+  @override
+  String get updatePermissionTitle => 'One more step';
+
+  @override
+  String get updatePermissionBody =>
+      'Allow E-Tarabay to install its update. On the next screen, turn on \"Allow from this source\", then come back here.';
+
+  @override
+  String get updateOpenSettings => 'Open settings';
+
+  @override
+  String get updateReadyTitle => 'Ready!';
+
+  @override
+  String get updateReadyBody => 'Tap \"Update\" on the next screen.';
+
+  @override
+  String get updateInstallAgain => 'Install';
+
+  @override
+  String get updateFailedTitle => 'The download did not finish';
+
+  @override
+  String get updateFailedBody => 'Check the internet, then try again.';
+
+  @override
+  String get updateRetry => 'Try again';
+
+  @override
+  String get updateWebsite => 'Open the website';
+
+  @override
+  String get updateClose => 'Close';
+
+  @override
+  String get updatePreparingTitle => 'Getting the update ready';
+
+  @override
+  String get updatePreparingBody => 'Just a moment. Keep the app open.';
+
+  @override
+  String get claimYouGotIt => 'You got it!';
+
+  @override
+  String get awardsKeepPlaying => 'Keep playing for the next medal!';
+
+  @override
+  String get awardsAllClaimed => 'Well done! You have every medal!';
 }

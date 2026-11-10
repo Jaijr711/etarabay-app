@@ -1628,7 +1628,7 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String updateAvailableBody(String version) {
-    return 'Handa na ang bersyon $version. Sa website ng E-Tarabay ito ina-update.';
+    return 'Handa na ang bersyon $version.';
   }
 
   @override
@@ -2585,4 +2585,72 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get loginProblemSteps => 'Ganito:';
+
+  @override
+  String updateSizeNote(String size) {
+    return '$size · Mas mabuti kung naka-WiFi.';
+  }
+
+  @override
+  String get updateDownloadingTitle => 'Dina-download ang update';
+
+  @override
+  String get updateDownloadingBody => 'Huwag munang isara ang app.';
+
+  @override
+  String updateProgress(String percent, String done, String total) {
+    return '$percent% · $done sa $total';
+  }
+
+  @override
+  String get updateCancel => 'Kanselahin';
+
+  @override
+  String get updatePermissionTitle => 'Isang hakbang pa';
+
+  @override
+  String get updatePermissionBody =>
+      'Payagan ang E-Tarabay na mag-install ng update. Sa susunod na screen, i-on ang \"Allow from this source\", saka bumalik dito.';
+
+  @override
+  String get updateOpenSettings => 'Buksan ang setting';
+
+  @override
+  String get updateReadyTitle => 'Handa na!';
+
+  @override
+  String get updateReadyBody => 'Pindutin ang \"Update\" sa susunod na screen.';
+
+  @override
+  String get updateInstallAgain => 'I-install';
+
+  @override
+  String get updateFailedTitle => 'Hindi natapos ang download';
+
+  @override
+  String get updateFailedBody => 'Tingnan ang internet, saka subukan ulit.';
+
+  @override
+  String get updateRetry => 'Subukan ulit';
+
+  @override
+  String get updateWebsite => 'Buksan ang website';
+
+  @override
+  String get updateClose => 'Isara';
+
+  @override
+  String get updatePreparingTitle => 'Inihahanda ang update';
+
+  @override
+  String get updatePreparingBody => 'Sandali lang. Huwag munang isara ang app.';
+
+  @override
+  String get claimYouGotIt => 'Nakuha mo!';
+
+  @override
+  String get awardsKeepPlaying => 'Maglaro pa para sa susunod na medalya!';
+
+  @override
+  String get awardsAllClaimed => 'Galing! Nakuha mo na ang lahat ng medalya!';
 }

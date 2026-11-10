@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
 import '../services/update_checker.dart';
+import 'update_flow.dart';
 import 'fun_dialog.dart';
 
 /// The whole app, covered: by the developers' maintenance switch, or by a
@@ -228,6 +229,13 @@ class _UpdateRequiredCoverState extends State<UpdateRequiredCover> {
   bool _showAddress = false;
 
   Future<void> _update() async {
+    // The newest release, downloaded and installed by the app itself.
+    final latest = await UpdateChecker.instance.checkForUpdate();
+    if (!mounted) return;
+    if (latest != null && latest.apkUrl != null && UpdateFlow.supported) {
+      await UpdateFlow.start(context, latest);
+      return;
+    }
     final opened = await UpdateChecker.instance.openUpdatePage(UpdateInfo(
       versionName: widget.minVersion,
       pageUrl: UpdateChecker.updatePageUrl(widget.installedVersion),

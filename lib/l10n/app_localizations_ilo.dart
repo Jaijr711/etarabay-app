@@ -1642,7 +1642,7 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String updateAvailableBody(String version) {
-    return 'Nakasagana ti bersion $version. Iti website ti E-Tarabay ti pang-update-an.';
+    return 'Nakasagana ti bersion $version.';
   }
 
   @override
@@ -2602,4 +2602,73 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String get loginProblemSteps => 'Kastoy:';
+
+  @override
+  String updateSizeNote(String size) {
+    return '$size · Nasaysayaat no naka-WiFi.';
+  }
+
+  @override
+  String get updateDownloadingTitle => 'Agdownload ti update';
+
+  @override
+  String get updateDownloadingBody => 'Saan pay nga irikep ti app.';
+
+  @override
+  String updateProgress(String percent, String done, String total) {
+    return '$percent% · $done iti $total';
+  }
+
+  @override
+  String get updateCancel => 'Ikansela';
+
+  @override
+  String get updatePermissionTitle => 'Maysa pay nga addang';
+
+  @override
+  String get updatePermissionBody =>
+      'Ipalubos nga ag-install ti E-Tarabay iti update. Iti sumaruno a screen, i-on ti \"Allow from this source\", sa agsubli ditoy.';
+
+  @override
+  String get updateOpenSettings => 'Lukatan ti setting';
+
+  @override
+  String get updateReadyTitle => 'Nakasagana!';
+
+  @override
+  String get updateReadyBody => 'Pinduten ti \"Update\" iti sumaruno a screen.';
+
+  @override
+  String get updateInstallAgain => 'I-install';
+
+  @override
+  String get updateFailedTitle => 'Saan a nalpas ti download';
+
+  @override
+  String get updateFailedBody => 'Kitaen ti internet, sa padasen manen.';
+
+  @override
+  String get updateRetry => 'Padasen manen';
+
+  @override
+  String get updateWebsite => 'Lukatan ti website';
+
+  @override
+  String get updateClose => 'Irikep';
+
+  @override
+  String get updatePreparingTitle => 'Agisagana ti update';
+
+  @override
+  String get updatePreparingBody =>
+      'Apagbiit laeng. Saan pay nga irikep ti app.';
+
+  @override
+  String get claimYouGotIt => 'Nagun-odmo!';
+
+  @override
+  String get awardsKeepPlaying => 'Agay-ayam pay para iti sumaruno a medalya!';
+
+  @override
+  String get awardsAllClaimed => 'Nagsayaat! Nagun-odmon amin a medalya!';
 }

@@ -3,6 +3,7 @@ import 'fun_dialog.dart';
 
 import '../l10n/app_localizations.dart';
 import '../services/update_checker.dart';
+import 'update_flow.dart';
 
 /// The one prompt a sideloaded install gets in place of a store's own
 /// "update available" banner. Shown once per app open at most — see the
@@ -21,25 +22,36 @@ Future<void> showUpdateAvailableDialog(
             icon: Icons.system_update_rounded, tone: Color(0xFF2F7FD6)),
         title: loc.updateAvailableTitle,
         message: loc.updateAvailableBody(update.versionName),
-        body: update.notes == null || update.notes!.trim().isEmpty
-            ? null
+        body: Column(mainAxisSize: MainAxisSize.min, children: [
+          // How big it is, before a parent on mobile data says yes.
+          if (update.downloadSize > 0)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text(
+                loc.updateSizeNote(megabytes(update.downloadSize)),
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+              ),
+            ),
+          if (update.notes != null && update.notes!.trim().isNotEmpty)
             // Release notes can run long; they scroll inside the card.
-            : ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 170),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: SingleChildScrollView(
-                    child: Text(update.notes!,
-                        style: TextStyle(
-                            fontSize: 13, color: Colors.grey.shade700)),
-                  ),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 170),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: SingleChildScrollView(
+                  child: Text(update.notes!,
+                      style:
+                          TextStyle(fontSize: 13, color: Colors.grey.shade700)),
                 ),
               ),
+            ),
+        ]),
         buttons: [
           FunPillButton(
             label: loc.updateLater,
@@ -52,6 +64,12 @@ Future<void> showUpdateAvailableDialog(
             colors: FunColors.green,
             onTap: () async {
               Navigator.pop(dialogContext);
+              // Downloaded and installed by the app itself, so no copy is
+              // left in Downloads; the website only where that cannot be.
+              if (UpdateFlow.supported && update.apkUrl != null) {
+                if (context.mounted) await UpdateFlow.start(context, update);
+                return;
+              }
               final opened =
                   await UpdateChecker.instance.openUpdatePage(update);
               // Updates come only from the website, so when the browser

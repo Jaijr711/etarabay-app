@@ -174,6 +174,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               icon: LucideIcons.trophy,
               label: loc.awards,
               color: AppColors.navAwards,
+              badgeCount: context.watch<UserProvider>().waitingBadgeCount,
               assetPath: 'assets/images/gantimpala.webp'),
           NavItemData(
               icon: LucideIcons.settings,

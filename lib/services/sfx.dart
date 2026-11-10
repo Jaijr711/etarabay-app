@@ -19,6 +19,10 @@ class Sfx {
   /// A balloon letting go, in Matematika's "Pop the Balloon".
   static const String pop = 'audio/sfx/pop.wav';
 
+  /// A medal claimed on the awards shelf: bells climbing as the gold light
+  /// grows, then the chord as the lock opens (tool/make_claim_sound.py).
+  static const String claim = 'audio/sfx/claim.wav';
+
   /// Three players, used in turn. A child popping balloons as fast as they
   /// can tap would otherwise cut each pop off with the next one, and the
   /// board would sound slower than their finger.

@@ -7,6 +7,9 @@
          reboot otherwise. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- The in-app update hands the downloaded APK to Android's installer;
+         Android asks the parent once to allow it. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <!-- Android backs an app's data up to the child's Google account by
          default and restores it on the next install. On a school device that
          means uninstalling and downloading again brings the previous pupil's
@@ -56,6 +59,19 @@
         </receiver>
         <receiver android:exported="false"
             android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+        <!-- The in-app update (lib/widgets/update_flow.dart): the APK is
+             downloaded into the app's own cache/update/ and handed to
+             Android's installer through this provider, so nothing is left
+             in Downloads. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.updates"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/update_paths" />
+        </provider>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

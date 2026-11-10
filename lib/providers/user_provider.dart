@@ -4147,6 +4147,15 @@ class UserProvider extends ChangeNotifier {
         .toList();
   }
 
+  /// Medals earned and not yet claimed: the number on the Awards button.
+  int get waitingBadgeCount {
+    final profile = _userProfile;
+    if (profile == null) return 0;
+    return profile.achievements.entries
+        .where((e) => e.value >= 1 && !profile.claimedBadges.contains(e.key))
+        .length;
+  }
+
   Future<void> claimBadge(String badgeId) async {
     await _ensureInitialized();
     if (_userProfile == null) return;

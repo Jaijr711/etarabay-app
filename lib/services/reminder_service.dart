@@ -4,6 +4,8 @@ import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
 import 'update_checker.dart';
+import '../main.dart' show appNavigatorKey;
+import '../widgets/update_flow.dart';
 
 /// The notifications the app raises while it is not open: a handful of
 /// daily nudges spread across the evening, each about a different everyday
@@ -391,7 +393,13 @@ class ReminderService {
     if (payload != _updatePayload) return;
     final update = await UpdateChecker.instance.checkForUpdate();
     // Already current by now, or no signal: the app simply opens.
-    if (update != null) await UpdateChecker.instance.openUpdatePage(update);
+    if (update == null) return;
+    final context = appNavigatorKey.currentContext;
+    if (context != null && context.mounted) {
+      await UpdateFlow.start(context, update);
+    } else {
+      await UpdateChecker.instance.openUpdatePage(update);
+    }
   }
 
   /// The name and description Android shows for each kind of notification

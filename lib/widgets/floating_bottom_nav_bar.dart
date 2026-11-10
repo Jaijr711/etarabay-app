@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
 
@@ -20,11 +22,17 @@ class NavItemData {
   /// this is".
   final Color color;
 
+  /// Things waiting behind this door, such as medals not yet claimed. Above
+  /// zero, the picture wears the number and wiggles now and then, so a child
+  /// on Home sees that Awards has something for them without reading.
+  final int badgeCount;
+
   const NavItemData({
     required this.icon,
     required this.label,
     this.color = AppColors.primary,
     this.assetPath,
+    this.badgeCount = 0,
   });
 }
 
@@ -59,6 +67,24 @@ class _FloatingBottomNavBarState extends State<FloatingBottomNavBar>
   late AnimationController _bounceController;
   late Animation<double> _bounceAnimation;
 
+  /// Runs only while some item has a [NavItemData.badgeCount]: a repeating
+  /// animation kept going for nothing would also keep every test that waits
+  /// for the screen to settle waiting forever.
+  late final AnimationController _wiggle = AnimationController(
+    duration: const Duration(milliseconds: 2400),
+    vsync: this,
+  );
+
+  void _syncWiggle() {
+    final any = widget.items.any((i) => i.badgeCount > 0);
+    if (any && !_wiggle.isAnimating) {
+      _wiggle.repeat();
+    } else if (!any && _wiggle.isAnimating) {
+      _wiggle.stop();
+      _wiggle.value = 0;
+    }
+  }
+
   // Distinct color for the center (parents) button — differs from the
   // primary tab color so it clearly stands apart from the 4 pages.
   static const Color _centerStart = Color(0xFF7C4DFF);
@@ -75,6 +101,7 @@ class _FloatingBottomNavBarState extends State<FloatingBottomNavBar>
       parent: _bounceController,
       curve: Curves.elasticOut,
     );
+    _syncWiggle();
   }
 
   @override
@@ -83,11 +110,13 @@ class _FloatingBottomNavBarState extends State<FloatingBottomNavBar>
     if (oldWidget.selectedIndex != widget.selectedIndex) {
       _bounceController.forward(from: 0.0);
     }
+    _syncWiggle();
   }
 
   @override
   void dispose() {
     _bounceController.dispose();
+    _wiggle.dispose();
     super.dispose();
   }
 
@@ -257,7 +286,9 @@ class _FloatingBottomNavBarState extends State<FloatingBottomNavBar>
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildIcon(item, isSelected),
+                        item.badgeCount > 0
+                            ? _waiting(item, _buildIcon(item, isSelected))
+                            : _buildIcon(item, isSelected),
                         const SizedBox(height: 1),
                         FittedBox(
                           fit: BoxFit.scaleDown,
@@ -291,6 +322,79 @@ class _FloatingBottomNavBarState extends State<FloatingBottomNavBar>
           },
         ),
       ),
+    );
+  }
+
+  /// The picture with its number, wiggling as the medals on the shelf do,
+  /// with a soft gold light behind it. Overlaid, so the bar does not grow.
+  Widget _waiting(NavItemData item, Widget icon) {
+    return AnimatedBuilder(
+      animation: _wiggle,
+      child: icon,
+      builder: (context, icon) {
+        final w = _wiggle.value;
+        final wiggling = w < 0.3;
+        final angle = wiggling
+            ? math.sin(w / 0.3 * math.pi * 4) * 0.14 * (1 - w / 0.3)
+            : 0.0;
+        final hop = wiggling ? -math.sin(w / 0.3 * math.pi) * 4 : 0.0;
+        final glow = 0.35 + 0.25 * math.sin(w * 2 * math.pi);
+        return Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFFFC21A).withOpacity(glow),
+                    blurRadius: 14,
+                    spreadRadius: 3,
+                  ),
+                ],
+              ),
+            ),
+            Transform.translate(
+              offset: Offset(0, hop),
+              child: Transform.rotate(angle: angle, child: icon),
+            ),
+            Positioned(
+              top: -5,
+              right: -9,
+              child: Container(
+                constraints: const BoxConstraints(minWidth: 19),
+                height: 19,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE53935),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.18),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  item.badgeCount > 9 ? '9+' : '${item.badgeCount}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 

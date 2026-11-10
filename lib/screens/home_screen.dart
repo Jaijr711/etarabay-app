@@ -883,6 +883,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
             icon: LucideIcons.trophy,
             label: AppLocalizations.of(context)!.awards,
             color: AppColors.navAwards,
+            badgeCount: context.watch<UserProvider>().waitingBadgeCount,
             assetPath: 'assets/images/gantimpala.webp',
           ),
           NavItemData(

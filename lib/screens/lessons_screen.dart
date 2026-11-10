@@ -351,6 +351,7 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
             icon: LucideIcons.trophy,
             label: AppLocalizations.of(context)!.awards,
             color: AppColors.navAwards,
+            badgeCount: context.watch<UserProvider>().waitingBadgeCount,
             assetPath: 'assets/images/gantimpala.webp',
           ),
           NavItemData(

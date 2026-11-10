@@ -7,6 +7,7 @@ import 'package:flutter_lucide/flutter_lucide.dart';
 import '../data/badge_catalog.dart';
 import '../widgets/badge_emblem.dart';
 import 'package:provider/provider.dart';
+import '../widgets/shelf_medal.dart';
 import 'package:e_tarabay/l10n/app_localizations.dart';
 import '../providers/user_provider.dart';
 import '../utils/constants.dart';
@@ -296,35 +297,46 @@ class AwardsScreen extends StatelessWidget {
         // had no way of knowing a prize was sitting there. Now it is the
         // brightest strip on the page, and it carries a medal so the message
         // survives without the sentence.
-        if (earned > claimed)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFF6DC),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: const Color(0xFFFFD980), width: 2),
-              ),
-              child: Row(
-                children: [
-                  const BadgeEmblem(
-                    icon: Icons.card_giftcard_rounded,
-                    color: Color(0xFFFFB800),
-                    size: 38,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      loc.awardsWaiting(earned, earned - claimed),
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF8A6A12),
-                      ),
+        //
+        // Always there, saying something else when nothing is waiting: it
+        // used to vanish with the last medal taken, and the whole cabinet
+        // under it jumped up.
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF6DC),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: const Color(0xFFFFD980), width: 2),
+            ),
+            child: Row(
+              children: [
+                BadgeEmblem(
+                  icon: earned > claimed
+                      ? Icons.card_giftcard_rounded
+                      : Icons.star_rounded,
+                  color: const Color(0xFFFFB800),
+                  size: 38,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    earned > claimed
+                        ? loc.awardsWaiting(earned, earned - claimed)
+                        : claimed >= _allBadges.length
+                            ? loc.awardsAllClaimed
+                            : loc.awardsKeepPlaying,
+                    maxLines: 2,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF8A6A12),
                     ),
                   ),
-                  // How many are waiting, as dots they can count.
+                ),
+                // How many are waiting, as dots they can count.
+                if (earned > claimed)
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: List.generate(
@@ -336,10 +348,10 @@ class AwardsScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                ],
-              ),
+              ],
             ),
           ),
+        ),
       ],
     );
   }
@@ -476,8 +488,9 @@ class AwardsScreen extends StatelessWidget {
     );
   }
 
-  /// A medal on the shelf. Pressing it does what the card used to: take a
-  /// won medal, look at a taken one, or hear how to win one not yet won.
+  /// A medal on the shelf. One press takes a won medal, with its
+  /// celebration (see [ShelfMedal]); a taken one opens its card, and one not
+  /// yet won says how to win it.
   Widget _buildShelfItem(
     BuildContext context, {
     required Map<String, dynamic> badge,
@@ -488,101 +501,23 @@ class AwardsScreen extends StatelessWidget {
     required double medal,
   }) {
     final loc = AppLocalizations.of(context)!;
-    final color = Color(badge['color'] as int);
+    final id = badge['id'] as String;
     final isEarned = tier >= 1;
-    final ready = isEarned && !isClaimed;
-
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: ready
-          ? () => _showClaimDialog(context, badge, userProvider, tier)
-          : isEarned
-              ? () => _showViewBadgeModal(context, badge)
-              : () => _showHowToEarnDialog(context, badge, progress),
-      child: SizedBox(
-        width: medal + 12,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            BadgeEmblem(
-              icon: badge['icon'] as IconData,
-              image: badge['image'] as String,
-              color: color,
-              size: medal,
-              locked: !isEarned,
-              tier: tier,
-              sparkle: ready,
-            ),
-            if (ready)
-              Container(
-                margin: const EdgeInsets.only(top: 2),
-                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFD23F),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  loc.claimShort,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w900,
-                    color: Color(0xFF7A4A00),
-                  ),
-                ),
-              ),
-            const SizedBox(height: 3),
-            Text(
-              _badgeTitle(context, badge['id'] as String),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 11,
-                height: 1.1,
-                fontWeight: FontWeight.w800,
-                color: isEarned
-                    ? const Color(0xFF5A3A12)
-                    : const Color(0xFF8D7B66),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showClaimDialog(BuildContext context, Map<String, dynamic> badge,
-      UserProvider userProvider, int tier) {
-    final color = Color(badge['color'] as int);
-    final loc = AppLocalizations.of(context)!;
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (dialogContext) => FunDialog(
-        child: FunMessage(
-          picture: BadgeEmblem(
-            icon: badge['icon'] as IconData,
-            image: badge['image'] as String,
-            color: color,
-            size: 96,
-            tier: tier,
-          ),
-          title: loc.claimBadge(_badgeTitle(context, badge['id'] as String)),
-          message: loc.claimBadgeBody,
-          buttons: [
-            FunPillButton(
-              label: loc.claimBadgeButton,
-              icon: LucideIcons.gift,
-              colors: FunColors.of(color),
-              onTap: () async {
-                await userProvider.claimBadge(badge['id'] as String);
-                if (dialogContext.mounted) Navigator.pop(dialogContext);
-                if (context.mounted) _showViewBadgeModal(context, badge);
-              },
-            ),
-          ],
-        ),
-      ),
+    return ShelfMedal(
+      key: ValueKey(id),
+      icon: badge['icon'] as IconData,
+      image: badge['image'] as String?,
+      color: Color(badge['color'] as int),
+      tier: tier,
+      title: _badgeTitle(context, id),
+      size: medal,
+      isEarned: isEarned,
+      ready: isEarned && !isClaimed,
+      claimLabel: loc.claimShort,
+      onClaim: () => userProvider.claimBadge(id),
+      onOpen: isEarned
+          ? () => _showViewBadgeModal(context, badge)
+          : () => _showHowToEarnDialog(context, badge, progress),
     );
   }
 

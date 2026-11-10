@@ -3056,7 +3056,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateAvailableBody.
   ///
   /// In en, this message translates to:
-  /// **'Version {version} is ready. Updates are installed from the E-Tarabay website.'**
+  /// **'Version {version} is ready.'**
   String updateAvailableBody(String version);
 
   /// No description provided for @updateDownloadNow.
@@ -4672,6 +4672,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Here\'s how:'**
   String get loginProblemSteps;
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'{size} · Best on WiFi.'**
+  String updateSizeNote(String size);
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading the update'**
+  String get updateDownloadingTitle;
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the app open for now.'**
+  String get updateDownloadingBody;
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% · {done} of {total}'**
+  String updateProgress(String percent, String done, String total);
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get updateCancel;
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'One more step'**
+  String get updatePermissionTitle;
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'Allow E-Tarabay to install its update. On the next screen, turn on \"Allow from this source\", then come back here.'**
+  String get updatePermissionBody;
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get updateOpenSettings;
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'Ready!'**
+  String get updateReadyTitle;
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'Tap \"Update\" on the next screen.'**
+  String get updateReadyBody;
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'Install'**
+  String get updateInstallAgain;
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'The download did not finish'**
+  String get updateFailedTitle;
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'Check the internet, then try again.'**
+  String get updateFailedBody;
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get updateRetry;
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'Open the website'**
+  String get updateWebsite;
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get updateClose;
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'Getting the update ready'**
+  String get updatePreparingTitle;
+
+  /// In-app update
+  ///
+  /// In en, this message translates to:
+  /// **'Just a moment. Keep the app open.'**
+  String get updatePreparingBody;
+
+  /// Shown as a medal is claimed
+  ///
+  /// In en, this message translates to:
+  /// **'You got it!'**
+  String get claimYouGotIt;
+
+  /// Awards strip when nothing is waiting
+  ///
+  /// In en, this message translates to:
+  /// **'Keep playing for the next medal!'**
+  String get awardsKeepPlaying;
+
+  /// Awards strip when nothing is waiting
+  ///
+  /// In en, this message translates to:
+  /// **'Well done! You have every medal!'**
+  String get awardsAllClaimed;
 }
 
 class _AppLocalizationsDelegate
