@@ -48,12 +48,20 @@ void main() {
 
   final out = Directory('build/previews/update')..createSync(recursive: true);
   const update = UpdateInfo(
-    versionName: '1.2.61',
+    versionName: '1.2.62',
     pageUrl: 'https://example.invalid',
     notes: 'Mga Ayos\n\n- Ang update ay sa loob na ng app: '
         'hindi na naiipon ang mga APK sa Downloads.',
     apkUrl: 'https://example.invalid/E-Tarabay.apk',
     apkSize: 122902714,
+    // A patch, as a real update from 1.2.61 on has: the size shown is its own.
+    patch: PatchInfo(
+      url: 'https://example.invalid/E-Tarabay.patch',
+      size: 2254857,
+      fromSha256: '',
+      toSha256: '',
+      toSize: 122902714,
+    ),
   );
   final ops = UpdateOps(
     download: (u, p, c, r) async => File('x'),
