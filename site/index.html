@@ -2,10 +2,10 @@
 <html lang="fil">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>E-Tarabay</title>
   <meta name="description" content="Learning app para sa daycare (edad 3–5) sa Ilocano, Filipino at English. I-download ang Android app.">
-  <meta name="theme-color" content="#FFFBF4">
+  <meta name="theme-color" content="#FFFFFF">
   <meta name="color-scheme" content="light">
   <link rel="icon" type="image/png" href="assets/favicon.png">
   <link rel="apple-touch-icon" href="assets/icon-192.png">
@@ -18,432 +18,379 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap">
   <!--
     The page to hand out for E-Tarabay, and the page the app opens when an
     update is out: it opens it as ?v=<installed version>, and the button
     then says Update. Everything about the release (version, size, date,
-    notes) is read from latest.json (or GitHub), so publishing a release is
-    all it takes; nothing here changes per version. The button itself is the
-    fixed "latest" link, so it works even when that read fails.
+    notes) is read from the newest GitHub release, so publishing a release
+    is all it takes — nothing here changes per version. The button itself
+    is the fixed "latest" link, so it works even when that read fails.
 
-    The look (2026-11-12): the logo's crayon world on a phone. One column
-    (max 440px, centred on a computer). Crayon lines only on the signature
-    pieces (the ABC blocks and the lesson wagons); everything else calm.
-    One action colour, pink. The logo's train drives across the blurred page
-    on the first open of a visit, and the page clears behind it.
+    Laid out like an app store listing: icon and name, a row of facts, one
+    green Install, the trailer and screenshots, then the sections below.
   -->
   <style>
-    @font-face { font-family: "Fredoka"; src: url("assets/fonts/fredoka.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
     :root {
-      --bg: #FFFBF4;
-      --surface: #FFFFFF;
-      --tint-teal: #E6F6F4;
-      --tint-pink: #FDECF1;
-      --tint-sun: #FFF4D6;
-      --line: #EFE6D6;
-      --ink: #24324B;
-      --ink-2: #56627A;
-      --teal: #16A39E;
-      --teal-ink: #0E7A75;
-      --pink: #EC6A8C;
-      --pink-deep: #C9476A;
-      --sun: #F4BE3A;
-      --sun-ink: #A87808;
-      --sky: #7F8FE3;
-      --display: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
-      --body: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      --r-lg: 24px; --r-md: 16px; --r-sm: 12px;
-      --shadow: 0 1px 2px rgba(36, 50, 75, .06), 0 8px 24px rgba(36, 50, 75, .07);
-      color-scheme: light;
+      --green: #01875F;
+      --green-dark: #016B4C;
+      --brand: #5C52E5;
+      --ink: #202124;
+      --muted: #5F6368;
+      --line: #DADCE0;
+      --soft: #F1F3F4;
+      --page: #FFFFFF;
     }
     * { box-sizing: border-box; }
-    [hidden] { display: none !important; }
-    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
-    img { max-width: 100%; }
-    button { font: inherit; color: inherit; }
-    p { margin: 0; }
-    h1, h2, h3 { margin: 0; font-family: var(--display); text-wrap: balance; }
-    :focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; border-radius: 12px; }
-    .col { max-width: 440px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-
-    /* The crayon line, for the signature pieces only. */
-    .crayon { position: relative; isolation: isolate; }
-    .crayon::before { content: ""; position: absolute; inset: 0; z-index: -1; border: 3px solid var(--c, var(--teal)); border-radius: var(--r, 16px); background: var(--fill, var(--surface)); filter: url(#crayon); }
-
-    /* ---------- top bar ---------- */
-    .bar { position: sticky; top: 0; z-index: 30; background: rgba(255, 251, 244, .9); -webkit-backdrop-filter: saturate(1.4) blur(10px); backdrop-filter: saturate(1.4) blur(10px); border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top, 0px); }
-    .bar .col { display: flex; align-items: center; gap: 10px; min-height: 56px; }
-    .bar img { width: 32px; height: 32px; border-radius: 9px; }
-    .bar strong { font-family: var(--display); font-weight: 600; font-size: 1.12rem; white-space: nowrap; }
-    @media (max-width: 359px) { .bar strong { display: none; } }
-    .bar .end { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-    .replay { border: 0; min-height: 36px; padding: 0 12px; border-radius: 999px; background: var(--tint-pink); color: var(--pink-deep); font-weight: 800; font-size: .8rem; cursor: pointer; white-space: nowrap; }
-    .lang { display: flex; border-radius: 999px; background: #F3ECDF; padding: 3px; }
-    .lang button { border: 0; background: none; min-height: 30px; min-width: 40px; padding: 0 10px; border-radius: 999px; font-weight: 800; font-size: .8rem; color: var(--ink-2); cursor: pointer; }
-    .lang button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(36, 50, 75, .12); }
-
-    /* ---------- hero ---------- */
-    .hero { position: relative; padding-block: 24px 8px; text-align: center; }
-    .hero::before { content: ""; position: absolute; inset: 0 0 -40px; z-index: -1;
-      background: repeating-linear-gradient(180deg, transparent 0 31px, rgba(127, 143, 227, .12) 31px 32px);
-      -webkit-mask-image: linear-gradient(#000 40%, transparent); mask-image: linear-gradient(#000 40%, transparent); }
-    .depot { position: relative; width: min(74%, 280px); margin: 0 auto 12px; padding-bottom: 12px; }
-    .depot::after { content: ""; position: absolute; left: -14%; right: -14%; bottom: 0; height: 10px;
-      background: repeating-linear-gradient(90deg, #C29A73 0 9px, transparent 9px 20px), linear-gradient(#9B9BA8, #9B9BA8) 0 0 / 100% 3px no-repeat; border-radius: 2px; }
-    .parked { display: block; width: 100%; height: auto; animation: idle 1.6s ease-in-out infinite; transform-origin: 50% 100%; }
-    @keyframes idle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
-    .smoke { position: absolute; left: 14%; top: 22%; width: 16px; height: 16px; border-radius: 50%; background: rgba(236, 106, 140, .45); animation: smoke 2.4s ease-out infinite; opacity: 0; }
-    .smoke.s2 { animation-delay: .8s; } .smoke.s3 { animation-delay: 1.6s; }
-    @keyframes smoke { 0% { transform: translate(0, 0) scale(.5); opacity: .9; } 100% { transform: translate(16px, -56px) scale(2); opacity: 0; } }
-    h1 { font-size: 2.5rem; line-height: 1; font-weight: 700; letter-spacing: .03em; }
-    h1 .e { color: var(--teal); } h1 .t { color: var(--pink); }
-    .tagline { margin-top: 8px; font-weight: 800; color: var(--teal-ink); }
-    .sub { margin-top: 2px; font-size: .9rem; color: var(--ink-2); }
-
-    /* ABC blocks: the three facts a parent asks first. */
-    .blocks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 24px; }
-    .block { --r: 14px; display: grid; justify-items: center; align-content: center; gap: 2px; min-height: 84px; padding: 10px 6px; text-align: center; transform: rotate(var(--tilt)); }
-    .block::before { box-shadow: inset 0 -6px 0 color-mix(in srgb, var(--c) 16%, transparent); }
-    .block b { font-family: var(--display); font-weight: 600; font-size: 1.4rem; line-height: 1.1; color: var(--c); }
-    .block span { font-size: .75rem; font-weight: 800; color: var(--ink-2); line-height: 1.2; }
-    .block:nth-child(1) { --c: var(--teal); --tilt: -2.5deg; }
-    .block:nth-child(2) { --c: var(--pink); --tilt: 1.5deg; }
-    .block:nth-child(3) { --c: var(--sun-ink); --tilt: -1deg; }
-
-    /* ---------- the one action ---------- */
-    .cta { margin-top: 8px; }
-    .get { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 64px; width: 100%; border-radius: 999px;
-      background: var(--pink); color: #fff; text-decoration: none; font-family: var(--display); font-weight: 600; font-size: 1.35rem; letter-spacing: .01em;
-      box-shadow: 0 6px 0 var(--pink-deep), 0 14px 24px rgba(236, 106, 140, .3); transition: transform .08s ease, box-shadow .08s ease; }
-    .get svg { width: 26px; height: 26px; flex: none; }
-    .get:active { transform: translateY(5px); box-shadow: 0 1px 0 var(--pink-deep), 0 4px 10px rgba(236, 106, 140, .25); }
-    .buddy { position: absolute; right: 8px; top: 0; display: flex; align-items: flex-start; gap: 2px; pointer-events: none; }
-    .buddy img { width: 60px; height: auto; animation: wave 2.6s ease-in-out infinite; transform-origin: 50% 90%; }
-    .bubble { margin-top: 4px; padding: 6px 12px; border-radius: 14px 14px 4px 14px; background: var(--surface); box-shadow: var(--shadow); font-family: var(--display); font-weight: 600; font-size: .9rem; white-space: nowrap; }
-    @keyframes wave { 0%, 60%, 100% { transform: rotate(0); } 70% { transform: rotate(-10deg); } 80% { transform: rotate(8deg); } 90% { transform: rotate(-4deg); } }
-    .meta { margin-top: 12px; text-align: center; font-size: .82rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-    .meta i { font-style: normal; margin: 0 6px; color: #CFC3AE; }
-    .notice { display: grid; grid-template-columns: 36px 1fr; gap: 12px; align-items: center; margin-top: 16px; padding: 12px 14px; border-radius: var(--r-md); background: var(--tint, var(--tint-teal)); font-size: .92rem; }
-    .notice > svg, .notice > .dot { width: 36px; height: 36px; padding: 7px; border-radius: 10px; background: var(--surface); color: var(--tone, var(--teal-ink)); }
-    .notice > .dot { display: grid; place-items: center; padding: 0; font-size: 1.1rem; }
-    .notice.update { --tint: var(--tint-pink); --tone: var(--pink-deep); }
-    .notice.warn { --tint: var(--tint-sun); --tone: var(--sun-ink); grid-template-columns: 1fr; }
-    .started { margin-top: 12px; text-align: center; font-size: .9rem; font-weight: 700; color: var(--teal-ink); }
-
-    /* ---------- sections ---------- */
-    main > section { padding-block: 40px 0; display: grid; gap: 16px; min-width: 0; }
-    .h { display: grid; gap: 6px; }
-    h2 { font-size: 1.38rem; font-weight: 600; line-height: 1.2; }
-    .h::after { content: ""; width: 32px; height: 4px; border-radius: 4px; background: var(--teal); }
-    .lede { color: var(--ink-2); }
-    .surface { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); }
-
-    .film { position: relative; display: block; width: 100%; padding: 0; border: 0; border-radius: var(--r-lg); overflow: hidden; cursor: pointer; box-shadow: var(--shadow); background: var(--surface); }
-    .film img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
-    .film .play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 64px; height: 64px; border-radius: 50%; background: var(--pink); color: #fff; display: grid; place-items: center; box-shadow: 0 5px 0 var(--pink-deep), 0 10px 20px rgba(0, 0, 0, .15); }
-    .film .play svg { width: 26px; height: 26px; margin-left: 4px; }
-    .film .label { position: absolute; left: 12px; bottom: 12px; padding: 4px 10px; border-radius: 999px; background: rgba(36, 50, 75, .78); color: #fff; font-size: .8rem; font-weight: 800; }
-    .shots { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; margin-inline: -16px; padding: 4px 16px 12px; scroll-padding-inline: 16px; scrollbar-width: none; }
-    .shots::-webkit-scrollbar { display: none; }
-    .shot { flex: none; scroll-snap-align: start; padding: 0; border: 0; background: none; border-radius: var(--r-md); overflow: hidden; box-shadow: var(--shadow); cursor: zoom-in; }
-    .shot img { display: block; height: 320px; width: auto; }
-
-    .swipe { display: flex; align-items: center; gap: 6px; font-size: .85rem; font-weight: 800; color: var(--ink-2); }
-    .swipe span { display: inline-block; animation: nudge 1.4s ease-in-out infinite; }
-    @keyframes nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
-    .rail { overflow-x: auto; margin-inline: -16px; padding: 8px 16px 4px; scrollbar-width: none; }
-    .rail::-webkit-scrollbar { display: none; }
-    .train { display: flex; align-items: flex-end; gap: 8px; width: max-content; padding-bottom: 14px; position: relative; }
-    .train::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 8px; background: repeating-linear-gradient(90deg, #C29A73 0 9px, transparent 9px 20px), linear-gradient(#9B9BA8, #9B9BA8) 0 0 / 100% 3px no-repeat; }
-    .engine { width: 120px; height: auto; display: block; margin-bottom: -2px; }
-    .wagon { --r: 18px; --fill: color-mix(in srgb, var(--c) 12%, #fff); width: 112px; min-height: 150px; padding: 12px 8px 22px; display: grid; justify-items: center; align-content: start; gap: 4px; text-align: center; border: 0; background: none; cursor: pointer; }
-    .wagon img { width: 60px; height: 60px; object-fit: contain; }
-    .wagon b { font-family: var(--display); font-weight: 600; font-size: .95rem; line-height: 1.15; }
-    .wagon span { font-size: .74rem; color: var(--ink-2); line-height: 1.25; }
-    .wagon i { position: absolute; bottom: -9px; width: 20px; height: 20px; border-radius: 50%; background: var(--sun); border: 3px solid var(--sun-ink); }
-    .wagon i:first-of-type { left: 18px; } .wagon i:last-of-type { right: 18px; }
-    .wagon:nth-child(2) { --c: var(--teal); } .wagon:nth-child(3) { --c: var(--pink); } .wagon:nth-child(4) { --c: var(--sun-ink); }
-    .wagon:nth-child(5) { --c: var(--sky); } .wagon:nth-child(6) { --c: var(--teal); } .wagon:nth-child(7) { --c: var(--pink); }
-    .wagon.hop { animation: hop .5s cubic-bezier(.3, 1.6, .5, 1); }
-    @keyframes hop { 40% { transform: translateY(-14px) rotate(-3deg); } }
-
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-    .chip { padding: 6px 12px; border-radius: 999px; font-size: .85rem; font-weight: 800; background: var(--tint-teal); color: var(--teal-ink); }
-
-    .list { padding: 4px 16px; }
-    .row { display: grid; grid-template-columns: 40px 1fr; gap: 14px; align-items: start; padding: 14px 0; border-bottom: 1px solid var(--line); }
-    .row:last-child { border-bottom: 0; }
-    .ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--tint, var(--tint-teal)); color: var(--tone, var(--teal-ink)); }
-    .ico svg { width: 22px; height: 22px; }
-    .row b { display: block; font-weight: 800; }
-    .row span { font-size: .92rem; color: var(--ink-2); }
-
-    .new { padding: 18px 18px 6px; display: grid; gap: 10px; }
-    .when { display: flex; align-items: center; gap: 8px; font-size: .85rem; font-weight: 800; color: var(--teal-ink); }
-    .when em { font-style: normal; padding: 2px 8px; border-radius: 999px; background: var(--tint-pink); color: var(--pink-deep); font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; }
-    .notes { max-height: 9.5em; overflow: hidden; position: relative; transition: max-height .35s ease; font-size: .95rem; }
-    .notes.open { max-height: none; }
-    .notes:not(.open)::after { content: ""; position: absolute; inset: auto 0 0; height: 3em; background: linear-gradient(rgba(255, 255, 255, 0), #fff); }
-    .notes h3 { font-size: 1rem; font-weight: 600; margin: 10px 0 4px; }
-    .notes p { margin: 6px 0; color: var(--ink-2); }
-    .notes ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
-    .notes li::marker { color: var(--pink); }
-    .textbtn { justify-self: start; min-height: 44px; padding: 0; border: 0; background: none; font-weight: 800; color: var(--teal-ink); cursor: pointer; }
-
-    .tut { display: grid; grid-template-columns: 112px 1fr; gap: 14px; align-items: center; padding: 10px; border: 0; width: 100%; text-align: left; cursor: pointer; }
-    .tut .thumb { position: relative; border-radius: var(--r-sm); overflow: hidden; }
-    .tut .thumb img { display: block; width: 112px; height: 68px; object-fit: cover; }
-    .tut .thumb span { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(36, 50, 75, .25); color: #fff; }
-    .tut .thumb svg { width: 22px; height: 22px; }
-    .tut b { display: block; font-family: var(--display); font-weight: 600; font-size: 1.02rem; line-height: 1.25; }
-    .tut small { color: var(--ink-2); font-size: .82rem; }
-    .line-wrap { position: relative; }
-    .line { list-style: none; margin: 0; padding: 0 0 0 56px; display: grid; gap: 22px; position: relative; }
-    .line::before { content: ""; position: absolute; left: 15px; top: 16px; bottom: 16px; width: 12px;
-      background: repeating-linear-gradient(180deg, #C29A73 0 3px, transparent 3px 12px), linear-gradient(90deg, #9B9BA8 0 2px, transparent 2px 10px, #9B9BA8 10px 12px); }
-    .line li { position: relative; min-height: 42px; display: flex; align-items: center; font-size: .98rem; }
-    .stop { position: absolute; left: -56px; top: 50%; transform: translateY(-50%); width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); border: 3px solid var(--teal); color: var(--teal-ink); font-family: var(--display); font-weight: 700; font-size: 1.1rem; z-index: 1; box-shadow: 0 2px 6px rgba(36, 50, 75, .08); }
-    .line li:last-child .stop { background: var(--teal); color: #fff; }
-    .rider { position: absolute; left: -2px; top: 40px; width: 48px; height: auto; z-index: 2; transition: top .25s ease-out; pointer-events: none; filter: drop-shadow(0 3px 3px rgba(36, 50, 75, .2)); }
-    .tips { display: grid; gap: 10px; }
-    .tip { padding: 12px 14px; border-radius: var(--r-md); font-size: .92rem; background: var(--tint, var(--tint-sun)); }
-    .tip:nth-child(2) { --tint: var(--tint-teal); } .tip:nth-child(3) { --tint: var(--tint-pink); }
-
-    .info { padding: 4px 16px; }
-    .info div { display: flex; justify-content: space-between; gap: 16px; padding: 13px 0; border-bottom: 1px solid var(--line); font-size: .95rem; }
-    .info div:last-child { border-bottom: 0; }
-    .info b { color: var(--ink-2); font-weight: 700; }
-    .info span { font-weight: 800; text-align: right; font-variant-numeric: tabular-nums; }
-
-    footer { padding-block: 40px 120px; text-align: center; font-size: .85rem; color: var(--ink-2); }
-    footer a { color: var(--teal-ink); font-weight: 800; overflow-wrap: anywhere; }
-
-    .dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); background: rgba(255, 251, 244, .92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-top: 1px solid var(--line); transform: translateY(110%); transition: transform .25s ease; }
-    .dock.show { transform: none; }
-    .dock .get { max-width: 408px; margin: 0 auto; min-height: 56px; font-size: 1.15rem; }
-
-    .player { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px; background: rgba(18, 24, 38, .94); }
-    .player video { max-width: 100%; max-height: 82vh; border-radius: 16px; background: #000; }
-    .player button { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); min-height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: #fff; color: var(--ink); font-weight: 800; cursor: pointer; }
-    .zoom { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px; background: rgba(18, 24, 38, .94); cursor: zoom-out; }
-    .zoom img { max-height: 90vh; border-radius: 16px; }
-
-    /* The train that opens the page. */
-    #intro { position: fixed; inset: 0; z-index: 60; }
-    #intro .veil { position: absolute; inset: 0; background: rgba(255, 251, 244, .35); -webkit-backdrop-filter: blur(12px) saturate(1.1); backdrop-filter: blur(12px) saturate(1.1); }
-    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { #intro .veil { background: rgba(255, 251, 244, .95); } }
-    #intro .loco { position: absolute; left: 0; top: 50%; width: min(72vw, 400px); height: auto; will-change: transform; filter: drop-shadow(0 14px 10px rgba(36, 50, 75, .18)); transform: translate(110vw, -50%); }
-    #intro .puff { position: absolute; width: 22px; height: 22px; border-radius: 50%; background: rgba(236, 106, 140, .5); animation: puff 1.1s ease-out forwards; pointer-events: none; }
-    @keyframes puff { from { transform: translate(-50%, -50%) scale(.4); opacity: .9; } to { transform: translate(calc(-50% + 18px), calc(-50% - 70px)) scale(2.2); opacity: 0; } }
-    #intro .skip { position: absolute; left: 50%; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); padding: 6px 14px; border-radius: 999px; background: rgba(255, 255, 255, .85); font-size: .82rem; font-weight: 800; color: var(--ink-2); white-space: nowrap; }
-
-    @media (min-width: 620px) {
-      body { background: #F6EFE2; }
-      main.col { background: var(--bg); box-shadow: 0 0 0 1px var(--line); padding-bottom: 8px; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body {
+      margin: 0; background: var(--page); color: var(--ink);
+      font-family: Roboto, system-ui, -apple-system, "Segoe UI", "Noto Sans", sans-serif;
+      font-size: 14px; line-height: 1.45; overflow-x: hidden;
     }
-    @media (prefers-reduced-motion: reduce) {
-      #intro { display: none; }
-      .parked, .smoke, .swipe span, .buddy img, .wagon.hop { animation: none; }
-      .rider { transition: none; }
-      html { scroll-behavior: auto; }
+    a { color: var(--green); }
+    img { max-width: 100%; }
+    [hidden] { display: none !important; }
+
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+    /* ── Top bar ── */
+    .bar { position: sticky; top: 0; z-index: 5; background: rgba(255, 255, 255, 0.96); border-bottom: 1px solid #EEE; }
+    .bar .wrap { display: flex; align-items: center; gap: 10px; height: 56px; }
+    .bar img { width: 28px; height: 28px; border-radius: 7px; }
+    .bar strong { font-size: 18px; font-weight: 500; flex: 1; color: var(--muted); }
+    .lang { display: flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+    .lang button {
+      border: 0; background: none; padding: 6px 12px; font: inherit; font-size: 13px; font-weight: 500;
+      color: var(--muted); cursor: pointer;
+    }
+    .lang button[aria-pressed="true"] { background: #E6F4EA; color: var(--green-dark); }
+
+    /* ── The listing's head ── */
+    .head { display: flex; gap: 18px; align-items: flex-start; padding: 22px 0 18px; }
+    .head .icon {
+      width: 72px; height: 72px; border-radius: 20%; flex: none; background: #fff;
+      box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+    }
+    .head h1 { margin: 0; font-size: 24px; line-height: 1.2; font-weight: 500; }
+    .maker { margin: 4px 0 0; color: var(--green); font-weight: 500; font-size: 14px; }
+    .tags { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+
+    .facts { display: flex; overflow-x: auto; scrollbar-width: none; margin: 0 -20px; padding: 0 20px 18px; }
+    .facts::-webkit-scrollbar { display: none; }
+    .fact { flex: none; min-width: 92px; padding: 0 16px; text-align: center; position: relative; }
+    .fact:first-child { padding-left: 0; text-align: left; min-width: 76px; }
+    .fact + .fact::before { content: ""; position: absolute; left: 0; top: 20%; height: 60%; border-left: 1px solid var(--line); }
+    .fact b { display: flex; align-items: center; justify-content: inherit; gap: 4px; font-size: 14px; font-weight: 500; height: 24px; white-space: nowrap; }
+    .fact:first-child b { justify-content: flex-start; }
+    .fact:not(:first-child) b { justify-content: center; }
+    .fact span { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .age {
+      display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 18px; padding: 0 3px;
+      border: 1.5px solid var(--ink); border-radius: 3px; font-size: 11px; font-weight: 700; line-height: 1;
+    }
+
+    .banner { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 12px; padding: 12px 14px; border-radius: 12px; font-size: 14px; font-weight: 500; }
+    .banner.update { background: #FEF7E0; color: #7A4B00; }
+    .banner.current { background: #E6F4EA; color: var(--green-dark); }
+    .banner .dot { font-size: 18px; line-height: 1.2; }
+
+    .get {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; height: 44px; padding: 0 24px; border-radius: 22px;
+      background: var(--green); color: #fff; font-size: 15px; font-weight: 500; text-decoration: none;
+      transition: background 0.15s, box-shadow 0.15s;
+    }
+    .get:hover { background: var(--green-dark); box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3); }
+    .get svg { width: 18px; height: 18px; flex: none; }
+    .under { margin: 10px 0 0; color: var(--muted); font-size: 12px; text-align: center; }
+    .started { margin: 12px 0 0; padding: 10px 14px; border-radius: 12px; background: #E6F4EA; font-size: 13.5px; }
+    .ios { padding: 14px 16px; border-radius: 12px; background: #FEF7E0; color: #7A4B00; font-size: 14px; }
+    .inapp { margin: 0 0 12px; }
+    .account { margin: 12px 0 0; padding: 10px 14px; border-radius: 12px; background: var(--soft); color: var(--muted); font-size: 13px; text-align: center; }
+    .account strong { color: var(--ink); font-weight: 600; }
+
+    /* ── Trailer and screenshots ── */
+    .media { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 22px -20px 0; padding: 0 20px 6px; scroll-padding: 0 20px; scrollbar-width: none; }
+    .media::-webkit-scrollbar { display: none; }
+    .media > * { flex: none; scroll-snap-align: start; border-radius: 10px; overflow: hidden; border: 1px solid #ECECEC; }
+    /* A phone's width less the side gaps, so the next picture peeks in. */
+    .trailer { position: relative; height: min(190px, calc((100vw - 64px) * 9 / 16)); aspect-ratio: 16 / 9; background: #FBFAFF; padding: 0; cursor: pointer; }
+    .trailer img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .trailer span {
+      position: absolute; left: 50%; top: 50%; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%;
+      background: rgba(255, 255, 255, 0.95); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .trailer span::after { content: ""; margin-left: 4px; border-left: 16px solid var(--ink); border-top: 10px solid transparent; border-bottom: 10px solid transparent; }
+    .shot { padding: 0; background: none; cursor: zoom-in; }
+    .shot img { display: block; height: 220px; width: auto; }
+
+    /* ── Sections ── */
+    section { padding: 26px 0 0; scroll-margin-top: 64px; }
+    .sec-h { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; }
+    .sec-h h2 { margin: 0; font-size: 20px; font-weight: 500; flex: 1; }
+    .sec-h .arrow { color: var(--muted); font-size: 22px; line-height: 1; }
+    p { margin: 0 0 10px; }
+    .body { color: var(--muted); font-size: 14px; line-height: 1.5; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
+    .chip { padding: 6px 14px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; color: var(--muted); font-weight: 500; }
+
+    .lessons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 12px; margin: 16px 0 0; }
+    .lesson { display: flex; gap: 10px; align-items: center; }
+    .lesson img { width: 48px; height: 48px; object-fit: contain; flex: none; border-radius: 12px; background: var(--soft); padding: 4px; }
+    .lesson b { display: block; font-size: 14px; font-weight: 500; line-height: 1.25; }
+    .lesson span { display: block; font-size: 12px; color: var(--muted); line-height: 1.3; }
+
+    .safety { border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-top: 4px; }
+    .safety-row { display: flex; gap: 14px; align-items: flex-start; }
+    .safety-row + .safety-row { margin-top: 16px; }
+    .safety-row svg { width: 22px; height: 22px; flex: none; color: var(--muted); margin-top: 1px; }
+    .safety-row b { display: block; font-size: 14px; font-weight: 500; }
+    .safety-row span { display: block; font-size: 13px; color: var(--muted); line-height: 1.45; }
+
+    .when { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+    .notes { position: relative; max-height: 190px; overflow: hidden; color: var(--muted); }
+    .notes.open { max-height: none; }
+    .notes:not(.open)::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 60px; background: linear-gradient(rgba(255, 255, 255, 0), #fff); }
+    .notes h3 { font-size: 14px; font-weight: 500; color: var(--ink); margin: 12px 0 4px; }
+    .notes ul { margin: 0 0 6px; padding-left: 20px; }
+    .notes li { margin: 3px 0; }
+    .more { margin-top: 6px; border: 0; background: none; padding: 6px 0; font: inherit; font-weight: 500; color: var(--green); cursor: pointer; }
+
+    ol.steps { margin: 4px 0 0; padding: 0; list-style: none; counter-reset: s; }
+    ol.steps li { counter-increment: s; display: flex; gap: 14px; align-items: flex-start; padding: 10px 0; color: var(--ink); }
+    ol.steps li + li { border-top: 1px solid #EEE; }
+    ol.steps li::before {
+      content: counter(s); flex: none; width: 26px; height: 26px; border-radius: 50%; background: #E6F4EA; color: var(--green-dark);
+      font-weight: 500; font-size: 13px; display: flex; align-items: center; justify-content: center;
+    }
+    .watch {
+      display: inline-flex; align-items: center; gap: 8px; margin: 8px 0 0; height: 36px; padding: 0 16px;
+      border: 1px solid var(--line); border-radius: 18px; background: #fff; color: var(--green); font: inherit; font-weight: 500; cursor: pointer;
+    }
+    .tip { margin: 12px 0 0; padding: 12px 14px; border-radius: 8px; background: var(--soft); font-size: 13px; color: var(--muted); }
+    .tip strong { color: var(--ink); font-weight: 500; }
+
+    .info { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; }
+    .info div b { display: block; font-size: 14px; font-weight: 500; }
+    .info div span { display: block; font-size: 13px; color: var(--muted); }
+
+    footer { margin-top: 32px; padding: 20px 20px 40px; border-top: 1px solid #EEE; color: var(--muted); font-size: 13px; text-align: center; }
+
+    /* The trailer and the install tutorial share one full-screen player. */
+    .zoom { position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; background: rgba(32, 33, 36, 0.9); padding: 16px; cursor: zoom-out; }
+    .zoom img { max-height: 92vh; max-width: 100%; border-radius: 12px; }
+    .tut { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 8px 14px; align-items: center; margin: 0 0 12px; padding: 12px; border-radius: 12px; border: 1px solid var(--line); }
+    .tut-play { position: relative; grid-row: span 2; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 8px; overflow: hidden; width: 72px; height: 92px; }
+    .tut-play img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .tut-play span { position: absolute; left: 50%; top: 50%; width: 32px; height: 32px; margin: -16px 0 0 -16px; border-radius: 50%; background: rgba(255, 255, 255, 0.95); color: var(--ink); font-size: 13px; display: flex; align-items: center; justify-content: center; }
+    .tut-text b { display: block; font-size: 14px; font-weight: 500; line-height: 1.3; }
+    .tut-text span { display: block; font-size: 12px; color: var(--muted); }
+    .tut-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tut-actions button, .player-skip { border: 0; border-radius: 18px; height: 36px; padding: 0 16px; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
+    .tut-watch { background: var(--green); color: #fff; }
+    .tut-skip { background: var(--soft); color: var(--muted); }
+    .player { position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; background: rgba(32, 33, 36, 0.95); padding: 56px 12px 16px; }
+    .player video { display: block; max-width: 100%; max-height: 100%; border-radius: 12px; background: #000; }
+    .player-skip { position: absolute; top: 12px; right: 12px; background: #fff; color: var(--ink); }
+
+    /* The Install button at the bottom of a phone once the big one is gone. */
+    .dock {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 6;
+      padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+      background: rgba(255, 255, 255, 0.97); border-top: 1px solid #EEE;
+      transform: translateY(110%); transition: transform 0.25s ease;
+    }
+    .dock.show { transform: none; }
+    body.docked { padding-bottom: 72px; }
+
+    @media (min-width: 840px) {
+      body { font-size: 15px; }
+      .top { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 40px; align-items: start; padding-top: 36px; }
+      .head { padding: 0 0 22px; }
+      .head .icon { display: none; }
+      .head h1 { font-size: 46px; line-height: 1.1; font-weight: 500; }
+      .maker { font-size: 16px; margin-top: 10px; }
+      .tags { font-size: 13px; }
+      .big-icon {
+        display: block; width: 240px; height: 240px; border-radius: 20%; background: #fff;
+        box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3), 0 8px 24px 4px rgba(60, 64, 67, 0.15);
+      }
+      .cta { max-width: 320px; }
+      .get { height: 40px; border-radius: 8px; font-size: 14px; }
+      .under, .account { text-align: left; }
+      .media { margin: 32px 0 0; padding: 0 0 8px; scroll-padding: 0; }
+      .trailer { height: 300px; }
+      .shot img { height: 300px; }
+      .cols { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 48px; }
+      .lessons { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .dock { display: none; }
+      body.docked { padding-bottom: 0; }
+    }
+    @media (max-width: 839px) {
+      .big-icon { display: none; }
     }
   </style>
 </head>
 <body>
-  <!-- The crayon edge: a little wobble and grain on the drawn borders. -->
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-    <filter id="crayon" x="-5%" y="-5%" width="110%" height="110%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="7" result="n"/>
-      <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/>
-    </filter>
-  </svg>
-
-  <!-- On a first open the page waits blurred under this veil; see the script. -->
-  <div id="intro" hidden aria-hidden="true">
-    <div class="veil" id="veil"></div>
-    <img class="loco" id="loco" src="assets/train.webp" alt="">
-    <span class="skip" id="skip" data-t="skipIntro">Pindutin para laktawan</span>
-  </div>
-  <script>
-    // Before anything paints: is this a visit that gets the train? Once a
-    // visit, never when sent by the app's update button, never for reduced motion.
-    (function () {
-      var q = location.search, first = true;
-      try { first = !sessionStorage.getItem('etarabay-intro'); } catch (e) { /* fine */ }
-      var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (first && !calm && !/[?&]v=/.test(q) && !/nointro/.test(q)) {
-        document.getElementById('intro').hidden = false;
-        try { sessionStorage.setItem('etarabay-intro', '1'); } catch (e) { /* fine */ }
-      }
-    })();
-  </script>
-
   <header class="bar">
-    <div class="col">
+    <div class="wrap">
       <img src="assets/icon-192.png" alt="">
       <strong>E-Tarabay</strong>
-      <div class="end">
-        <button type="button" class="replay" id="replay" data-t="replay">▶ Tren</button>
-        <div class="lang" role="group" aria-label="Language">
-          <button type="button" data-lang="fil" aria-pressed="true">FIL</button>
-          <button type="button" data-lang="en" aria-pressed="false">EN</button>
-        </div>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="fil" aria-pressed="true">FIL</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
       </div>
     </div>
   </header>
 
-  <main class="col">
-    <div class="hero">
-      <div class="depot" aria-hidden="true">
-        <span class="smoke"></span><span class="smoke s2"></span><span class="smoke s3"></span>
-        <img class="parked" src="assets/train.webp" alt="">
+  <main class="wrap">
+    <div class="top">
+      <div>
+        <div class="head">
+          <img class="icon" src="assets/icon-512.png" alt="E-Tarabay">
+          <div>
+            <h1>E-Tarabay</h1>
+            <p class="maker" data-t="tagline">Ang Kabataan ay Pag-asa ng Bayan</p>
+            <p class="tags" data-t="tags">Pang-edukasyon · Para sa daycare · Libre</p>
+          </div>
+        </div>
+
+        <div class="facts">
+          <div class="fact"><b id="stVersion">—</b><span data-t="stVersion">Bersyon</span></div>
+          <div class="fact"><b id="stSize">—</b><span data-t="stSize">Laki</span></div>
+          <div class="fact"><b><span class="age">3+</span></b><span data-t="ageLabel">Edad 3–5</span></div>
+          <div class="fact"><b>3</b><span data-t="stLang">Wika</span></div>
+          <div class="fact"><b>✓</b><span data-t="stOffline">Kahit offline</span></div>
+          <div class="fact"><b data-t="iPriceVal">Libre</b><span data-t="iPrice">Presyo</span></div>
+        </div>
+
+        <div id="bannerUpdate" class="banner update" hidden><span class="dot">⬆️</span><span id="bannerUpdateText"></span></div>
+        <div id="bannerCurrent" class="banner current" hidden><span class="dot">✅</span><span id="bannerCurrentText"></span></div>
+
+        <div id="inapp" class="ios inapp" hidden data-t="inapp"><strong>Nasa loob ka ng Messenger/Facebook.</strong> Pindutin ang &#8942; sa itaas, saka ang "Buksan sa Chrome", para tuloy-tuloy ang download.</div>
+        <div id="android" class="cta">
+          <a id="get" class="get" href="https://github.com/Jaijr711/etarabay-releases/releases/latest/download/E-Tarabay.apk">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            <span id="getLabel">I-install</span>
+          </a>
+          <p class="under" id="under" data-t="under">Para sa Android 7.0 pataas</p>
+          <p class="account" data-t="account">Para sa mga batang naka-enroll sa daycare. <strong>Ang teacher ang gagawa ng account</strong> at magbibigay ng login card.</p>
+          <p class="started" id="started" hidden data-t="started">Nagsimula na ang download. Kapag tapos na, buksan ang file para i-install — tingnan ang mga hakbang sa ibaba.</p>
+        </div>
+        <div id="ios" class="ios" hidden data-t="ios"><strong>Para sa Android lamang ang E-Tarabay.</strong> Hindi ito magagamit sa iPhone o iPad.</div>
       </div>
-      <h1><span class="e">E-</span><span class="t">TARABAY</span></h1>
-      <p class="tagline" data-t="tagline">Ang Kabataan ay Pag-asa ng Bayan</p>
-      <p class="sub" data-t="sub">Learning app para sa daycare · Ilocano, Filipino, English</p>
-      <div class="blocks">
-        <div class="block crayon"><b data-t="bFree">Libre</b><span data-t="bFreeL">Walang bayad</span></div>
-        <div class="block crayon"><b>3–5</b><span data-t="bAgeL">Edad ng bata</span></div>
-        <div class="block crayon"><b>Offline</b><span data-t="bOffL">Kahit walang internet</span></div>
-      </div>
+      <img class="big-icon" src="assets/icon-512.png" alt="">
     </div>
 
-    <div class="cta">
-      <div id="bannerUpdate" class="notice update" hidden><span class="dot">⬆</span><p id="bannerUpdateText"></p></div>
-      <div id="bannerCurrent" class="notice" hidden><span class="dot">✓</span><p id="bannerCurrentText"></p></div>
-      <div id="inapp" class="notice warn" hidden><p data-t="inapp"><strong>Nasa loob ka ng Messenger/Facebook.</strong> Pindutin ang &#8942; sa itaas, saka ang "Buksan sa Chrome", para tuloy-tuloy ang download.</p></div>
-      <div id="android" style="position:relative;padding-top:64px">
-        <div class="buddy" aria-hidden="true">
-          <span class="bubble" data-t="bubble">Pindutin mo ako!</span>
-          <img src="assets/phone-buddy.webp" alt="">
-        </div>
-        <a id="get" class="get" href="https://github.com/Jaijr711/etarabay-releases/releases/latest/download/E-Tarabay.apk">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
-          <span id="getLabel">I-install</span>
-        </a>
-        <p class="meta"><span data-t="stVersion">Bersyon</span> <span id="stVersion">—</span><i>•</i><span id="stSize">—</span><i>•</i><span data-t="under">Android 7.0 pataas</span></p>
-        <p class="started" id="started" hidden data-t="started">Nagsimula na ang download. Kapag tapos na, buksan ang file para i-install — tingnan ang mga hakbang sa ibaba.</p>
-        <div class="notice">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="11" r="2"/><path d="M6.5 16c.6-1.3 1.5-2 2.5-2s1.9.7 2.5 2M14 10h4M14 13h3"/></svg>
-          <p data-t="account">Para sa mga batang naka-enroll sa daycare. <strong>Ang teacher ang gagawa ng account</strong> at magbibigay ng login card.</p>
-        </div>
-      </div>
-      <div id="ios" class="notice warn" hidden><p data-t="ios"><strong>Para sa Android lamang ang E-Tarabay.</strong> Hindi ito magagamit sa iPhone o iPad.</p></div>
+    <!-- The trailer first, then the screenshots, as a store lists them. The
+         film loads only when it is played. -->
+    <div class="media" id="shots">
+      <button type="button" class="trailer" id="trailer" aria-label="Panoorin ang video ng E-Tarabay"><img src="assets/promo.jpg" alt=""><span></span></button>
+      <button type="button" class="shot"><img src="assets/shot1.jpg" alt="Mga Aralin" loading="lazy"></button>
+      <button type="button" class="shot"><img src="assets/shot2.jpg" alt="Bilang" loading="lazy"></button>
+      <button type="button" class="shot"><img src="assets/shot3.jpg" alt="Ang Aking Sarili" loading="lazy"></button>
+      <button type="button" class="shot"><img src="assets/shot4.jpg" alt="Aklat Pangkulay" loading="lazy"></button>
+      <button type="button" class="shot"><img src="assets/shot5.jpg" alt="Gantimpala" loading="lazy"></button>
+      <button type="button" class="shot"><img src="assets/shot6.jpg" alt="Talaan ng Guro" loading="lazy"></button>
     </div>
 
-    <section aria-label="Video">
-      <button type="button" class="film" id="trailer" aria-label="Panoorin ang video ng E-Tarabay">
-        <img src="assets/promo.jpg" alt="">
-        <span class="play"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg></span>
-        <span class="label" data-t="filmLabel">Panoorin ang app</span>
-      </button>
-      <div class="shots" id="shots">
-        <button type="button" class="shot"><img src="assets/shot1.jpg" alt="Mga Aralin" loading="lazy"></button>
-        <button type="button" class="shot"><img src="assets/shot2.jpg" alt="Bilang" loading="lazy"></button>
-        <button type="button" class="shot"><img src="assets/shot3.jpg" alt="Ang Aking Sarili" loading="lazy"></button>
-        <button type="button" class="shot"><img src="assets/shot4.jpg" alt="Aklat Pangkulay" loading="lazy"></button>
-        <button type="button" class="shot"><img src="assets/shot5.jpg" alt="Gantimpala" loading="lazy"></button>
-        <button type="button" class="shot"><img src="assets/shot6.jpg" alt="Talaan ng Guro" loading="lazy"></button>
-      </div>
-    </section>
+    <div class="cols">
+      <div>
+        <section>
+          <div class="sec-h"><h2 data-t="aboutH">Tungkol sa app</h2><span class="arrow" aria-hidden="true">→</span></div>
+          <p class="body" data-t="about1">Ang E-Tarabay ay learning app para sa mga batang nasa daycare, edad 3 hanggang 5. Natututo silang magbasa, magbilang, sumulat at magkulay sa Ilocano, Filipino at English — at gumagana ito kahit walang internet.</p>
+          <p class="body" data-t="about2">May bituin at medalya sa bawat natapos, at Sertipiko ng Pagtatapos kapag natapos ang lahat.</p>
+          <div class="chips">
+            <span class="chip" data-t="chipEdu">Pang-edukasyon</span>
+            <span class="chip" data-t="chipKids">Para sa bata</span>
+            <span class="chip" data-t="chipDaycare">Daycare</span>
+            <span class="chip" data-t="chipOffline">Kahit offline</span>
+          </div>
+          <div class="lessons">
+            <div class="lesson"><img src="assets/mod-magbasa.webp" alt=""><div><b data-t="m1">Magbasa Tayo</b><span data-t="m1d">Mga kuwento, tula at awit</span></div></div>
+            <div class="lesson"><img src="assets/mod-bilang.webp" alt=""><div><b data-t="m2">Bilang</b><span data-t="m2d">Lobo, prutas at mga numero</span></div></div>
+            <div class="lesson"><img src="assets/mod-sarili.webp" alt=""><div><b data-t="m3">Ang Aking Sarili</b><span data-t="m3d">Ang pamilya at ang tahanan</span></div></div>
+            <div class="lesson"><img src="assets/mod-sundan.webp" alt=""><div><b data-t="m4">Sundan Mo</b><span data-t="m4d">Matuto ng iyong ABC!</span></div></div>
+            <div class="lesson"><img src="assets/mod-kulay.webp" alt=""><div><b data-t="m5">Masayang Pagkukulay</b><span data-t="m5d">Kulayan ang mga larawan</span></div></div>
+            <div class="lesson"><img src="assets/mod-tandaan.webp" alt=""><div><b data-t="m6">Tandaan!</b><span data-t="m6d">Pag-ugnayin ang mga Pares</span></div></div>
+          </div>
+        </section>
 
-    <section>
-      <div class="h"><h2 data-t="lessonsH">Anim na aralin</h2></div>
-      <p class="swipe"><span data-t="swipe" style="animation:none">I-swipe ang tren</span> <span aria-hidden="true">→</span></p>
-      <div class="rail">
-        <div class="train" id="wagons">
-          <img class="engine" src="assets/train.webp" alt="">
-          <button type="button" class="wagon crayon"><img src="assets/mod-magbasa.webp" alt=""><b data-t="m1">Magbasa Tayo</b><span data-t="m1d">Mga kuwento, tula at awit</span><i></i><i></i></button>
-          <button type="button" class="wagon crayon"><img src="assets/mod-bilang.webp" alt=""><b data-t="m2">Bilang</b><span data-t="m2d">Lobo, prutas at mga numero</span><i></i><i></i></button>
-          <button type="button" class="wagon crayon"><img src="assets/mod-sarili.webp" alt=""><b data-t="m3">Ang Aking Sarili</b><span data-t="m3d">Ang pamilya at ang tahanan</span><i></i><i></i></button>
-          <button type="button" class="wagon crayon"><img src="assets/mod-sundan.webp" alt=""><b data-t="m4">Sundan Mo</b><span data-t="m4d">Matuto ng iyong ABC!</span><i></i><i></i></button>
-          <button type="button" class="wagon crayon"><img src="assets/mod-kulay.webp" alt=""><b data-t="m5">Masayang Pagkukulay</b><span data-t="m5d">Kulayan ang mga larawan</span><i></i><i></i></button>
-          <button type="button" class="wagon crayon"><img src="assets/mod-tandaan.webp" alt=""><b data-t="m6">Tandaan!</b><span data-t="m6d">Pag-ugnayin ang mga Pares</span><i></i><i></i></button>
-        </div>
-      </div>
-    </section>
+        <section>
+          <div class="sec-h"><h2 data-t="forH">Para sa teacher at magulang</h2></div>
+          <div class="safety">
+            <div class="safety-row">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 9h10M7 13h6M7 17h4"/></svg>
+              <div><b data-t="forT">Talaan ng Guro</b><span data-t="for1">May sariling Talaan ng Guro ang teacher: dito ini-enroll ang mga bata, nakikita ang progress ng bawat isa, at may login card para sa magulang.</span></div>
+            </div>
+            <div class="safety-row">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg>
+              <div><b data-t="forP">Para sa magulang</b><span data-t="for2">Ang teacher ang gumagawa ng account ng bata at nagbibigay ng login card. Gamit ang Username at password na nasa card, nasusundan ang progress kahit lumipat ng phone.</span></div>
+            </div>
+            <div class="safety-row">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
+              <div><b data-t="safeT">Privacy at kaligtasan</b><span data-t="safeD">Privacy Agreement (RA 10173), PIN ng guro, at kusang pag-lock kapag umalis sa app.</span></div>
+            </div>
+          </div>
+        </section>
 
-    <section>
-      <div class="h"><h2 data-t="aboutH">Tungkol sa app</h2></div>
-      <p data-t="about1">Ang E-Tarabay ay learning app para sa mga batang nasa daycare, edad 3 hanggang 5. Natututo silang magbasa, magbilang, sumulat at magkulay sa Ilocano, Filipino at English — at gumagana ito kahit walang internet.</p>
-      <p class="lede" data-t="about2">May bituin at medalya sa bawat natapos, at Sertipiko ng Pagtatapos kapag natapos ang lahat.</p>
-      <div class="chips"><span class="chip" data-t="chipEdu">Pang-edukasyon</span><span class="chip" data-t="chipKids">Para sa bata</span><span class="chip" data-t="chipDaycare">Daycare</span><span class="chip" data-t="chipOffline">Kahit offline</span></div>
-    </section>
-
-    <section>
-      <div class="h"><h2 data-t="forH">Para sa teacher at magulang</h2></div>
-      <div class="surface list">
-        <div class="row">
-          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 9h10M7 13h6M7 17h4"/></svg></span>
-          <div><b data-t="forT">Talaan ng Guro</b><span data-t="for1">May sariling Talaan ng Guro ang teacher: dito ini-enroll ang mga bata, nakikita ang progress ng bawat isa, at may login card para sa magulang.</span></div>
-        </div>
-        <div class="row" style="--tint: var(--tint-pink); --tone: var(--pink-deep)">
-          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg></span>
-          <div><b data-t="forP">Para sa magulang</b><span data-t="for2">Ang teacher ang gumagawa ng account ng bata at nagbibigay ng login card. Gamit ang Username at password na nasa card, nasusundan ang progress kahit lumipat ng phone.</span></div>
-        </div>
-        <div class="row" style="--tint: #EEF0FC; --tone: #4F5FC0">
-          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></span>
-          <div><b data-t="safeT">Privacy at kaligtasan</b><span data-t="safeD">Privacy Agreement (RA 10173), PIN ng guro, at kusang pag-lock kapag umalis sa app.</span></div>
-        </div>
+        <section id="newSection" hidden>
+          <div class="sec-h"><h2 data-t="newH">Ano ang bago</h2><span class="arrow" aria-hidden="true">→</span></div>
+          <div class="when" id="newWhen"></div>
+          <div class="notes" id="notes"></div>
+          <button type="button" class="more" id="more" data-t="more">Higit pa</button>
+        </section>
       </div>
-    </section>
 
-    <section id="newSection" hidden>
-      <div class="h"><h2 data-t="newH">Ano ang bago</h2></div>
-      <div class="surface new">
-        <p class="when"><em data-t="newBadge">Bago</em> <span id="newWhen"></span></p>
-        <div class="notes" id="notes"></div>
-        <button type="button" class="textbtn" id="more" data-t="more">Higit pa</button>
-      </div>
-    </section>
+      <div>
+        <section id="how">
+          <div class="sec-h"><h2 data-t="howH">Paano i-install</h2></div>
+          <div class="tut" id="tut" hidden>
+            <button type="button" class="tut-play" id="tutPlay" aria-label="Panoorin"><img src="assets/tutorial.jpg" alt=""><span aria-hidden="true">▶</span></button>
+            <div class="tut-text"><b data-t="tutTitle">Panoorin kung paano i‑install at i‑update</b><span data-t="tutLen">45 segundo · may caption</span></div>
+            <div class="tut-actions">
+              <button type="button" class="tut-watch" id="tutWatch" data-t="tutWatch">▶ Panoorin</button>
+              <button type="button" class="tut-skip" id="tutSkip" data-t="tutSkip">Laktawan</button>
+            </div>
+          </div>
+          <ol class="steps">
+            <li><span data-t="s1">Pindutin ang I-install sa itaas at hintaying matapos ang download.</span></li>
+            <li><span data-t="s2">Buksan ang na-download na file (E-Tarabay.apk) mula sa notification o sa Downloads.</span></li>
+            <li><span data-t="s3">Kapag itinanong, payagan ang "Install unknown apps" para sa browser mo, saka bumalik.</span></li>
+            <li><span data-t="s4">Pindutin ang Install, saka buksan ang E-Tarabay.</span></li>
+            <li><span data-t="s5">Mag-login gamit ang <strong>Username</strong> at <strong>password</strong> na nasa login card mula sa teacher. Wala pang card? Hingin ito sa teacher.</span></li>
+          </ol>
+          <button type="button" class="watch" id="tutAgain" data-t="tutLink">▶ Panoorin ang video tutorial</button>
+          <p class="tip" data-t="tipTeacher"><strong>Teacher ka?</strong> Sa login ng app, pindutin ang "Ipagpatuloy bilang Guro" sa ibaba.</p>
+          <p class="tip" data-t="tipUpdate"><strong>Pag-update:</strong> sa app na mismo. Kapag may abiso, pindutin ang I-update. Ilang MB lang ang download, at hindi nawawala ang stars, awards at progress ng bata.</p>
+          <p class="tip" data-t="tipOld"><strong>Kung v1.2.48 o mas luma ang nasa phone:</strong> i-uninstall muna ang lumang E-Tarabay bago i-install ito. Babalik ang stars, awards at progress pagka-sign in ulit.</p>
+        </section>
 
-    <section id="how">
-      <div class="h"><h2 data-t="howH">Paano i-install</h2></div>
-      <button type="button" class="surface tut" id="tutPlay">
-        <span class="thumb"><img src="assets/tutorial.jpg" alt=""><span><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg></span></span>
-        <span><b data-t="tutTitle">Panoorin kung paano i‑install at i‑update</b><small data-t="tutLen">45 segundo · may caption</small></span>
-      </button>
-      <div class="line-wrap" id="line">
-        <img class="rider" id="rider" src="assets/train.webp" alt="" aria-hidden="true">
-        <ol class="line">
-          <li><span class="stop">1</span><span data-t="s1">Pindutin ang I-install sa itaas at hintaying matapos ang download.</span></li>
-          <li><span class="stop">2</span><span data-t="s2">Buksan ang na-download na file (E-Tarabay.apk) mula sa notification o sa Downloads.</span></li>
-          <li><span class="stop">3</span><span data-t="s3">Kapag itinanong, payagan ang "Install unknown apps" para sa browser mo, saka bumalik.</span></li>
-          <li><span class="stop">4</span><span data-t="s4">Pindutin ang Install, saka buksan ang E-Tarabay.</span></li>
-          <li><span class="stop">5</span><span data-t="s5">Mag-login gamit ang <strong>Username</strong> at <strong>password</strong> na nasa login card mula sa teacher. Wala pang card? Hingin ito sa teacher.</span></li>
-        </ol>
+        <section>
+          <div class="sec-h"><h2 data-t="infoH">Impormasyon</h2></div>
+          <div class="info">
+            <div><b data-t="iVersion">Bersyon</b><span id="iVersion">—</span></div>
+            <div><b data-t="iUpdated">Na-update</b><span id="iUpdated">—</span></div>
+            <div><b data-t="iSize">Laki ng download</b><span id="iSize">—</span></div>
+            <div><b data-t="iNeeds">Kailangan</b><span data-t="iNeedsVal">Android 7.0 pataas</span></div>
+            <div><b data-t="iLangs">Mga wika</b><span>Ilocano, Filipino, English</span></div>
+            <div><b data-t="iPrice">Presyo</b><span data-t="iPriceVal">Libre</span></div>
+          </div>
+        </section>
       </div>
-      <div class="tips">
-        <p class="tip" data-t="tipTeacher"><strong>Teacher ka?</strong> Sa login ng app, pindutin ang "Ipagpatuloy bilang Guro" sa ibaba.</p>
-        <p class="tip" data-t="tipUpdate"><strong>Pag-update:</strong> sa app na mismo. Kapag may abiso, pindutin ang I-update. Ilang MB lang ang download, at hindi nawawala ang stars, awards at progress ng bata.</p>
-        <p class="tip" data-t="tipOld"><strong>Kung v1.2.48 o mas luma ang nasa phone:</strong> i-uninstall muna ang lumang E-Tarabay bago i-install ito. Babalik ang stars, awards at progress pagka-sign in ulit.</p>
-      </div>
-    </section>
-
-    <section>
-      <div class="h"><h2 data-t="infoH">Impormasyon</h2></div>
-      <div class="surface info">
-        <div><b data-t="iVersion">Bersyon</b><span id="iVersion">—</span></div>
-        <div><b data-t="iUpdated">Na-update</b><span id="iUpdated">—</span></div>
-        <div><b data-t="iSize">Laki ng download</b><span id="iSize">—</span></div>
-        <div><b data-t="iNeeds">Kailangan</b><span data-t="iNeedsVal">Android 7.0 pataas</span></div>
-        <div><b data-t="iLangs">Mga wika</b><span>Ilocano, Filipino, English</span></div>
-        <div><b data-t="iPrice">Presyo</b><span data-t="iPriceVal">Libre</span></div>
-      </div>
-    </section>
-
-    <footer>
-      <span data-t="foot">Lahat ng bersyon:</span>
-      <a href="https://github.com/Jaijr711/etarabay-releases/releases">github.com/Jaijr711/etarabay-releases</a>
-    </footer>
+    </div>
   </main>
+
+  <footer>
+    <span data-t="foot">Lahat ng bersyon:</span>
+    <a href="https://github.com/Jaijr711/etarabay-releases/releases">github.com/Jaijr711/etarabay-releases</a>
+  </footer>
 
   <div class="dock" id="dock" aria-hidden="true">
     <a id="dockGet" class="get" href="https://github.com/Jaijr711/etarabay-releases/releases/latest/download/E-Tarabay.apk" tabindex="-1">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
       <span id="dockLabel">I-install</span>
     </a>
   </div>
@@ -453,13 +400,13 @@
     <video id="tutVideo" playsinline controls preload="none" poster="assets/tutorial.jpg">
       <source src="assets/tutorial.mp4" type="video/mp4">
     </video>
-    <button type="button" id="playerSkip" data-t="close">Isara</button>
+    <button type="button" class="player-skip" id="playerSkip" data-t="tutSkip">Laktawan</button>
   </div>
   <div class="player" id="trailerPlayer" hidden role="dialog" aria-label="E-Tarabay">
     <video id="trailerVideo" playsinline controls preload="none" poster="assets/promo.jpg">
       <source src="assets/promo.mp4" type="video/mp4">
     </video>
-    <button type="button" id="trailerClose" data-t="close">Isara</button>
+    <button type="button" class="player-skip" id="trailerClose" data-t="close">Isara</button>
   </div>
 
   <script>
@@ -469,25 +416,22 @@
       var T = {
         fil: {
           tagline: 'Ang Kabataan ay Pag-asa ng Bayan',
-          sub: 'Learning app para sa daycare · Ilocano, Filipino, English',
-          bFree: 'Libre', bFreeL: 'Walang bayad', bAgeL: 'Edad ng bata', bOffL: 'Kahit walang internet',
-          bubble: 'Pindutin mo ako!', replay: '▶ Tren', skipIntro: 'Pindutin para laktawan',
-          stVersion: 'Bersyon',
+          tags: 'Pang-edukasyon · Para sa daycare · Libre',
+          stVersion: 'Bersyon', stSize: 'Laki', ageVal: '3–5', stAge: 'Edad',
+          stLang: 'Wika', stOffline: 'Kahit offline',
           install: 'I-install', update: 'I-update sa {v}',
-          under: 'Android 7.0 pataas',
+          under: 'Para sa Android 7.0 pataas',
           started: 'Nagsimula na ang download. Kapag tapos na, buksan ang file para i-install — tingnan ang mga hakbang sa ibaba.',
           bannerUpdate: 'May bagong update: bersyon {new}. Ang nasa phone mo: {old}. Pindutin ang I-update.',
           bannerCurrent: 'Pinakabago na ang app mo (bersyon {v}).',
           ios: '<strong>Para sa Android lamang ang E-Tarabay.</strong> Hindi ito magagamit sa iPhone o iPad.',
-          filmLabel: 'Panoorin ang app',
-          lessonsH: 'Anim na aralin', swipe: 'I-swipe ang tren',
           aboutH: 'Tungkol sa app',
           about1: 'Ang E-Tarabay ay learning app para sa mga batang nasa daycare, edad 3 hanggang 5. Natututo silang magbasa, magbilang, sumulat at magkulay sa Ilocano, Filipino at English — at gumagana ito kahit walang internet.',
           about2: 'May bituin at medalya sa bawat natapos, at Sertipiko ng Pagtatapos kapag natapos ang lahat.',
           m1: 'Magbasa Tayo', m2: 'Bilang', m3: 'Ang Aking Sarili', m4: 'Sundan Mo', m5: 'Masayang Pagkukulay', m6: 'Tandaan!',
           m1d: 'Mga kuwento, tula at awit', m2d: 'Lobo, prutas at mga numero', m3d: 'Ang pamilya at ang tahanan',
           m4d: 'Matuto ng iyong ABC!', m5d: 'Kulayan ang mga larawan', m6d: 'Pag-ugnayin ang mga Pares',
-          chipEdu: 'Pang-edukasyon', chipKids: 'Para sa bata', chipDaycare: 'Daycare',
+          ageLabel: 'Edad 3–5', chipEdu: 'Pang-edukasyon', chipKids: 'Para sa bata', chipDaycare: 'Daycare',
           chipOffline: 'Kahit offline', forT: 'Talaan ng Guro', forP: 'Para sa magulang',
           safeT: 'Privacy at kaligtasan',
           safeD: 'Privacy Agreement (RA 10173), PIN ng guro, at kusang pag-lock kapag umalis sa app.',
@@ -495,7 +439,7 @@
           forH: 'Para sa teacher at magulang',
           for1: 'May sariling Talaan ng Guro ang teacher: dito ini-enroll ang mga bata, nakikita ang progress ng bawat isa, at may login card para sa magulang.',
           for2: 'Ang teacher ang gumagawa ng account ng bata at nagbibigay ng login card. Gamit ang Username at password na nasa card, nasusundan ang progress kahit lumipat ng phone.',
-          newH: 'Ano ang bago', newBadge: 'Bago', more: 'Higit pa', less: 'Mas kaunti',
+          newH: 'Ano ang bago', more: 'Higit pa', less: 'Mas kaunti',
           released: 'Bersyon {v} · {d}',
           howH: 'Paano i-install',
           s1: 'Pindutin ang I-install sa itaas at hintaying matapos ang download.',
@@ -509,6 +453,7 @@
           tipUpdate: '<strong>Pag-update:</strong> sa app na mismo. Kapag may abiso, pindutin ang I-update. Ilang MB lang ang download, at hindi nawawala ang stars, awards at progress ng bata.',
           tutTitle: 'Panoorin kung paano i‑install at i‑update',
           tutLen: '45 segundo · may caption',
+          tutWatch: '▶ Panoorin', tutSkip: 'Laktawan', tutLink: '▶ Panoorin ang video tutorial',
           tipOld: '<strong>Kung v1.2.48 o mas luma ang nasa phone:</strong> i-uninstall muna ang lumang E-Tarabay bago i-install ito. Babalik ang stars, awards at progress pagka-sign in ulit.',
           infoH: 'Impormasyon', iVersion: 'Bersyon', iUpdated: 'Na-update', iSize: 'Laki ng download',
           iNeeds: 'Kailangan', iNeedsVal: 'Android 7.0 pataas', iLangs: 'Mga wika',
@@ -518,25 +463,22 @@
         },
         en: {
           tagline: 'The youth is the hope of the nation',
-          sub: 'Learning app for daycare · Ilocano, Filipino, English',
-          bFree: 'Free', bFreeL: 'No cost', bAgeL: "Child's age", bOffL: 'Works without internet',
-          bubble: 'Tap me!', replay: '▶ Train', skipIntro: 'Tap to skip',
-          stVersion: 'Version',
+          tags: 'Education · For daycare · Free',
+          stVersion: 'Version', stSize: 'Size', ageVal: '3–5', stAge: 'Ages',
+          stLang: 'Languages', stOffline: 'Works offline',
           install: 'Install', update: 'Update to {v}',
-          under: 'Android 7.0 and up',
+          under: 'For Android 7.0 and up',
           started: 'The download has started. When it is done, open the file to install it — see the steps below.',
           bannerUpdate: 'A new update is out: version {new}. Your phone has {old}. Tap Update.',
           bannerCurrent: 'Your app is up to date (version {v}).',
           ios: '<strong>E-Tarabay is for Android only.</strong> It cannot be used on an iPhone or iPad.',
-          filmLabel: 'Watch the app',
-          lessonsH: 'Six lessons', swipe: 'Swipe the train',
           aboutH: 'About this app',
           about1: 'E-Tarabay is a learning app for daycare children aged 3 to 5. They learn to read, count, write and colour in Ilocano, Filipino and English — and it works without internet.',
           about2: 'Every finished activity earns stars and medals, and finishing everything earns a Certificate of Completion.',
           m1: "Let's Read", m2: 'Numbers', m3: 'About Me', m4: 'Trace It', m5: 'Color Fun', m6: 'Remember It!',
           m1d: 'Stories, poems and songs', m2d: 'Balloons, fruit and numbers', m3d: 'Family and home',
           m4d: 'Learn your ABC!', m5d: 'Colour the pictures', m6d: 'Match the pairs',
-          chipEdu: 'Education', chipKids: 'For kids', chipDaycare: 'Daycare',
+          ageLabel: 'Ages 3–5', chipEdu: 'Education', chipKids: 'For kids', chipDaycare: 'Daycare',
           chipOffline: 'Works offline', forT: 'Class dashboard', forP: 'For parents',
           safeT: 'Privacy and safety',
           safeD: "Privacy Agreement (RA 10173), the teacher's PIN, and a lock when the app is left.",
@@ -544,7 +486,7 @@
           forH: 'For teachers and parents',
           for1: "The teacher has a class dashboard: enrol the children, see each child's progress, and print a login card for parents.",
           for2: "The teacher makes the child's account and gives a login card. With the Username and password on the card, progress follows the child even on a new phone.",
-          newH: "What's new", newBadge: 'New', more: 'More', less: 'Less',
+          newH: "What's new", more: 'More', less: 'Less',
           released: 'Version {v} · {d}',
           howH: 'How to install',
           s1: 'Tap Install above and wait for the download to finish.',
@@ -558,6 +500,7 @@
           tipUpdate: "<strong>Updating:</strong> inside the app. When it says an update is out, tap Update. Only a few MB download, and the child's stars, awards and progress stay.",
           tutTitle: 'Watch how to install and update',
           tutLen: '45 seconds · captions in Filipino',
+          tutWatch: '▶ Watch', tutSkip: 'Skip', tutLink: '▶ Watch the video tutorial',
           tipOld: '<strong>If the phone has v1.2.48 or older:</strong> uninstall the old E-Tarabay first, then install this one. Stars, awards and progress come back when you sign in.',
           infoH: 'Information', iVersion: 'Version', iUpdated: 'Updated', iSize: 'Download size',
           iNeeds: 'Requires', iNeedsVal: 'Android 7.0 and up', iLangs: 'Languages',
@@ -599,9 +542,11 @@
         }
         return 0;
       }
+
       function latestVersion() {
         return release ? String(release.tag_name || '').replace(/^v/, '') : '';
       }
+
       function formatDate(iso) {
         var d = new Date(iso);
         if (isNaN(d)) return '';
@@ -618,6 +563,7 @@
         document.querySelectorAll('.lang button').forEach(function (b) {
           b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === lang));
         });
+
         var latest = latestVersion();
         var needsUpdate = installed && latest && compare(latest, installed) > 0;
         var upToDate = installed && latest && !needsUpdate;
@@ -627,6 +573,7 @@
         $('bannerCurrent').hidden = !upToDate;
         if (needsUpdate) $('bannerUpdateText').textContent = fill(t.bannerUpdate, { 'new': latest, old: installed });
         if (upToDate) $('bannerCurrentText').textContent = fill(t.bannerCurrent, { v: installed });
+
         if (release) {
           var date = formatDate(release.published_at);
           $('iUpdated').textContent = date || '—';
@@ -636,10 +583,11 @@
       }
 
       // Release notes as plain lines: "- " starts a bullet, a short line
-      // just before bullets is their heading, "---" is dropped. In the chosen
-      // language only: the notes are Filipino first, then "---", then English;
-      // above them sit the Filipino "Mula v…" lines, their English "From v…"
-      // twin, and a download line that is this very page.
+      // just before bullets is their heading, "---" is dropped.
+      // In the chosen language only. The notes are written Filipino first,
+      // then "---", then the same in English; above them sit the Filipino
+      // "Mula v…" lines, their English "From v…" twin, and a download line
+      // that is this very page.
       function renderNotes(body) {
         var all = String(body || '').replace(/\r/g, '').split('\n');
         var cut = -1;
@@ -695,100 +643,16 @@
         $('notes').classList.toggle('open');
         render();
       });
-      $('get').addEventListener('click', function () { $('started').hidden = false; });
-      $('dockGet').addEventListener('click', function () { $('started').hidden = false; });
 
-      // ---- The train that opens the page --------------------------------
-      // The page waits blurred under a veil; the logo's train drives across
-      // from the right and the blur thins out behind its last wagon. Sound
-      // plays only where the browser allows it before a tap; "Tren" in the
-      // bar plays it all again, with sound.
-      var intro = $('intro'), veil = $('veil'), loco = $('loco'), skip = $('skip');
-      var running = null, sound = null;
-      function hush() {
-        if (!sound || sound.paused) return;
-        var v = sound.volume;
-        var fade = setInterval(function () {
-          v -= 0.12;
-          if (v <= 0) { clearInterval(fade); sound.pause(); return; }
-          sound.volume = v;
-        }, 30);
-      }
-      function finish() {
-        if (running) cancelAnimationFrame(running);
-        running = null;
-        intro.hidden = true;
-        hush();
-      }
-      function play() {
-        if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) { finish(); return; }
-        intro.hidden = false;
-        veil.style.webkitMaskImage = veil.style.maskImage = 'none';
-        skip.style.opacity = 1;
-        intro.querySelectorAll('.puff').forEach(function (p) { p.remove(); });
-        try {
-          if (!sound) { sound = new Audio('assets/train.mp3'); }
-          sound.currentTime = 0; sound.volume = 1;
-          var pr = sound.play();
-          if (pr && pr.catch) pr.catch(function () { /* not allowed yet: silent */ });
-        } catch (e) { /* no sound here */ }
-        var start = null, DUR = 2600, lastPuff = 0;
-        function frame(t) {
-          if (start === null) start = t;
-          var vw = innerWidth, w = loco.offsetWidth || 300, h = loco.offsetHeight || 220;
-          var p = Math.min(1, (t - start) / DUR);
-          var e = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
-          var x = vw + 20 - e * (vw + w + 40);
-          var bob = Math.abs(Math.sin(t / 95)) * -5;
-          loco.style.transform = 'translate(' + x + 'px,' + (-h / 2 + bob) + 'px)';
-          var tail = x + w * .92, soft = Math.max(80, w * .45);
-          var g = 'linear-gradient(90deg, #000 ' + (tail - soft) + 'px, rgba(0,0,0,.55) ' + (tail - soft * .45) + 'px, transparent ' + tail + 'px)';
-          veil.style.webkitMaskImage = g; veil.style.maskImage = g;
-          skip.style.opacity = Math.max(0, Math.min(1, (tail - 40) / (vw * .5)));
-          if (sound) sound.volume = Math.max(0, Math.min(1, 1.15 - p * .35));
-          if (t - lastPuff > 170 && x < vw) {
-            lastPuff = t;
-            var s = document.createElement('span');
-            s.className = 'puff';
-            s.style.left = (x + w * .16) + 'px';
-            s.style.top = (innerHeight / 2 - h / 2 + bob + h * .3) + 'px';
-            intro.appendChild(s);
-            setTimeout(function () { s.remove(); }, 1200);
-          }
-          if (p < 1) running = requestAnimationFrame(frame); else finish();
-        }
-        running = requestAnimationFrame(frame);
-      }
-      intro.addEventListener('pointerdown', finish);
-      document.addEventListener('keydown', function () { if (!intro.hidden) finish(); });
-      $('replay').addEventListener('click', function () { scrollTo(0, 0); play(); });
-      if (!intro.hidden) {
-        if (loco.complete) play();
-        else { loco.addEventListener('load', play); loco.addEventListener('error', finish); }
-        // Never stuck behind the veil, whatever happens to the animation.
-        setTimeout(function () { if (!running) finish(); }, 4000);
-      }
-
-      // Wagons hop when pressed.
-      $('wagons').addEventListener('click', function (e) {
-        var w = e.target.closest('.wagon');
-        if (!w) return;
-        w.classList.remove('hop'); void w.offsetWidth; w.classList.add('hop');
+      $('get').addEventListener('click', function () {
+        $('started').hidden = false;
+      });
+      $('dockGet').addEventListener('click', function () {
+        $('started').hidden = false;
       });
 
-      // The little train riding down the install stations.
-      var line = $('line'), rider = $('rider');
-      function ride() {
-        var r = line.getBoundingClientRect();
-        var p = Math.max(0, Math.min(1, (innerHeight * .55 - r.top) / Math.max(1, r.height)));
-        rider.style.top = (40 + p * (r.height - 80)) + 'px';
-      }
-      addEventListener('scroll', ride, { passive: true });
-      addEventListener('resize', ride);
-      ride();
-
-      // The dock: once the big button has scrolled out of sight, and never
-      // on an iPhone, which cannot install it.
+      // The dock: on a phone, once the big button has scrolled out of
+      // sight, and never on an iPhone, which cannot install it.
       var dock = $('dock');
       if ('IntersectionObserver' in window) {
         new IntersectionObserver(function (entries) {
@@ -796,48 +660,70 @@
           dock.classList.toggle('show', away);
           dock.setAttribute('aria-hidden', String(!away));
           $('dockGet').tabIndex = away ? 0 : -1;
+          document.body.classList.toggle('docked', away);
         }).observe($('get'));
       }
 
-      // The trailer, played full screen from a tap.
+      // The trailer, first in the row: played full screen, from a tap.
       var trailerPlayer = $('trailerPlayer'), trailerVideo = $('trailerVideo');
       $('trailer').addEventListener('click', function () {
         trailerPlayer.hidden = false;
         var playing = trailerVideo.play();
         if (playing && playing.catch) playing.catch(function () { /* the controls stay */ });
       });
-      function closeTrailer() { trailerVideo.pause(); trailerPlayer.hidden = true; }
+      function closeTrailer() {
+        trailerVideo.pause();
+        trailerPlayer.hidden = true;
+      }
       $('trailerClose').addEventListener('click', closeTrailer);
       trailerVideo.addEventListener('ended', closeTrailer);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !trailerPlayer.hidden) closeTrailer();
+      });
 
-      // Screenshots open large.
       var zoom = $('zoom');
       document.querySelectorAll('#shots .shot img').forEach(function (img) {
         img.parentNode.addEventListener('click', function () {
           zoom.querySelector('img').src = img.src;
-          zoom.querySelector('img').alt = img.alt;
           zoom.hidden = false;
         });
       });
       zoom.addEventListener('click', function () { zoom.hidden = true; });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') zoom.hidden = true;
+      });
 
-      // The install and update tutorial.
-      var player = $('player'), tutVideo = $('tutVideo');
+      // The tutorial: offered once on a phone's first visit. Sound needs a
+      // tap, so it only ever starts from one. Skipping or finishing it
+      // means it is not offered again; the link under the steps still is.
+      var TUT_KEY = 'etarabay-tutorial';
+      var tut = $('tut'), player = $('player'), tutVideo = $('tutVideo');
+      var seen = false;
+      try { seen = localStorage.getItem(TUT_KEY) === 'seen'; } catch (e) { /* fine */ }
+      tut.hidden = seen;
+      function markSeen() {
+        tut.hidden = true;
+        try { localStorage.setItem(TUT_KEY, 'seen'); } catch (e) { /* fine */ }
+      }
       function openPlayer() {
         player.hidden = false;
         try { tutVideo.currentTime = 0; } catch (e) { /* not loaded yet */ }
         var playing = tutVideo.play();
         if (playing && playing.catch) playing.catch(function () { /* the controls stay */ });
       }
-      function closePlayer() { tutVideo.pause(); player.hidden = true; }
+      function closePlayer() {
+        tutVideo.pause();
+        player.hidden = true;
+        markSeen();
+      }
       $('tutPlay').addEventListener('click', openPlayer);
+      $('tutWatch').addEventListener('click', openPlayer);
+      $('tutAgain').addEventListener('click', openPlayer);
+      $('tutSkip').addEventListener('click', markSeen);
       $('playerSkip').addEventListener('click', closePlayer);
       tutVideo.addEventListener('ended', closePlayer);
       document.addEventListener('keydown', function (e) {
-        if (e.key !== 'Escape') return;
-        if (!player.hidden) closePlayer();
-        if (!trailerPlayer.hidden) closeTrailer();
-        zoom.hidden = true;
+        if (e.key === 'Escape' && !player.hidden) closePlayer();
       });
 
       // iPadOS reports itself as a Mac; a Mac has no touch screen.
@@ -855,7 +741,8 @@
 
       // This page's own copy of the newest release, written at each release
       // in the shape GitHub's API gives. GitHub answers only 60 times an hour
-      // for one address, and a daycare's phones share one.
+      // for one address, and a daycare's phones share one: past that the
+      // version, size and date showed a dash.
       function getJson(url, opts) {
         return fetch(url, opts).then(function (r) { return r.ok ? r.json() : null; });
       }
@@ -895,14 +782,13 @@
 
       // Nothing could say the version: no dashes, the rows simply go.
       function hideUnknown() {
-        ['iVersion', 'iUpdated', 'iSize'].forEach(function (id) {
+        ['stVersion', 'stSize', 'iVersion', 'iUpdated', 'iSize'].forEach(function (id) {
           var el = $(id);
-          if (el && el.textContent === '—') el.parentNode.style.display = 'none';
+          if (el && el.textContent === '\u2014') el.parentNode.style.display = 'none';
         });
-        var meta = document.querySelector('.meta');
-        if ($('stVersion').textContent === '—') meta.style.display = 'none';
       }
     })();
   </script>
+
 </body>
 </html>
