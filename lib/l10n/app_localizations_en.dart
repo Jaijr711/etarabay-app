@@ -2640,4 +2640,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get awardsAllClaimed => 'Well done! You have every medal!';
+
+  @override
+  String missingFields(String fields) {
+    return 'Still missing: $fields';
+  }
+
+  @override
+  String checkFields(String fields) {
+    return 'Please check: $fields';
+  }
+
+  @override
+  String get fieldRequired => 'Required';
+
+  @override
+  String get nameLettersOnly => 'Letters only, at least 2';
+
+  @override
+  String get birthdayAgeCheck =>
+      'Check the birthday: the child should be 2 to 7 years old';
+
+  @override
+  String get contactStart09 => '11 digits starting with 09';
+
+  @override
+  String get genderRequired => 'Choose boy or girl';
+
+  @override
+  String get infoIncomplete => 'Info incomplete';
 }

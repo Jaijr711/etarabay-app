@@ -911,5 +911,13 @@
   "updatePreparingBody": "Sandali lang. Huwag munang isara ang app.",
   "claimYouGotIt": "Nakuha mo!",
   "awardsKeepPlaying": "Maglaro pa para sa susunod na medalya!",
-  "awardsAllClaimed": "Galing! Nakuha mo na ang lahat ng medalya!"
+  "awardsAllClaimed": "Galing! Nakuha mo na ang lahat ng medalya!",
+  "missingFields": "Kulang pa: {fields}",
+  "checkFields": "Pakitingnan: {fields}",
+  "fieldRequired": "Kailangan ito",
+  "nameLettersOnly": "Mga titik lang, hindi bababa sa 2",
+  "birthdayAgeCheck": "Pakitingnan ang birthday: dapat 2 hanggang 7 taong gulang ang bata",
+  "contactStart09": "11 numero, nagsisimula sa 09",
+  "genderRequired": "Piliin kung lalaki o babae",
+  "infoIncomplete": "Kulang ang info"
 }

@@ -15,6 +15,7 @@ import '../services/teacher_privacy.dart';
 import '../services/test_account.dart';
 import '../services/update_checker.dart';
 import '../utils/constants.dart';
+import '../utils/student_info_check.dart';
 import '../widgets/staggered_entrance.dart';
 import '../widgets/cached_avatar.dart';
 import '../widgets/how_to_video.dart';
@@ -269,6 +270,77 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
     super.dispose();
   }
 
+  /// The name a teacher sees for a field, in the summary of what is missing.
+  String _fieldLabel(StudentField f, {String? nameLabel}) {
+    final loc = AppLocalizations.of(context)!;
+    switch (f) {
+      case StudentField.firstName:
+        return nameLabel ?? loc.firstName;
+      case StudentField.lastName:
+        return loc.lastName;
+      case StudentField.middleName:
+        return loc.middleName;
+      case StudentField.gender:
+        return loc.gender;
+      case StudentField.birthday:
+        return loc.birthday;
+      case StudentField.parentName:
+        return loc.parentNameLabel;
+      case StudentField.parentContact:
+        return loc.parentContactLabel;
+    }
+  }
+
+  Widget _errorLine(String? text) => text == null
+      ? const SizedBox.shrink()
+      : Padding(
+          padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
+          child: Text(text,
+              style: const TextStyle(
+                  fontSize: 12, color: Color(0xFFD93A3A), height: 1.3)),
+        );
+
+  /// The line under a field that is not good yet, or null when it is.
+  String? _fieldError(
+      Map<StudentField, StudentFieldProblem> problems, StudentField f) {
+    final loc = AppLocalizations.of(context)!;
+    final problem = problems[f];
+    if (problem == null) return null;
+    if (problem == StudentFieldProblem.missing) {
+      return f == StudentField.gender ? loc.genderRequired : loc.fieldRequired;
+    }
+    switch (f) {
+      case StudentField.birthday:
+        return loc.birthdayAgeCheck;
+      case StudentField.parentContact:
+        return loc.contactStart09;
+      default:
+        return loc.nameLettersOnly;
+    }
+  }
+
+  /// One line naming every field still to fix: "Kulang pa: Kaarawan,
+  /// Kasarian". It used to say only "fill in all the fields", and a
+  /// teacher had to hunt for which.
+  void _showProblems(Map<StudentField, StudentFieldProblem> problems,
+      {String? nameLabel}) {
+    final loc = AppLocalizations.of(context)!;
+    String names(StudentFieldProblem kind) => problems.entries
+        .where((e) => e.value == kind)
+        .map((e) => _fieldLabel(e.key, nameLabel: nameLabel))
+        .join(', ');
+    final missing = names(StudentFieldProblem.missing);
+    final wrong = names(StudentFieldProblem.invalid);
+    _showStatusDialog(
+      [
+        if (missing.isNotEmpty) loc.missingFields(missing),
+        if (wrong.isNotEmpty) loc.checkFields(wrong),
+      ].join('\n'),
+      LucideIcons.triangle_alert,
+      Colors.orange,
+    );
+  }
+
   void _showStatusDialog(String message, IconData icon, Color color) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -307,9 +379,13 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
     final parentNameController = TextEditingController();
     final parentContactController = TextEditingController();
     DateTime? selectedBirthday;
-    String selectedGender = 'Male';
+    // Nobody's choice until the teacher makes it. It used to start as boy,
+    // so a child could be saved as one without anyone having said so.
+    String? selectedGender;
     String selectedAvatar = 'boy1';
     int currentStep = 0;
+    // What the last "Next" found still to fix, shown under each field.
+    var problems = <StudentField, StudentFieldProblem>{};
     // The parent's yes to keeping these details. Nothing is enrolled
     // without it.
     bool consented = false;
@@ -369,9 +445,11 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                           selectedAvatar = preset;
                           selectedGender =
                               preset.startsWith('girl') ? 'Female' : 'Male';
+                          problems.remove(StudentField.gender);
                         });
                       },
                     ),
+                    _errorLine(_fieldError(problems, StudentField.gender)),
                     const SizedBox(height: 20),
                     _buildSectionHeader(
                         AppLocalizations.of(context)!.studentInformation),
@@ -380,18 +458,42 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                         controller: firstNameController,
                         label: AppLocalizations.of(context)!.firstName,
                         icon: LucideIcons.user,
+                        errorText:
+                            _fieldError(problems, StudentField.firstName),
+                        onChanged: (_) {
+                          if (problems.containsKey(StudentField.firstName)) {
+                            setSheetState(
+                                () => problems.remove(StudentField.firstName));
+                          }
+                        },
                       ),
                       const SizedBox(height: 14),
                       _buildTextField(
                         controller: middleNameController,
                         label: AppLocalizations.of(context)!.middleName,
                         icon: LucideIcons.user,
+                        errorText:
+                            _fieldError(problems, StudentField.middleName),
+                        onChanged: (_) {
+                          if (problems.containsKey(StudentField.middleName)) {
+                            setSheetState(
+                                () => problems.remove(StudentField.middleName));
+                          }
+                        },
                       ),
                       const SizedBox(height: 14),
                       _buildTextField(
                         controller: lastNameController,
                         label: AppLocalizations.of(context)!.lastName,
                         icon: LucideIcons.user,
+                        errorText:
+                            _fieldError(problems, StudentField.lastName),
+                        onChanged: (_) {
+                          if (problems.containsKey(StudentField.lastName)) {
+                            setSheetState(
+                                () => problems.remove(StudentField.lastName));
+                          }
+                        },
                       ),
                       const SizedBox(height: 14),
                       InkWell(
@@ -409,14 +511,19 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                             lastDate: DateTime.now(),
                           );
                           if (picked != null) {
-                            setSheetState(() => selectedBirthday = picked);
+                            setSheetState(() {
+                              selectedBirthday = picked;
+                              problems.remove(StudentField.birthday);
+                            });
                           }
                         },
                         child: InputDecorator(
                           decoration: _inputDecoration(
                             label: AppLocalizations.of(context)!.birthday,
                             icon: LucideIcons.cake,
-                          ),
+                          ).copyWith(
+                              errorText: _fieldError(
+                                  problems, StudentField.birthday)),
                           child: Text(
                             selectedBirthday == null
                                 ? AppLocalizations.of(context)!.notSet
@@ -444,6 +551,14 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                         controller: parentNameController,
                         label: AppLocalizations.of(context)!.parentNameLabel,
                         icon: LucideIcons.users,
+                        errorText:
+                            _fieldError(problems, StudentField.parentName),
+                        onChanged: (_) {
+                          if (problems.containsKey(StudentField.parentName)) {
+                            setSheetState(
+                                () => problems.remove(StudentField.parentName));
+                          }
+                        },
                       ),
                       const SizedBox(height: 14),
                       _buildTextField(
@@ -456,6 +571,15 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly
                         ],
+                        errorText:
+                            _fieldError(problems, StudentField.parentContact),
+                        onChanged: (_) {
+                          if (problems
+                              .containsKey(StudentField.parentContact)) {
+                            setSheetState(() =>
+                                problems.remove(StudentField.parentContact));
+                          }
+                        },
                       ),
                     ]),
                   ],
@@ -479,31 +603,47 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
             }
           }
 
-          /// The parent's name and a reachable number, checked on the way
+          /// Everything about the child: names, gender, birthday. A first
+          /// and a last name were all this used to ask for.
+          bool validateChild() {
+            final found = StudentInfoCheck.child(
+              firstName: firstNameController.text,
+              lastName: lastNameController.text,
+              middleName: middleNameController.text,
+              gender: selectedGender,
+              birthday: selectedBirthday,
+            );
+            if (found.isEmpty) return true;
+            setSheetState(() => problems = found);
+            _showProblems(found);
+            return false;
+          }
+
+          /// The parent's name and a reachable 09 number, checked on the way
           /// to the consent step.
           bool validateParent() {
-            if (parentNameController.text.trim().isEmpty ||
-                parentContactController.text.trim().isEmpty) {
-              _showStatusDialog(
-                AppLocalizations.of(context)!.fillAllFields,
-                LucideIcons.triangle_alert,
-                Colors.orange,
-              );
-              return false;
-            }
-            if (parentContactController.text.trim().length != 11) {
-              _showStatusDialog(
-                AppLocalizations.of(context)!.contactLengthError,
-                LucideIcons.triangle_alert,
-                Colors.orange,
-              );
-              return false;
-            }
-            return true;
+            final found = StudentInfoCheck.parent(
+              parentName: parentNameController.text,
+              parentContact: parentContactController.text,
+            );
+            if (found.isEmpty) return true;
+            setSheetState(() => problems = found);
+            _showProblems(found);
+            return false;
           }
 
           Future<void> submit() async {
-            if (!consented || !validateParent()) return;
+            if (!consented) return;
+            // Checked again here, so no way through the steps saves a child
+            // with something missing.
+            if (!validateChild()) {
+              setSheetState(() => currentStep = 0);
+              return;
+            }
+            if (!validateParent()) {
+              setSheetState(() => currentStep = 1);
+              return;
+            }
             // Minted at the end rather than on the way past a step that only
             // displayed it.
             if (lrnController.text.trim().isEmpty) {
@@ -545,7 +685,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
               name: fullName,
               middleName: mid,
               lrn: lrnController.text.trim(),
-              gender: selectedGender,
+              gender: selectedGender!,
               username: usernameController.text,
               birthday: selectedBirthday,
               parentName: parentNameController.text.trim(),
@@ -583,17 +723,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
 
           void goNext() {
             // Validate the current step before advancing.
-            if (currentStep == 0) {
-              if (firstNameController.text.trim().isEmpty ||
-                  lastNameController.text.trim().isEmpty) {
-                _showStatusDialog(
-                  AppLocalizations.of(context)!.fillAllFields,
-                  LucideIcons.triangle_alert,
-                  Colors.orange,
-                );
-                return;
-              }
-            }
+            if (currentStep == 0 && !validateChild()) return;
             if (currentStep == 1 && !validateParent()) return;
             FocusScope.of(sheetStateContext).unfocus();
             setSheetState(() => currentStep++);
@@ -1026,6 +1156,8 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
           selectedGender.toLowerCase() == 'female' ? 'girl1' : 'boy1';
     }
     int tab = 0;
+    // What the last save found still to fix, shown under each field.
+    var problems = <StudentField, StudentFieldProblem>{};
 
     // As the sheet opened, so the save knows whether there is anything new.
     final startName = nameController.text;
@@ -1098,7 +1230,9 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                       controller: nameController,
                       label: loc.fullName,
                       icon: LucideIcons.user,
-                      onChanged: (_) => setSheetState(() {}),
+                      errorText: _fieldError(problems, StudentField.firstName),
+                      onChanged: (_) => setSheetState(
+                          () => problems.remove(StudentField.firstName)),
                     ),
                     const SizedBox(height: 14),
                     InkWell(
@@ -1116,7 +1250,10 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                           lastDate: DateTime.now(),
                         );
                         if (picked != null) {
-                          setSheetState(() => selectedBirthday = picked);
+                          setSheetState(() {
+                            selectedBirthday = picked;
+                            problems.remove(StudentField.birthday);
+                          });
                         }
                       },
                       child: InputDecorator(
@@ -1124,6 +1261,8 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                           label: loc.birthday,
                           icon: LucideIcons.cake,
                         ).copyWith(
+                          errorText:
+                              _fieldError(problems, StudentField.birthday),
                           // Covered like the parent's number until asked for.
                           suffixIcon: selectedBirthday == null
                               ? null
@@ -1235,7 +1374,9 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                       controller: parentNameController,
                       label: loc.parentNameLabel,
                       icon: LucideIcons.users,
-                      onChanged: (_) => setSheetState(() {}),
+                      errorText: _fieldError(problems, StudentField.parentName),
+                      onChanged: (_) => setSheetState(
+                          () => problems.remove(StudentField.parentName)),
                     ),
                     const SizedBox(height: 14),
                     _buildTextField(
@@ -1249,7 +1390,10 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                       obscure: hideContact,
                       onToggleObscure: () =>
                           setSheetState(() => hideContact = !hideContact),
-                      onChanged: (_) => setSheetState(() {}),
+                      errorText:
+                          _fieldError(problems, StudentField.parentContact),
+                      onChanged: (_) => setSheetState(
+                          () => problems.remove(StudentField.parentContact)),
                     ),
                   ]),
                   note(LucideIcons.shield_check, loc.parentNumberUse),
@@ -1500,22 +1644,46 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
           }
 
           Future<void> saveUpdate() async {
-            if (nameController.text.trim().isEmpty ||
-                parentNameController.text.trim().isEmpty ||
-                parentContactController.text.trim().isEmpty) {
-              _showStatusDialog(
-                loc.fillAllFields,
-                LucideIcons.triangle_alert,
-                Colors.orange,
-              );
-              return;
+            // The same rule as enrolment. A birthday may not be taken away;
+            // the age range is checked only on one typed in now, so a child
+            // enrolled years ago is not refused for having grown.
+            final found = <StudentField, StudentFieldProblem>{};
+            final typedName = nameController.text.trim();
+            if (typedName.isEmpty) {
+              found[StudentField.firstName] = StudentFieldProblem.missing;
+            } else if (!StudentInfoCheck.validName(typedName)) {
+              found[StudentField.firstName] = StudentFieldProblem.invalid;
             }
-            if (parentContactController.text.trim().length != 11) {
-              _showStatusDialog(
-                loc.contactLengthError,
-                LucideIcons.triangle_alert,
-                Colors.orange,
-              );
+            final childCheck = StudentInfoCheck.child(
+              firstName: 'Ok',
+              lastName: 'Ok',
+              gender: selectedGender,
+              birthday: selectedBirthday,
+            );
+            for (final f in [StudentField.gender, StudentField.birthday]) {
+              final problem = childCheck[f];
+              if (problem == null) continue;
+              if (f == StudentField.birthday &&
+                  problem == StudentFieldProblem.invalid &&
+                  selectedBirthday == startBirthday) {
+                continue;
+              }
+              found[f] = problem;
+            }
+            found.addAll(StudentInfoCheck.parent(
+              parentName: parentNameController.text,
+              parentContact: parentContactController.text,
+            ));
+            if (found.isNotEmpty) {
+              final childSide = found.keys.any((f) =>
+                  f == StudentField.firstName ||
+                  f == StudentField.gender ||
+                  f == StudentField.birthday);
+              setSheetState(() {
+                problems = found;
+                tab = childSide ? 0 : 1;
+              });
+              _showProblems(found, nameLabel: loc.fullName);
               return;
             }
             final name = nameController.text.trim();
@@ -1894,6 +2062,14 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
         borderRadius: BorderRadius.circular(14),
         borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
       ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Color(0xFFD93A3A), width: 1.5),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Color(0xFFD93A3A), width: 1.5),
+      ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
@@ -1909,6 +2085,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
     ValueChanged<String>? onChanged,
     bool obscure = false,
     VoidCallback? onToggleObscure,
+    String? errorText,
   }) {
     final loc = AppLocalizations.of(context)!;
     return TextField(
@@ -1917,6 +2094,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
       obscureText: obscure,
       decoration: _inputDecoration(label: label, icon: icon).copyWith(
         hintText: hintText,
+        errorText: errorText,
         counterText: maxLength != null ? '' : null,
         // A child's private detail, covered until the teacher asks for it.
         suffixIcon: onToggleObscure == null
@@ -2013,7 +2191,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
   /// Boy or girl. The picture itself is the child's to choose, at their
   /// first sign-in and from their profile, so the teacher sets only this.
   Widget _buildGenderPicker({
-    required String selectedGender,
+    required String? selectedGender,
     required Function(String) onSelect,
   }) {
     // Translated labels: these were once English literals in a Filipino
@@ -2027,8 +2205,9 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
       children: List.generate(options.length, (i) {
         final preset = options[i].key;
         final label = options[i].label;
-        final isSelected = preset.startsWith('girl') ==
-            (selectedGender.toLowerCase() == 'female');
+        final isSelected = selectedGender != null &&
+            preset.startsWith('girl') ==
+                (selectedGender.toLowerCase() == 'female');
         return Expanded(
           child: Padding(
             padding: EdgeInsets.only(
@@ -2617,6 +2796,9 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                                   hasNewCertificate: hasNewCertificate,
                                   testAccount:
                                       studentData[TestAccount.field] == true,
+                                  infoIncomplete: StudentInfoCheck
+                                      .missingInRecord(studentData)
+                                      .isNotEmpty,
                                   // The card is the report. It is what a
                                   // teacher opens twenty times a day.
                                   onTap: () {
@@ -2950,6 +3132,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
     required VoidCallback onTap,
     required VoidCallback onEdit,
     bool testAccount = false,
+    bool infoIncomplete = false,
   }) {
     final loc = AppLocalizations.of(context)!;
     final barColor = overallProgress >= 0.7
@@ -3054,6 +3237,38 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                                             fontSize: 11,
                                             fontWeight: FontWeight.w800,
                                             color: Color(0xFF9A6200),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              // Enrolled before every detail was asked for:
+                              // a tap opens the edit sheet to finish it.
+                              if (infoIncomplete) ...[
+                                const SizedBox(width: 6),
+                                GestureDetector(
+                                  onTap: onEdit,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 7, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFDECEC),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(LucideIcons.circle_alert,
+                                            size: 12, color: Color(0xFFC2334D)),
+                                        const SizedBox(width: 3),
+                                        Text(
+                                          loc.infoIncomplete,
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w800,
+                                            color: Color(0xFFC2334D),
                                           ),
                                         ),
                                       ],

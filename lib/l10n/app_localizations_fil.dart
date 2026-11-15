@@ -2653,4 +2653,33 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get awardsAllClaimed => 'Galing! Nakuha mo na ang lahat ng medalya!';
+
+  @override
+  String missingFields(String fields) {
+    return 'Kulang pa: $fields';
+  }
+
+  @override
+  String checkFields(String fields) {
+    return 'Pakitingnan: $fields';
+  }
+
+  @override
+  String get fieldRequired => 'Kailangan ito';
+
+  @override
+  String get nameLettersOnly => 'Mga titik lang, hindi bababa sa 2';
+
+  @override
+  String get birthdayAgeCheck =>
+      'Pakitingnan ang birthday: dapat 2 hanggang 7 taong gulang ang bata';
+
+  @override
+  String get contactStart09 => '11 numero, nagsisimula sa 09';
+
+  @override
+  String get genderRequired => 'Piliin kung lalaki o babae';
+
+  @override
+  String get infoIncomplete => 'Kulang ang info';
 }

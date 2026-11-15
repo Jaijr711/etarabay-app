@@ -1940,5 +1940,16 @@
   "awardsKeepPlaying": "Keep playing for the next medal!",
   "@awardsKeepPlaying": {"description": "Awards strip when nothing is waiting"},
   "awardsAllClaimed": "Well done! You have every medal!",
-  "@awardsAllClaimed": {"description": "Awards strip when nothing is waiting"}
+  "@awardsAllClaimed": {"description": "Awards strip when nothing is waiting"},
+  "missingFields": "Still missing: {fields}",
+  "@missingFields": {"description": "Enrol and edit: the fields still empty", "placeholders": {"fields": {"type": "String"}}},
+  "checkFields": "Please check: {fields}",
+  "@checkFields": {"description": "Enrol and edit: the fields filled wrong", "placeholders": {"fields": {"type": "String"}}},
+  "fieldRequired": "Required",
+  "nameLettersOnly": "Letters only, at least 2",
+  "birthdayAgeCheck": "Check the birthday: the child should be 2 to 7 years old",
+  "contactStart09": "11 digits starting with 09",
+  "genderRequired": "Choose boy or girl",
+  "infoIncomplete": "Info incomplete",
+  "@infoIncomplete": {"description": "Roster mark on a child whose record lacks a birthday, gender or parent detail"}
 }

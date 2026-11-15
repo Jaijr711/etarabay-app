@@ -2671,4 +2671,33 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String get awardsAllClaimed => 'Nagsayaat! Nagun-odmon amin a medalya!';
+
+  @override
+  String missingFields(String fields) {
+    return 'Kurang pay: $fields';
+  }
+
+  @override
+  String checkFields(String fields) {
+    return 'Pangngaasi ta kitaem: $fields';
+  }
+
+  @override
+  String get fieldRequired => 'Masapul daytoy';
+
+  @override
+  String get nameLettersOnly => 'Letra laeng, saan a kurang iti 2';
+
+  @override
+  String get birthdayAgeCheck =>
+      'Kitaem ti kasangay: masapul a 2 agingga 7 ti tawen ti ubing';
+
+  @override
+  String get contactStart09 => '11 a numero, mangrugi iti 09';
+
+  @override
+  String get genderRequired => 'Pilien no lalaki wenno babai';
+
+  @override
+  String get infoIncomplete => 'Kurang ti impormasion';
 }

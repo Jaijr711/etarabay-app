@@ -907,5 +907,13 @@
   "updatePreparingBody": "Apagbiit laeng. Saan pay nga irikep ti app.",
   "claimYouGotIt": "Nagun-odmo!",
   "awardsKeepPlaying": "Agay-ayam pay para iti sumaruno a medalya!",
-  "awardsAllClaimed": "Nagsayaat! Nagun-odmon amin a medalya!"
+  "awardsAllClaimed": "Nagsayaat! Nagun-odmon amin a medalya!",
+  "missingFields": "Kurang pay: {fields}",
+  "checkFields": "Pangngaasi ta kitaem: {fields}",
+  "fieldRequired": "Masapul daytoy",
+  "nameLettersOnly": "Letra laeng, saan a kurang iti 2",
+  "birthdayAgeCheck": "Kitaem ti kasangay: masapul a 2 agingga 7 ti tawen ti ubing",
+  "contactStart09": "11 a numero, mangrugi iti 09",
+  "genderRequired": "Pilien no lalaki wenno babai",
+  "infoIncomplete": "Kurang ti impormasion"
 }

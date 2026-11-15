@@ -4798,6 +4798,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Well done! You have every medal!'**
   String get awardsAllClaimed;
+
+  /// Enrol and edit: the fields still empty
+  ///
+  /// In en, this message translates to:
+  /// **'Still missing: {fields}'**
+  String missingFields(String fields);
+
+  /// Enrol and edit: the fields filled wrong
+  ///
+  /// In en, this message translates to:
+  /// **'Please check: {fields}'**
+  String checkFields(String fields);
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get fieldRequired;
+
+  /// No description provided for @nameLettersOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Letters only, at least 2'**
+  String get nameLettersOnly;
+
+  /// No description provided for @birthdayAgeCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the birthday: the child should be 2 to 7 years old'**
+  String get birthdayAgeCheck;
+
+  /// No description provided for @contactStart09.
+  ///
+  /// In en, this message translates to:
+  /// **'11 digits starting with 09'**
+  String get contactStart09;
+
+  /// No description provided for @genderRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose boy or girl'**
+  String get genderRequired;
+
+  /// Roster mark on a child whose record lacks a birthday, gender or parent detail
+  ///
+  /// In en, this message translates to:
+  /// **'Info incomplete'**
+  String get infoIncomplete;
 }
 
 class _AppLocalizationsDelegate
