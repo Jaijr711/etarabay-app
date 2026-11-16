@@ -8,7 +8,8 @@ builds the new APK from the one it has installed, instead of the whole
     python tool/make_patches.py <new.apk> <new-version> <old.apk>:<old-version> ...
 
 Writes next to <new.apk>:
-    E-Tarabay-<old>-to-<new>.patch   one per old APK
+    patch-<old>-to-<new>.etpatch     one per old APK (named to sort after
+                                     the APKs, which old apps rely on)
     patches.json                     what the app reads to choose one
 
 Needs bsdiff4 (pip install bsdiff4), best in a venv:
@@ -92,7 +93,9 @@ def main():
         patch = make_patch(old, new)
         if apply_patch(old, patch) != new:
             sys.exit(f'patch from {version} does not rebuild the new APK')
-        name = f'E-Tarabay-{version}-to-{new_version}.patch'
+        # Named to sort after the APKs: GitHub lists a release's files by
+        # name, and apps up to v1.2.55 download the first file listed.
+        name = f'patch-{version}-to-{new_version}.etpatch'
         out = new_apk.parent / name
         out.write_bytes(patch)
         entries.append({
