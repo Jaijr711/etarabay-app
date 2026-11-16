@@ -2,6 +2,7 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:e_tarabay/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import '../widgets/kid_star.dart';
 import '../widgets/replay_dialog.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:provider/provider.dart';
@@ -433,93 +434,42 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
   //  Header
   // ─────────────────────────────────────────────────────────────────────────
 
+  /// Five big stars and the trophy: how far the child has come, with no
+  /// words to read. It said "Overall progress" over a thin bar, which a
+  /// child of three to five could not read and barely saw.
   Widget _buildHeader(BuildContext context) {
-    final done = _overallProgress >= 1.0;
-    final value = _overallProgress.clamp(0.0, 1.0);
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 10, 14, 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF14503A).withOpacity(0.12),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Image.asset('assets/images/badges/trophy.webp',
-              width: 40, height: 40, excludeFromSemantics: true),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    AppLocalizations.of(context)!.overallProgress,
-                    style: const TextStyle(
-                      fontFamily: 'Fredoka',
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textDark,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        height: 10,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE6EEE9),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        alignment: Alignment.centerLeft,
-                        child: FractionallySizedBox(
-                          widthFactor: value,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              gradient: LinearGradient(
-                                colors: done
-                                    ? const [
-                                        Color(0xFF34C759),
-                                        Color(0xFF6EDC8C)
-                                      ]
-                                    : const [
-                                        Color(0xFF2E9E5B),
-                                        Color(0xFF5CCB8A)
-                                      ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // Five stars, the most this age counts: a full row is a
-                    // finish line they can see coming.
-                    for (var i = 0; i < 5; i++)
-                      Icon(
-                        Icons.star_rounded,
-                        size: 18,
-                        color: _overallProgress * 5 > i
-                            ? const Color(0xFFFFB800)
-                            : const Color(0xFFDDE1E7),
-                      ),
-                  ],
-                ),
-              ],
+    final filled = (_overallProgress * 5).ceil().clamp(0, 5);
+    return Semantics(
+      label: AppLocalizations.of(context)!.overallProgress,
+      value: '$filled / 5',
+      excludeSemantics: true,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF14503A).withOpacity(0.12),
+              blurRadius: 14,
+              offset: const Offset(0, 4),
             ),
-          ),
-        ],
+          ],
+        ),
+        child: Row(
+          children: [
+            Image.asset('assets/images/badges/trophy.webp',
+                width: 46, height: 46, excludeFromSemantics: true),
+            const SizedBox(width: 12),
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: KidStarRow(count: filled, total: 5, size: 36, gap: 4),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -725,141 +675,133 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
       actionIcon = Icons.play_arrow_rounded;
     }
 
-    return GestureDetector(
-      // Locked first: a finished module that is locked offered "Finished
-      // already! Repeat" and only then said it was locked.
-      onTap: locked
-          ? _showLockedMessage
-          : (isCompleted ? () => _showCompletedDialog(title, onTap) : onTap),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            constraints: const BoxConstraints(minHeight: 112),
-            padding: const EdgeInsets.fromLTRB(14, 12, 118, 12),
-            decoration: BoxDecoration(
-              gradient: locked
-                  ? null
-                  : LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [tintTop, tintBottom],
+    // The count left the card's face; a screen reader still says it.
+    return Semantics(
+      button: true,
+      label: '$title, $subtitle',
+      child: GestureDetector(
+        // Locked first: a finished module that is locked offered "Finished
+        // already! Repeat" and only then said it was locked.
+        onTap: locked
+            ? _showLockedMessage
+            : (isCompleted ? () => _showCompletedDialog(title, onTap) : onTap),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              constraints: const BoxConstraints(minHeight: 132),
+              padding: const EdgeInsets.fromLTRB(16, 14, 124, 14),
+              decoration: BoxDecoration(
+                gradient: locked
+                    ? null
+                    : LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [tintTop, tintBottom],
+                      ),
+                color: locked ? const Color(0xFFF3F4F6) : null,
+                borderRadius: BorderRadius.circular(22),
+                border: highlight ? Border.all(color: color, width: 3) : null,
+                boxShadow: [
+                  BoxShadow(
+                    color: locked
+                        ? const Color(0xFFE5E7EB)
+                        : highlight
+                            ? Color.lerp(color, Colors.black, 0.25)!
+                            : edge,
+                    offset: const Offset(0, 3),
+                  ),
+                  BoxShadow(
+                    color: const Color(0xFF143C28).withOpacity(0.10),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: 'Fredoka',
+                      fontSize: 20,
+                      height: 1.1,
+                      fontWeight: FontWeight.w600,
+                      color:
+                          locked ? const Color(0xFF8A93A3) : AppColors.textDark,
                     ),
-              color: locked ? const Color(0xFFF3F4F6) : null,
-              borderRadius: BorderRadius.circular(22),
-              border: highlight ? Border.all(color: color, width: 3) : null,
-              boxShadow: [
-                BoxShadow(
-                  color: locked
-                      ? const Color(0xFFE5E7EB)
-                      : highlight
-                          ? Color.lerp(color, Colors.black, 0.25)!
-                          : edge,
-                  offset: const Offset(0, 3),
-                ),
-                BoxShadow(
-                  color: const Color(0xFF143C28).withOpacity(0.10),
-                  blurRadius: 14,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: 'Fredoka',
-                    fontSize: 16,
-                    height: 1.12,
-                    fontWeight: FontWeight.w600,
-                    color:
-                        locked ? const Color(0xFF8A93A3) : AppColors.textDark,
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF475569),
+                  const SizedBox(height: 12),
+                  // The count ("3 of 31 activities") is gone from the card: a
+                  // child cannot read it, and a teacher or parent finds it in
+                  // their report. A thick bar with a star riding its end shows
+                  // the same thing.
+                  _LessonTrack(
+                    progress: progress.clamp(0.0, 1.0),
+                    color: isCompleted ? const Color(0xFF2ECC71) : color,
+                    locked: locked,
                   ),
-                ),
-                const SizedBox(height: 6),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(5),
-                  child: LinearProgressIndicator(
-                    value: progress.clamp(0.0, 1.0),
-                    minHeight: 9,
-                    backgroundColor: Colors.white.withOpacity(0.85),
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                        isCompleted ? const Color(0xFF2ECC71) : color),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: actionBg,
-                    borderRadius: BorderRadius.circular(999),
-                    boxShadow: locked
-                        ? null
-                        : [
-                            BoxShadow(
-                              color: Color.lerp(actionBg, Colors.black, 0.3)!,
-                              offset: const Offset(0, 3),
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 18, 8),
+                    decoration: BoxDecoration(
+                      color: actionBg,
+                      borderRadius: BorderRadius.circular(999),
+                      boxShadow: locked
+                          ? null
+                          : [
+                              BoxShadow(
+                                color: Color.lerp(actionBg, Colors.black, 0.3)!,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(actionIcon, size: 20, color: actionFg),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            action,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 15.5,
+                              fontWeight: FontWeight.w900,
+                              color: actionFg,
                             ),
-                          ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(actionIcon, size: 16, color: actionFg),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          action,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w900,
-                            color: actionFg,
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          // The picture: the same box for every lesson, on the right,
-          // centred and inside the card, so they all sit alike.
-          Positioned(
-            right: 10,
-            top: 0,
-            bottom: 0,
-            child: Center(
-              child: SizedBox(
-                width: 100,
-                height: 100,
-                child: Opacity(
-                  opacity: locked ? 0.45 : 1,
-                  child: _lessonPicture(imagePath, color, grey: locked),
+            // The picture: the same box for every lesson, on the right,
+            // centred and inside the card, so they all sit alike.
+            Positioned(
+              right: 10,
+              top: 0,
+              bottom: 0,
+              child: Center(
+                child: SizedBox(
+                  width: 108,
+                  height: 108,
+                  child: Opacity(
+                    opacity: locked ? 0.45 : 1,
+                    child: _lessonPicture(imagePath, color, grey: locked),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -903,6 +845,66 @@ class _LessonsScreenState extends State<LessonsScreen> with RouteAware {
         ),
         image(grey ? greyscale : null),
       ],
+    );
+  }
+}
+
+/// A lesson's progress as a child sees it: a thick white track filling in
+/// the lesson's colour, with a gold star riding the end of what is done.
+class _LessonTrack extends StatelessWidget {
+  final double progress;
+  final Color color;
+  final bool locked;
+
+  const _LessonTrack(
+      {required this.progress, required this.color, required this.locked});
+
+  @override
+  Widget build(BuildContext context) {
+    final fill = locked ? const Color(0xFFB8BEC9) : color;
+    return SizedBox(
+      width: 178,
+      height: 16,
+      child: LayoutBuilder(builder: (context, box) {
+        final w = box.maxWidth;
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(99),
+                  border: Border.all(color: const Color(0x0F000000)),
+                ),
+              ),
+            ),
+            if (progress > 0)
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: w * progress,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(99),
+                    gradient: LinearGradient(colors: [
+                      fill,
+                      Color.lerp(fill, Colors.white, 0.35)!,
+                    ]),
+                  ),
+                ),
+              ),
+            if (progress > 0)
+              Positioned(
+                left: (w * progress - 15).clamp(-4.0, w - 26),
+                top: -7,
+                child: Image.asset('assets/images/star_gold.webp',
+                    width: 30, height: 30, excludeFromSemantics: true),
+              ),
+          ],
+        );
+      }),
     );
   }
 }

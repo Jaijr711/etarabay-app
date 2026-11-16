@@ -718,6 +718,12 @@ abstract class AppLocalizations {
   /// **'Coloring Book'**
   String get coloringBook;
 
+  /// Short name of the colouring tab that holds the child's finished pictures
+  ///
+  /// In en, this message translates to:
+  /// **'My Work'**
+  String get myWorkTab;
+
   /// No description provided for @myCreations.
   ///
   /// In en, this message translates to:
@@ -4840,6 +4846,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose boy or girl'**
   String get genderRequired;
+
+  /// Mark on a child in the class list: the lesson they are furthest behind the class in
+  ///
+  /// In en, this message translates to:
+  /// **'Struggling in: {lesson}'**
+  String strugglingIn(String lesson);
+
+  /// No description provided for @enrolledNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is enrolled!'**
+  String enrolledNamed(String name);
+
+  /// Shown after enrolling: every required detail was given
+  ///
+  /// In en, this message translates to:
+  /// **'Details complete'**
+  String get infoComplete;
+
+  /// Button after enrolling a child: open the form for the next child
+  ///
+  /// In en, this message translates to:
+  /// **'Enrol the next child'**
+  String get enrolNext;
+
+  /// No description provided for @seeLoginCardOf.
+  ///
+  /// In en, this message translates to:
+  /// **'See {name}\'s login card'**
+  String seeLoginCardOf(String name);
+
+  /// No description provided for @enrolledToday.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 enrolled today} other{{count} enrolled today}}'**
+  String enrolledToday(int count);
+
+  /// No description provided for @sameParentAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Same parent as {name}'**
+  String sameParentAs(String name);
 
   /// Roster mark on a child whose record lacks a birthday, gender or parent detail
   ///

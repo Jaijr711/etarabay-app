@@ -152,6 +152,7 @@
   "colorSomethingFirst": "Agmaris umuna ti uray ania!",
   "saved": "Naidulin!",
   "coloringBook": "Libro a Pagmarisan",
+  "myWorkTab": "Aramidko",
   "myCreations": "Dagiti Inaramid ko",
   "color": "Maris",
   "animals": "Dagiti Ayup",
@@ -915,5 +916,12 @@
   "birthdayAgeCheck": "Kitaem ti kasangay: masapul a 2 agingga 7 ti tawen ti ubing",
   "contactStart09": "11 a numero, mangrugi iti 09",
   "genderRequired": "Pilien no lalaki wenno babai",
+  "strugglingIn": "Narigatan iti: {lesson}",
+  "enrolledNamed": "Nairehistron ni {name}!",
+  "infoComplete": "Kompleto ti impormasion",
+  "enrolNext": "Irehistro ti sumaruno",
+  "seeLoginCardOf": "Kitaen ti Login card ni {name}",
+  "enrolledToday": "{count, plural, =1{1 ti nairehistro ita nga aldaw} other{{count} ti nairehistro ita nga aldaw}}",
+  "sameParentAs": "Isu met laeng a nagannak ni {name}",
   "infoIncomplete": "Kurang ti impormasion"
 }

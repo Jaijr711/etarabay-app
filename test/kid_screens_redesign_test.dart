@@ -8,10 +8,10 @@ import 'package:e_tarabay/screens/awards_screen.dart';
 import 'package:e_tarabay/screens/lessons_screen.dart';
 import 'package:e_tarabay/screens/settings_screen.dart';
 import 'package:e_tarabay/widgets/badge_emblem.dart';
+import 'package:e_tarabay/widgets/kid_star.dart';
 import 'package:flutter/cupertino.dart'
     show CupertinoLocalizations, DefaultCupertinoLocalizations;
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart' show RenderParagraph;
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -98,16 +98,20 @@ void main() {
       // The old layout put each name twice: once as a heading, once on the
       // card. Now only the card says it.
       expect(find.text(loc.matematika, skipOffstage: false), findsOneWidget);
-      // Counts read as a sentence, "0 sa 31 na gawain", not "0/31".
+      // No count to read on the card, "0 sa 31 na gawain": a child goes by
+      // the bar and its star. A screen reader still says the count.
+      final count = loc.lessonActivities(0, UserProvider.matematikaGameCount);
+      expect(find.text(count, skipOffstage: false), findsNothing);
       expect(
-          find.text(loc.lessonActivities(0, UserProvider.matematikaGameCount),
+          find.byWidgetPredicate(
+              (w) =>
+                  w is Semantics && (w.properties.label ?? '').contains(count),
               skipOffstage: false),
           findsOneWidget);
-      // The title has the whole width now, so a small phone shows all of it.
-      final title = find.text(loc.overallProgress);
-      expect(title, findsOneWidget);
-      final shown = tester.renderObject<RenderParagraph>(title);
-      expect(shown.didExceedMaxLines, isFalse);
+      // Five big stars in place of the words "Kabuuang Pag-unlad", which
+      // are now only what a screen reader says.
+      expect(find.text(loc.overallProgress), findsNothing);
+      expect(find.byType(KidStar), findsNWidgets(5));
       expect(tester.takeException(), isNull);
       await tester.pump(const Duration(seconds: 5));
     });

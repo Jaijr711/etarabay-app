@@ -342,6 +342,9 @@ class AppLocalizationsIlo extends AppLocalizations {
   String get coloringBook => 'Libro a Pagmarisan';
 
   @override
+  String get myWorkTab => 'Aramidko';
+
+  @override
   String get myCreations => 'Dagiti Inaramid ko';
 
   @override
@@ -2697,6 +2700,43 @@ class AppLocalizationsIlo extends AppLocalizations {
 
   @override
   String get genderRequired => 'Pilien no lalaki wenno babai';
+
+  @override
+  String strugglingIn(String lesson) {
+    return 'Narigatan iti: $lesson';
+  }
+
+  @override
+  String enrolledNamed(String name) {
+    return 'Nairehistron ni $name!';
+  }
+
+  @override
+  String get infoComplete => 'Kompleto ti impormasion';
+
+  @override
+  String get enrolNext => 'Irehistro ti sumaruno';
+
+  @override
+  String seeLoginCardOf(String name) {
+    return 'Kitaen ti Login card ni $name';
+  }
+
+  @override
+  String enrolledToday(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ti nairehistro ita nga aldaw',
+      one: '1 ti nairehistro ita nga aldaw',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sameParentAs(String name) {
+    return 'Isu met laeng a nagannak ni $name';
+  }
 
   @override
   String get infoIncomplete => 'Kurang ti impormasion';

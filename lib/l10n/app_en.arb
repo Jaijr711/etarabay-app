@@ -176,6 +176,10 @@
   "colorSomethingFirst": "Color something first!",
   "saved": "Saved!",
   "coloringBook": "Coloring Book",
+  "myWorkTab": "My Work",
+  "@myWorkTab": {
+    "description": "Short name of the colouring tab that holds the child's finished pictures"
+  },
   "myCreations": "My Creations",
   "color": "Color",
   "animals": "Animals",
@@ -1950,6 +1954,23 @@
   "birthdayAgeCheck": "Check the birthday: the child should be 2 to 7 years old",
   "contactStart09": "11 digits starting with 09",
   "genderRequired": "Choose boy or girl",
+  "strugglingIn": "Struggling in: {lesson}",
+  "@strugglingIn": {
+    "description": "Mark on a child in the class list: the lesson they are furthest behind the class in",
+    "placeholders": {"lesson": {"type": "String"}}
+  },
+  "enrolledNamed": "{name} is enrolled!",
+  "@enrolledNamed": {"placeholders": {"name": {"type": "String"}}},
+  "infoComplete": "Details complete",
+  "@infoComplete": {"description": "Shown after enrolling: every required detail was given"},
+  "enrolNext": "Enrol the next child",
+  "@enrolNext": {"description": "Button after enrolling a child: open the form for the next child"},
+  "seeLoginCardOf": "See {name}'s login card",
+  "@seeLoginCardOf": {"placeholders": {"name": {"type": "String"}}},
+  "enrolledToday": "{count, plural, =1{1 enrolled today} other{{count} enrolled today}}",
+  "@enrolledToday": {"placeholders": {"count": {"type": "int"}}},
+  "sameParentAs": "Same parent as {name}",
+  "@sameParentAs": {"placeholders": {"name": {"type": "String"}}},
   "infoIncomplete": "Info incomplete",
   "@infoIncomplete": {"description": "Roster mark on a child whose record lacks a birthday, gender or parent detail"}
 }

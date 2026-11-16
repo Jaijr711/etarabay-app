@@ -152,6 +152,7 @@
   "colorSomethingFirst": "Kulayan muna ang isang bagay!",
   "saved": "Nai-save!",
   "coloringBook": "Aklat Pangkulay",
+  "myWorkTab": "Gawa Ko",
   "myCreations": "Ang Aking mga Likha",
   "color": "Kulay",
   "animals": "Mga Hayop",
@@ -919,5 +920,12 @@
   "birthdayAgeCheck": "Pakitingnan ang birthday: dapat 2 hanggang 7 taong gulang ang bata",
   "contactStart09": "11 numero, nagsisimula sa 09",
   "genderRequired": "Piliin kung lalaki o babae",
+  "strugglingIn": "Hirap sa: {lesson}",
+  "enrolledNamed": "Naka-enroll na si {name}!",
+  "infoComplete": "Kumpleto ang info",
+  "enrolNext": "Magpatala ng kasunod",
+  "seeLoginCardOf": "Tingnan ang Login card ni {name}",
+  "enrolledToday": "{count, plural, =1{1 ang naka-enroll ngayong araw} other{{count} ang naka-enroll ngayong araw}}",
+  "sameParentAs": "Parehong magulang ni {name}",
   "infoIncomplete": "Kulang ang info"
 }

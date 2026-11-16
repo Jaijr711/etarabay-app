@@ -342,6 +342,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get coloringBook => 'Aklat Pangkulay';
 
   @override
+  String get myWorkTab => 'Gawa Ko';
+
+  @override
   String get myCreations => 'Ang Aking mga Likha';
 
   @override
@@ -2679,6 +2682,43 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get genderRequired => 'Piliin kung lalaki o babae';
+
+  @override
+  String strugglingIn(String lesson) {
+    return 'Hirap sa: $lesson';
+  }
+
+  @override
+  String enrolledNamed(String name) {
+    return 'Naka-enroll na si $name!';
+  }
+
+  @override
+  String get infoComplete => 'Kumpleto ang info';
+
+  @override
+  String get enrolNext => 'Magpatala ng kasunod';
+
+  @override
+  String seeLoginCardOf(String name) {
+    return 'Tingnan ang Login card ni $name';
+  }
+
+  @override
+  String enrolledToday(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ang naka-enroll ngayong araw',
+      one: '1 ang naka-enroll ngayong araw',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sameParentAs(String name) {
+    return 'Parehong magulang ni $name';
+  }
 
   @override
   String get infoIncomplete => 'Kulang ang info';

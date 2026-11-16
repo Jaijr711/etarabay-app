@@ -339,6 +339,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coloringBook => 'Coloring Book';
 
   @override
+  String get myWorkTab => 'My Work';
+
+  @override
   String get myCreations => 'My Creations';
 
   @override
@@ -2666,6 +2669,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get genderRequired => 'Choose boy or girl';
+
+  @override
+  String strugglingIn(String lesson) {
+    return 'Struggling in: $lesson';
+  }
+
+  @override
+  String enrolledNamed(String name) {
+    return '$name is enrolled!';
+  }
+
+  @override
+  String get infoComplete => 'Details complete';
+
+  @override
+  String get enrolNext => 'Enrol the next child';
+
+  @override
+  String seeLoginCardOf(String name) {
+    return 'See $name\'s login card';
+  }
+
+  @override
+  String enrolledToday(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count enrolled today',
+      one: '1 enrolled today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sameParentAs(String name) {
+    return 'Same parent as $name';
+  }
 
   @override
   String get infoIncomplete => 'Info incomplete';

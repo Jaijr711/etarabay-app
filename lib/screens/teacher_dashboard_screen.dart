@@ -15,6 +15,7 @@ import '../services/teacher_privacy.dart';
 import '../services/test_account.dart';
 import '../services/update_checker.dart';
 import '../utils/constants.dart';
+import '../utils/class_struggle.dart';
 import '../utils/student_info_check.dart';
 import '../widgets/staggered_entrance.dart';
 import '../widgets/cached_avatar.dart';
@@ -270,6 +271,25 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
     super.dispose();
   }
 
+  /// A lesson's name as the Lessons screen shows it.
+  String _lessonName(String key) {
+    final loc = AppLocalizations.of(context)!;
+    switch (key) {
+      case 'matematika':
+        return loc.matematika;
+      case 'pamilya':
+        return loc.angAkingSariliTitle;
+      case 'kulay':
+        return loc.kulaySaya;
+      case 'traceit':
+        return loc.traceItTitle;
+      case 'magbasa':
+        return loc.magbasaTitle;
+      default:
+        return loc.tandaanTitle;
+    }
+  }
+
   /// The name a teacher sees for a field, in the summary of what is missing.
   String _fieldLabel(StudentField f, {String? nameLabel}) {
     final loc = AppLocalizations.of(context)!;
@@ -369,6 +389,20 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
   /// The number is also the password, so handing the same one to two children
   /// gives them each other's account.
   final Set<String> _takenIds = <String>{};
+
+  /// The children enrolled from this phone today, newest last: for "3 ang
+  /// naka-enroll ngayong araw" and for "Parehong magulang ni …" when the
+  /// next one is a brother or sister.
+  final List<_Enrolled> _enrolledToday = [];
+
+  List<_Enrolled> get _todaysEnrolled {
+    final now = DateTime.now();
+    _enrolledToday.removeWhere((e) =>
+        e.at.year != now.year ||
+        e.at.month != now.month ||
+        e.at.day != now.day);
+    return _enrolledToday;
+  }
 
   void _showEnrollSheet() {
     final firstNameController = TextEditingController();
@@ -486,8 +520,7 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                         controller: lastNameController,
                         label: AppLocalizations.of(context)!.lastName,
                         icon: LucideIcons.user,
-                        errorText:
-                            _fieldError(problems, StudentField.lastName),
+                        errorText: _fieldError(problems, StudentField.lastName),
                         onChanged: (_) {
                           if (problems.containsKey(StudentField.lastName)) {
                             setSheetState(
@@ -522,8 +555,8 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                             label: AppLocalizations.of(context)!.birthday,
                             icon: LucideIcons.cake,
                           ).copyWith(
-                              errorText: _fieldError(
-                                  problems, StudentField.birthday)),
+                              errorText:
+                                  _fieldError(problems, StudentField.birthday)),
                           child: Text(
                             selectedBirthday == null
                                 ? AppLocalizations.of(context)!.notSet
@@ -540,12 +573,54 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                   ],
                 );
               case 1:
+                final sibling =
+                    _todaysEnrolled.isEmpty ? null : _todaysEnrolled.last;
                 return Column(
                   key: const ValueKey(1),
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildSectionHeader(
                         AppLocalizations.of(context)!.parentInformation),
+                    // A brother or sister of the child just enrolled: the
+                    // same parent, without typing it twice.
+                    if (sibling != null) ...[
+                      Material(
+                        color: const Color(0xFFE7F6EC),
+                        borderRadius: BorderRadius.circular(14),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(14),
+                          onTap: () => setSheetState(() {
+                            parentNameController.text = sibling.parentName;
+                            parentContactController.text =
+                                sibling.parentContact;
+                            problems.remove(StudentField.parentName);
+                            problems.remove(StudentField.parentContact);
+                          }),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
+                            child: Row(
+                              children: [
+                                const Icon(LucideIcons.users,
+                                    size: 18, color: Color(0xFF1F7A45)),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    '${AppLocalizations.of(context)!.sameParentAs(sibling.firstName)} (${sibling.parentName})',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w900,
+                                      color: Color(0xFF1F7A45),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                     _buildCard([
                       _buildTextField(
                         controller: parentNameController,
@@ -714,11 +789,18 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                 Colors.orange.shade800,
               );
             }
-            _showEnrollmentSuccess(
-              usernameController.text,
-              lrnController.text.trim(),
-              fullName,
-            );
+            _todaysEnrolled.add(_Enrolled(
+              firstName:
+                  firstNameController.text.trim().split(RegExp(r'\s+')).first,
+              fullName: fullName,
+              avatar: selectedAvatar,
+              username: usernameController.text,
+              password: lrnController.text.trim(),
+              parentName: parentNameController.text.trim(),
+              parentContact: parentContactController.text.trim(),
+              at: DateTime.now(),
+            ));
+            _showEnrollmentSuccess(_todaysEnrolled.last);
           }
 
           void goNext() {
@@ -886,194 +968,157 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
     );
   }
 
-  void _showEnrollmentSuccess(String username, String lrn, String studentName) {
-    showDialog(
+  /// After a child is saved: who it was, and the next thing a teacher
+  /// enrolling a class does, which is the next child. The login is one tap
+  /// away on its card. It used to be a dialog with only "Done", and the
+  /// next child meant going back to the list and starting over.
+  void _showEnrollmentSuccess(_Enrolled child) {
+    final loc = AppLocalizations.of(context)!;
+    final today = _todaysEnrolled;
+    showModalBottomSheet(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: Row(
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Icon(LucideIcons.circle_check,
-                  color: AppColors.success, size: 28),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  AppLocalizations.of(context)!.studentEnrolled,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+              Row(
+                children: [
+                  Container(
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFFF4E5),
+                      shape: BoxShape.circle,
+                    ),
+                    child: _buildPresetAvatar(child.avatar,
+                        size: 62, iconSize: 28),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          loc.enrolledNamed(child.firstName),
+                          style: const TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            const Icon(Icons.check_rounded,
+                                size: 16, color: Color(0xFF2E9E5B)),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                loc.infoComplete,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFF2E9E5B),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(sheetContext);
+                  _showEnrollSheet();
+                },
+                icon: const Icon(LucideIcons.user_plus, size: 20),
+                label: Text(loc.enrolNext),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size.fromHeight(50),
+                  elevation: 0,
+                  textStyle: const TextStyle(
+                      fontSize: 15.5, fontWeight: FontWeight.w900),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
                 ),
+              ),
+              const SizedBox(height: 10),
+              TextButton.icon(
+                onPressed: () {
+                  Navigator.pop(sheetContext);
+                  _openLoginCard(
+                    name: child.fullName,
+                    avatar: child.avatar,
+                    username: child.username,
+                    password: child.password,
+                  );
+                },
+                icon: const Icon(LucideIcons.id_card, size: 20),
+                label: Text(loc.seeLoginCardOf(child.firstName)),
+                style: TextButton.styleFrom(
+                  backgroundColor: const Color(0xFFEEEDFB),
+                  foregroundColor: const Color(0xFF4A3FD6),
+                  minimumSize: const Size.fromHeight(50),
+                  textStyle: const TextStyle(
+                      fontSize: 15.5, fontWeight: FontWeight.w900),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                ),
+              ),
+              const SizedBox(height: 4),
+              TextButton(
+                onPressed: () => Navigator.pop(sheetContext),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.textLight,
+                  textStyle: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w900),
+                ),
+                child: Text(loc.done),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  for (final e in today.reversed.take(4).toList().reversed)
+                    Align(
+                      widthFactor: 0.75,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: const Color(0xFFF4F3FF),
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        child: _buildPresetAvatar(e.avatar,
+                            size: 26, iconSize: 14),
+                      ),
+                    ),
+                  const SizedBox(width: 10),
+                  Flexible(
+                    child: Text(
+                      loc.enrolledToday(today.length),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF6B7088),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!
-                      .studentEnrolledSuccessfully(studentName),
-                  style: const TextStyle(fontSize: 14),
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(12),
-                    border:
-                        Border.all(color: AppColors.primary.withOpacity(0.2)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context)!.loginCredentials,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textDark,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const Divider(height: 24),
-                      Row(
-                        children: [
-                          const Icon(LucideIcons.user,
-                              size: 16, color: AppColors.textLight),
-                          const SizedBox(width: 12),
-                          // No fixed width: the Ilokano label ("Agus-usar:")
-                          // measures 130 logical pixels at this font size —
-                          // nearly double the 65px this used to be capped
-                          // to — and would wrap onto a second line rather
-                          // than overflow outright, throwing the row's
-                          // height off between locales. Sizing to content
-                          // means every locale's label just sits at
-                          // whatever width it actually needs.
-                          Text(AppLocalizations.of(context)!.userLabel,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  color: AppColors.textLight, fontSize: 13)),
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: Text(
-                              username,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            icon: const Icon(LucideIcons.copy,
-                                size: 16, color: AppColors.primary),
-                            onPressed: () async {
-                              // Awaited, like the sheet's. This dialog is the
-                              // one moment the teacher has to hand these two
-                              // strings over, so a silent failure here costs
-                              //
-                              // Both strings are read now, while the context
-                              // is certainly good: this dialog can be closed
-                              // while the browser is still deciding.
-                              final loc = AppLocalizations.of(context)!;
-                              final ok = loc.usernameCopied;
-                              final field = loc.userLabel;
-                              try {
-                                await Clipboard.setData(
-                                    ClipboardData(text: username));
-                                if (!mounted) return;
-                                _showStatusDialog(
-                                    ok, LucideIcons.copy, AppColors.primary);
-                              } catch (_) {
-                                if (!mounted) return;
-                                _showCopyByHand(field, username);
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          const Icon(LucideIcons.lock,
-                              size: 16, color: AppColors.textLight),
-                          const SizedBox(width: 12),
-                          // Content-sized to match the label above it — see
-                          // the note there.
-                          Text(AppLocalizations.of(context)!.passwordLabel,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  color: AppColors.textLight, fontSize: 13)),
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: Text(
-                              lrn,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            icon: const Icon(LucideIcons.copy,
-                                size: 16, color: AppColors.primary),
-                            onPressed: () async {
-                              // Awaited, like the sheet's. This dialog is the
-                              // one moment the teacher has to hand these two
-                              // strings over, so a silent failure here costs
-                              //
-                              // Both strings are read now, while the context
-                              // is certainly good: this dialog can be closed
-                              // while the browser is still deciding.
-                              final loc = AppLocalizations.of(context)!;
-                              final ok = loc.passwordCopied;
-                              final field = loc.passwordLabel;
-                              try {
-                                await Clipboard.setData(
-                                    ClipboardData(text: lrn));
-                                if (!mounted) return;
-                                _showStatusDialog(
-                                    ok, LucideIcons.copy, AppColors.primary);
-                              } catch (_) {
-                                if (!mounted) return;
-                                _showCopyByHand(field, lrn);
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: Text(AppLocalizations.of(context)!.done,
-                  style: const TextStyle(color: Colors.white)),
-            ),
-          ],
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -2487,6 +2532,11 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
             // class average said "63%" without saying which child was at 8%.
             final needHelp = <String>{};
             final unseen = <String>{};
+            // And in which lesson: "Hirap sa: Bilang" on the card.
+            final struggling = ClassStruggle.of({
+              for (final doc in studentDocs)
+                doc.id: doc.data()['progress'] as Map<String, dynamic>?,
+            });
 
             // Behind *the class*, not behind finishing the whole app.
             //
@@ -2796,9 +2846,13 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                                   hasNewCertificate: hasNewCertificate,
                                   testAccount:
                                       studentData[TestAccount.field] == true,
-                                  infoIncomplete: StudentInfoCheck
-                                      .missingInRecord(studentData)
-                                      .isNotEmpty,
+                                  infoIncomplete:
+                                      StudentInfoCheck.missingInRecord(
+                                              studentData)
+                                          .isNotEmpty,
+                                  struggling: struggling[studentId] == null
+                                      ? null
+                                      : _lessonName(struggling[studentId]!),
                                   // The card is the report. It is what a
                                   // teacher opens twenty times a day.
                                   onTap: () {
@@ -3133,8 +3187,64 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
     required VoidCallback onEdit,
     bool testAccount = false,
     bool infoIncomplete = false,
+    String? struggling,
   }) {
     final loc = AppLocalizations.of(context)!;
+    // The marks sit on a line of their own under the name. Beside the
+    // student number they squeezed it to "Stu…".
+    Widget chip(IconData icon, String text, Color bg, Color fg) => Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 12, color: fg),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  text,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w800,
+                    color: fg,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+    final chips = <Widget>[
+      if (hasNewCertificate)
+        Tooltip(
+          message: loc.newCertificateBadge,
+          child: chip(LucideIcons.graduation_cap, loc.newBadgeShort,
+              const Color(0xFFFFF3D6), const Color(0xFF9A6200)),
+        ),
+      // Enrolled before every detail was asked for: a tap opens the edit
+      // sheet to finish it.
+      if (infoIncomplete)
+        GestureDetector(
+          onTap: onEdit,
+          child: chip(LucideIcons.circle_alert, loc.infoIncomplete,
+              const Color(0xFFFDECEC), const Color(0xFFC2334D)),
+        ),
+      if (struggling != null)
+        chip(LucideIcons.trending_down, loc.strugglingIn(struggling),
+            const Color(0xFFFFE9D6), const Color(0xFFB4520E)),
+      // The developer finished this one for testing: not to be read as the
+      // child's own work.
+      if (testAccount)
+        Tooltip(
+          message: loc.testAccountNote,
+          child: chip(LucideIcons.flask_conical, loc.testAccountTag,
+              const Color(0xFFEEEDFD), const Color(0xFF5C52E5)),
+        ),
+    ];
     final barColor = overallProgress >= 0.7
         ? AppColors.success
         : overallProgress >= 0.4
@@ -3194,121 +3304,21 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                             ),
                           ),
                           const SizedBox(height: 2),
-                          Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  lrn.isEmpty
-                                      ? '@$username'
-                                      : '${loc.studentNumberField} '
-                                          '${_showLrn ? lrn : _maskedLrn(lrn)}',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    letterSpacing: 0.3,
-                                    color: Colors.grey.shade500,
-                                    fontFeatures: const [
-                                      FontFeature.tabularFigures()
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              if (hasNewCertificate) ...[
-                                const SizedBox(width: 6),
-                                Tooltip(
-                                  message: loc.newCertificateBadge,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 7, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFFFF3D6),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Icon(LucideIcons.graduation_cap,
-                                            size: 12, color: Color(0xFF9A6200)),
-                                        const SizedBox(width: 3),
-                                        Text(
-                                          loc.newBadgeShort,
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w800,
-                                            color: Color(0xFF9A6200),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                          Text(
+                            lrn.isEmpty
+                                ? '@$username'
+                                : '${loc.studentNumberField} '
+                                    '${_showLrn ? lrn : _maskedLrn(lrn)}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12,
+                              letterSpacing: 0.3,
+                              color: Colors.grey.shade500,
+                              fontFeatures: const [
+                                FontFeature.tabularFigures()
                               ],
-                              // Enrolled before every detail was asked for:
-                              // a tap opens the edit sheet to finish it.
-                              if (infoIncomplete) ...[
-                                const SizedBox(width: 6),
-                                GestureDetector(
-                                  onTap: onEdit,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 7, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFFDECEC),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Icon(LucideIcons.circle_alert,
-                                            size: 12, color: Color(0xFFC2334D)),
-                                        const SizedBox(width: 3),
-                                        Text(
-                                          loc.infoIncomplete,
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w800,
-                                            color: Color(0xFFC2334D),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                              // The developer finished this one for testing:
-                              // not to be read as the child's own work.
-                              if (testAccount) ...[
-                                const SizedBox(width: 6),
-                                Tooltip(
-                                  message: loc.testAccountNote,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 7, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFEEEDFD),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Icon(LucideIcons.flask_conical,
-                                            size: 12, color: Color(0xFF5C52E5)),
-                                        const SizedBox(width: 3),
-                                        Text(
-                                          loc.testAccountTag,
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w800,
-                                            color: Color(0xFF5C52E5),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ],
+                            ),
                           ),
                         ],
                       ),
@@ -3329,6 +3339,16 @@ class _TeacherDashboardScreenState extends State<TeacherDashboardScreen> {
                     ),
                   ],
                 ),
+                if (chips.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: Wrap(spacing: 6, runSpacing: 6, children: chips),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.only(right: 6),
@@ -3421,4 +3441,27 @@ class _HeaderIconButton extends StatelessWidget {
       ),
     );
   }
+}
+
+/// A child enrolled from this phone today.
+class _Enrolled {
+  final String firstName;
+  final String fullName;
+  final String avatar;
+  final String username;
+  final String password;
+  final String parentName;
+  final String parentContact;
+  final DateTime at;
+
+  const _Enrolled({
+    required this.firstName,
+    required this.fullName,
+    required this.avatar,
+    required this.username,
+    required this.password,
+    required this.parentName,
+    required this.parentContact,
+    required this.at,
+  });
 }

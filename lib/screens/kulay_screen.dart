@@ -2861,8 +2861,10 @@ class _KulayScreenState extends State<KulayScreen>
                 child: Row(children: [
                   _tabBtn(0, LucideIcons.brush,
                       AppLocalizations.of(context)!.color),
-                  _tabBtn(1, LucideIcons.folder_open,
-                      AppLocalizations.of(context)!.myCreations),
+                  // "Ang Aking mga Likha" did not fit and was cut short;
+                  // the tab says it in two words.
+                  _tabBtn(1, LucideIcons.image,
+                      AppLocalizations.of(context)!.myWorkTab),
                 ]),
               ),
             ),
@@ -3194,23 +3196,36 @@ class _KulayScreenState extends State<KulayScreen>
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
                     color: AppColors.textDark)),
-            const SizedBox(height: 4),
-            Text(loc.levelsDone(done, n),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF8A90A0))),
             const Spacer(),
             const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(9),
-              child: LinearProgressIndicator(
-                value: n == 0 ? 0 : done / n,
-                minHeight: 9,
-                backgroundColor: const Color(0xFFECEEF4),
-                valueColor: AlwaysStoppedAnimation(cat.color),
+            // One circle for each picture: a green tick when it is done, a
+            // dashed ring when not. "0 sa 3 ang tapos" was words a child
+            // could not read; a screen reader still says them.
+            Semantics(
+              label: loc.levelsDone(done, n),
+              excludeSemantics: true,
+              child: Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  for (int p = 0; p < n; p++)
+                    _pageFinished(cat, p)
+                        ? Container(
+                            width: 24,
+                            height: 24,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF2EBD6B),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.check_rounded,
+                                size: 17, color: Colors.white),
+                          )
+                        : const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CustomPaint(painter: _DashedRing()),
+                          ),
+                ],
               ),
             ),
           ],
@@ -4847,4 +4862,33 @@ class _PlusOneStar extends StatelessWidget {
       child: chip,
     );
   }
+}
+
+/// A picture not coloured yet: a dashed grey ring, the size of the green
+/// tick that takes its place.
+class _DashedRing extends CustomPainter {
+  const _DashedRing();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final r = size.width / 2 - 1.25;
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round
+      ..color = const Color(0xFFC9CDD9);
+    const dashes = 9;
+    const sweep = 2 * 3.14159265 / dashes;
+    for (var i = 0; i < dashes; i++) {
+      canvas.drawArc(
+          Rect.fromCircle(center: size.center(Offset.zero), radius: r),
+          i * sweep,
+          sweep * 0.55,
+          false,
+          paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashedRing old) => false;
 }

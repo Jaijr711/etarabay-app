@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
 import '../utils/constants.dart';
+import 'kid_star.dart';
 import 'pressable.dart';
 import '../services/device_performance.dart';
 
@@ -123,7 +124,7 @@ class ModuleLevelTile extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _panel(capsule: true),
-        const SizedBox(height: 16),
+        const SizedBox(height: 22),
         // Room for two lines on every tile, so the pills of a row line up.
         ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 14 * 1.15 * 2),
@@ -271,7 +272,7 @@ class ModuleLevelTile extends StatelessWidget {
             Positioned(
               left: 0,
               right: 0,
-              bottom: -10,
+              bottom: -15,
               child: Center(
                 child: Container(
                   padding:
@@ -439,29 +440,16 @@ class _ModulePill extends StatelessWidget {
   }
 }
 
-/// Three small stars on the tile: the earned ones gold, the rest a faint
-/// grey of the same shape.
+/// The tile's three stars, big enough to count: the earned ones gold, the
+/// rest a pale star with a dashed gold edge. They were 15 across and the
+/// unearned ones a faint grey a child could not make out.
 class _TileStars extends StatelessWidget {
   final int count;
 
   const _TileStars({required this.count});
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(
-        3,
-        (i) => Icon(
-          Icons.star_rounded,
-          size: 15,
-          color: i < count
-              ? const Color(0xFFFFB800)
-              : const Color(0xFF1F2340).withOpacity(0.16),
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => KidStarRow(count: count, size: 24);
 }
 
 /// Three stars, the earned ones filled gold.
@@ -570,7 +558,7 @@ class ModuleTally extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 10, 12, 0),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
@@ -585,62 +573,77 @@ class ModuleTally extends StatelessWidget {
       child: Row(
         children: [
           Image.asset(picture,
-              width: 42, height: 42, excludeFromSemantics: true),
+              width: 46, height: 46, excludeFromSemantics: true),
           const SizedBox(width: 10),
           Expanded(
             child: TweenAnimationBuilder<double>(
               tween: Tween(begin: 0, end: done.toDouble()),
               duration: _fill,
               curve: Curves.easeOutCubic,
-              builder: (_, value, __) => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    label(value.round()),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.textDark,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(9),
-                    child: SizedBox(
-                      height: 9,
-                      child: Stack(
-                        children: [
-                          const Positioned.fill(
-                            child: ColoredBox(color: Color(0xFFECEEF4)),
-                          ),
-                          // Full height: without it the fill sat in the
-                          // stack's loose constraints and drew zero tall, so
-                          // the bar stayed grey at 21 of 21.
-                          FractionallySizedBox(
-                            alignment: Alignment.centerLeft,
-                            heightFactor: 1,
-                            widthFactor: total == 0
-                                ? 0
-                                : (value / total).clamp(0.0, 1.0),
-                            child: const DecoratedBox(
-                              decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(9)),
-                                gradient: LinearGradient(colors: [
-                                  Color(0xFFFFC93C),
-                                  Color(0xFFFF9F1C),
-                                ]),
-                              ),
-                            ),
-                          ),
-                        ],
+              // A big number a child can count, "5 / 21", in place of the
+              // words "5 sa 21 bituin", which the child could not read. The
+              // words are still what a screen reader says.
+              builder: (_, value, __) => Semantics(
+                label: label(value.round()),
+                excludeSemantics: true,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text.rich(
+                      TextSpan(children: [
+                        TextSpan(text: '${value.round()} '),
+                        TextSpan(
+                          text: '/ $total',
+                          style: const TextStyle(
+                              fontSize: 17, color: Color(0xFFC7A55A)),
+                        ),
+                      ]),
+                      maxLines: 1,
+                      style: const TextStyle(
+                        fontFamily: 'Fredoka',
+                        fontSize: 28,
+                        height: 1,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFB07800),
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: SizedBox(
+                        height: 12,
+                        child: Stack(
+                          children: [
+                            const Positioned.fill(
+                              child: ColoredBox(color: Color(0xFFFFF1C2)),
+                            ),
+                            // Full height: without it the fill sat in the
+                            // stack's loose constraints and drew zero tall,
+                            // so the bar stayed empty at 21 of 21.
+                            FractionallySizedBox(
+                              alignment: Alignment.centerLeft,
+                              heightFactor: 1,
+                              widthFactor: total == 0
+                                  ? 0
+                                  : (value / total).clamp(0.0, 1.0),
+                              child: const DecoratedBox(
+                                decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12)),
+                                  gradient: LinearGradient(colors: [
+                                    Color(0xFFFFC83D),
+                                    Color(0xFFFFB000),
+                                  ]),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

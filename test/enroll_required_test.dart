@@ -27,16 +27,34 @@ void main() {
   setUpAll(() async {
     if (!shots) return;
     for (final (family, files) in const [
-      ('Roboto', ['assets/fonts/Roboto-regular.ttf', 'assets/fonts/Roboto-bold.ttf', 'assets/fonts/Roboto-black.ttf']),
+      (
+        'Roboto',
+        [
+          'assets/fonts/Roboto-regular.ttf',
+          'assets/fonts/Roboto-bold.ttf',
+          'assets/fonts/Roboto-black.ttf'
+        ]
+      ),
       ('Fredoka', ['assets/fonts/Fredoka.ttf']),
-      ('MaterialIcons', [r'C:\develop\flutter\bin\cache\artifacts\material_fonts\materialicons-regular.otf']),
-      ('packages/flutter_lucide/lucide', [r'C:\Users\jayjr\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_lucide-1.11.0\lib\fonts\lucide.ttf']),
+      (
+        'MaterialIcons',
+        [
+          r'C:\develop\flutter\bin\cache\artifacts\material_fonts\materialicons-regular.otf'
+        ]
+      ),
+      (
+        'packages/flutter_lucide/lucide',
+        [
+          r'C:\Users\jayjr\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_lucide-1.11.0\lib\fonts\lucide.ttf'
+        ]
+      ),
     ]) {
       final loader = FontLoader(family);
       for (final file in files) {
         final f = File(file);
         if (f.existsSync()) {
-          loader.addFont(Future.value(ByteData.view(f.readAsBytesSync().buffer)));
+          loader
+              .addFont(Future.value(ByteData.view(f.readAsBytesSync().buffer)));
         }
       }
       await loader.load();
@@ -79,7 +97,8 @@ void main() {
         providers: [
           ChangeNotifierProvider(create: (_) => UserProvider()),
           ChangeNotifierProvider(create: (_) => LanguageProvider('fil')),
-          ChangeNotifierProvider<AudioManager>.value(value: AudioManager.instance),
+          ChangeNotifierProvider<AudioManager>.value(
+              value: AudioManager.instance),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -98,12 +117,15 @@ void main() {
 
     Future<void> shot(String name) async {
       if (!shots) return;
-      final out = Directory('build/previews/enroll_required')..createSync(recursive: true);
-      final boundary = key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+      final out = Directory('build/previews/enroll_required')
+        ..createSync(recursive: true);
+      final boundary =
+          key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
       await tester.runAsync(() async {
         final image = await boundary.toImage(pixelRatio: 1);
         final png = await image.toByteData(format: ui.ImageByteFormat.png);
-        File('${out.path}/$name.png').writeAsBytesSync(png!.buffer.asUint8List());
+        File('${out.path}/$name.png')
+            .writeAsBytesSync(png!.buffer.asUint8List());
       });
     }
 
@@ -158,7 +180,8 @@ void main() {
     }
   });
 
-  testWidgets('the class list marks a child whose details are incomplete',
+  testWidgets(
+      'the class list marks missing details and where a child is behind',
       (tester) async {
     await tester.runAsync(() async {
       Hive.init(Directory.systemTemp.createTempSync('roster').path);
@@ -180,8 +203,26 @@ void main() {
         'birthday': '2022-03-01T00:00:00.000',
         'parentName': 'Maria Reyes',
         'parentContact': '09171234567',
-        'progress': {'overallProgress': 0.6},
+        'progress': {
+          'overallProgress': 0.6,
+          'matematika': {'gamesCompleted': 12, 'totalGames': 21},
+        },
         'profile': {'stars': 30},
+      },
+      {
+        'name': 'Carlo Santos',
+        'username': 'carlo7710',
+        'lrn': 'DC-2026-7710',
+        'avatar': 'boy1',
+        'gender': 'Male',
+        'birthday': '2021-06-01T00:00:00.000',
+        'parentName': 'Rosa Santos',
+        'parentContact': '09191234567',
+        'progress': {
+          'overallProgress': 0.5,
+          'matematika': {'gamesCompleted': 10, 'totalGames': 21},
+        },
+        'profile': {'stars': 22},
       },
       {
         // Enrolled before a birthday was asked for.
@@ -192,7 +233,11 @@ void main() {
         'gender': 'Male',
         'parentName': 'Jose Cruz',
         'parentContact': '09181234567',
-        'progress': {'overallProgress': 0.3},
+        // Far behind the class in Numbers.
+        'progress': {
+          'overallProgress': 0.3,
+          'matematika': {'gamesCompleted': 2, 'totalGames': 21},
+        },
         'profile': {'stars': 12},
       },
     ]));
@@ -214,7 +259,8 @@ void main() {
         providers: [
           ChangeNotifierProvider(create: (_) => UserProvider()),
           ChangeNotifierProvider(create: (_) => LanguageProvider('fil')),
-          ChangeNotifierProvider<AudioManager>.value(value: AudioManager.instance),
+          ChangeNotifierProvider<AudioManager>.value(
+              value: AudioManager.instance),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -231,13 +277,18 @@ void main() {
     }
     final loc = await AppLocalizations.delegate.load(const Locale('fil'));
     expect(find.text(loc.infoIncomplete), findsOneWidget);
+    // And where Benjamin is behind, on a line of its own.
+    expect(find.text(loc.strugglingIn(loc.matematika)), findsOneWidget);
     if (shots) {
-      final out = Directory('build/previews/enroll_required')..createSync(recursive: true);
-      final boundary = key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+      final out = Directory('build/previews/enroll_required')
+        ..createSync(recursive: true);
+      final boundary =
+          key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
       await tester.runAsync(() async {
         final image = await boundary.toImage(pixelRatio: 1);
         final png = await image.toByteData(format: ui.ImageByteFormat.png);
-        File('${out.path}/2_roster.png').writeAsBytesSync(png!.buffer.asUint8List());
+        File('${out.path}/2_roster.png')
+            .writeAsBytesSync(png!.buffer.asUint8List());
       });
     }
     await tester.pumpWidget(const SizedBox());
